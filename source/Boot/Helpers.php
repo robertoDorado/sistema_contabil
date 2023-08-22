@@ -1,5 +1,14 @@
 <?php
 
+function transformCamelCaseToSnakeCase(array $args)
+{
+    foreach($args as &$originalString) {
+        $transformedString = preg_replace('/([a-z])([A-Z])/', '$1_$2', $originalString);
+        $originalString = strtolower($transformedString);
+    }
+    return $args;
+}
+
 /**
  * @param string $path
  * @return string

@@ -3,7 +3,6 @@
 namespace Source\Controllers;
 
 use Source\Core\Controller;
-use Source\Models\Cliente;
 
 /**
  * Home Controllers
