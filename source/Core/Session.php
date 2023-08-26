@@ -112,6 +112,8 @@ class Session
 
     public function csrf(): void
     {
-        $_SESSION['csrf_token'] = base64_encode(random_bytes(20));
+        if (!isset($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
     }
 }
