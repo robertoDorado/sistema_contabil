@@ -18,6 +18,12 @@ class RequestPost
     /** @var Session */
     protected $session;
 
+    /** @var string Campo senha */
+    protected string $password;
+
+    /** @var string Campo confirme a senha */
+    protected string $confirmPassword;
+
     /**
      * RequestPost constructor
      */
@@ -31,8 +37,44 @@ class RequestPost
         array_walk($this->post, [$this, 'formConfigure']);
     }
 
+    private function verifyData(string $field, string $key, string $value) {
+        if ($field == $key) {
+            if ($value == '') {
+                throw new \Exception("Campo " . $key . " é obrigatório.");
+            }
+        }
+    }
+
+    public function setRequiredFields(array $requiredFields)
+    {
+        $verifyRequiredFields = function (&$value, $key) use ($requiredFields) {
+            if (!empty($requiredFields)) {
+                foreach ($requiredFields as $field) {
+                    $this->verifyData($field, $key, $value);
+                }
+            }
+        };
+
+        array_walk($this->post, $verifyRequiredFields);
+        return $this;
+    }
+
     private function formConfigure(&$value, $key)
     {
+        if ($key == "password") {
+            $this->password = $value;
+        }
+
+        if ($key == "confirmPassword") {
+            $this->confirmPassword = $value;
+        }
+
+        if (!empty($this->password) && !empty($this->confirmPassword)) {
+            if ($this->password != $this->confirmPassword) {
+                throw new \Exception("Campos de autenticação estão divergentes.");
+            }
+        }
+
         if ($key == "csrfToken" || $key == "csrf_token") {
             if ($value != $this->session->csrf_token) {
                 throw new \Exception("Token csrf inválido");
