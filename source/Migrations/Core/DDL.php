@@ -125,14 +125,20 @@ class DDL
 
     public function alterTable(array $params)
     {
-        $this->sql .= "ALTER TABLE " . strtolower($this->getClassName()) . " ";
-        $this->sql .= implode(",", $params) . ";";
+        $this->sql .= " ALTER TABLE " . strtolower($this->getClassName()) . " ";
+        $this->sql .= implode(",", $params) . "; ";
+        return $this;
+    }
+
+    public function setForeignKeyChecks(int $int)
+    {
+        $this->sql .= " SET FOREIGN_KEY_CHECKS=" . $int . "; ";
         return $this;
     }
 
     public function dropTableIfExists()
     {
-        $this->sql .= "DROP TABLE IF EXISTS " . strtolower($this->getClassName()) . ";";
+        $this->sql .= " DROP TABLE IF EXISTS " . strtolower($this->getClassName()) . "; ";
         return $this;
     }
 
@@ -143,7 +149,7 @@ class DDL
         }
 
         $params = "(" . implode(", ", $this->classProperties) . ")";
-        $this->sql .= "CREATE TABLE IF NOT EXISTS " . strtolower($this->getClassName()) . " " . $params .";";
+        $this->sql .= " CREATE TABLE IF NOT EXISTS " . strtolower($this->getClassName()) . " " . $params ."; ";
         return $this;
     }
 
