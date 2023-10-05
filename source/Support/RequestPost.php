@@ -24,6 +24,9 @@ class RequestPost
     /** @var string Campo confirme a senha */
     protected string $confirmPassword;
 
+    /** @var bool Atributo para controlar atribuição da hash em campo do tipo senha */
+    protected bool $hashPassword = true;
+
     /**
      * RequestPost constructor
      */
@@ -34,7 +37,12 @@ class RequestPost
             return filter_var($value, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         }, $this->post);
         $this->session = !empty($session) ? $session : null;
+    }
+    
+    public function configureDataPost()
+    {
         array_walk($this->post, [$this, 'formConfigure']);
+        return $this;
     }
 
     private function verifyData(string $field, string $key, string $value) {
@@ -43,6 +51,17 @@ class RequestPost
                 throw new \Exception("Campo " . $key . " é obrigatório.");
             }
         }
+    }
+
+    public function setHashPassword(bool $bool)
+    {
+        $this->hashPassword = $bool;
+        return $this;
+    }
+
+    private function getHashPassword()
+    {
+        return $this->hashPassword;
     }
 
     public function setRequiredFields(array $requiredFields)
@@ -92,8 +111,10 @@ class RequestPost
             $value = count($userName) > 0 ? implode("", $userName) : $value;
         }
 
-        if ($key === 'password' || $key === 'confirmPassword') {
-            $value = password_hash($value, PASSWORD_DEFAULT);
+        if ($this->getHashPassword()) {
+            if ($key === 'password' || $key === 'confirmPassword') {
+                $value = password_hash($value, PASSWORD_DEFAULT);
+            }
         }
     }
 
