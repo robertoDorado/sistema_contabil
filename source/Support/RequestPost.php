@@ -33,9 +33,6 @@ class RequestPost
     public function __construct(Session $session)
     {
         $this->post = $_POST;
-        $this->post = array_map(function ($value) {
-            return filter_var($value, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        }, $this->post);
         $this->session = !empty($session) ? $session : null;
     }
     
@@ -90,7 +87,9 @@ class RequestPost
 
         if (!empty($this->password) && !empty($this->confirmPassword)) {
             if ($this->password != $this->confirmPassword) {
-                throw new \Exception("Campos de autenticação estão divergentes.");
+                echo json_encode(["invalid_passwords_value" => true,
+                "msg" => "Campo senha e confirme a sua senha são diferentes"]);
+                die;
             }
         }
 

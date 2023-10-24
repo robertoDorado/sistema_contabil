@@ -2,6 +2,7 @@
 
 namespace Source\Core;
 
+use DateTime;
 use Source\Support\Message;
 
 /**
@@ -31,7 +32,6 @@ abstract class Model
     /** @var string */
     protected $terms;
 
-    /** @var string */
     protected $params;
 
     /** @var string */
@@ -192,9 +192,18 @@ abstract class Model
                 $terms
             )
         );
-        parse_str($params, $params);
-        $this->params = !empty($this->params) ? array_merge($this->params, $params) : $params;
 
+        $parts = explode("&", $params);
+        $data = [];
+
+        if (!empty($parts)) {
+            foreach($parts as $part) {
+                list($key, $value) = explode("=", $part);
+                $data[$key] = $value;
+            }
+        }
+
+        $this->params = $data;
         return $this;
     }
 
@@ -478,11 +487,15 @@ abstract class Model
      */
     public function fetch(bool $all = false)
     {
-
         try {
             $stmt = Connect::getInstance()
                 ->prepare($this->query . $this->group . $this->order . $this->limit . $this->offset);
-            $stmt->execute($this->params);
+            if (!empty($this->params)) {
+                foreach($this->params as $key => $value) {
+                    $stmt->bindValue($key, $value);
+                }
+            }
+            $stmt->execute();
 
             if (!$stmt->rowCount()) {
                 return null;
@@ -520,9 +533,9 @@ abstract class Model
     {
         try {
             $stmt = Connect::getInstance()->prepare($select);
-            if ($params) {
+            if (!empty($params)) {
                 parse_str($params, $params);
-                foreach ($params as $key => $value) {
+                foreach ((array) $params as $key => $value) {
                     if ($key == 'limit' || $key == 'offset') {
                         $stmt->bindValue(":{$key}", $value, \PDO::PARAM_INT);
                     } else {
@@ -548,8 +561,12 @@ abstract class Model
         try {
             $columns = implode(", ", array_keys($data));
             $values = ":" . implode(", :", array_keys($data));
-            $stmt = Connect::getInstance()->prepare("INSERT INTO {$this->entity} ({$columns}) VALUES ({$values})");
-            $stmt->execute($this->filter($data));
+            $query = "INSERT INTO {$this->entity} ({$columns}) VALUES ({$values})";
+            $stmt = Connect::getInstance()->prepare($query);
+            foreach($data as $key => $value) {
+                $stmt->bindValue(":{$key}", $value);
+            }
+            $stmt->execute();
             return connect::getInstance()->lastInsertId();
         } catch (\PDOException $e) {
             $this->fail = $e;
@@ -626,7 +643,7 @@ abstract class Model
             $stmt = Connect::getInstance()->prepare("DELETE FROM {$this->entity} WHERE {$terms}");
             if ($params) {
                 parse_str($params, $params);
-                $stmt->execute($params);
+                $stmt->execute((array)$params);
                 return true;
             }
 
