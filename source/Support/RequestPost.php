@@ -27,6 +27,9 @@ class RequestPost
     /** @var bool Atributo para controlar atribuição da hash em campo do tipo senha */
     protected bool $hashPassword = true;
 
+    /** @var bool Atributo para validar a existência da tag csrfToken */
+    protected bool $csrfTokenExists = false;
+
     /**
      * RequestPost constructor
      */
@@ -39,6 +42,9 @@ class RequestPost
     public function configureDataPost()
     {
         array_walk($this->post, [$this, 'formConfigure']);
+        if (!$this->csrfTokenExists) {
+            throw new \Exception("Token csrf não existe");
+        }
         return $this;
     }
 
@@ -92,8 +98,9 @@ class RequestPost
                 die;
             }
         }
-
+        
         if ($key == "csrfToken" || $key == "csrf_token") {
+            $this->csrfTokenExists = true;
             if ($value != $this->session->csrf_token) {
                 throw new \Exception("Token csrf inválido");
             }
