@@ -8,7 +8,7 @@
     <meta name="description" content="">
     <meta name="robots" content="noindex, nofollow">
 
-    <title><?= (isset($title) ? $title : "") ?>Laborcode</title>
+    <title><?= (isset($title) ? $title : "") ?>Framework PHP</title>
 
     <link type="text/css" href="<?= theme("/assets/style.css") ?>" rel="stylesheet">
 
