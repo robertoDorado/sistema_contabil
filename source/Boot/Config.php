@@ -3,9 +3,9 @@
 /**
  * Main Setup
  */
-define("CONF_URL_BASE", "https://localhost/newlaborcode");
-define("CONF_URL_TEST", "https://localhost/newlaborcode");
-define("CONF_SITE_NAME", "laborcode");
+define("CONF_URL_BASE", "https://localhost/framework-php");
+define("CONF_URL_TEST", "https://localhost/framework-php");
+define("CONF_SITE_NAME", "framework-php");
 define("CONF_MAIL", "robertodorado7@gmail.com");
 
 /**
@@ -22,4 +22,4 @@ define("CONF_VIEW_THEME", "mytheme");
 define("CONF_DB_HOST", "localhost");
 define("CONF_DB_USER", "root");
 define("CONF_DB_PASS", "");
-define("CONF_DB_NAME", "");
+define("CONF_DB_NAME", "framework_php");

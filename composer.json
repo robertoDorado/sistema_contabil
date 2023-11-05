@@ -1,10 +1,10 @@
 {
-    "name": "laborcode/dev",
+    "name": "framework-php/dev",
     "description": "Framework padrão MVC",
     "minimum-stability": "stable",
     "authors": [
         {
-            "name": "Laborcode",
+            "name": "framework-php",
             "email": "robertodorado7@gmail.com",
             "homepage": "http://localhost",
             "role": "Developer"
