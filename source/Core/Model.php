@@ -2,7 +2,6 @@
 
 namespace Source\Core;
 
-use DateTime;
 use Source\Support\Message;
 
 /**
@@ -197,7 +196,7 @@ abstract class Model
         $data = [];
 
         if (!empty($parts)) {
-            foreach($parts as $part) {
+            foreach ($parts as $part) {
                 list($key, $value) = explode("=", $part);
                 $data[$key] = $value;
             }
@@ -491,7 +490,7 @@ abstract class Model
             $stmt = Connect::getInstance()
                 ->prepare($this->query . $this->group . $this->order . $this->limit . $this->offset);
             if (!empty($this->params)) {
-                foreach($this->params as $key => $value) {
+                foreach ($this->params as $key => $value) {
                     $stmt->bindValue($key, $value);
                 }
             }
@@ -529,13 +528,23 @@ abstract class Model
      * @param string|null $params
      * @return null|\PDOStatement
      */
-    protected function read(string $select, string $params = null): ?\PDOStatement
+    protected function read(string $select, string $params = ""): ?\PDOStatement
     {
         try {
             $stmt = Connect::getInstance()->prepare($select);
+
             if (!empty($params)) {
-                parse_str($params, $params);
-                foreach ((array) $params as $key => $value) {
+                $parts = explode("&", $params);
+                $data = [];
+
+                if (!empty($parts)) {
+                    foreach ($parts as $part) {
+                        list($key, $value) = explode("=", $part);
+                        $data[$key] = $value;
+                    }
+                }
+
+                foreach ($data as $key => $value) {
                     if ($key == 'limit' || $key == 'offset') {
                         $stmt->bindValue(":{$key}", $value, \PDO::PARAM_INT);
                     } else {
@@ -563,7 +572,7 @@ abstract class Model
             $values = ":" . implode(", :", array_keys($data));
             $query = "INSERT INTO {$this->entity} ({$columns}) VALUES ({$values})";
             $stmt = Connect::getInstance()->prepare($query);
-            foreach($data as $key => $value) {
+            foreach ($data as $key => $value) {
                 $stmt->bindValue(":{$key}", $value);
             }
             $stmt->execute();
