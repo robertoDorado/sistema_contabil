@@ -124,7 +124,7 @@ class RequestPost
         }
     }
 
-    public function getPost($key)
+    public function getPost(string $key)
     {
         if (isset($this->post[$key]) && !empty($this->post[$key])) {
             return $this->post[$key];
