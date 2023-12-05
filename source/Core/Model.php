@@ -99,6 +99,11 @@ abstract class Model
         return isset($this->data->$name);
     }
 
+    public function in(string $in)
+    {
+        $this->in = "WHERE " . $in;
+        return $this;
+    }
 
     public function data()
     {
@@ -129,16 +134,18 @@ abstract class Model
     private function setQuery(): Model
     {
         $distinct = (!empty($this->distinct) ? "DISTINCT({$this->distinct})" : '');
+        $this->in = empty($this->in) ? "" : $this->in;
 
         if (!empty($distinct) && !empty($this->columns)) {
             $distinct .= ", ";
         }
-
+        
         $this->query = "
             SELECT {$distinct}{$this->columns} 
             FROM {$this->entity} 
             {$this->join} 
             {$this->terms}
+            {$this->in}
         ";
         return $this;
     }
