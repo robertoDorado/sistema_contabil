@@ -134,7 +134,6 @@ abstract class Model
     private function setQuery(): Model
     {
         $distinct = (!empty($this->distinct) ? "DISTINCT({$this->distinct})" : '');
-        $this->in = empty($this->in) ? "" : $this->in;
 
         if (!empty($distinct) && !empty($this->columns)) {
             $distinct .= ", ";
@@ -577,8 +576,8 @@ abstract class Model
         try {
             $columns = implode(", ", array_keys($data));
             $values = ":" . implode(", :", array_keys($data));
-            $query = "INSERT INTO {$this->entity} ({$columns}) VALUES ({$values})";
-            $stmt = Connect::getInstance()->prepare($query);
+            $this->query = "INSERT INTO {$this->entity} ({$columns}) VALUES ({$values})";
+            $stmt = Connect::getInstance()->prepare($this->query);
             foreach ($data as $key => $value) {
                 $stmt->bindValue(":{$key}", $value);
             }
@@ -605,8 +604,8 @@ abstract class Model
             }
             $dataSet = implode(", ", $dataSet);
             parse_str($params, $params);
-
-            $stmt = Connect::getInstance()->prepare("UPDATE {$this->entity} SET {$dataSet} WHERE {$terms}");
+            $this->query = "UPDATE {$this->entity} SET {$dataSet} WHERE {$terms}";
+            $stmt = Connect::getInstance()->prepare($this->query);
             $stmt->execute($this->filter(array_merge($data, $params)));
             return ($stmt->rowCount() ?? 1);
         } catch (\PDOException $e) {
@@ -683,6 +682,16 @@ abstract class Model
 
         $destroy = $this->delete("id = :id", "id={$this->id}");
         return $destroy;
+    }
+
+    /**
+     * Retora a ultima query executada
+     *
+     * @return string
+     */
+    public function queryExecuted(): string
+    {
+        return empty($this->query) ? "" : $this->query;
     }
 
     /**
