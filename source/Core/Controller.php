@@ -18,8 +18,8 @@ class Controller
     /** @var array Armazena a variavel global $_GET */
     protected $getData;
 
-    /** @var array Armazena a variavel global $_SERVER */
-    protected $serverData;
+    /** @var Server Objeto Server */
+    protected $server;
 
     /** @var RequestFiles */
     protected $fileData;
@@ -27,7 +27,7 @@ class Controller
     /** @var RequestPost */
     protected $postData;
 
-    /** @var Seesion */
+    /** @var Session */
     protected $session;
 
     /**
@@ -36,7 +36,7 @@ class Controller
      */
     public function __construct(string $viewPath = CONF_VIEW_PATH . "/" . CONF_VIEW_THEME)
     {
-        $this->serverData = $_SERVER;
+        $this->server = new Server();
         $this->getData = $_GET;
         $this->message = new Message();
         $this->view = new View($viewPath);
@@ -61,18 +61,9 @@ class Controller
         return $this->fileData;
     }
 
-    public function getAllServerData(): array
+    public function getServer(): Server
     {
-        return $this->serverData;
-    }
-
-    public function getServer($key)
-    {
-        if (isset($this->serverData[$key])) {
-            return $this->serverData[$key];
-        } else {
-            throw new \Exception("chave " . $key . " da global server não existe");
-        }
+        return $this->server;
     }
 
     public function get($key, $default = null)
