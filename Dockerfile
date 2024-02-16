@@ -5,6 +5,12 @@ RUN docker-php-ext-install pdo pdo_mysql mysqli
 # Ativar o módulo rewrite
 RUN a2enmod rewrite
 
+# Copiar o arquivo .htaccess para o diretório do documento
+COPY ./.htaccess /var/www/html/
+
+# Definir o diretório de trabalho
+WORKDIR /var/www/html/
+
 # Instalação do driver libpq-dev para auxiliar na instalação do composer
 RUN apt-get update \
     && apt-get install -y libpq-dev
