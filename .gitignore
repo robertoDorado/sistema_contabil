@@ -2,3 +2,5 @@ vendor/
 Logs/
 themes/mytheme/assets/scripts.js
 themes/mytheme/assets/style.css
+source/Boot/Config.php
+sql

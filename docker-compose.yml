@@ -1,0 +1,31 @@
+services:
+  php-apache:
+    container_name: php-apache
+    volumes:
+      - ./:/var/www/html
+    ports:
+      - 80:80
+    depends_on:
+      - db
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - app-network
+  db:
+    image: mysql
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: sistema_contabil
+    networks:
+      - app-network
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d
+networks:
+  app-network:
+    driver: bridge

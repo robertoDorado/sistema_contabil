@@ -1,10 +1,10 @@
 {
-    "name": "framework-php/dev",
-    "description": "Framework padrão MVC",
+    "name": "sistema/contabil",
+    "description": "Sistema para contabilidade",
     "minimum-stability": "stable",
     "authors": [
         {
-            "name": "framework-php",
+            "name": "sistema-contabil",
             "email": "robertodorado7@gmail.com",
             "homepage": "http://localhost",
             "role": "Developer"
