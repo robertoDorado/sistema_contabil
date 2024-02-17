@@ -1,7 +1,7 @@
 <?php
 namespace Source\Migrations;
 
-require __DIR__ . "/../../vendor/autoload.php";
+require dirname(dirname(__DIR__)) . "/vendor/autoload.php";
 
 use Source\Migrations\Core\DDL;
 use Source\Models\TestModel as ModelsTestModel;
