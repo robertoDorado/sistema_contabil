@@ -22,12 +22,14 @@ ini_set('log_errors', true);
 $route = new MyRouter(url(), ":");
 
 /**
- * Home Route
+ * Admin Route
  */
-$module = null;
+$module = "admin";
 $route->namespace("Source\Controllers");
 $route->group($module);
-$route->get("/", "Home:index");
+$route->get("/", "Admin:index");
+$route->get("/login", "Admin:login");
+
 
 /**
  * Error Route

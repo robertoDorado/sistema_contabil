@@ -11,7 +11,7 @@ use Source\Core\Connect;
  * @author Roberto Dorado <robertodorado7@gmail.com>
  * @package Source\Migrations
  */
-abstract class DDL
+class DDL
 {
     /** @var ReflectionClass Objeto de reflexão que permite espelhar outras classes */
     private ReflectionClass $reflectionClass;

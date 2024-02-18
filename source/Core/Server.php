@@ -25,12 +25,8 @@ class Server
         return $this->server;
     }
 
-    public function getServerByKey(string $key)
+    public function getServerByKey(string $key, $default = null)
     {
-        try {
-            return $this->server[$key];
-        }catch(\Exception $e) {
-            throw new \Exception("Erro na classe Server: " . $e->getMessage());
-        }
+        return isset($this->server[$key]) ? $this->server[$key] : $default;
     }
 }

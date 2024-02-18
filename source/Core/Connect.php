@@ -33,7 +33,7 @@ class Connect
                     self::OPTIONS
                 );
             } catch (PDOException $e) {
-                die("Erro ao conectar");
+                throw new \Exception($e->getMessage());
             }
         }
         return self::$instance;

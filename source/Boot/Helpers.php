@@ -1,8 +1,21 @@
 <?php
 
+function executeMigrations(string $instance)
+{
+    $object = new $instance();
+    $methods = array_reverse(get_class_methods($object));
+
+    foreach ($methods as $method) {
+        if ($method != "__construct") {
+            echo "executando: " . $method . "\n";
+            $object->$method();
+        }
+    }
+}
+
 function transformCamelCaseToSnakeCase(array $args)
 {
-    foreach($args as &$originalString) {
+    foreach ($args as &$originalString) {
         $transformedString = preg_replace('/([a-z])([A-Z])/', '$1_$2', $originalString);
         $originalString = strtolower($transformedString);
     }

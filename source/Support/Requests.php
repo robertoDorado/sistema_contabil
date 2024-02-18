@@ -10,10 +10,13 @@ use Source\Core\Session;
  * @author Roberto Dorado <robertodorado7@gmail.com>
  * @package Source\Support
  */
-class RequestPost
+class Requests
 {
     /** @var array Aramazena a variavel global $_POST */
     protected array $post;
+
+    /** @var array Armazena a variavel global $_GET */
+    protected array $get;
 
     /** @var Session */
     protected $session;
@@ -35,8 +38,19 @@ class RequestPost
      */
     public function __construct(Session $session)
     {
+        $this->get = $_GET;
         $this->post = $_POST;
         $this->session = !empty($session) ? $session : null;
+    }
+
+    public function get($key, $default = null)
+    {
+        return isset($this->get[$key]) ? $this->get[$key] : $default;
+    }
+
+    public function has($key): bool
+    {
+        return isset($this->get[$key]);
     }
     
     public function configureDataPost()
@@ -124,13 +138,9 @@ class RequestPost
         }
     }
 
-    public function getPost(string $key)
+    public function getPost(string $key, $default = null)
     {
-        if (isset($this->post[$key]) && !empty($this->post[$key])) {
-            return $this->post[$key];
-        } else {
-            throw new \Exception("chave " . $key . " POST não existe");
-        }
+        return isset($this->post[$key]) ? $this->post[$key] : $default;
     }
 
     public function getAllPostData()
