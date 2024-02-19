@@ -16,7 +16,7 @@
   </php>
   <coverage processUncoveredFiles="true">
     <report>
-      <html outputDirectory="coverage"></html>
+        <html outputDirectory="coverage" />
     </report>
   </coverage>
 </phpunit>
