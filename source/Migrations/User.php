@@ -41,7 +41,7 @@ class User
         $this->ddl->setClassProperties();
         $this->ddl->setKeysToProperties(["BIGINT AUTO_INCREMENT PRIMARY KEY", "VARCHAR(355) NOT NULL",
         "VARCHAR(355) NOT NULL", "VARCHAR(355) NOT NULL", "VARCHAR(355) NOT NULL"]);
-        $this->ddl->dropTableIfExists()->createTableQuery();
+        $this->ddl->createTableQuery();
         return $this->ddl->executeQuery();
     }
 }

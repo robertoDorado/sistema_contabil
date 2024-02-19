@@ -2,6 +2,20 @@
 FROM php:7.4-apache
 RUN docker-php-ext-install pdo pdo_mysql mysqli
 
+# Instalação das dependências necessárias
+RUN apt-get update \
+    && apt-get install -y \
+        git \
+        unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Instalação do Xdebug
+RUN pecl install xdebug-3.0.4 \
+    && docker-php-ext-enable xdebug
+
+# Configurações do Xdebug
+COPY xdebug.ini /usr/local/etc/php/conf.d/
+
 # Ativar o módulo rewrite
 RUN a2enmod rewrite
 

@@ -4,8 +4,6 @@ namespace Source\Domain\Model;
 use ReflectionClass;
 use Source\Models\User as ModelsUser;
 
-require dirname(dirname(dirname(__DIR__))) . "/vendor/autoload.php";
-
 /**
  * User Domain\Model
  * @link 
@@ -25,11 +23,47 @@ class User
         $this->user = new ModelsUser();
     }
 
+    public function dropUserByEmail(string $userEmail)
+    {
+        $user = $this->user->find("user_email=:user_email",
+            ":user_email=" . $userEmail . "")->fetch();
+
+        if (empty($user)) {
+            throw new \Exception("usuario nao encontrado");
+        }
+
+        try {
+            return $user->destroy();
+        } catch (\PDOException $_) {
+            throw new \PDOException($user->fail());
+        }
+    }
+
+    public function login(string $userEmail, string $userPassword)
+    {
+        if (empty($userEmail) || empty($userPassword)) {
+            return json_encode(["invalid_login_data" => "dados iválidos"]);
+        }
+
+        $user = $this->user->find("user_email=:user_email",
+            ":user_email=" . $userEmail . "")->fetch();
+        
+        if (empty($user)) {
+            return json_encode(["user_not_register" => "usuário não registrado"]);
+        }
+        
+        if (!password_verify($userPassword, $user->user_password)) {
+            return json_encode(["user_not_auth" => "usuário não autenticado"]);
+        }
+
+        return $user;
+        
+    }
+
     public function persistData(array $data)
     {
         if (empty($data)) {
-            echo json_encode(["dados inválidos"]);
-            die;
+            return json_encode(["invalid_persist_data" => "dados inválidos"]);
         }
 
         $reflectionClass = new ReflectionClass(ModelsUser::class);
@@ -60,19 +94,19 @@ class User
             }
         }
 
+        if (!empty($data["user_email"])) {
+            $user = $this->user
+                ->find("user_email=:user_email", ":user_email=" . $data["user_email"] . "")->fetch();
+            
+            if (!empty($user)) {
+                return json_encode(["error_user_exists" => "este usuário já foi cadastrado"]);
+            }
+        }
+
         foreach ($data as $key => $value) {
             $this->user->$key = $value;
         }
 
         return $this->user->save();
-    }
-
-    public function register(string $fullName, string $nickName, string $email, string $password)
-    {
-        $user = $this->user->find("user_email=:user_email", ":user_email={$email}")->fetch();
-        if (!empty($user)) {
-            echo json_encode(["error_user_exists" => "este usuário já foi cadastrado"]);
-            die;
-        }
     }
 }
