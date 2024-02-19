@@ -5,3 +5,4 @@ themes/mytheme/assets/style.css
 source/Boot/Config.php
 sql
 coverage
+.phpunit.result.cache
