@@ -12,22 +12,22 @@ use Source\Core\Model;
 class CashFlow extends Model
 {
     /** @var string Id do usuário */
-    private string $idUser = "id_user";
+    protected string $idUser = "id_user";
 
     /** @var string Valor de entrada */
-    private string $entry = "entry";
+    protected string $entry = "entry";
 
     /** @var string Histórico dos lançamentos */
-    private string $history = "history";
+    protected string $history = "history";
 
     /** @var string Tipo de entrada */
-    private string $entryType = "entry_type";
+    protected string $entryType = "entry_type";
 
     /** @var string Data de criação do registro */
-    private string $createdAt = "created_at";
+    protected string $createdAt = "created_at";
 
     /** @var string Data de atualização do registro */
-    private string $updatedAt = "updated_at";
+    protected string $updatedAt = "updated_at";
 
     /**
      * ChashFlow constructor
@@ -42,5 +42,15 @@ class CashFlow extends Model
             $this->createdAt, 
             $this->updatedAt
         ]);
+    }
+
+    public function getHistory()
+    {
+        return $this->history;
+    }
+
+    public function getEntry()
+    {
+        return $this->entry;
     }
 }

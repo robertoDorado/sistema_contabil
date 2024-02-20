@@ -12,16 +12,16 @@ use Source\Core\Model;
 class User extends Model
 {
     /** @var string Nome completo do usuário */
-    private string $userFullName = "user_full_name";
+    public string $userFullName = "user_full_name";
 
     /** @var string Nickname do usuário */
-    private string $userNickName = "user_nick_name";
+    public string $userNickName = "user_nick_name";
 
     /** @var string E-mail do usuário */
-    private string $userEmail = "user_email";
+    public string $userEmail = "user_email";
 
     /** @var string Senha do usuário */
-    private string $userPassword = "user_password";
+    public string $userPassword = "user_password";
 
     /**
      * User constructor

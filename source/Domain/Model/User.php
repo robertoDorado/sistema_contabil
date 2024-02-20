@@ -31,7 +31,7 @@ class User
     {
         $this->user = new ModelsUser();
 
-        $columns = empty($columns) ? "*" : implode(",", $columns);
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
         $data = $this->user
             ->find("user_email=:user_email", ":user_email=" . $email . "", $columns)->fetch();
         
@@ -51,7 +51,7 @@ class User
         }
 
         if (!$user->destroy()) {
-            throw new \PDOException($user->fail());
+            throw new \PDOException($user->fail()->getMessage());
         }
         return true;
     }
@@ -71,7 +71,7 @@ class User
 
     public function findUserById(array $columns = [])
     {
-        $columns = empty($columns) ? "*" : implode(",", $columns);
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
         $data = $this->user->findById($this->getId(), $columns);
         if (empty($data)) {
             return json_encode(["user_not_found" => "usuário não encontrado"]);
@@ -92,7 +92,7 @@ class User
         try {
             return $user->destroy();
         } catch (\PDOException $_) {
-            throw new \PDOException($user->fail());
+            throw new \PDOException($user->fail()->getMessage());
         }
     }
 
@@ -139,7 +139,7 @@ class User
         }
 
         if (!$this->user->save()) {
-            throw new PDOException($this->user->fail());
+            throw new PDOException($this->user->fail()->getMessage());
         }
 
         $this->setId(Connect::getInstance()->lastInsertId());

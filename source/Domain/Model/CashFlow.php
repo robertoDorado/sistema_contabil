@@ -15,8 +15,9 @@ use Source\Models\CashFlow as ModelsCashFlow;
 class CashFlow
 {
     /** @var ModelsCashFlow Objeto de persistencia na tabela cash_flow */
-    private ModelsCashFlow $chashFlow;
+    private ModelsCashFlow $cashFlow;
 
+    /** @var int Id da tabela cash_flow */
     private int $id;
 
     /**
@@ -24,11 +25,24 @@ class CashFlow
      */
     public function __construct()
     {
-        $this->chashFlow = new ModelsCashFlow();
+        $this->cashFlow = new ModelsCashFlow();
+    }
+
+    public function findAllCashFlow(array $columns = [])
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        $data = $this->cashFlow->find("", "", $columns)->fetch(true);
+        if (empty($data)) {
+            return json_encode(["cash_flow_empty" => "nenhum registro foi encontrado"]);
+        }
+        return $data;
     }
 
     public function getId()
     {
+        if (empty($this->id)) {
+            throw new Exception("id não atribuido");
+        }
         return $this->id;
     }
 
@@ -37,27 +51,34 @@ class CashFlow
         $this->id = $id;
     }
 
-    public function findCashFlowById($id)
+    public function findCashFlowById(array $columns = [])
     {
-        return $this->chashFlow->findById($id);
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        $data = $this->cashFlow->findById($this->getId(), $columns);
+        
+        if (empty($data)) {
+            return json_encode(["cashflow_not_found" => "registro fluxo de caixa não encontrado"]);
+        }
+
+        return $data;
     }
 
     public function dropCashFlowById(int $id)
     {
-        $chashFlowData = $this->chashFlow->findById($id);
-        if (!$chashFlowData->destroy()) {
-            throw new PDOException($chashFlowData->fail());
+        $cashFlowData = $this->cashFlow->findById($id);
+        if (!$cashFlowData->destroy()) {
+            throw new PDOException($cashFlowData->fail()->getMessage());
         }
     }
 
-    public function calculateBalance(): float
+    public function calculateBalance()
     {
-        $data = $this->chashFlow->find("")->fetch(true);
+        $data = $this->cashFlow->find("", "")->fetch(true);
         $balance = 0;
-
+        
         if (!empty($data)) {
             foreach ($data as $value) {
-                $balance += $value->entry;
+                $balance += $value->getEntry();
             }
         }
 
@@ -89,11 +110,11 @@ class CashFlow
                 $value = $value->getId();
             }
 
-            $this->chashFlow->$key = $value;
+            $this->cashFlow->$key = $value;
         }
 
-        if (!$this->chashFlow->save()) {
-            throw new PDOException($this->chashFlow->fail());
+        if (!$this->cashFlow->save()) {
+            throw new PDOException($this->cashFlow->fail()->getMessage());
         }
 
         $this->setId(Connect::getInstance()->lastInsertId());

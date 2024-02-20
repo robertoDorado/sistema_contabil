@@ -43,7 +43,7 @@ function validateModelProperties(string $class, array $data)
 
     if (!empty($properties)) {
         for ($i = 0; $i < count($properties); $i++) {
-            if (empty($data[$properties[$i]])) {
+            if (!isset($data[$properties[$i]])) {
                 throw new \Exception("esta propriedade " . $properties[$i] . " foi passado de maneira incorreta");
             }
         }
