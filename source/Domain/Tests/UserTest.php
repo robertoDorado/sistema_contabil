@@ -150,4 +150,83 @@ class UserTest extends TestCase
         $response = $this->user->dropUserByEmail($data["user_email"]);
         $this->assertTrue($response, 'erro ao deletar usuário');
     }
+
+    public function testFindUserById()
+    {
+        $this->user = new User();
+        $data = [
+            "user_full_name" => "teste fulano de tal",
+            "user_nick_name" => "fulanoDeTal",
+            "user_email" => "testefulano@gmail.com",
+            "user_password" => password_hash("minhasenha123", PASSWORD_DEFAULT)
+        ];
+        
+        $this->user->persistData($data);
+        $userData = $this->user->findUserByEmail($data["user_email"], ["id"]);
+        
+        $this->user = new User();
+        $this->user->setId($userData->id);
+        $userData = $this->user->findUserById();
+
+        $this->assertIsObject($userData);
+        $this->user->dropUserById($userData->id);
+    }
+
+    public function testFindUserByIdNotFound()
+    {
+        $this->user = new User();
+        $this->user->setId(1);
+        $userData = $this->user->findUserById();
+        $this->assertJsonStringEqualsJsonString(json_encode([
+            "user_not_found" => "usuário não encontrado"
+        ]), $userData);
+    }
+
+    public function invalidSetUserId()
+    {
+        $this->user = new User();
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("parametro inválido na classe " . User::class . "");
+        $this->user->setId("--");
+    }
+
+    public function testGetId()
+    {
+        $this->user = new User();
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("id não atribuido");
+        $this->user->setId(0);
+        $this->user->getId();
+    }
+
+    public function testDropUserById()
+    {
+        $this->user = new User();
+        $data = [
+            "user_full_name" => "teste fulano de tal",
+            "user_nick_name" => "fulanoDeTal",
+            "user_email" => "testefulano@gmail.com",
+            "user_password" => password_hash("minhasenha123", PASSWORD_DEFAULT)
+        ];
+        $this->user->persistData($data);
+        $userData = $this->user->findUserByEmail($data["user_email"]);
+        $this->user = new User();
+        $this->assertTrue($this->user->dropUserById($userData->id), 'erro ao dropar usuário pelo id');
+    }
+
+    public function testTryDropUserNotFoud()
+    {
+        $this->user = new User();
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("usuario nao encontrado");
+        $this->user->dropUserById(0);
+    }
+
+    public function testFindUserByEmailNotFound()
+    {
+        $this->user = new User();
+        $userData = $this->user->findUserByEmail("emailqualquer@gmail.com");
+        $this->assertJsonStringEqualsJsonString(json_encode(["user_not_exists" => "usuário não existe"]),
+        $userData);
+    }
 }

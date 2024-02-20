@@ -28,6 +28,11 @@ class User extends Model
      */
     public function __construct()
     {
-        parent::__construct(CONF_DB_NAME . ".user", ["id"], [$this->userFullName, $this->userNickName, $this->userEmail, $this->userPassword]);
+        parent::__construct(CONF_DB_NAME . ".user", ["id"], [
+            $this->userFullName, 
+            $this->userNickName, 
+            $this->userEmail, 
+            $this->userPassword
+        ]);
     }
 }

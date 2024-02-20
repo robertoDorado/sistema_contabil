@@ -1,16 +1,68 @@
 <?php
 
+function convertCurrencyRealToFloat(string $value)
+{
+    if (empty($value)) {
+        throw new \Exception("Valor a ser convertido não pode estar vazio.");
+    }
+
+    $value = preg_replace("/[^\d\.,]+/", "", $value);
+    $value = str_replace(".", "", $value);
+    $value = str_replace(",", ".", $value);
+    $value = floatval($value);
+
+    if (gettype($value) !== "double") {
+        throw new \Exception("Erro na conversão do valor para float");
+    }
+
+    return $value;
+}
+
+function validateModelProperties(string $class, array $data)
+{
+    $reflectionClass = new ReflectionClass($class);
+
+    $properties = $reflectionClass->getProperties();
+    $properties = array_filter($properties, function ($property) use ($reflectionClass) {
+        if ($property->getDeclaringClass()->getName() == $reflectionClass->getName()) {
+            return $property->getName();
+        }
+    });
+
+    $properties = transformCamelCaseToSnakeCase($properties);
+
+    foreach ($properties as &$value) {
+        $value = preg_replace('/^.*\\$([A-Za-z0-9_]+).*/', '$1', trim($value));
+    }
+
+    $properties = array_filter($properties, function ($property) {
+        if (!empty($property)) {
+            return $property;
+        }
+    });
+
+    if (!empty($properties)) {
+        for ($i = 0; $i < count($properties); $i++) {
+            if (empty($data[$properties[$i]])) {
+                throw new \Exception("esta propriedade " . $properties[$i] . " foi passado de maneira incorreta");
+            }
+        }
+    }
+}
+
 function executeMigrations(string $instance)
 {
+    echo "------------ CLASSE: " . $instance . " -----------------\n";
     $object = new $instance();
     $methods = array_reverse(get_class_methods($object));
 
     foreach ($methods as $method) {
         if ($method != "__construct") {
-            echo "executando: " . $method . "\n";
+            echo "EXECUTANDO: " . $method . "\n";
             $object->$method();
         }
     }
+    echo "----------------------------------------------\n";
 }
 
 function transformCamelCaseToSnakeCase(array $args)

@@ -1,7 +1,8 @@
 <?php
 namespace Source\Domain\Model;
 
-use ReflectionClass;
+use PDOException;
+use Source\Core\Connect;
 use Source\Models\User as ModelsUser;
 
 /**
@@ -15,12 +16,68 @@ class User
     /** @var ModelsUser Model do usuário */
     private ModelsUser $user;
 
+    /** @var int Id do usuário */
+    private int $id;
+
     /**
      * User constructor
      */
     public function __construct()
     {
         $this->user = new ModelsUser();
+    }
+
+    public function findUserByEmail(string $email, array $columns = [])
+    {
+        $this->user = new ModelsUser();
+
+        $columns = empty($columns) ? "*" : implode(",", $columns);
+        $data = $this->user
+            ->find("user_email=:user_email", ":user_email=" . $email . "", $columns)->fetch();
+        
+        if (empty($data)) {
+            return json_encode(["user_not_exists" => "usuário não existe"]);
+        }
+
+        return $data;
+    }
+
+    public function dropUserById(int $id)
+    {
+        $user = $this->user->findById($id);
+
+        if (empty($user)) {
+            throw new \Exception("usuario nao encontrado");
+        }
+
+        if (!$user->destroy()) {
+            throw new \PDOException($user->fail());
+        }
+        return true;
+    }
+
+    public function getId()
+    {
+        if (empty($this->id)) {
+            throw new \Exception("id não atribuido");
+        }
+        return $this->id;
+    }
+
+    public function setId(int $id)
+    {
+        $this->id = $id;
+    }
+
+    public function findUserById(array $columns = [])
+    {
+        $columns = empty($columns) ? "*" : implode(",", $columns);
+        $data = $this->user->findById($this->getId(), $columns);
+        if (empty($data)) {
+            return json_encode(["user_not_found" => "usuário não encontrado"]);
+        }
+
+        return $data;
     }
 
     public function dropUserByEmail(string $userEmail)
@@ -66,33 +123,7 @@ class User
             return json_encode(["invalid_persist_data" => "dados inválidos"]);
         }
 
-        $reflectionClass = new ReflectionClass(ModelsUser::class);
-        
-        $properties = $reflectionClass->getProperties();
-        $properties = array_filter($properties, function($property) use ($reflectionClass) {
-            if ($property->getDeclaringClass()->getName() == $reflectionClass->getName()) {
-                return $property->getName();
-            }
-        });
-        $properties = transformCamelCaseToSnakeCase($properties);
-
-        foreach ($properties as &$value) {
-            $value = preg_replace('/^.*\\$([A-Za-z0-9_]+).*/', '$1', trim($value));
-        }
-
-        $properties = array_filter($properties, function($property) {
-            if (!empty($property)) {
-                return $property;
-            }
-        });
-        
-        if (!empty($properties)) {
-            for ($i=0; $i < count($properties); $i++) { 
-                if (empty($data[$properties[$i]])) {
-                    throw new \Exception("esta propriedade " . $properties[$i] . " foi passado de maneira incorreta");
-                }
-            }
-        }
+        validateModelProperties(ModelsUser::class, $data);
 
         if (!empty($data["user_email"])) {
             $user = $this->user
@@ -107,6 +138,11 @@ class User
             $this->user->$key = $value;
         }
 
-        return $this->user->save();
+        if (!$this->user->save()) {
+            throw new PDOException($this->user->fail());
+        }
+
+        $this->setId(Connect::getInstance()->lastInsertId());
+        return true;
     }
 }
