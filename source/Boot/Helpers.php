@@ -1,4 +1,9 @@
 <?php
+
+function message() {
+    return new \Source\Support\Message();
+}
+
 function session() {
     return new \Source\Core\Session();
 }

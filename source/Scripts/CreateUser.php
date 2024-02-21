@@ -5,13 +5,13 @@ use Source\Domain\Model\User;
 require dirname(dirname(__DIR__)) . "/vendor/autoload.php";
 
 echo "Digite o nome completo: ";
-$userFullName = fgets(STDIN);
+$userFullName = trim(fgets(STDIN));
 
 echo "Digite um nome de usuário: ";
-$userNickName = fgets(STDIN);
+$userNickName = trim(fgets(STDIN));
 
 echo "Digite um e-mail válido: ";
-$userEmail = fgets(STDIN);
+$userEmail = trim(fgets(STDIN));
 
 echo "Digite uma senha: ";
 $userPassword = rtrim(`stty -echo; head -1; stty echo`);

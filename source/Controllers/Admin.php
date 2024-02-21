@@ -2,6 +2,7 @@
 namespace Source\Controllers;
 
 use Source\Core\Controller;
+use Source\Domain\Model\User;
 
 /**
  * Admin Controllers
@@ -22,8 +23,17 @@ class Admin extends Controller
     public function login()
     {
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
-            $requestPost = $this->getRequests()
-                ->setRequiredFields(["csrfToken", "userEmail", "userPassword"])->getAllPostData();
+            $requestPost = $this->getRequests()->getAllPostData();
+            
+            $user = new User();
+            $userDataOrErrorMessage = $user
+                ->login($requestPost["userEmail"], $requestPost["userPassword"]);
+
+            if (is_string($userDataOrErrorMessage) && json_decode($userDataOrErrorMessage) !== null) {
+                echo $userDataOrErrorMessage;
+                die;
+            }
+            
             echo json_encode($requestPost);
             die;
         }
