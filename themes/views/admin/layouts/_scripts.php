@@ -34,6 +34,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <script src="<?= url(CONF_ADMIN_PATH . "/plugins/bootstrap/js/bootstrap.bundle.min.js") ?>"></script>
     <!-- AdminLTE App -->
     <script src="<?= url(CONF_ADMIN_PATH . "/dist/js/adminlte.min.js") ?>"></script>
+    <!-- Laborcode Scripts -->
+    <script src="<?= theme("/assets/scripts.js") ?>"></script>
 </body>
 
 </html>

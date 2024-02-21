@@ -19,7 +19,7 @@ error_reporting(E_ALL & (~E_NOTICE | ~E_USER_NOTICE));
 ini_set('error_log', $path);
 ini_set('log_errors', true);
 
-$route = new MyRouter(url(), ":");
+$route = new MyRouter(url(), "::");
 
 /**
  * Admin Route
@@ -27,8 +27,9 @@ $route = new MyRouter(url(), ":");
 $module = "admin";
 $route->namespace("Source\Controllers");
 $route->group($module);
-$route->get("/", "Admin:index");
-$route->get("/login", "Admin:login");
+$route->get("/", "Admin::index");
+$route->get("/login", "Admin::login");
+$route->post("/login", "Admin::login");
 
 
 /**

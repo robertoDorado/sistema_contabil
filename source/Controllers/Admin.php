@@ -21,11 +21,22 @@ class Admin extends Controller
 
     public function login()
     {
+        if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            $requestPost = $this->getRequests()
+                ->setRequiredFields(["csrfToken", "userEmail", "userPassword"])->getAllPostData();
+            echo json_encode($requestPost);
+            die;
+        }
+
         echo $this->view->render("admin/login", []);
     }
 
     public function index()
     {
+        if (empty(session()->user)) {
+            redirect("/admin/login");
+        }
+
         echo $this->view->render("admin/home", []);
     }
 

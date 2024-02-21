@@ -1,4 +1,7 @@
 <?php
+function session() {
+    return new \Source\Core\Session();
+}
 
 function convertCurrencyRealToFloat(string $value)
 {
