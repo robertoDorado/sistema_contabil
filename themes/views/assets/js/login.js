@@ -1,8 +1,10 @@
 if (window.location.pathname == "/admin/login") {
+    
     const loginForm = document.getElementById("loginForm")
     loginForm.addEventListener("submit", function(event) {
         event.preventDefault()
 
+        const btnSubmit = this.querySelector(".btn.btn-primary.btn-block")
         if (this.userEmail.value == '') {
             toastr.error("Campo e-mail deve ser obrigatório")
             throw new Error("Campo e-mail deve ser obrigatório")
@@ -23,16 +25,19 @@ if (window.location.pathname == "/admin/login") {
             throw new Error("Campo csrf-token inválido")
         }
 
+        showSpinner(btnSubmit)
         const form = new FormData(this)
         fetch(window.location.pathname, {
             method: "POST",
             body: form
         }).then(response => response.json()).then(function(response) {
             let message = ''
+
             if (response.invalid_login_data) {
                 message = response.invalid_login_data
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.error(message)
+                btnSubmit.innerHTML = 'Login'
                 throw new Error(message)
             }
 
@@ -40,6 +45,7 @@ if (window.location.pathname == "/admin/login") {
                 message = response.user_not_register
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.error(message)
+                btnSubmit.innerHTML = 'Login'
                 throw new Error(message)
             }
 
@@ -47,10 +53,13 @@ if (window.location.pathname == "/admin/login") {
                 message = response.user_not_auth
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.error(message)
+                btnSubmit.innerHTML = 'Login'
                 throw new Error(message)
             }
 
-            console.log(response)
+            if (response.login_success) {
+                window.location.href = response.url
+            }
         })
     })
 }

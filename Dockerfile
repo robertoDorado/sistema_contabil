@@ -2,12 +2,33 @@
 FROM php:7.4-apache
 RUN docker-php-ext-install pdo pdo_mysql mysqli
 
+# Copiar certificados SSL para o conteiner php-apache
+COPY ssl/localhost.pem /etc/ssl/certs/localhost.pem
+COPY ssl/localhost-key.pem /etc/ssl/private/localhost-key.pem
+
+# Copiar arquivos de configuração
+COPY apache-config/000-default.conf /etc/apache2/sites-available/000-default.conf
+COPY apache-config/default-ssl.conf /etc/apache2/sites-available/default-ssl.conf
+
+# Atualização das configurações do Apache para usar SSL
+RUN a2enmod ssl
+RUN a2enmod socache_shmcb
+RUN a2ensite default-ssl
+RUN a2ensite 000-default
+
+# Reiniciar o Apache
+RUN service apache2 restart
+
+# Definir permissões
+RUN chown -R www-data:www-data /var/www/html/
+
 # Instalação das dependências necessárias
 RUN apt-get update \
     && apt-get install -y \
-        git \
         unzip \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    ca-certificates && \
+    update-ca-certificates
 
 # Instalação do Xdebug
 RUN pecl install xdebug-3.0.4 \

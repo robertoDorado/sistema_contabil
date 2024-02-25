@@ -30,6 +30,7 @@ $route->group($module);
 $route->get("/", "Admin::index");
 $route->get("/login", "Admin::login");
 $route->post("/login", "Admin::login");
+$route->post("/logout", "Admin::logout");
 
 
 /**
