@@ -33,6 +33,7 @@ $route->post("/login", "Admin::login");
 $route->post("/logout", "Admin::logout");
 $route->get("/cash-flow/report", "Admin::cashFlowReport");
 $route->get("/cash-flow/form", "Admin::cashFlowForm");
+$route->post("/cash-flow/form", "Admin::cashFlowForm");
 
 
 /**
@@ -41,7 +42,7 @@ $route->get("/cash-flow/form", "Admin::cashFlowForm");
 $module = "ops";
 $route->namespace("Source\Controllers");
 $route->group($module);
-$route->get("/error/{error_code}", "Home:error");
+$route->get("/error/{error_code}", "Admin::error");
 
 
 /**

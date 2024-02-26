@@ -30,6 +30,20 @@ class Admin extends Controller
 
     public function cashFlowForm()
     {
+        if ($this->getServer()->getServerByKey('REQUEST_METHOD') == 'POST') {
+            $requestPost = $this->getRequests()
+                ->setRequiredFields(["launchValue", "releaseHistory", "entryType", "csrfToken"])
+                ->getAllPostData();
+            
+            $entryTypeFields = [0, 1];
+            if (!in_array($requestPost["entryType"], $entryTypeFields)) {
+                throw new \Exception("Erro na verificação do tipo de entrada");
+            }
+            
+            print_r($requestPost);
+            die;
+        }
+
         echo $this->view->render("admin/cash-flow-form", [
             "userFullName" => showUserFullName(),
             "endpoints" => ['/admin/cash-flow/form', "/admin/cash-flow/report"]
@@ -67,6 +81,11 @@ class Admin extends Controller
                 die;
             }
 
+            if (isset($requestPost["remember"]) && $requestPost["remember"] == "on") {
+                setcookie("user_email", $userDataOrErrorMessage->user_email, time() + 3600);
+                setcookie("user_password", $requestPost["userPassword"], time() + 3600);
+            }
+
             session()->set("user", [
                 "user_full_name" => $userDataOrErrorMessage->user_full_name,
                 "user_nick_name" => $userDataOrErrorMessage->user_nick_name,
@@ -90,6 +109,11 @@ class Admin extends Controller
             "userFullName" => showUserFullName(),
             "endpoints" => []
         ]);
+    }
+
+    public function error()
+    {
+        redirect("/admin");
     }
 
 }

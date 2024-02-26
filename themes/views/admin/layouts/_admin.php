@@ -26,7 +26,7 @@
         <div class="sidebar">
             <!-- Sidebar user panel (optional) -->
             <div class="user-panel mt-3 pb-3 mb-3 d-flex text-center">
-                <a href="#" class="d-block" style="margin:0 auto">Bem vindo <?= $userFullName ?></a>
+                <a href="<?= url("/admin") ?>" class="d-block" style="margin:0 auto">Bem vindo <?= $userFullName ?></a>
             </div>
 
             <!-- Sidebar Menu -->
