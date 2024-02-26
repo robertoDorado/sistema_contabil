@@ -31,6 +31,8 @@ $route->get("/", "Admin::index");
 $route->get("/login", "Admin::login");
 $route->post("/login", "Admin::login");
 $route->post("/logout", "Admin::logout");
+$route->get("/cash-flow/report", "Admin::cashFlowReport");
+$route->get("/cash-flow/form", "Admin::cashFlowForm");
 
 
 /**

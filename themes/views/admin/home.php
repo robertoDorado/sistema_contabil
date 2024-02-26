@@ -39,33 +39,51 @@
                                     <div class="card-header">
                                         <h4 class="card-title w-100">
                                             <a class="d-block w-100" data-toggle="collapse" href="#collapseOne">
-                                                Automatização Eficiente
+                                               Fluxo de Caixa Dinâmico
                                             </a>
                                         </h4>
                                     </div>
                                     <div id="collapseOne" class="collapse show" data-parent="#accordion">
                                         <div class="card-body">
-                                            Nosso sistema utiliza algoritmos inteligentes para automatizar 
-                                            tarefas rotineiras, economizando tempo e minimizando erros. 
-                                            A automação de processos contábeis permite que você e sua equipe 
-                                            foquem em análises estratégicas e tomada de decisões.
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card card-primary">
-                                    <div class="card-header">
-                                        <h4 class="card-title w-100">
-                                            <a class="d-block w-100" data-toggle="collapse" href="#collapseOne">
-                                                Integração Total
-                                            </a>
-                                        </h4>
-                                    </div>
-                                    <div id="collapseOne" class="collapse" data-parent="#accordion">
-                                        <div class="card-body">
-                                            Conectamos todos os aspectos da gestão contábil em uma única 
-                                            plataforma. Desde a emissão de notas fiscais até a conciliação 
-                                            bancária, nossa solução proporciona uma visão holística e em tempo 
-                                            real de todas as operações financeiras da sua empresa.
+                                            Uma das características distintivas do nosso Sistema de Gestão Contábil 
+                                            é a robusta funcionalidade de Fluxo de Caixa. Essencial para uma gestão 
+                                            financeira eficiente, nossa plataforma oferece um painel intuitivo que 
+                                            permite uma visão holística e detalhada do fluxo de entrada e saída de 
+                                            recursos financeiros.
+                                            <ul>
+                                                <li>
+                                                    <strong>Previsões Precisas:</strong>
+                                                    Antecipe-se às necessidades financeiras da sua empresa com previsões 
+                                                    de fluxo de caixa precisas. Nosso sistema utiliza algoritmos avançados 
+                                                    para analisar dados históricos e tendências, proporcionando uma projeção 
+                                                    confiável das finanças futuras.
+                                                </li>
+                                                <li>
+                                                    <strong>Controle de Despesas e Receitas:</strong>
+                                                    Mantenha um controle rigoroso sobre todas as despesas e receitas. 
+                                                    Nossa plataforma categoriza automaticamente as transações, 
+                                                    simplificando a identificação de áreas de oportunidade para redução de custos
+                                                    ou aumento de receitas.
+                                                </li>
+                                                <li>
+                                                    <strong>Tomada de Decisões Estratégicas:</strong>
+                                                    Capacite sua equipe de gestão com informações em tempo real. 
+                                                    O acesso fácil e rápido ao fluxo de caixa permite uma tomada de decisões 
+                                                    estratégicas fundamentada, auxiliando na alocação eficiente de recursos 
+                                                    e na identificação de oportunidades de investimento.
+                                                </li>
+                                                <li>
+                                                    <strong>Alertas Automáticos:</strong>
+                                                    Receba alertas automáticos para eventos críticos, 
+                                                    como saldos baixos ou previsões de fluxo de caixa negativas. 
+                                                    Essa funcionalidade proativa ajuda a evitar surpresas financeiras indesejadas 
+                                                    e a implementar medidas corretivas antes que problemas se agravem.
+                                                </li>
+                                            </ul>
+                                            O Fluxo de Caixa Dinâmico do nosso sistema não apenas simplifica a gestão diária das finanças, 
+                                            mas também se torna uma ferramenta estratégica vital para o crescimento sustentável 
+                                            da sua empresa. Tenha o controle total das finanças e transforme dados em ações, 
+                                            impulsionando o sucesso financeiro do seu negócio.
                                         </div>
                                     </div>
                                 </div>

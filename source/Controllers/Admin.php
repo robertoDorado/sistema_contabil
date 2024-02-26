@@ -20,6 +20,22 @@ class Admin extends Controller
         parent::__construct();
     }
 
+    public function cashFlowReport()
+    {
+        echo $this->view->render("admin/cash-flow-report", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => ['/admin/cash-flow/form', "/admin/cash-flow/report"]
+        ]);
+    }
+
+    public function cashFlowForm()
+    {
+        echo $this->view->render("admin/cash-flow-form", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => ['/admin/cash-flow/form', "/admin/cash-flow/report"]
+        ]);
+    }
+
     public function logout(array $data)
     {
         if (empty($data['request'])) {
@@ -70,28 +86,9 @@ class Admin extends Controller
             redirect("/admin/login");
         }
 
-        $user = new User();
-        $userData = $user->findUserByEmail(session()->user->user_email);
-
-        if (is_string($userData) && json_decode($userData) != null) {
-            throw new \Exception($userData);
-        }
-
-        $userFullNameData = explode(" ", $userData->user_full_name);
-        $userFullName = [];
-        $keys = [0, 1];
-
-        foreach ($userFullNameData as $key => $value) {
-            if (in_array($key, $keys)) {
-                array_push($userFullName, $value);
-            }
-        }
-
-        $userFullName = implode(" ", $userFullName);
-        $userFullName = ucwords($userFullName);
-        
         echo $this->view->render("admin/home", [
-            "userFullName" => $userFullName
+            "userFullName" => showUserFullName(),
+            "endpoints" => []
         ]);
     }
 

@@ -10,7 +10,7 @@
 
       <form id="loginForm" action="#" method="post">
         <div class="input-group mb-3">
-          <input type="email" class="form-control" name="userEmail" placeholder="Email">
+          <input type="email" class="form-control" name="userEmail" placeholder="E-mail">
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-envelope"></span>
@@ -18,7 +18,7 @@
           </div>
         </div>
         <div class="input-group mb-3">
-          <input type="password" class="form-control" name="userPassword" placeholder="Password">
+          <input type="password" class="form-control" name="userPassword" placeholder="Senha">
           <input type="hidden" name="csrfToken" value="<?= session()->csrf_token ?>">
           <div class="input-group-append">
             <div class="input-group-text">
@@ -27,16 +27,8 @@
           </div>
         </div>
         <div class="row">
-          <div class="col-8">
-            <div class="icheck-primary">
-              <input type="checkbox" id="remember" name="remember">
-              <label for="remember">
-                Lembrar-me
-              </label>
-            </div>
-          </div>
           <!-- /.col -->
-          <div class="col-4">
+          <div class="col-4 ml-auto">
             <button type="submit" class="btn btn-primary btn-block">Login</button>
           </div>
           <!-- /.col -->
