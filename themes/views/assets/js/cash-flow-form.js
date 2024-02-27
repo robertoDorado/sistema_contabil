@@ -8,10 +8,38 @@ if (window.location.pathname == '/admin/cash-flow/form') {
             affixesStay: false
         }
     )
+
+    const launchBtn = document.getElementById("launchBtn")
     cashFlowForm.addEventListener("submit", function(event) {
         event.preventDefault()
-        const form = new FormData(this)
 
+        if (!this.launchValue.value) {
+            toastr.error("Campo valor de entrada inválido")
+            throw new Error('Campo valor de entrada é obrigatório')
+        }
+
+        if (!this.csrfToken.value) {
+            toastr.error("Campo csrf-token inválido")
+            throw new Error("Campo csrf-token inválido")
+        }
+
+        if (!this.releaseHistory.value) {
+            toastr.error("Campo histórico inválido")
+            throw new Error("Campo histórico inválido")
+        }
+
+        if (!this.entryType.value) {
+            toastr.error("Campo tipo de entrada inválido")
+            throw new Error("Campo tipo de entrada inválido")
+        }
+
+        const cashFlowFormFields = [
+            this.launchValue,
+            this.releaseHistory,
+            this.entryType
+        ]
+        showSpinner(launchBtn)
+        const form = new FormData(this)
         fetch(window.location.href, 
         {
             method: "POST",
@@ -19,7 +47,40 @@ if (window.location.pathname == '/admin/cash-flow/form') {
         }
         ).then((response) => response.json())
         .then(function(response) {
-            console.log(response)
+            let message = ''
+
+            if (response.user_not_exists) {
+                message = response.user_not_exists
+                message = message.charAt(0).toUpperCase() + message.slice(1)
+                toastr.error(message)
+                launchBtn.innerHTML = 'Enviar'
+                throw new Error(message)
+            }
+
+            if (response.invalid_entry_type) {
+                message = response.invalid_entry_type
+                message = message.charAt(0).toUpperCase() + message.slice(1)
+                toastr.error(message)
+                launchBtn.innerHTML = 'Enviar'
+                throw new Error(message)
+            }
+
+            if (response.invalid_persist_data) {
+                message = response.invalid_persist_data
+                message = message.charAt(0).toUpperCase() + message.slice(1)
+                toastr.error(message)
+                launchBtn.innerHTML = 'Enviar'
+                throw new Error(message)
+            }
+            
+            cashFlowFormFields.forEach(function(elem) {
+                elem.value = ''
+            })
+            
+            message = response.success
+            message = message.charAt(0).toUpperCase() + message.slice(1)
+            launchBtn.innerHTML = 'Enviar'
+            toastr.success(message)
         })
     })
 }

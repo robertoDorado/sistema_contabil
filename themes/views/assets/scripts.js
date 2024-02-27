@@ -59,18 +59,49 @@ function buildIntegerPart(integerPart,negative,settings){integerPart=integerPart
 return negative+integerPart}
 $.fn.maskMoney=function(method){if(methods[method]){return methods[method].apply(this,Array.prototype.slice.call(arguments,1))}else if(typeof method==="object"||!method){return methods.init.apply(this,arguments)}else{$.error("Method "+method+" does not exist on jQuery.maskMoney")}}})(window.jQuery||window.Zepto);if(window.location.pathname.match(/admin/)){window.addEventListener("load",function(){toastr.options={'closeButton':!0,'debug':!1,'newestOnTop':!1,'progressBar':!0,'positionClass':'toast-top-right','preventDuplicates':!1,'showDuration':'1000','hideDuration':'1000','timeOut':'5000','extendedTimeOut':'1000','showEasing':'swing','hideEasing':'linear','showMethod':'fadeIn','hideMethod':'fadeOut',}})};if(window.location.pathname=='/admin/cash-flow/form'){const cashFlowForm=document.getElementById("cashFlowForm")
 $("#launchValue").maskMoney({allowNegative:!1,thousands:'.',decimal:',',affixesStay:!1})
+const launchBtn=document.getElementById("launchBtn")
 cashFlowForm.addEventListener("submit",function(event){event.preventDefault()
+if(!this.launchValue.value){toastr.error("Campo valor de entrada inválido")
+throw new Error('Campo valor de entrada é obrigatório')}
+if(!this.csrfToken.value){toastr.error("Campo csrf-token inválido")
+throw new Error("Campo csrf-token inválido")}
+if(!this.releaseHistory.value){toastr.error("Campo histórico inválido")
+throw new Error("Campo histórico inválido")}
+if(!this.entryType.value){toastr.error("Campo tipo de entrada inválido")
+throw new Error("Campo tipo de entrada inválido")}
+const cashFlowFormFields=[this.launchValue,this.releaseHistory,this.entryType]
+showSpinner(launchBtn)
 const form=new FormData(this)
-fetch(window.location.href,{method:"POST",body:form}).then((response)=>response.json()).then(function(response){console.log(response)})})};if(window.location.pathname=="/admin/login"){const loginForm=document.getElementById("loginForm")
+fetch(window.location.href,{method:"POST",body:form}).then((response)=>response.json()).then(function(response){let message=''
+if(response.user_not_exists){message=response.user_not_exists
+message=message.charAt(0).toUpperCase()+message.slice(1)
+toastr.error(message)
+launchBtn.innerHTML='Enviar'
+throw new Error(message)}
+if(response.invalid_entry_type){message=response.invalid_entry_type
+message=message.charAt(0).toUpperCase()+message.slice(1)
+toastr.error(message)
+launchBtn.innerHTML='Enviar'
+throw new Error(message)}
+if(response.invalid_persist_data){message=response.invalid_persist_data
+message=message.charAt(0).toUpperCase()+message.slice(1)
+toastr.error(message)
+launchBtn.innerHTML='Enviar'
+throw new Error(message)}
+cashFlowFormFields.forEach(function(elem){elem.value=''})
+message=response.success
+message=message.charAt(0).toUpperCase()+message.slice(1)
+launchBtn.innerHTML='Enviar'
+toastr.success(message)})})};if(window.location.pathname=="/admin/login"){const loginForm=document.getElementById("loginForm")
 loginForm.addEventListener("submit",function(event){event.preventDefault()
 const btnSubmit=this.querySelector(".btn.btn-primary.btn-block")
-if(this.userEmail.value==''){toastr.error("Campo e-mail deve ser obrigatório")
+if(!this.userEmail.value){toastr.error("Campo e-mail deve ser obrigatório")
 throw new Error("Campo e-mail deve ser obrigatório")}
 if(!this.userEmail.value.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)){toastr.error("Este e-mail não é válido")
 throw new Error("este e-mail não é válido")}
-if(this.userPassword.value==''){toastr.error("Campo senha deve ser obrigatório")
+if(!this.userPassword.value){toastr.error("Campo senha deve ser obrigatório")
 throw new Error("campo senha deve ser obrigatório")}
-if(this.csrfToken.value==''){toastr.error("Campo csrf-token inválido")
+if(!this.csrfToken.value){toastr.error("Campo csrf-token inválido")
 throw new Error("Campo csrf-token inválido")}
 showSpinner(btnSubmit)
 const form=new FormData(this)

@@ -5,7 +5,7 @@ if (window.location.pathname == "/admin/login") {
         event.preventDefault()
 
         const btnSubmit = this.querySelector(".btn.btn-primary.btn-block")
-        if (this.userEmail.value == '') {
+        if (!this.userEmail.value) {
             toastr.error("Campo e-mail deve ser obrigatório")
             throw new Error("Campo e-mail deve ser obrigatório")
         }
@@ -15,12 +15,12 @@ if (window.location.pathname == "/admin/login") {
             throw new Error("este e-mail não é válido")
         }
 
-        if (this.userPassword.value == '') {
+        if (!this.userPassword.value) {
             toastr.error("Campo senha deve ser obrigatório")
             throw new Error("campo senha deve ser obrigatório")
         }
 
-        if (this.csrfToken.value == '') {
+        if (!this.csrfToken.value) {
             toastr.error("Campo csrf-token inválido")
             throw new Error("Campo csrf-token inválido")
         }

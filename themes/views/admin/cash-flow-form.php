@@ -35,7 +35,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="releaseHistory">Histórico de lançamento</label>
-                                    <textarea name="releaseHistory" id="releaseHistory" cols="30" rows="5" class="form-control"></textarea>
+                                    <input name="releaseHistory" id="releaseHistory"class="form-control" placeholder="Histórico de lançamento">
                                 </div>
                                 <div class="form-group">
                                     <label for="entryType">Tipo de entrada</label>
@@ -48,7 +48,7 @@
                             </div>
     
                             <div class="card-footer">
-                                <button type="submit" class="btn btn-primary">Enviar</button>
+                                <button type="submit" id="launchBtn" class="btn btn-primary">Enviar</button>
                             </div>
                         </form>
                     </div>
