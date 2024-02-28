@@ -175,7 +175,7 @@ class UserTest extends TestCase
     public function testFindUserByIdNotFound()
     {
         $this->user = new User();
-        $this->user->setId(1);
+        $this->user->setId(1000000000000000000);
         $userData = $this->user->findUserById();
         $this->assertJsonStringEqualsJsonString(json_encode([
             "user_not_found" => "usuário não encontrado"

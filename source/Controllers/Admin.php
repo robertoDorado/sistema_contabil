@@ -4,6 +4,7 @@ namespace Source\Controllers;
 use Source\Core\Controller;
 use Source\Domain\Model\CashFlow;
 use Source\Domain\Model\User;
+use stdClass;
 
 /**
  * Admin Controllers
@@ -23,9 +24,49 @@ class Admin extends Controller
 
     public function cashFlowReport()
     {
+        $user = new User();
+        $userData = $user->findUserByEmail(session()->user->user_email);
+
+        if (is_string($userData) && json_decode($userData) != null) {
+            echo $userData;
+            die;
+        }
+
+        $user->setId($userData->id);
+        $cashFlow = new CashFlow();
+        $cashFlowDataByUser = $cashFlow->findCashFlowByUser([], $user);
+        
+        $cashFlowEmptyMessage = "";
+        if (is_string($cashFlowDataByUser) && json_decode($cashFlowDataByUser) != null) {
+            $cashFlowEmptyMessage = $cashFlowDataByUser;
+        }
+
+        if (is_array($cashFlowDataByUser) && !empty($cashFlowDataByUser)) {
+            foreach($cashFlowDataByUser as &$data) {
+                if (!empty($data->entry_type)) {
+                    $data->setEntry('R$ ' . number_format($data->getEntry(), 2, ',', '.'));
+                }else {
+                    $data->setEntry('R$ ' . number_format($data->getEntry() * -1, 2, ',', '.'));
+                }
+                $data->created_at = date('d/m/Y', strtotime($data->created_at));
+                $data->entry_type_value = $data->entry_type == 1 ? "Crédito" : "Débito";
+            }
+        }
+
+        $balanceValue = $cashFlow->calculateBalance($user);
+        if ($balanceValue < 0) {
+            $balance = !empty($balanceValue) ? 'R$ ' . number_format($balanceValue * -1, 2, ',', '.') : 0;
+        }else {
+            $balance = !empty($balanceValue) ? 'R$ ' . number_format($balanceValue, 2, ',', '.') : 0;
+        }
+
         echo $this->view->render("admin/cash-flow-report", [
             "userFullName" => showUserFullName(),
-            "endpoints" => ['/admin/cash-flow/form', "/admin/cash-flow/report"]
+            "endpoints" => ['/admin/cash-flow/form', "/admin/cash-flow/report"],
+            "cashFlowDataByUser" => $cashFlowDataByUser,
+            "cashFlowEmptyMessage" => $cashFlowEmptyMessage,
+            "balance" => $balance,
+            "balanceValue" => $balanceValue
         ]);
     }
 

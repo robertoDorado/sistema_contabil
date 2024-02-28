@@ -44,6 +44,16 @@ class CashFlow extends Model
         ]);
     }
 
+    public function setHistory($history)
+    {
+        $this->history = $history;
+    }
+
+    public function setEntry($entry)
+    {
+        $this->entry = $entry;
+    }
+
     public function getHistory()
     {
         return $this->history;

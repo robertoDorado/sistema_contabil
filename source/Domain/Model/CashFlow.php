@@ -28,13 +28,16 @@ class CashFlow
         $this->cashFlow = new ModelsCashFlow();
     }
 
-    public function findAllCashFlow(array $columns = [])
+    public function findCashFlowByUser(array $columns = [], User $user)
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
-        $data = $this->cashFlow->find("", "", $columns)->fetch(true);
+        $data = $this->cashFlow->find("id_user=:id_user", 
+            ":id_user=" . $user->getId() . "", $columns)->fetch(true);
+        
         if (empty($data)) {
             return json_encode(["cash_flow_empty" => "nenhum registro foi encontrado"]);
         }
+        
         return $data;
     }
 
@@ -71,9 +74,10 @@ class CashFlow
         }
     }
 
-    public function calculateBalance()
+    public function calculateBalance(User $user)
     {
-        $data = $this->cashFlow->find("", "")->fetch(true);
+        $data = $this->cashFlow
+            ->find("id_user=:id_user", ":id_user=" . $user->getId() . "")->fetch(true);
         $balance = 0;
         
         if (!empty($data)) {

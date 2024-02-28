@@ -92,7 +92,11 @@ cashFlowFormFields.forEach(function(elem){elem.value=''})
 message=response.success
 message=message.charAt(0).toUpperCase()+message.slice(1)
 launchBtn.innerHTML='Enviar'
-toastr.success(message)})})};if(window.location.pathname=="/admin/cash-flow/report"){$(function(){$("#cashFlowReport").DataTable({"responsive":!0,"lengthChange":!1,"autoWidth":!1,"buttons":[{extend:'copy',text:'Copiar'},"csv","excel","pdf","print",{extend:'colvis',text:'Visibilidade Coluna'}]}).buttons().container().appendTo('#widgets .col-md-6:eq(0)')})};if(window.location.pathname=="/admin/login"){const loginForm=document.getElementById("loginForm")
+toastr.success(message)})})};if(window.location.pathname=="/admin/cash-flow/report"){const jsonMessage=document.getElementById("jsonMessage")
+let message={cash_flow_empty:''}
+if(jsonMessage){message=JSON.parse(jsonMessage.dataset.message)
+message.cash_flow_empty=message.cash_flow_empty.charAt(0).toUpperCase()+message.cash_flow_empty.slice(1)}
+$(function(){$("#cashFlowReport").DataTable({"language":{"emptyTable":message.cash_flow_empty,},"responsive":!0,"lengthChange":!1,"autoWidth":!1,"buttons":[{extend:'copy',text:'Copiar'},"csv","excel","pdf","print",{extend:'colvis',text:'Visibilidade Coluna'}]}).buttons().container().appendTo('#widgets .col-md-6:eq(0)')})};if(window.location.pathname=="/admin/login"){const loginForm=document.getElementById("loginForm")
 loginForm.addEventListener("submit",function(event){event.preventDefault()
 const btnSubmit=this.querySelector(".btn.btn-primary.btn-block")
 if(!this.userEmail.value){toastr.error("Campo e-mail deve ser obrigatório")
