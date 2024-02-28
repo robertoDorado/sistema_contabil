@@ -37,6 +37,8 @@
                                             <th>Histórico</th>
                                             <th>Tipo de entrada</th>
                                             <th>Lançamento</th>
+                                            <th>Editar</th>
+                                            <th>Excluir</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -49,6 +51,8 @@
                                                         <td><?= $cashFlowData->getHistory() ?></td>
                                                         <td><?= $cashFlowData->entry_type_value ?></td>
                                                         <td><?= $cashFlowData->getEntry() ?></td>
+                                                        <td><a class="icons" href="#"><i class="fas fa-edit" aria-hidden="true"></i></a></td>
+                                                        <td><a class="icons" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a></td>
                                                     </tr>
                                                 <?php else : ?>
                                                     <tr style="color:#ff0000">
@@ -57,6 +61,8 @@
                                                         <td><?= $cashFlowData->getHistory() ?></td>
                                                         <td><?= $cashFlowData->entry_type_value ?></td>
                                                         <td><?= $cashFlowData->getEntry() ?></td>
+                                                        <td><a class="icons" href="#"><i class="fas fa-edit" aria-hidden="true"></i></a></td>
+                                                        <td><a class="icons" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a></td>
                                                     </tr>
                                                 <?php endif ?>
                                             <?php endforeach ?>
@@ -70,6 +76,18 @@
                                                 <th rowspan="1" colspan="1"></th>
                                                 <th rowspan="1" colspan="1"></th>
                                                 <th rowspan="1" colspan="1"><?= $balance ?></th>
+                                                <th rowspan="1" colspan="1"></th>
+                                                <th rowspan="1" colspan="1"></th>
+                                            </tr>
+                                        <?php elseif(empty($balanceValue)) : ?>
+                                            <tr>
+                                                <th rowspan="1" colspan="1">Total</th>
+                                                <th rowspan="1" colspan="1"></th>
+                                                <th rowspan="1" colspan="1"></th>
+                                                <th rowspan="1" colspan="1"></th>
+                                                <th rowspan="1" colspan="1">0,00</th>
+                                                <th rowspan="1" colspan="1"></th>
+                                                <th rowspan="1" colspan="1"></th>
                                             </tr>
                                         <?php else : ?>
                                             <tr style="color:#ff0000">
@@ -78,6 +96,8 @@
                                                 <th rowspan="1" colspan="1"></th>
                                                 <th rowspan="1" colspan="1"></th>
                                                 <th rowspan="1" colspan="1"><?= $balance ?></th>
+                                                <th rowspan="1" colspan="1"></th>
+                                                <th rowspan="1" colspan="1"></th>
                                             </tr>
                                         <?php endif ?>
                                     </tfoot>

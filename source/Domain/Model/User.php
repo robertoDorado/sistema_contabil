@@ -27,6 +27,27 @@ class User
         $this->user = new ModelsUser();
     }
 
+    public function dropUserByUuid(string $uuid)
+    {
+        $userData = $this->user->find("uuid=:uuid", ":uuid={$uuid}")->fetch();
+        if (empty($userData)) {
+            throw new \Exception("usuário não encontrado");
+        }
+        
+        if (!$userData->destroy()) {
+            throw new PDOException($userData->fail()->getMessage());
+        }
+    }
+
+    public function findUserByUuid(string $uuid)
+    {
+        $userData = $this->user->find("uuid=:uuid", ":uuid={$uuid}")->fetch();
+        if (empty($userData)) {
+            return json_encode(["user_not_found" => "usuário não encontrado"]);
+        }
+        return $userData;
+    }
+
     public function findUserByEmail(string $email, array $columns = [])
     {
         $this->user = new ModelsUser();

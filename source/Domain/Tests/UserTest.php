@@ -3,6 +3,7 @@ namespace Source\Domain\Tests;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 use Source\Domain\Model\User;
 
 /**
@@ -20,6 +21,7 @@ class UserTest extends TestCase
     {
         $this->user = new User();
         $data = [
+            "uuid" => Uuid::uuid6(),
             "user_full_name" => "teste fulano de tal",
             "user_nick_name" => "fulanoDeTal",
             "user_email" => "testefulano@gmail.com",
@@ -44,6 +46,7 @@ class UserTest extends TestCase
     {
         $this->user = new User();
         $data = [
+            "uuid" => Uuid::uuid6(),
             "user_full_name" => "teste fulano de tal",
             "user_nick_name" => "fulanoDeTal",
             "user_emaill" => "testefulano@gmail.com",
@@ -58,6 +61,7 @@ class UserTest extends TestCase
     {
         $this->user = new User();
         $data = [
+            "uuid" => Uuid::uuid6(),
             "user_full_name" => "teste fulano de tal",
             "user_nick_name" => "fulanoDeTal",
             "user_email" => "testefulano@gmail.com",
@@ -97,6 +101,7 @@ class UserTest extends TestCase
     {
         $this->user = new User();
         $data = [
+            "uuid" => Uuid::uuid6(),
             "user_full_name" => "teste fulano de tal",
             "user_nick_name" => "fulanoDeTal",
             "user_email" => "testefulano@gmail.com",
@@ -116,6 +121,7 @@ class UserTest extends TestCase
     {
         $this->user = new User();
         $data = [
+            "uuid" => Uuid::uuid6(),
             "user_full_name" => "teste fulano de tal",
             "user_nick_name" => "fulanoDeTal",
             "user_email" => "testefulano@gmail.com",
@@ -140,6 +146,7 @@ class UserTest extends TestCase
     {
         $this->user = new User();
         $data = [
+            "uuid" => Uuid::uuid6(),
             "user_full_name" => "teste fulano de tal",
             "user_nick_name" => "fulanoDeTal",
             "user_email" => "testefulano@gmail.com",
@@ -155,6 +162,7 @@ class UserTest extends TestCase
     {
         $this->user = new User();
         $data = [
+            "uuid" => Uuid::uuid6(),
             "user_full_name" => "teste fulano de tal",
             "user_nick_name" => "fulanoDeTal",
             "user_email" => "testefulano@gmail.com",
@@ -203,6 +211,7 @@ class UserTest extends TestCase
     {
         $this->user = new User();
         $data = [
+            "uuid" => Uuid::uuid6(),
             "user_full_name" => "teste fulano de tal",
             "user_nick_name" => "fulanoDeTal",
             "user_email" => "testefulano@gmail.com",

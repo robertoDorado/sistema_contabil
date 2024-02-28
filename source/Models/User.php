@@ -11,17 +11,20 @@ use Source\Core\Model;
  */
 class User extends Model
 {
+    /** @var string Uuid do usuário */
+    protected string $uuid = "uuid";
+
     /** @var string Nome completo do usuário */
-    public string $userFullName = "user_full_name";
+    protected string $userFullName = "user_full_name";
 
     /** @var string Nickname do usuário */
-    public string $userNickName = "user_nick_name";
+    protected string $userNickName = "user_nick_name";
 
     /** @var string E-mail do usuário */
-    public string $userEmail = "user_email";
+    protected string $userEmail = "user_email";
 
     /** @var string Senha do usuário */
-    public string $userPassword = "user_password";
+    protected string $userPassword = "user_password";
 
     /**
      * User constructor
@@ -29,10 +32,21 @@ class User extends Model
     public function __construct()
     {
         parent::__construct(CONF_DB_NAME . ".user", ["id"], [
+            $this->uuid,
             $this->userFullName, 
             $this->userNickName, 
             $this->userEmail, 
             $this->userPassword
         ]);
+    }
+
+    public function getUuid()
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid(string $uuid)
+    {
+        $this->uuid = $uuid;
     }
 }

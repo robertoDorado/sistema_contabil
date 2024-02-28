@@ -1,4 +1,5 @@
 #!/bin/bash
-for file in source/Migrations/*.php; do
-    php "$file"
+PHP_FILES=($(ls -r source/Migrations/*.php))
+for FILE in "${PHP_FILES[@]}"; do
+    php "$FILE"
 done

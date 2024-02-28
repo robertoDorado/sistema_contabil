@@ -11,7 +11,10 @@ use Source\Core\Model;
  */
 class CashFlow extends Model
 {
-    /** @var string Id do usuário */
+    /** @var string Uuid do fluxo de caixa */
+    protected string $uuid = "uuid";
+
+    /** @var string Uuid do usuário (chave de relacionamento) */
     protected string $idUser = "id_user";
 
     /** @var string Valor de entrada */
@@ -35,6 +38,7 @@ class CashFlow extends Model
     public function __construct()
     {
         parent::__construct(CONF_DB_NAME . ".cash_flow", ["id"], [
+            $this->uuid,
             $this->idUser, 
             $this->entry,
             $this->history,
@@ -42,6 +46,16 @@ class CashFlow extends Model
             $this->createdAt, 
             $this->updatedAt
         ]);
+    }
+
+    public function getUuid()
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid(string $uuid)
+    {
+        $this->uuid = $uuid;
     }
 
     public function setHistory($history)

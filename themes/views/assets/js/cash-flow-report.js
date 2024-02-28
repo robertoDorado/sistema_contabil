@@ -13,6 +13,7 @@ if (window.location.pathname == "/admin/cash-flow/report") {
     $(function () {
         $("#cashFlowReport").DataTable({
             "language": {
+                "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
                 "emptyTable": message.cash_flow_empty,
             },
             "responsive": true, "lengthChange": false, "autoWidth": false,

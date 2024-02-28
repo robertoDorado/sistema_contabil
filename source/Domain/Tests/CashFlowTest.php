@@ -3,6 +3,7 @@ namespace Source\Domain\Tests;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 use Source\Domain\Model\CashFlow;
 use Source\Domain\Model\User;
 
@@ -25,6 +26,7 @@ class CashFlowTest extends TestCase
         $this->cashFlow = new CashFlow();
         $this->user = new User();
         $cashFlowData = [
+            "uuid" => Uuid::uuid6(),
             "id_user" => $this->user,
             "entry" => 100.55,
             "history" => "venda realizada no dia" . date("d/m/Y"),
@@ -43,6 +45,7 @@ class CashFlowTest extends TestCase
         $this->cashFlow = new CashFlow();
         $this->user = new User();
         $cashFlowData = [
+            "uuid" => Uuid::uuid6(),
             "id_user" => $this->user,
             "entry" => "---",
             "history" => "venda realizada no dia" . date("d/m/Y"),
@@ -60,6 +63,7 @@ class CashFlowTest extends TestCase
     {
         $this->cashFlow = new CashFlow();
         $cashFlowData = [
+            "uuid" => Uuid::uuid6(),
             "id_user" => $this->cashFlow,
             "entry" => "445.77",
             "history" => "venda realizada no dia" . date("d/m/Y"),
@@ -86,6 +90,7 @@ class CashFlowTest extends TestCase
         $this->cashFlow = new CashFlow();
         $this->user = new User();
         $userData = [
+            "uuid" => Uuid::uuid6(),
             "user_full_name" => "teste fulano de tal 2",
             "user_nick_name" => "fulanoDeTal2",
             "user_email" => "testefulano2@gmail.com",
@@ -100,6 +105,7 @@ class CashFlowTest extends TestCase
         $this->user->setId($userData->id);
 
         $cashFlowData = [
+            "uuid" => Uuid::uuid6(),
             "id_user" => $this->user,
             "entry" => "1.750,45",
             "history" => "venda realizada no dia " . date("d/m/Y"),
@@ -121,6 +127,7 @@ class CashFlowTest extends TestCase
         $this->user = new User();
 
         $userData = [
+            "uuid" => Uuid::uuid6(),
             "user_full_name" => "teste fulano de tal 2",
             "user_nick_name" => "fulanoDeTal2",
             "user_email" => "testefulano2@gmail.com",
@@ -136,6 +143,7 @@ class CashFlowTest extends TestCase
             $this->cashFlow = new CashFlow();
 
             $cashFlowData = [
+                "uuid" => Uuid::uuid6(),
                 "id_user" => $this->user,
                 "entry" => "1.750,45",
                 "history" => "venda realizada no dia " . date("d/m/Y"),
@@ -167,6 +175,7 @@ class CashFlowTest extends TestCase
         $this->user = new User();
 
         $userData = [
+            "uuid" => Uuid::uuid6(),
             "user_full_name" => "teste fulano de tal 2",
             "user_nick_name" => "fulanoDeTal2",
             "user_email" => "testefulano2@gmail.com",
@@ -182,6 +191,7 @@ class CashFlowTest extends TestCase
             $this->cashFlow = new CashFlow();
 
             $cashFlowData = [
+                "uuid" => Uuid::uuid6(),
                 "id_user" => $this->user,
                 "entry" => "1.750,45",
                 "history" => "venda realizada no dia " . date("d/m/Y"),
@@ -224,6 +234,7 @@ class CashFlowTest extends TestCase
         $this->cashFlow = new CashFlow();
         $this->user = new User();
         $userData = [
+            "uuid" => Uuid::uuid6(),
             "user_full_name" => "teste fulano de tal 2",
             "user_nick_name" => "fulanoDeTal2",
             "user_email" => "testefulano2@gmail.com",
@@ -232,6 +243,7 @@ class CashFlowTest extends TestCase
         $this->user->persistData($userData);
         
         $cashFlowData = [
+            "uuid" => Uuid::uuid6(),
             "id_user" => $this->user,
             "entry" => "1.750,45",
             "history" => "venda realizada no dia " . date("d/m/Y"),
@@ -283,6 +295,7 @@ class CashFlowTest extends TestCase
     {
         $this->user = new User();
         $userData = [
+            "uuid" => Uuid::uuid6(),
             "user_full_name" => "teste fulano de tal 2",
             "user_nick_name" => "fulanoDeTal2",
             "user_email" => "testefulano2@gmail.com",
@@ -294,6 +307,7 @@ class CashFlowTest extends TestCase
 
         $this->cashFlow = new CashFlow();
         $cashFlowData = [
+            "uuid" => Uuid::uuid6(),
             "id_user" => $this->user,
             "entry" => "1.750,45",
             "history" => "venda realizada no dia " . date("d/m/Y"),
