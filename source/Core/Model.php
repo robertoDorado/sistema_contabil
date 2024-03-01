@@ -731,6 +731,11 @@ abstract class Model
         return $filter;
     }
 
+    public function setRequiredFields(array $required)
+    {
+        $this->required = $required;
+    }
+
     /**
      * @return boolean
      */

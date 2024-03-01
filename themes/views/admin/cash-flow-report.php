@@ -51,7 +51,7 @@
                                                         <td><?= $cashFlowData->getHistory() ?></td>
                                                         <td><?= $cashFlowData->entry_type_value ?></td>
                                                         <td><?= $cashFlowData->getEntry() ?></td>
-                                                        <td><a class="icons" href="#"><i class="fas fa-edit" aria-hidden="true"></i></a></td>
+                                                        <td><a class="icons" href="<?= url("/admin/cash-flow/update/form/" . $cashFlowData->getUuid() . "") ?>"><i class="fas fa-edit" aria-hidden="true"></i></a></td>
                                                         <td><a class="icons" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a></td>
                                                     </tr>
                                                 <?php else : ?>
@@ -61,7 +61,7 @@
                                                         <td><?= $cashFlowData->getHistory() ?></td>
                                                         <td><?= $cashFlowData->entry_type_value ?></td>
                                                         <td><?= $cashFlowData->getEntry() ?></td>
-                                                        <td><a class="icons" href="#"><i class="fas fa-edit" aria-hidden="true"></i></a></td>
+                                                        <td><a class="icons" href="<?= url("/admin/cash-flow/update/form/" . $cashFlowData->getUuid() . "") ?>"><i class="fas fa-edit" aria-hidden="true"></i></a></td>
                                                         <td><a class="icons" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a></td>
                                                     </tr>
                                                 <?php endif ?>

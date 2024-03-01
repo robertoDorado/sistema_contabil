@@ -32,6 +32,9 @@ class CashFlow extends Model
     /** @var string Data de atualização do registro */
     protected string $updatedAt = "updated_at";
 
+    /** @var string Coluna para soft delete do registro */
+    protected string $deleted = "deleted";
+
     /**
      * ChashFlow constructor
      */
@@ -44,8 +47,18 @@ class CashFlow extends Model
             $this->history,
             $this->entryType,
             $this->createdAt, 
-            $this->updatedAt
+            $this->updatedAt,
+            $this->deleted
         ]);
+    }
+
+    public function getDeleted()
+    {
+        return $this->deleted;
+    }
+
+    public function setDeleted(int $delete) {
+        $this->deleted = $delete;
     }
 
     public function getUuid()

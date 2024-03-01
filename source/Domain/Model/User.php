@@ -1,6 +1,7 @@
 <?php
 namespace Source\Domain\Model;
 
+use Exception;
 use PDOException;
 use Source\Core\Connect;
 use Source\Models\User as ModelsUser;
@@ -27,6 +28,34 @@ class User
         $this->user = new ModelsUser();
     }
 
+    public function updateUserByUuid(array $data)
+    {
+        if (empty($data)) {
+            return json_encode(["data_is_empty" => "data não pode ser vazio"]);
+        }
+
+        $userData = $this->user->find("uuid=:uuid", ":uuid={$data['uuid']}")->fetch();
+        if (empty($userData)) {
+            return json_encode(["user_not_found" => "usuário não encontrado"]);
+        }
+        
+        foreach($data as $key => $value) {
+            $userData->$key = $value;
+        }
+        
+        validateModelProperties(ModelsUser::class, $data);
+        $userData->setRequiredFields(array_keys($data));
+
+        if (!$userData->save()) {
+            if (!empty($userData->fail())) {
+                throw new PDOException($userData->fail()->getMessage());
+            }else {
+                throw new Exception($userData->message()->getText());
+            }
+        }
+        return true;
+    }
+
     public function dropUserByUuid(string $uuid)
     {
         $userData = $this->user->find("uuid=:uuid", ":uuid={$uuid}")->fetch();
@@ -45,6 +74,11 @@ class User
         if (empty($userData)) {
             return json_encode(["user_not_found" => "usuário não encontrado"]);
         }
+
+        if (!empty($userData->getDeleted())) {
+            return json_encode(["access_denied" => "acesso negado"]);
+        }
+
         return $userData;
     }
 
@@ -58,6 +92,10 @@ class User
         
         if (empty($data)) {
             return json_encode(["user_not_exists" => "usuário não existe"]);
+        }
+        
+        if (!empty($data->getDeleted())) {
+            return json_encode(["access_denied" => "acesso negado"]);
         }
 
         return $data;
@@ -94,8 +132,13 @@ class User
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
         $data = $this->user->findById($this->getId(), $columns);
+        
         if (empty($data)) {
             return json_encode(["user_not_found" => "usuário não encontrado"]);
+        }
+
+        if (!empty($data->getDeleted())) {
+            return json_encode(["access_denied" => "acesso negado"]);
         }
 
         return $data;
@@ -129,6 +172,10 @@ class User
         if (empty($user)) {
             return json_encode(["user_not_register" => "usuário não registrado"]);
         }
+
+        if (!empty($user->getDeleted())) {
+            return json_encode(["access_denied" => "acesso negado"]);
+        }
         
         if (!password_verify($userPassword, $user->user_password)) {
             return json_encode(["user_not_auth" => "usuário não autenticado"]);
@@ -160,7 +207,11 @@ class User
         }
 
         if (!$this->user->save()) {
-            throw new PDOException($this->user->fail()->getMessage());
+            if (!empty($this->user->fail())) {
+                throw new PDOException($this->user->fail()->getMessage());
+            }else {
+                throw new PDOException($this->user->message()->getText());
+            }
         }
 
         $this->setId(Connect::getInstance()->lastInsertId());

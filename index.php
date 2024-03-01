@@ -22,18 +22,27 @@ ini_set('log_errors', true);
 $route = new MyRouter(url(), "::");
 
 /**
+ * Site Route
+ */
+$module = null;
+$route->namespace("Source\Controllers");
+$route->group($module);
+$route->get("/", "Site::index");
+
+/**
  * Admin Route
  */
 $module = "admin";
 $route->namespace("Source\Controllers");
 $route->group($module);
-$route->get("/", "Admin::index");
-$route->get("/login", "Admin::login");
-$route->post("/login", "Admin::login");
-$route->post("/logout", "Admin::logout");
-$route->get("/cash-flow/report", "Admin::cashFlowReport");
-$route->get("/cash-flow/form", "Admin::cashFlowForm");
-$route->post("/cash-flow/form", "Admin::cashFlowForm");
+$route->get("/", "Site::admin");
+$route->get("/login", "Login::login");
+$route->post("/login", "Login::login");
+$route->post("/logout", "Login::logout");
+$route->get("/cash-flow/report", "CashFlow::cashFlowReport");
+$route->get("/cash-flow/form", "CashFlow::cashFlowForm");
+$route->post("/cash-flow/form", "CashFlow::cashFlowForm");
+$route->get("/cash-flow/update/form/{uuid}", "CashFlow::cashFlowUpdateForm");
 
 
 /**

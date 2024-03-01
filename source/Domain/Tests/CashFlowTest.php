@@ -32,7 +32,8 @@ class CashFlowTest extends TestCase
             "history" => "venda realizada no dia" . date("d/m/Y"),
             "entry_typee" => 1,
             "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d")
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
         ];
 
         $this->expectException(Exception::class);
@@ -51,7 +52,8 @@ class CashFlowTest extends TestCase
             "history" => "venda realizada no dia" . date("d/m/Y"),
             "entry_type" => 1,
             "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d")
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
         ];
 
         $this->expectException(Exception::class);
@@ -69,11 +71,12 @@ class CashFlowTest extends TestCase
             "history" => "venda realizada no dia" . date("d/m/Y"),
             "entry_type" => 1,
             "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d")
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
         ];
 
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage("Instancia inválida");
+        $this->expectExceptionMessage("Instância inválida ao persistir o dado");
         $this->cashFlow->persistData($cashFlowData);
     }
 
@@ -96,7 +99,8 @@ class CashFlowTest extends TestCase
             "user_email" => "testefulano2@gmail.com",
             "user_password" => password_hash("minhasenha1234", PASSWORD_DEFAULT),
             "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d")
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
         ];
         $this->user->persistData($userData);
         $this->user = new User();
@@ -111,7 +115,8 @@ class CashFlowTest extends TestCase
             "history" => "venda realizada no dia " . date("d/m/Y"),
             "entry_type" => 1,
             "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d")
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
         ];
 
         $response = $this->cashFlow->persistData($cashFlowData);
@@ -133,7 +138,8 @@ class CashFlowTest extends TestCase
             "user_email" => "testefulano2@gmail.com",
             "user_password" => password_hash("minhasenha1234", PASSWORD_DEFAULT),
             "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d")
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
         ];
 
         $this->user->persistData($userData);
@@ -149,7 +155,8 @@ class CashFlowTest extends TestCase
                 "history" => "venda realizada no dia " . date("d/m/Y"),
                 "entry_type" => 1,
                 "created_at" => date("Y-m-d"),
-                "updated_at" => date("Y-m-d")
+                "updated_at" => date("Y-m-d"),
+                "deleted" => 0
             ];
             $this->cashFlow->persistData($cashFlowData);
             array_push($cashFlowIds, $this->cashFlow->getId());
@@ -181,7 +188,8 @@ class CashFlowTest extends TestCase
             "user_email" => "testefulano2@gmail.com",
             "user_password" => password_hash("minhasenha1234", PASSWORD_DEFAULT),
             "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d")
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
         ];
 
         $this->user->persistData($userData);
@@ -197,7 +205,8 @@ class CashFlowTest extends TestCase
                 "history" => "venda realizada no dia " . date("d/m/Y"),
                 "entry_type" => 0,
                 "created_at" => date("Y-m-d"),
-                "updated_at" => date("Y-m-d")
+                "updated_at" => date("Y-m-d"),
+                "deleted" => 0
             ];
             $this->cashFlow->persistData($cashFlowData);
             array_push($cashFlowIds, $this->cashFlow->getId());
@@ -220,13 +229,9 @@ class CashFlowTest extends TestCase
     public function testFindCashFlowByIdNotFound()
     {
         $this->cashFlow = new CashFlow();
-        $this->cashFlow->setId(1);
+        $this->cashFlow->setId(100000000000000000);
         $response = $this->cashFlow->findCashFlowById();
-        $this->assertJsonStringEqualsJsonString(
-            json_encode([
-                "cashflow_not_found" => "registro fluxo de caixa não encontrado"
-            ]), 
-        $response);
+        $this->assertNull($response);
     }
 
     public function testFindCashFlowById()
@@ -238,7 +243,8 @@ class CashFlowTest extends TestCase
             "user_full_name" => "teste fulano de tal 2",
             "user_nick_name" => "fulanoDeTal2",
             "user_email" => "testefulano2@gmail.com",
-            "user_password" => password_hash("minhasenha1234", PASSWORD_DEFAULT)
+            "user_password" => password_hash("minhasenha1234", PASSWORD_DEFAULT),
+            "deleted" => 0
         ];
         $this->user->persistData($userData);
         
@@ -249,7 +255,8 @@ class CashFlowTest extends TestCase
             "history" => "venda realizada no dia " . date("d/m/Y"),
             "entry_type" => 1,
             "created_at" => date("2024-01-14"),
-            "updated_at" => date("2024-01-14")
+            "updated_at" => date("2024-01-14"),
+            "deleted" => 0
         ];
 
         $this->cashFlow->persistData($cashFlowData);
@@ -299,7 +306,8 @@ class CashFlowTest extends TestCase
             "user_full_name" => "teste fulano de tal 2",
             "user_nick_name" => "fulanoDeTal2",
             "user_email" => "testefulano2@gmail.com",
-            "user_password" => password_hash("minhasenha1234", PASSWORD_DEFAULT)
+            "user_password" => password_hash("minhasenha1234", PASSWORD_DEFAULT),
+            "deleted" => 0
         ];
         
         $this->user->persistData($userData);
@@ -313,7 +321,8 @@ class CashFlowTest extends TestCase
             "history" => "venda realizada no dia " . date("d/m/Y"),
             "entry_type" => 1,
             "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d")
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
         ];
         
         $this->cashFlow->persistData($cashFlowData);
@@ -327,6 +336,160 @@ class CashFlowTest extends TestCase
         
         $this->user = new User();
         $this->user->dropUserById($userId);
+    }
 
+    public function testFindCashFlowByUuid()
+    {
+        $this->user = new User();
+        $userData = [
+            "uuid" => Uuid::uuid6(),
+            "user_full_name" => "teste fulano de tal 2",
+            "user_nick_name" => "fulanoDeTal2",
+            "user_email" => "testefulano2@gmail.com",
+            "user_password" => password_hash("minhasenha1234", PASSWORD_DEFAULT),
+            "deleted" => 0
+        ];
+        
+        $this->user->persistData($userData);
+        $userId = $this->user->getId();
+
+        $this->cashFlow = new CashFlow();
+        $cashFlowData = [
+            "uuid" => "1eed7357-6e74-6096-abf0-0242ac120003",
+            "id_user" => $this->user,
+            "entry" => "1.750,45",
+            "history" => "venda realizada no dia " . date("d/m/Y"),
+            "entry_type" => 1,
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ];
+        
+        $this->cashFlow->persistData($cashFlowData);
+        $uuid = $cashFlowData["uuid"];
+
+        $this->cashFlow = new CashFlow();
+        $response = $this->cashFlow->findCashFlowByUuid($uuid);
+        $this->assertIsObject($response);
+        
+        $this->cashFlow = new CashFlow();
+        $this->cashFlow->dropCashFlowByUuid($uuid);
+        
+        $this->user = new User();
+        $this->user->dropUserById($userId);
+    }
+
+    public function testFindCashFlowByUuidNotFound()
+    {
+        $this->cashFlow = new CashFlow();
+        $response = $this->cashFlow->findCashFlowByUuid("1eed7357-6e74-6096-abf0-0242ac120003");
+        $this->assertJsonStringEqualsJsonString($response, 
+            json_encode(["empty_cash_flow" => "o registro fluxo de caixa não existe"]));
+    }
+
+    public function testUpdateCashFlowByUuid()
+    {
+        $this->user = new User();
+        $userData = [
+            "uuid" => Uuid::uuid6(),
+            "user_full_name" => "teste fulano de tal 2",
+            "user_nick_name" => "fulanoDeTal2",
+            "user_email" => "testefulano2@gmail.com",
+            "user_password" => password_hash("minhasenha1234", PASSWORD_DEFAULT),
+            "deleted" => 0
+        ];
+        
+        $this->user->persistData($userData);
+        $userId = $this->user->getId();
+
+        $this->cashFlow = new CashFlow();
+        $cashFlowData = [
+            "uuid" => Uuid::uuid6(),
+            "id_user" => $this->user,
+            "entry" => "1.750,45",
+            "history" => "venda realizada no dia " . date("d/m/Y"),
+            "entry_type" => 0,
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ];
+        $this->cashFlow->persistData($cashFlowData);
+
+        $this->cashFlow = new CashFlow();
+        $cashFlowData['deleted'] = 1;
+        
+        $response = $this->cashFlow->updateCashFlowByUuid($cashFlowData);
+        $this->assertTrue($response);
+        
+        $this->user = new User();
+        $this->user->dropUserById($userId);
+    }
+
+    public function testUpdateCashFlowByUuidInstanceUserError()
+    {
+        $this->user = new User();
+        $userData = [
+            "uuid" => "1eed7357-6e74-6096-abf0-0242ac120003",
+            "user_full_name" => "teste fulano de tal 2",
+            "user_nick_name" => "fulanoDeTal2",
+            "user_email" => "testefulano2@gmail.com",
+            "user_password" => password_hash("minhasenha1234", PASSWORD_DEFAULT),
+            "deleted" => 0
+        ];
+        
+        $this->user->persistData($userData);
+
+        $this->cashFlow = new CashFlow();
+        $cashFlowData = [
+            "uuid" => "1eed7357-6e74-6096-abf0-0242ac120003",
+            "id_user" => $this->user,
+            "entry" => "1.750,45",
+            "history" => "venda realizada no dia " . date("d/m/Y"),
+            "entry_type" => 0,
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ];
+        $this->cashFlow->persistData($cashFlowData);
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("Instância inválida ao atualizar o dado");
+
+        $this->cashFlow = new CashFlow();
+        $cashFlowData['id_user'] = $this->cashFlow;
+        $this->cashFlow->updateCashFlowByUuid($cashFlowData);
+    }
+
+    public function testDropCashFlowCascadeByUuid()
+    {
+        $this->user = new User();
+        $response = $this->user->dropUserByUuid("1eed7357-6e74-6096-abf0-0242ac120003");
+        $this->assertNull($response);
+    }
+
+    public function testUpdateCashFlowByUuidEmptyCashFlow()
+    {
+        $this->cashFlow = new CashFlow();
+        $response = $this->cashFlow->updateCashFlowByUuid([]);
+        $this->assertJsonStringEqualsJsonString(
+            $response, json_encode(["data_is_empty" => "data não pode ser vazio"]));
+    }
+
+    public function testUpdateCashFlowByUuidEmptyData()
+    {
+        $this->cashFlow = new CashFlow();
+        $cashFlowData = [
+            "uuid" => Uuid::uuid6(),
+            "id_user" => new User(),
+            "entry" => "1.750,45",
+            "history" => "venda realizada no dia " . date("d/m/Y"),
+            "entry_type" => 0,
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ];
+        $response = $this->cashFlow->updateCashFlowByUuid($cashFlowData);
+        $this->assertJsonStringEqualsJsonString($response,
+            json_encode(["cash_flow_data_not_found" => "registro de fluxo de caixa não encontrado"]));
     }
 }

@@ -2,6 +2,7 @@
 namespace Source\Domain\Tests;
 
 use Exception;
+use PDOException;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 use Source\Domain\Model\User;
@@ -25,7 +26,8 @@ class UserTest extends TestCase
             "user_full_name" => "teste fulano de tal",
             "user_nick_name" => "fulanoDeTal",
             "user_email" => "testefulano@gmail.com",
-            "user_password" => password_hash("minhasenha123", PASSWORD_DEFAULT)
+            "user_password" => password_hash("minhasenha123", PASSWORD_DEFAULT),
+            "deleted" => 0
         ];
 
         $response = $this->user->persistData($data);
@@ -50,7 +52,8 @@ class UserTest extends TestCase
             "user_full_name" => "teste fulano de tal",
             "user_nick_name" => "fulanoDeTal",
             "user_emaill" => "testefulano@gmail.com",
-            "user_password" => password_hash("minhasenha123", PASSWORD_DEFAULT)
+            "user_password" => password_hash("minhasenha123", PASSWORD_DEFAULT),
+            "deleted" => 0
         ];
         $this->expectException(Exception::class);
         $this->expectExceptionMessage("esta propriedade user_email foi passado de maneira incorreta");
@@ -65,7 +68,8 @@ class UserTest extends TestCase
             "user_full_name" => "teste fulano de tal",
             "user_nick_name" => "fulanoDeTal",
             "user_email" => "testefulano@gmail.com",
-            "user_password" => password_hash("minhasenha123", PASSWORD_DEFAULT)
+            "user_password" => password_hash("minhasenha123", PASSWORD_DEFAULT),
+            "deleted" => 0
         ];
 
         $this->user->persistData($data);
@@ -75,6 +79,28 @@ class UserTest extends TestCase
         ]),
         $response);
         $this->user->dropUserByEmail($data["user_email"]);
+    }
+
+    public function testLoginAccessDenied()
+    {
+        $this->user = new User();
+        $data = [
+            "uuid" => Uuid::uuid6(),
+            "user_full_name" => "teste fulano de tal",
+            "user_nick_name" => "fulanoDeTal",
+            "user_email" => "testefulano@gmail.com",
+            "user_password" => password_hash("minhasenha123", PASSWORD_DEFAULT),
+            "deleted" => 1
+        ];
+        $this->user->persistData($data);
+        $userId = $this->user->getId();
+        
+        $response = $this->user->login("testefulano@gmail.com", "minhasenha123");
+        $this->assertJsonStringEqualsJsonString(
+            $response, json_encode(["access_denied" => "acesso negado"]));
+        
+        $this->user = new User();
+        $this->user->dropUserById($userId);
     }
 
     public function testInvalidLoginParameter()
@@ -105,7 +131,8 @@ class UserTest extends TestCase
             "user_full_name" => "teste fulano de tal",
             "user_nick_name" => "fulanoDeTal",
             "user_email" => "testefulano@gmail.com",
-            "user_password" => password_hash("minhasenha123", PASSWORD_DEFAULT)
+            "user_password" => password_hash("minhasenha123", PASSWORD_DEFAULT),
+            "deleted" => 0
         ];
 
         $this->user->persistData($data);
@@ -125,7 +152,8 @@ class UserTest extends TestCase
             "user_full_name" => "teste fulano de tal",
             "user_nick_name" => "fulanoDeTal",
             "user_email" => "testefulano@gmail.com",
-            "user_password" => password_hash("minhasenha123", PASSWORD_DEFAULT)
+            "user_password" => password_hash("minhasenha123", PASSWORD_DEFAULT),
+            "deleted" => 0
         ];
         
         $this->user->persistData($data);
@@ -150,12 +178,39 @@ class UserTest extends TestCase
             "user_full_name" => "teste fulano de tal",
             "user_nick_name" => "fulanoDeTal",
             "user_email" => "testefulano@gmail.com",
-            "user_password" => password_hash("minhasenha123", PASSWORD_DEFAULT)
+            "user_password" => password_hash("minhasenha123", PASSWORD_DEFAULT),
+            "deleted" => 0,
         ];
         
         $this->user->persistData($data);
         $response = $this->user->dropUserByEmail($data["user_email"]);
         $this->assertTrue($response, 'erro ao deletar usuário');
+    }
+
+    public function testFindUserByIdAccessDenied()
+    {
+        $this->user = new User();
+        $data = [
+            "uuid" => Uuid::uuid6(),
+            "user_full_name" => "teste fulano de tal",
+            "user_nick_name" => "fulanoDeTal",
+            "user_email" => "testefulano@gmail.com",
+            "user_password" => password_hash("minhasenha123", PASSWORD_DEFAULT),
+            "deleted" => 1
+        ];
+        
+        $this->user->persistData($data);
+        $userId = $this->user->getId();
+        
+        $this->user = new User();
+        $this->user->setId($userId);
+        $response = $this->user->findUserById();
+        
+        $this->assertJsonStringEqualsJsonString($response, 
+            json_encode(["access_denied" => "acesso negado"]));
+        
+        $this->user = new User();
+        $this->user->dropUserById($userId);
     }
 
     public function testFindUserById()
@@ -166,17 +221,20 @@ class UserTest extends TestCase
             "user_full_name" => "teste fulano de tal",
             "user_nick_name" => "fulanoDeTal",
             "user_email" => "testefulano@gmail.com",
-            "user_password" => password_hash("minhasenha123", PASSWORD_DEFAULT)
+            "user_password" => password_hash("minhasenha123", PASSWORD_DEFAULT),
+            "deleted" => 0
         ];
         
         $this->user->persistData($data);
-        $userData = $this->user->findUserByEmail($data["user_email"], ["id"]);
+        $userId = $this->user->getId();
+
+        $this->user = new User();
+        $this->user->setId($userId);
+        
+        $userData = $this->user->findUserById();
+        $this->assertIsObject($userData);
         
         $this->user = new User();
-        $this->user->setId($userData->id);
-        $userData = $this->user->findUserById();
-
-        $this->assertIsObject($userData);
         $this->user->dropUserById($userData->id);
     }
 
@@ -215,7 +273,8 @@ class UserTest extends TestCase
             "user_full_name" => "teste fulano de tal",
             "user_nick_name" => "fulanoDeTal",
             "user_email" => "testefulano@gmail.com",
-            "user_password" => password_hash("minhasenha123", PASSWORD_DEFAULT)
+            "user_password" => password_hash("minhasenha123", PASSWORD_DEFAULT),
+            "deleted" => 0
         ];
         $this->user->persistData($data);
         $userData = $this->user->findUserByEmail($data["user_email"]);
@@ -231,11 +290,172 @@ class UserTest extends TestCase
         $this->user->dropUserById(0);
     }
 
+    public function testFindUserByEmailAccessDenied()
+    {
+        $this->user = new User();
+        $data = [
+            "uuid" => Uuid::uuid6(),
+            "user_full_name" => "teste fulano de tal",
+            "user_nick_name" => "fulanoDeTal",
+            "user_email" => "testefulano@gmail.com",
+            "user_password" => password_hash("minhasenha123", PASSWORD_DEFAULT),
+            "deleted" => 1
+        ];
+        $this->user->persistData($data);
+        $userId = $this->user->getId();
+
+        $this->user = new User();
+        $response = $this->user->findUserByEmail($data["user_email"]);
+       
+        $this->assertJsonStringEqualsJsonString($response, 
+            json_encode(["access_denied" => "acesso negado"]));
+        
+        $this->user = new User();
+        $this->user->dropUserById($userId);
+    }
+
     public function testFindUserByEmailNotFound()
     {
         $this->user = new User();
         $userData = $this->user->findUserByEmail("emailqualquer@gmail.com");
         $this->assertJsonStringEqualsJsonString(json_encode(["user_not_exists" => "usuário não existe"]),
         $userData);
+    }
+
+    public function testfindUserByUuid()
+    {
+        $this->user = new User();
+        $data = [
+            "uuid" => "1eed719c-6cdc-6b78-bbef-0242ac120003",
+            "user_full_name" => "teste fulano de tal",
+            "user_nick_name" => "fulanoDeTal",
+            "user_email" => "testefulano@gmail.com",
+            "user_password" => password_hash("minhasenha123", PASSWORD_DEFAULT),
+            "deleted" => 0
+        ];
+        $this->user->persistData($data);
+        
+        $this->user = new User();
+        $userData = $this->user->findUserByUuid($data["uuid"]);
+        $this->assertIsObject($userData);
+
+        $this->user = new User();
+        $this->user->dropUserByUuid($data["uuid"]);
+    }
+
+    public function testFindUserByUuidNotFoud()
+    {
+        $this->user = new User();
+        $userData = $this->user->findUserByUuid("1eed719c-5555-6b78-bbef-0242ac120003");
+
+        $this->assertJsonStringEqualsJsonString($userData,
+            json_encode(["user_not_found" => "usuário não encontrado"]));
+    }
+
+    public function testfindUserByUuidAccessDenied()
+    {
+        $this->user = new User();
+        $data = [
+            "uuid" => "1eed719c-6cdc-6b78-bbef-0242ac120003",
+            "user_full_name" => "teste fulano de tal",
+            "user_nick_name" => "fulanoDeTal",
+            "user_email" => "testefulano@gmail.com",
+            "user_password" => password_hash("minhasenha123", PASSWORD_DEFAULT),
+            "deleted" => 1
+        ];
+
+        $this->user->persistData($data);
+        $this->user = new User();
+        $response = $this->user->findUserByUuid($data["uuid"]);
+
+        $this->assertJsonStringEqualsJsonString($response, 
+            json_encode(["access_denied" => "acesso negado"]));
+        
+        $this->user = new User();
+        $this->user->dropUserByUuid($data["uuid"]);
+    }
+
+    public function testDropUserByUuidNotFound()
+    {
+        $this->user = new User();
+        $data = [
+            "uuid" => "1eed719c-6cdc-6b78-bbef-0242ac120003",
+            "user_full_name" => "teste fulano de tal",
+            "user_nick_name" => "fulanoDeTal",
+            "user_email" => "testefulano@gmail.com",
+            "user_password" => password_hash("minhasenha123", PASSWORD_DEFAULT),
+            "deleted" => 0
+        ];
+
+        $this->user->persistData($data);
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("usuário não encontrado");
+        $this->user = new User();
+        $this->user->dropUserByUuid("1eed719c-6cdc-5252-bbef-0242ac120003");
+    }
+
+    public function testDropUserByUuid()
+    {
+        $this->user = new User();
+        $data = [
+            "uuid" => "1eed719c-6cdc-6b78-bbef-0242ac120003",
+            "user_full_name" => "teste fulano de tal",
+            "user_nick_name" => "fulanoDeTal",
+            "user_email" => "testefulano@gmail.com",
+            "user_password" => password_hash("minhasenha123", PASSWORD_DEFAULT),
+            "deleted" => 0
+        ];
+
+        $this->user->persistData($data);
+        
+        $this->user = new User();
+        $this->assertNull($this->user->dropUserByUuid($data["uuid"]));
+    }
+
+    public function testUpdateUserByUuid()
+    {
+        $this->user = new User();
+        $data = [
+            "uuid" => "1eed719c-6cdc-6b78-bbef-0242ac120003",
+            "user_full_name" => "teste fulano de tal",
+            "user_nick_name" => "fulanoDeTal",
+            "user_email" => "testefulano@gmail.com",
+            "user_password" => password_hash("minhasenha123", PASSWORD_DEFAULT),
+            "deleted" => 0
+        ];
+
+        $this->user->persistData($data);
+        $this->user = new User();
+        
+        $data["deleted"] = 1;
+        $response = $this->user->updateUserByUuid($data);
+        $this->assertTrue($response);
+        
+        $this->user = new User();
+        $this->user->dropUserByUuid($data["uuid"]);
+    }
+
+    public function testUpdateUserByUuidOnNull()
+    {
+        $this->user = new User();
+        $data = [
+            "uuid" => "1eed719c-6cdc-6b78-bbef-0242ac120003",
+            "user_full_name" => "teste fulano de tal",
+            "user_nick_name" => "fulanoDeTal",
+            "user_email" => "testefulano@gmail.com",
+            "user_password" => password_hash("minhasenha123", PASSWORD_DEFAULT),
+            "deleted" => 0
+        ];
+        $response = $this->user->updateUserByUuid($data);
+        $this->assertJsonStringEqualsJsonString($response,
+            json_encode(["user_not_found" => "usuário não encontrado"]));
+    }
+
+    public function testUpdateUserByUuidAccessDenied()
+    {
+        $this->user = new User();
+        $response = $this->user->updateUserByUuid([]);
+        $this->assertJsonStringEqualsJsonString($response, 
+        json_encode(["data_is_empty" => "data não pode ser vazio"]));
     }
 }

@@ -26,6 +26,9 @@ class User extends Model
     /** @var string Senha do usuário */
     protected string $userPassword = "user_password";
 
+    /** @var string Coluna para soft delete do registro */
+    protected string $deleted = "deleted";
+
     /**
      * User constructor
      */
@@ -36,8 +39,18 @@ class User extends Model
             $this->userFullName, 
             $this->userNickName, 
             $this->userEmail, 
-            $this->userPassword
+            $this->userPassword,
+            $this->deleted
         ]);
+    }
+
+    public function getDeleted()
+    {
+        return $this->deleted;
+    }
+
+    public function setDeleted(int $delete) {
+        $this->deleted = $delete;
     }
 
     public function getUuid()

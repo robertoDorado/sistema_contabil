@@ -1,5 +1,6 @@
 <?php
 
+use Ramsey\Uuid\Uuid;
 use Source\Domain\Model\User;
 
 require dirname(dirname(__DIR__)) . "/vendor/autoload.php";
@@ -20,10 +21,12 @@ echo "\n";
 
 $user = new User();
 $userData = [
+    "uuid" => Uuid::uuid6(),
     "user_full_name" => $userFullName,
     "user_nick_name" => $userNickName,
     "user_email" => $userEmail,
-    "user_password" => password_hash($userPassword, PASSWORD_DEFAULT)
+    "user_password" => password_hash($userPassword, PASSWORD_DEFAULT),
+    "deleted" => 0
 ];
 
 if (!$user->persistData($userData)) {

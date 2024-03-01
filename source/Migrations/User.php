@@ -40,7 +40,7 @@ class User
     {
         $this->ddl->setClassProperties();
         $this->ddl->setKeysToProperties(["BIGINT AUTO_INCREMENT PRIMARY KEY","VARCHAR(36) UNIQUE NOT NULL", "VARCHAR(355) NOT NULL",
-        "VARCHAR(355) NOT NULL", "VARCHAR(355) NOT NULL", "VARCHAR(355) NOT NULL"]);
+        "VARCHAR(355) NOT NULL", "VARCHAR(355) NOT NULL", "VARCHAR(355) NOT NULL", "TINYINT(1) NOT NULL"]);
         $this->ddl->setForeignKeyChecks(0)->dropTableIfExists()->createTableQuery()->setForeignKeyChecks(1);
         return $this->ddl->executeQuery();
     }

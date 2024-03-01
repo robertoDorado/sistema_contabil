@@ -28,11 +28,89 @@ class CashFlow
         $this->cashFlow = new ModelsCashFlow();
     }
 
+    public function updateCashFlowByUuid(array $data)
+    {
+        if (empty($data)) {
+            return json_encode(["data_is_empty" => "data não pode ser vazio"]);
+        }
+
+        $cashFlowData = $this->cashFlow->find("uuid=:uuid", ":uuid={$data['uuid']}")->fetch();
+        if (empty($cashFlowData)) {
+            return json_encode(["cash_flow_data_not_found" => "registro de fluxo de caixa não encontrado"]);
+        }
+
+        $verifyKeys = [
+            "id_user" => function ($value) {
+                if (!$value instanceof User) {
+                    throw new Exception("Instância inválida ao atualizar o dado");
+                }
+                return $value->getId();
+            },
+
+            "entry" => function (string $value) {
+                $value = convertCurrencyRealToFloat($value);
+                return $value;
+            },
+
+            "entry_type" => function (int $value) {
+                return $value["entry_type"] == 0 ? ($value["entry"] * -1) : $value["entry"];
+            }
+        ];
+        
+        foreach($data as $key => &$value) {
+            if (!empty($verifyKeys[$key])) {
+                $verifyKeys[$key]($value);
+            }else {
+                $cashFlowData->$key = $value;
+            }
+        }
+        
+        validateModelProperties(ModelsCashFlow::class, $data);
+        $cashFlowData->setRequiredFields(array_keys($data));
+
+        if (!$cashFlowData->save()) {
+            if (!empty($cashFlowData->fail())) {
+                throw new PDOException($cashFlowData->fail()->getMessage());
+            }else {
+                throw new Exception($cashFlowData->message()->getText());
+            }
+        }
+        return true;
+    }
+
+    public function dropCashFlowByUuid(string $uuid)
+    {
+        $cashFlowData = $this->cashFlow
+            ->find("uuid=:uuid", ":uuid={$uuid}")
+            ->fetch();
+        
+        if (!$cashFlowData->destroy()) {
+            if (!empty($cashFlowData->fail())) {
+                throw new PDOException($cashFlowData->fail()->getMessage());
+            }else {
+                throw new Exception($cashFlowData->message()->getText());
+            }
+        }
+    }
+
+    public function findCashFlowByUuid(string $uuid)
+    {
+        $cashFlowData = $this->cashFlow
+            ->find("uuid=:uuid", ":uuid={$uuid}")
+            ->fetch();
+        
+        if (empty($cashFlowData)) {
+            return json_encode(["empty_cash_flow" => "o registro fluxo de caixa não existe"]);
+        }
+
+        return $cashFlowData;
+    }
+
     public function findCashFlowByUser(array $columns = [], User $user)
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
-        $data = $this->cashFlow->find("id_user=:id_user", 
-            ":id_user=" . $user->getId() . "", $columns)->fetch(true);
+        $data = $this->cashFlow->find("id_user=:id_user AND deleted=:deleted", 
+            ":id_user=" . $user->getId() . "&:deleted=0", $columns)->fetch(true);
         
         if (empty($data)) {
             return json_encode(["cash_flow_empty" => "nenhum registro foi encontrado"]);
@@ -57,27 +135,27 @@ class CashFlow
     public function findCashFlowById(array $columns = [])
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
-        $data = $this->cashFlow->findById($this->getId(), $columns);
-        
-        if (empty($data)) {
-            return json_encode(["cashflow_not_found" => "registro fluxo de caixa não encontrado"]);
-        }
-
-        return $data;
+        return $this->cashFlow->find("id=:id AND deleted=:deleted",
+            ":id=" . $this->getId() . "&:deleted=0")->fetch();
     }
 
     public function dropCashFlowById(int $id)
     {
         $cashFlowData = $this->cashFlow->findById($id);
         if (!$cashFlowData->destroy()) {
-            throw new PDOException($cashFlowData->fail()->getMessage());
+            if (!empty($cashFlowData->fail())) {
+                throw new PDOException($cashFlowData->fail()->getMessage());
+            }else {
+                throw new Exception($cashFlowData->message()->getText());
+            }
         }
     }
 
     public function calculateBalance(User $user)
     {
         $data = $this->cashFlow
-            ->find("id_user=:id_user", ":id_user=" . $user->getId() . "")->fetch(true);
+            ->find("id_user=:id_user AND deleted=:deleted",
+            ":id_user=" . $user->getId() . "&:deleted=0")->fetch(true);
         $balance = 0;
         
         if (!empty($data)) {
@@ -108,7 +186,7 @@ class CashFlow
         foreach ($data as $key => &$value) {
             if ($key == "id_user") {
                 if (!$value instanceof User) {
-                    throw new Exception("Instancia inválida");
+                    throw new Exception("Instância inválida ao persistir o dado");
                 }
 
                 $value = $value->getId();
@@ -118,7 +196,11 @@ class CashFlow
         }
 
         if (!$this->cashFlow->save()) {
-            throw new PDOException($this->cashFlow->fail()->getMessage());
+            if (!empty($this->cashFlow->fail())) {
+                throw new PDOException($this->cashFlow->fail()->getMessage());
+            }else {
+                throw new Exception($this->cashFlow->message()->getText());
+            }
         }
 
         $this->setId(Connect::getInstance()->lastInsertId());
