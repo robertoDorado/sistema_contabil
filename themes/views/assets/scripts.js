@@ -61,13 +61,13 @@ $.fn.maskMoney=function(method){if(methods[method]){return methods[method].apply
 $("#launchValue").maskMoney({allowNegative:!1,thousands:'.',decimal:',',affixesStay:!1})
 const launchBtn=document.getElementById("launchBtn")
 cashFlowForm.addEventListener("submit",function(event){event.preventDefault()
-if(!this.launchValue.value){toastr.error("Campo valor de entrada inválido")
+if(!this.launchValue.value){toastr.warning("Campo valor de entrada inválido")
 throw new Error('Campo valor de entrada é obrigatório')}
-if(!this.csrfToken.value){toastr.error("Campo csrf-token inválido")
+if(!this.csrfToken.value){toastr.warning("Campo csrf-token inválido")
 throw new Error("Campo csrf-token inválido")}
-if(!this.releaseHistory.value){toastr.error("Campo histórico inválido")
+if(!this.releaseHistory.value){toastr.warning("Campo histórico inválido")
 throw new Error("Campo histórico inválido")}
-if(!this.entryType.value){toastr.error("Campo tipo de entrada inválido")
+if(!this.entryType.value){toastr.warning("Campo tipo de entrada inválido")
 throw new Error("Campo tipo de entrada inválido")}
 const cashFlowFormFields=[this.launchValue,this.releaseHistory,this.entryType]
 showSpinner(launchBtn)
@@ -99,13 +99,13 @@ message.cash_flow_empty=message.cash_flow_empty.charAt(0).toUpperCase()+message.
 $(function(){$("#cashFlowReport").DataTable({"language":{"sInfo":"Mostrando de _START_ até _END_ de _TOTAL_ registros","emptyTable":message.cash_flow_empty,},"responsive":!0,"lengthChange":!1,"autoWidth":!1,"buttons":[{extend:'copy',text:'Copiar'},"csv","excel","pdf","print",{extend:'colvis',text:'Visibilidade Coluna'}]}).buttons().container().appendTo('#widgets .col-md-6:eq(0)')})};if(window.location.pathname=="/admin/login"){const loginForm=document.getElementById("loginForm")
 loginForm.addEventListener("submit",function(event){event.preventDefault()
 const btnSubmit=this.querySelector(".btn.btn-primary.btn-block")
-if(!this.userEmail.value){toastr.error("Campo e-mail deve ser obrigatório")
+if(!this.userEmail.value){toastr.warning("Campo e-mail deve ser obrigatório")
 throw new Error("Campo e-mail deve ser obrigatório")}
-if(!this.userEmail.value.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)){toastr.error("Este e-mail não é válido")
+if(!this.userEmail.value.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)){toastr.warning("Este e-mail não é válido")
 throw new Error("este e-mail não é válido")}
-if(!this.userPassword.value){toastr.error("Campo senha deve ser obrigatório")
+if(!this.userPassword.value){toastr.warning("Campo senha deve ser obrigatório")
 throw new Error("campo senha deve ser obrigatório")}
-if(!this.csrfToken.value){toastr.error("Campo csrf-token inválido")
+if(!this.csrfToken.value){toastr.warning("Campo csrf-token inválido")
 throw new Error("Campo csrf-token inválido")}
 showSpinner(btnSubmit)
 const form=new FormData(this)
@@ -125,8 +125,38 @@ message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)
 btnSubmit.innerHTML='Login'
 throw new Error(message)}
-if(response.login_success){window.location.href=response.url}})})};if(window.location.pathname=="/admin"){const logoutBtn=document.getElementById("logout")
+if(response.login_success){window.location.href=response.url}})})};const logoutBtn=document.getElementById("logout")
 logoutBtn.addEventListener("click",function(event){event.preventDefault()
 const form=new FormData()
 form.append('request',JSON.stringify({logout:!0}))
-fetch(window.location.origin+"/admin/logout",{method:"POST",body:form}).then((response)=>response.json()).then(function(response){if(response.logout_success){window.location.href=window.location.href}})})}
+fetch(window.location.origin+"/admin/logout",{method:"POST",body:form}).then((response)=>response.json()).then(function(response){if(response.logout_success){window.location.href=window.location.href}})});let parameter=window.location.pathname.split("/")
+parameter=parameter.pop()
+if(window.location.pathname==`/admin/cash-flow/update/form/${parameter}`){$("#launchValue").maskMoney({allowNegative:!1,thousands:'.',decimal:',',affixesStay:!1})
+const cashFlowForm=document.getElementById("cashFlowForm")
+cashFlowForm.addEventListener("submit",function(event){event.preventDefault()
+const launchBtn=document.getElementById("launchBtn")
+if(!this.launchValue.value){toastr.warning("Campo valor de lançamento não pode estar vazio")
+throw new Error("Campo valor de lançamento não pode estar vazio")}
+if(!this.releaseHistory.value){toastr.warning("Campo histórico não pode estar vazio")
+throw new Error("Campo histórico não pode estar vazio")}
+if(!this.entryType.value){toastr.warning("Tipo de entrada inválida")
+throw new Error("Tipo de entrada inválida")}
+showSpinner(launchBtn)
+const form=new FormData(this)
+fetch(window.location.href,{method:"POST",body:form}).then((response)=>response.json()).then(function(response){let message=''
+if(response.user_not_exists){message=response.user_not_exists
+message=message.charAt(0).toUpperCase()+message.slice(1)
+toastr.error(message)
+btnSubmit.innerHTML='Atualizar'
+throw new Error(message)}
+if(response.data_is_empty){message=response.data_is_empty
+message=message.charAt(0).toUpperCase()+message.slice(1)
+toastr.error(message)
+btnSubmit.innerHTML='Atualizar'
+throw new Error(message)}
+if(response.cash_flow_data_not_found){message=response.cash_flow_data_not_found
+message=message.charAt(0).toUpperCase()+message.slice(1)
+toastr.error(message)
+btnSubmit.innerHTML='Atualizar'
+throw new Error(message)}
+if(response.success){window.location.href=response.url}})})}

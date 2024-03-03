@@ -1,6 +1,7 @@
 <?php
 namespace Source\Controllers;
 
+use DateTime;
 use Ramsey\Uuid\Uuid;
 use Source\Core\Controller;
 use Source\Domain\Model\CashFlow as ModelCashFlow;
@@ -24,6 +25,55 @@ class CashFlow extends Controller
 
     public function cashFlowUpdateForm(array $data)
     {
+        if (empty(session()->user)) {
+            redirect("/admin/login");
+        }
+
+        if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            $requestPost = $this->getRequests()
+            ->setRequiredFields(["launchValue", "releaseHistory", "entryType", "csrfToken"])
+            ->getAllPostData();
+
+            $uriParameter = $this->getServer()->getServerByKey("REQUEST_URI");
+            $uriParameter = explode("/", $uriParameter);
+            $uriParameter = array_pop($uriParameter);
+
+            if (empty($uriParameter)) {
+                throw new \Exception("parametro vazio ou inválido para atualização do fluxo de caixa");
+            }
+            
+            $user = new User();
+            $userData = $user->findUserByEmail(session()->user->user_email);
+
+            if (is_string($userData) && json_decode($userData) != null) {
+                echo $userData;
+                die;
+            }
+
+            $user->setId($userData->id);
+            $cashFlow = new ModelCashFlow();
+            $dateTime = new DateTime();
+            
+            $response = $cashFlow->updateCashFlowByUuid([
+                "uuid" => $uriParameter,
+                "id_user" => $user,
+                "entry" => $requestPost["launchValue"],
+                "history" => $requestPost["releaseHistory"],
+                "entry_type" => $requestPost["entryType"],
+                "created_at" => $dateTime->format("Y-m-d H:i:s"),
+                "updated_at" => $dateTime->format("Y-m-d H:i:s"),
+                "deleted" => 0
+            ]);
+
+            if (is_string($response) && json_decode($response) != null) {
+                echo $response;
+                die;
+            }
+
+            echo json_encode(["success" => true, "url" => url("/admin/cash-flow/report")]);
+            die;
+        }
+
         if (empty($data["uuid"])) {
             redirect("/admin/cash-flow/report");
         }
@@ -32,8 +82,13 @@ class CashFlow extends Controller
         $cashFlow = new ModelCashFlow();
         
         $cashFlowData = $cashFlow->findCashFlowByUuid($uuid);
+        
         if (is_string($cashFlowData) && json_decode($cashFlowData) != null) {
             redirect("/admin/cash-flow/report");
+        }
+        
+        if ($cashFlowData->getEntry() < 0) {
+            $cashFlowData->setEntry($cashFlowData->getEntry() * -1);
         }
 
         echo $this->view->render("admin/cash-flow-form-update", [
@@ -45,6 +100,10 @@ class CashFlow extends Controller
 
     public function cashFlowReport()
     {
+        if (empty(session()->user)) {
+            redirect("/admin/login");
+        }
+
         $user = new User();
         $userData = $user->findUserByEmail(session()->user->user_email);
 
@@ -61,7 +120,7 @@ class CashFlow extends Controller
         if (is_string($cashFlowDataByUser) && json_decode($cashFlowDataByUser) != null) {
             $cashFlowEmptyMessage = $cashFlowDataByUser;
         }
-
+        
         if (is_array($cashFlowDataByUser) && !empty($cashFlowDataByUser)) {
             foreach($cashFlowDataByUser as &$data) {
                 if (!empty($data->entry_type)) {
@@ -69,8 +128,12 @@ class CashFlow extends Controller
                 }else {
                     $data->setEntry('R$ ' . number_format($data->getEntry() * -1, 2, ',', '.'));
                 }
+                
                 $data->created_at = date('d/m/Y', strtotime($data->created_at));
                 $data->entry_type_value = $data->entry_type == 1 ? "Crédito" : "Débito";
+                
+                $data->uuid_array = explode("-", $data->getUuid());
+                $data->uuid_value = $data->uuid_array[0];
             }
         }
         
@@ -98,6 +161,10 @@ class CashFlow extends Controller
 
     public function cashFlowForm()
     {
+        if (empty(session()->user)) {
+            redirect("/admin/login");
+        }
+
         if ($this->getServer()->getServerByKey('REQUEST_METHOD') == 'POST') {
             $requestPost = $this->getRequests()
                 ->setRequiredFields(["launchValue", "releaseHistory", "entryType", "csrfToken"])
@@ -122,6 +189,7 @@ class CashFlow extends Controller
 
             $user->setId($userData->id);
             $cashFlow = new ModelCashFlow();
+            $dateTime = new DateTime();
 
             $response = $cashFlow->persistData([
                 "uuid" => Uuid::uuid6(),
@@ -129,8 +197,8 @@ class CashFlow extends Controller
                 "entry" => $requestPost["launchValue"],
                 "history" => $requestPost["releaseHistory"],
                 "entry_type" => $requestPost["entryType"],
-                "created_at" => date("Y-m-d"),
-                "updated_at" => date("Y-m-d"),
+                "created_at" => $dateTime->format("Y-m-d H:i:s"),
+                "updated_at" => $dateTime->format("Y-m-d H:i:s"),
                 "deleted" => 0
             ]);
 

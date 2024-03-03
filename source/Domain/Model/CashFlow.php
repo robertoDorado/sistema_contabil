@@ -47,19 +47,17 @@ class CashFlow
                 return $value->getId();
             },
 
-            "entry" => function (string $value) {
+            "entry" => function (string $value) use ($data) {
                 $value = convertCurrencyRealToFloat($value);
+                $value = empty($data['entry_type']) ? ($value * -1) : $value;
                 return $value;
-            },
-
-            "entry_type" => function (int $value) {
-                return $value["entry_type"] == 0 ? ($value["entry"] * -1) : $value["entry"];
             }
         ];
         
         foreach($data as $key => &$value) {
             if (!empty($verifyKeys[$key])) {
-                $verifyKeys[$key]($value);
+                $value = $verifyKeys[$key]($value);
+                $cashFlowData->$key = $value;
             }else {
                 $cashFlowData->$key = $value;
             }

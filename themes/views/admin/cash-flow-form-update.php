@@ -30,7 +30,7 @@
                             <div class="card-body">
                                 <div class="form-group">
                                     <label for="launchValue">Valor de Lançamento</label>
-                                    <input type="text" value="<?= $cashFlowData->getEntry() ?>" name="launchValue" class="form-control" id="launchValue" placeholder="Valor de lançamento">
+                                    <input type="text" value="<?= number_format($cashFlowData->getEntry(), 2, ',', '.') ?>" name="launchValue" class="form-control" id="launchValue" placeholder="Valor de lançamento">
                                     <input type="hidden" name="csrfToken" id="csrfToken" value="<?= session()->csrf_token ?>">
                                 </div>
                                 <div class="form-group">
@@ -48,7 +48,7 @@
                             </div>
     
                             <div class="card-footer">
-                                <button type="submit" id="launchBtn" class="btn btn-primary">Enviar</button>
+                                <button type="submit" id="launchBtn" class="btn btn-primary">Atualizar</button>
                             </div>
                         </form>
                     </div>

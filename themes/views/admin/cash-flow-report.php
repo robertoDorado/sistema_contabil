@@ -46,7 +46,7 @@
                                             <?php foreach($cashFlowDataByUser as $cashFlowData): ?>
                                                 <?php if (!empty($cashFlowData->entry_type)) : ?>
                                                     <tr style="color:#008000">
-                                                        <td>#<?= $cashFlowData->id ?></td>
+                                                        <td>#<?= $cashFlowData->uuid_value ?></td>
                                                         <td><?= $cashFlowData->created_at ?></td>
                                                         <td><?= $cashFlowData->getHistory() ?></td>
                                                         <td><?= $cashFlowData->entry_type_value ?></td>
@@ -56,7 +56,7 @@
                                                     </tr>
                                                 <?php else : ?>
                                                     <tr style="color:#ff0000">
-                                                        <td>#<?= $cashFlowData->id ?></td>
+                                                        <td>#<?= $cashFlowData->uuid_value ?></td>
                                                         <td><?= $cashFlowData->created_at ?></td>
                                                         <td><?= $cashFlowData->getHistory() ?></td>
                                                         <td><?= $cashFlowData->entry_type_value ?></td>

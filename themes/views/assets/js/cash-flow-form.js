@@ -14,22 +14,22 @@ if (window.location.pathname == '/admin/cash-flow/form') {
         event.preventDefault()
 
         if (!this.launchValue.value) {
-            toastr.error("Campo valor de entrada inválido")
+            toastr.warning("Campo valor de entrada inválido")
             throw new Error('Campo valor de entrada é obrigatório')
         }
 
         if (!this.csrfToken.value) {
-            toastr.error("Campo csrf-token inválido")
+            toastr.warning("Campo csrf-token inválido")
             throw new Error("Campo csrf-token inválido")
         }
 
         if (!this.releaseHistory.value) {
-            toastr.error("Campo histórico inválido")
+            toastr.warning("Campo histórico inválido")
             throw new Error("Campo histórico inválido")
         }
 
         if (!this.entryType.value) {
-            toastr.error("Campo tipo de entrada inválido")
+            toastr.warning("Campo tipo de entrada inválido")
             throw new Error("Campo tipo de entrada inválido")
         }
 

@@ -20,7 +20,7 @@ class DDL
     private array $classProperties;
 
     /** @var string String sql */
-    private string $sql = '';
+    private string $sql = "";
 
     /** @var string Nome da classe */
     private string $className;
