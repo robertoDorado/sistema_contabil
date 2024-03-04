@@ -63,7 +63,7 @@ abstract class Model
     public function __construct(string $entity, array $protected, array $required)
     {
         $this->entity = $entity;
-        $this->protected = array_merge($protected, ["created_at", "updated_at"]);
+        $this->protected = $protected;
         $this->required = $required;
 
         $this->message = new Message();
@@ -643,7 +643,6 @@ abstract class Model
             }
         }
 
-        // $this->data = $this->findById($id)->data();
         return true;
     }
 
@@ -712,8 +711,10 @@ abstract class Model
     protected function safe(): ?array
     {
         $safe = (array) $this->data;
-        foreach ($this->protected as $unset) {
-            unset($safe[$unset]);
+        if (!empty($this->protected)) {
+            foreach ($this->protected as $unset) {
+                unset($safe[$unset]);
+            }
         }
         return $safe;
     }

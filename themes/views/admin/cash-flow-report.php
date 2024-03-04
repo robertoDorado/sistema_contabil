@@ -1,4 +1,5 @@
 <?php $v->layout("admin/layouts/_admin") ?>
+<?php $v->insert("admin/layouts/_modal") ?>
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <div class="content-header">
@@ -43,7 +44,7 @@
                                     </thead>
                                     <tbody>
                                         <?php if (is_array($cashFlowDataByUser) && !empty($cashFlowDataByUser)) : ?>
-                                            <?php foreach($cashFlowDataByUser as $cashFlowData): ?>
+                                            <?php foreach ($cashFlowDataByUser as $cashFlowData) : ?>
                                                 <?php if (!empty($cashFlowData->entry_type)) : ?>
                                                     <tr style="color:#008000">
                                                         <td>#<?= $cashFlowData->uuid_value ?></td>
@@ -79,7 +80,7 @@
                                                 <th rowspan="1" colspan="1"></th>
                                                 <th rowspan="1" colspan="1"></th>
                                             </tr>
-                                        <?php elseif(empty($balanceValue)) : ?>
+                                        <?php elseif (empty($balanceValue)) : ?>
                                             <tr>
                                                 <th rowspan="1" colspan="1">Total</th>
                                                 <th rowspan="1" colspan="1"></th>

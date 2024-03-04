@@ -129,7 +129,41 @@ if(response.login_success){window.location.href=response.url}})})};const logoutB
 logoutBtn.addEventListener("click",function(event){event.preventDefault()
 const form=new FormData()
 form.append('request',JSON.stringify({logout:!0}))
-fetch(window.location.origin+"/admin/logout",{method:"POST",body:form}).then((response)=>response.json()).then(function(response){if(response.logout_success){window.location.href=window.location.href}})});let parameter=window.location.pathname.split("/")
+fetch(window.location.origin+"/admin/logout",{method:"POST",body:form}).then((response)=>response.json()).then(function(response){if(response.logout_success){window.location.href=window.location.href}})});if(window.location.pathname=='/admin/cash-flow/report'){const trashIconBtn=Array.from(document.querySelectorAll(".fa.fa-trash"))
+if(trashIconBtn){const launchModal=document.getElementById("launchModal")
+const modalContainerLabel=document.getElementById("modalContainerLabel")
+const modalBody=document.querySelector(".modal-body")
+const saveChanges=document.getElementById("saveChanges")
+saveChanges.classList.remove("btn-primary")
+saveChanges.classList.add("btn-danger")
+saveChanges.innerHTML="Excluir"
+const dismissModal=document.getElementById("dismissModal")
+dismissModal.innerHTML="Voltar"
+const dataDelete={}
+trashIconBtn.forEach(function(element){const linkDelete=element.parentElement
+linkDelete.addEventListener("click",function(event){event.preventDefault()
+const row=this.parentElement.parentElement
+let uuidParameter=this.parentElement.previousElementSibling.firstElementChild
+uuidParameter=uuidParameter.href.split("/")
+uuidParameter=uuidParameter.pop()
+let uuidReference=uuidParameter.split("-")
+uuidReference=uuidReference.shift()
+let url=`${window.location.origin}/admin/cash-flow/remove/${uuidParameter}`
+dataDelete.uuidParameter=uuidParameter
+dataDelete.url=url
+dataDelete.uuidReference=uuidReference
+dataDelete.row=row
+launchModal.click()})})
+launchModal.addEventListener("click",function(){modalContainerLabel.innerHTML="Atenção!"
+modalBody.innerHTML=`Você quer mesmo deletar o registro ${dataDelete.uuidReference}?`
+saveChanges.addEventListener("click",function(){showSpinner(saveChanges)
+fetch(`${window.location.origin}/admin/cash-flow/remove/${dataDelete.uuidParameter}`,{method:"POST"}).then((response)=>response.json()).then(function(response){const tFoot=Array.from(document.querySelector("tfoot").firstElementChild.children)
+const totalRow=document.querySelector("tfoot").firstElementChild
+totalRow.style.color=response.color
+tFoot.forEach(function(element){if(element.innerHTML&&element.innerHTML!='Total'){element.innerHTML=response.balance}})
+if(response.success){dataDelete.row.style.display="none"
+saveChanges.innerHTML="Excluir"
+dismissModal.click()}})})})}};let parameter=window.location.pathname.split("/")
 parameter=parameter.pop()
 if(window.location.pathname==`/admin/cash-flow/update/form/${parameter}`){$("#launchValue").maskMoney({allowNegative:!1,thousands:'.',decimal:',',affixesStay:!1})
 const cashFlowForm=document.getElementById("cashFlowForm")
@@ -144,6 +178,11 @@ throw new Error("Tipo de entrada inválida")}
 showSpinner(launchBtn)
 const form=new FormData(this)
 fetch(window.location.href,{method:"POST",body:form}).then((response)=>response.json()).then(function(response){let message=''
+if(response.empty_cash_flow){message=response.empty_cash_flow
+message=message.charAt(0).toUpperCase()+message.slice(1)
+toastr.error(message)
+btnSubmit.innerHTML='Atualizar'
+throw new Error(message)}
 if(response.user_not_exists){message=response.user_not_exists
 message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)

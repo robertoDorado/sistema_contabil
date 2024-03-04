@@ -40,6 +40,14 @@ if (window.location.pathname == `/admin/cash-flow/update/form/${parameter}`) {
         .then(function(response) {
             let message = ''
 
+            if (response.empty_cash_flow) {
+                message = response.empty_cash_flow
+                message = message.charAt(0).toUpperCase() + message.slice(1)
+                toastr.error(message)
+                btnSubmit.innerHTML = 'Atualizar'
+                throw new Error(message)
+            }
+
             if (response.user_not_exists) {
                 message = response.user_not_exists
                 message = message.charAt(0).toUpperCase() + message.slice(1)

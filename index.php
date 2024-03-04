@@ -44,6 +44,7 @@ $route->get("/cash-flow/form", "CashFlow::cashFlowForm");
 $route->post("/cash-flow/form", "CashFlow::cashFlowForm");
 $route->get("/cash-flow/update/form/{uuid}", "CashFlow::cashFlowUpdateForm");
 $route->post("/cash-flow/update/form/{uuid}", "CashFlow::cashFlowUpdateForm");
+$route->post("/cash-flow/remove/{uuid}", "CashFlow::cashFlowRemoveRegister");
 
 
 /**

@@ -63,9 +63,7 @@ class CashFlow
             }
         }
         
-        validateModelProperties(ModelsCashFlow::class, $data);
         $cashFlowData->setRequiredFields(array_keys($data));
-
         if (!$cashFlowData->save()) {
             if (!empty($cashFlowData->fail())) {
                 throw new PDOException($cashFlowData->fail()->getMessage());
@@ -177,20 +175,28 @@ class CashFlow
             throw new \Exception("valor de entrada inválido");
         }
         
-        $entry = convertCurrencyRealToFloat($data["entry"]);
-        $entry = $data["entry_type"] == 0 ? ($entry * -1) : $entry;
-        $data["entry"] = $entry;
-
-        foreach ($data as $key => &$value) {
-            if ($key == "id_user") {
+        $verifyKeys = [
+            "id_user" => function ($value) {
                 if (!$value instanceof User) {
                     throw new Exception("Instância inválida ao persistir o dado");
                 }
+                return $value->getId();
+            },
 
-                $value = $value->getId();
+            "entry" => function (string $value) use ($data) {
+                $value = convertCurrencyRealToFloat($value);
+                $value = empty($data['entry_type']) ? ($value * -1) : $value;
+                return $value;
             }
-
-            $this->cashFlow->$key = $value;
+        ];
+        
+        foreach($data as $key => &$value) {
+            if (!empty($verifyKeys[$key])) {
+                $value = $verifyKeys[$key]($value);
+                $this->cashFlow->$key = $value;
+            }else {
+                $this->cashFlow->$key = $value;
+            }
         }
 
         if (!$this->cashFlow->save()) {

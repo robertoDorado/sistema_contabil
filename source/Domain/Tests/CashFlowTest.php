@@ -98,8 +98,6 @@ class CashFlowTest extends TestCase
             "user_nick_name" => "fulanoDeTal2",
             "user_email" => "testefulano2@gmail.com",
             "user_password" => password_hash("minhasenha1234", PASSWORD_DEFAULT),
-            "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d"),
             "deleted" => 0
         ];
         $this->user->persistData($userData);
@@ -137,8 +135,6 @@ class CashFlowTest extends TestCase
             "user_nick_name" => "fulanoDeTal2",
             "user_email" => "testefulano2@gmail.com",
             "user_password" => password_hash("minhasenha1234", PASSWORD_DEFAULT),
-            "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d"),
             "deleted" => 0
         ];
 
@@ -187,8 +183,6 @@ class CashFlowTest extends TestCase
             "user_nick_name" => "fulanoDeTal2",
             "user_email" => "testefulano2@gmail.com",
             "user_password" => password_hash("minhasenha1234", PASSWORD_DEFAULT),
-            "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d"),
             "deleted" => 0
         ];
 

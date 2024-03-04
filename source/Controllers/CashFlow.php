@@ -23,6 +23,58 @@ class CashFlow extends Controller
         parent::__construct();
     }
 
+    public function cashFlowRemoveRegister(array $data)
+    {
+        if (empty(session()->user)) {
+            throw new \Exception("usuário inválido");
+        }
+
+        if (empty($data["uuid"])) {
+            throw new \Exception("uuid inválido");
+        }    
+        
+        $uuid = $data["uuid"];
+        $cashFlow = new ModelCashFlow();
+        $cashFlowData = $cashFlow->findCashFlowByUuid($uuid);
+        
+        if (is_string($cashFlowData) && json_decode($cashFlowData) != null) {
+            throw new \Exception("registro inválido");
+        }
+
+        $cashFlow = new ModelCashFlow();        
+        $response = $cashFlow->updateCashFlowByUuid([
+            "uuid" => $cashFlowData->getUuid(),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 1
+        ]);
+
+        if (is_string($response) && json_decode($response) != null) {
+            throw new \Exception($response);
+        }
+
+        $user = new User();
+        $userData = $user->findUserByEmail(session()->user->user_email);
+
+        if (is_string($userData) && json_decode($userData) != null) {
+            throw new \Exception($userData);
+        }
+        
+        $user->setId($userData->id);
+        $cashFlow = new ModelCashFlow();
+        
+        $balance = $cashFlow->calculateBalance($user);
+        $color = ($balance < 0 ? "#ff0000" : ($balance > 0 ? "#008000" : ""));
+        $balance = ($balance < 0 ? $balance * -1 : $balance);
+
+        echo json_encode(
+            [
+                "success" => true, 
+                "balance" => "R$ " . number_format($balance, 2, ",", "."),
+                "color" => $color
+            ]
+        );
+    }
+
     public function cashFlowUpdateForm(array $data)
     {
         if (empty(session()->user)) {
@@ -52,16 +104,22 @@ class CashFlow extends Controller
 
             $user->setId($userData->id);
             $cashFlow = new ModelCashFlow();
-            $dateTime = new DateTime();
+            $cashFlowData = $cashFlow->findCashFlowByUuid($uriParameter);
             
+            if (is_string($cashFlowData) && json_decode($cashFlowData) != null) {
+                echo $cashFlowData;
+                die;
+            }
+            
+            $cashFlow = new ModelCashFlow();
             $response = $cashFlow->updateCashFlowByUuid([
                 "uuid" => $uriParameter,
                 "id_user" => $user,
                 "entry" => $requestPost["launchValue"],
                 "history" => $requestPost["releaseHistory"],
                 "entry_type" => $requestPost["entryType"],
-                "created_at" => $dateTime->format("Y-m-d H:i:s"),
-                "updated_at" => $dateTime->format("Y-m-d H:i:s"),
+                "created_at" => $cashFlowData->created_at,
+                "updated_at" => date("Y-m-d"),
                 "deleted" => 0
             ]);
 
@@ -189,7 +247,6 @@ class CashFlow extends Controller
 
             $user->setId($userData->id);
             $cashFlow = new ModelCashFlow();
-            $dateTime = new DateTime();
 
             $response = $cashFlow->persistData([
                 "uuid" => Uuid::uuid6(),
@@ -197,8 +254,8 @@ class CashFlow extends Controller
                 "entry" => $requestPost["launchValue"],
                 "history" => $requestPost["releaseHistory"],
                 "entry_type" => $requestPost["entryType"],
-                "created_at" => $dateTime->format("Y-m-d H:i:s"),
-                "updated_at" => $dateTime->format("Y-m-d H:i:s"),
+                "created_at" => date("Y-m-d"),
+                "updated_at" => date("Y-m-d"),
                 "deleted" => 0
             ]);
 

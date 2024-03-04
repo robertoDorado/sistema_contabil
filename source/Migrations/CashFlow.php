@@ -36,8 +36,7 @@ class CashFlow
         $this->ddl->setProperty('');
         $this->ddl->setKeysToProperties(["BIGINT AUTO_INCREMENT PRIMARY KEY", "VARCHAR(36) UNIQUE NOT NULL",
         "BIGINT NOT NULL", "DECIMAL(10, 2) NOT NULL", "VARCHAR(255) NOT NULL",
-        "TINYINT(1) NOT NULL", "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
-        "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP", "TINYINT(1) NOT NULL",
+        "TINYINT(1) NOT NULL", "DATE", "DATE", "TINYINT(1) NOT NULL",
         "CONSTRAINT fk_cash_flow FOREIGN KEY (id_user) REFERENCES user(id) ON DELETE CASCADE"]);
         $this->ddl->dropTableIfExists()->createTableQuery();
         $this->ddl->executeQuery();
