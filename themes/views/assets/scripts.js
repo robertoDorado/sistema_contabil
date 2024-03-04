@@ -99,10 +99,8 @@ message.cash_flow_empty=message.cash_flow_empty.charAt(0).toUpperCase()+message.
 $(function(){$("#cashFlowReport").DataTable({"language":{"sInfo":"Mostrando de _START_ até _END_ de _TOTAL_ registros","emptyTable":message.cash_flow_empty,},"responsive":!0,"lengthChange":!1,"autoWidth":!1,"buttons":[{extend:'copy',text:'Copiar'},"csv","excel","pdf","print",{extend:'colvis',text:'Visibilidade Coluna'}]}).buttons().container().appendTo('#widgets .col-md-6:eq(0)')})};if(window.location.pathname=="/admin/login"){const loginForm=document.getElementById("loginForm")
 loginForm.addEventListener("submit",function(event){event.preventDefault()
 const btnSubmit=this.querySelector(".btn.btn-primary.btn-block")
-if(!this.userEmail.value){toastr.warning("Campo e-mail deve ser obrigatório")
-throw new Error("Campo e-mail deve ser obrigatório")}
-if(!this.userEmail.value.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)){toastr.warning("Este e-mail não é válido")
-throw new Error("este e-mail não é válido")}
+if(!this.userData.value){toastr.warning("Campo nome de usuário deve ser obrigatório")
+throw new Error("Campo nome de usuário deve ser obrigatório")}
 if(!this.userPassword.value){toastr.warning("Campo senha deve ser obrigatório")
 throw new Error("campo senha deve ser obrigatório")}
 if(!this.csrfToken.value){toastr.warning("Campo csrf-token inválido")
@@ -125,11 +123,11 @@ message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)
 btnSubmit.innerHTML='Login'
 throw new Error(message)}
-if(response.login_success){window.location.href=response.url}})})};const logoutBtn=document.getElementById("logout")
+if(response.login_success){window.location.href=response.url}})})};if(window.location.pathname!='/admin/login'){const logoutBtn=document.getElementById("logout")
 logoutBtn.addEventListener("click",function(event){event.preventDefault()
 const form=new FormData()
 form.append('request',JSON.stringify({logout:!0}))
-fetch(window.location.origin+"/admin/logout",{method:"POST",body:form}).then((response)=>response.json()).then(function(response){if(response.logout_success){window.location.href=window.location.href}})});if(window.location.pathname=='/admin/cash-flow/report'){const trashIconBtn=Array.from(document.querySelectorAll(".fa.fa-trash"))
+fetch(window.location.origin+"/admin/logout",{method:"POST",body:form}).then((response)=>response.json()).then(function(response){if(response.logout_success){window.location.href=window.location.href}})})};if(window.location.pathname=='/admin/cash-flow/report'){const trashIconBtn=Array.from(document.querySelectorAll(".fa.fa-trash"))
 if(trashIconBtn){const launchModal=document.getElementById("launchModal")
 const modalContainerLabel=document.getElementById("modalContainerLabel")
 const modalBody=document.querySelector(".modal-body")

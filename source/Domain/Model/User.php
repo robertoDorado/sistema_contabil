@@ -160,7 +160,7 @@ class User
         }
     }
 
-    public function login(string $userEmail, string $userPassword)
+    public function login(string $userEmail, string $userNickName, string $userPassword)
     {
         if (empty($userEmail) || empty($userPassword)) {
             return json_encode(["invalid_login_data" => "dados iválidos"]);
@@ -168,6 +168,12 @@ class User
 
         $user = $this->user->find("user_email=:user_email",
             ":user_email=" . $userEmail . "")->fetch();
+        
+        if (empty($user)) {
+            $user = new ModelsUser();
+            $user = $user->find("user_nick_name=:user_nick_name",
+            ":user_nick_name=" . $userNickName . "")->fetch();
+        }
         
         if (empty($user)) {
             return json_encode(["user_not_register" => "usuário não registrado"]);

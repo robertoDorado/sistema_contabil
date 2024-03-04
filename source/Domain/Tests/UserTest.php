@@ -95,7 +95,7 @@ class UserTest extends TestCase
         $this->user->persistData($data);
         $userId = $this->user->getId();
         
-        $response = $this->user->login("testefulano@gmail.com", "minhasenha123");
+        $response = $this->user->login($data["user_email"], $data["user_nick_name"], "minhasenha123");
         $this->assertJsonStringEqualsJsonString(
             $response, json_encode(["access_denied" => "acesso negado"]));
         
@@ -106,7 +106,7 @@ class UserTest extends TestCase
     public function testInvalidLoginParameter()
     {
         $this->user = new User();
-        $response = $this->user->login("", "");
+        $response = $this->user->login("", "", "");
         $this->assertJsonStringEqualsJsonString(json_encode([
             "invalid_login_data" => "dados iválidos"
         ]),
@@ -116,7 +116,7 @@ class UserTest extends TestCase
     public function testUserIsNotRegister()
     {
         $this->user = new User();
-        $response = $this->user->login("testefulano@gmail.com", "minhasenha123");
+        $response = $this->user->login("testefulano@gmail.com", "fulanoDeTal", "minhasenha123");
         $this->assertJsonStringEqualsJsonString(json_encode([
             "user_not_register" => "usuário não registrado"
         ]),
@@ -136,7 +136,7 @@ class UserTest extends TestCase
         ];
 
         $this->user->persistData($data);
-        $response = $this->user->login($data["user_email"], "minhasenha12345");
+        $response = $this->user->login($data["user_email"], $data["user_nick_name"], "minhasenha1234");
         $this->assertJsonStringEqualsJsonString(json_encode([
             "user_not_auth" => "usuário não autenticado"
         ]),
@@ -157,7 +157,7 @@ class UserTest extends TestCase
         ];
         
         $this->user->persistData($data);
-        $response = $this->user->login($data["user_email"], "minhasenha123");
+        $response = $this->user->login($data["user_email"], $data["user_nick_name"], "minhasenha123");
         $this->assertIsObject($response);
         $this->user->dropUserByEmail($data["user_email"]);
     }

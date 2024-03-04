@@ -10,7 +10,7 @@
 
       <form id="loginForm" action="#" method="post">
         <div class="input-group mb-3">
-          <input type="email" value="<?= empty($_COOKIE["user_email"]) ? '' : $_COOKIE["user_email"] ?>" class="form-control" name="userEmail" placeholder="E-mail">
+          <input type="text" value="<?= empty($_COOKIE["user_email"]) ? '' : $_COOKIE["user_email"] ?>" class="form-control" name="userData" placeholder="E-mail ou usuário">
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-envelope"></span>

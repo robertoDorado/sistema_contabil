@@ -40,11 +40,12 @@ class Login extends Controller
     public function login()
     {
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
-            $requestPost = $this->getRequests()->getAllPostData();
+            $requestPost = $this->getRequests()
+            ->setRequiredFields(["csrfToken", "userData", "userPassword"])->getAllPostData();
             
             $user = new User();
             $userDataOrErrorMessage = $user
-                ->login($requestPost["userEmail"], $requestPost["userPassword"]);
+                ->login($requestPost["userData"], $requestPost["userData"], $requestPost["userPassword"]);
 
             if (is_string($userDataOrErrorMessage) && json_decode($userDataOrErrorMessage) !== null) {
                 echo $userDataOrErrorMessage;
@@ -52,7 +53,7 @@ class Login extends Controller
             }
 
             if (isset($requestPost["remember"]) && $requestPost["remember"] == "on") {
-                setcookie("user_email", $userDataOrErrorMessage->user_email, time() + 3600);
+                setcookie("user_email", $requestPost["userData"], time() + 3600);
                 setcookie("user_password", $requestPost["userPassword"], time() + 3600);
             }
 
