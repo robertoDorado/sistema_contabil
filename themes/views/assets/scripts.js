@@ -93,10 +93,18 @@ message=response.success
 message=message.charAt(0).toUpperCase()+message.slice(1)
 launchBtn.innerHTML='Enviar'
 toastr.success(message)})})};if(window.location.pathname=="/admin/cash-flow/report"){const jsonMessage=document.getElementById("jsonMessage")
+const urlJson=document.getElementById("urlJson").dataset.url
 let message={cash_flow_empty:''}
 if(jsonMessage){message=JSON.parse(jsonMessage.dataset.message)
 message.cash_flow_empty=message.cash_flow_empty.charAt(0).toUpperCase()+message.cash_flow_empty.slice(1)}
-$(function(){$("#cashFlowReport").DataTable({"language":{"sInfo":"Mostrando de _START_ até _END_ de _TOTAL_ registros","emptyTable":message.cash_flow_empty,},"responsive":!0,"lengthChange":!1,"autoWidth":!1,"buttons":[{extend:'copy',text:'Copiar'},"csv","excel","pdf","print",{extend:'colvis',text:'Visibilidade Coluna'}]}).buttons().container().appendTo('#widgets .col-md-6:eq(0)')})};if(window.location.pathname=="/admin/login"){const loginForm=document.getElementById("loginForm")
+const table=$("#cashFlowReport").DataTable({"order":[[0,"desc"]],"language":{"url":urlJson,"emptyTable":message.cash_flow_empty,},"responsive":!0,"lengthChange":!1,"autoWidth":!1,"buttons":["copy","csv","excel","pdf","print","colvis"],"initComplete":function(){this.api().buttons().container().appendTo("#widgets .col-md-6:eq(0)")}})
+const tFoot=document.querySelector("tfoot").firstElementChild
+table.on('search.dt',function(){const dataFilter=table.rows({search:'applied'}).data();if(table.search()){let balance=0
+dataFilter.each(function(row){let entryValue=parseFloat(row[4].replace("R$","").replace(".","").replace(",",".").trim())
+if(row[3]=='Débito'){entryValue=entryValue*-1}
+balance+=entryValue})
+balance<0?tFoot.style.color="#ff0000":balance==0?tFoot.removeAttribute("style"):tFoot.style.color="#008000"
+if(balance<0){tFoot.children[4].innerHTML=(balance*-1).toLocaleString("pt-br",{"currency":"BRL","style":"currency"})}else{tFoot.children[4].innerHTML=balance.toLocaleString("pt-br",{"currency":"BRL","style":"currency"})}}})};if(window.location.pathname=="/admin/login"){const loginForm=document.getElementById("loginForm")
 loginForm.addEventListener("submit",function(event){event.preventDefault()
 const btnSubmit=this.querySelector(".btn.btn-primary.btn-block")
 if(!this.userData.value){toastr.warning("Campo nome de usuário deve ser obrigatório")

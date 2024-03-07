@@ -108,6 +108,7 @@
                         <?php if (!empty($cashFlowEmptyMessage)) : ?>
                             <div id="jsonMessage" data-message='<?= $cashFlowEmptyMessage ?>' style="display:none"></div>
                         <?php endif ?>
+                        <div id="urlJson" style="display:none" data-url="<?= theme("assets/datatable/datatable.json") ?>"></div>
                     </div>
                 </div>
             </div>
