@@ -181,11 +181,7 @@ class CashFlow extends Controller
         
         if (is_array($cashFlowDataByUser) && !empty($cashFlowDataByUser)) {
             foreach($cashFlowDataByUser as &$data) {
-                if (!empty($data->entry_type)) {
-                    $data->setEntry('R$ ' . number_format($data->getEntry(), 2, ',', '.'));
-                }else {
-                    $data->setEntry('R$ ' . number_format($data->getEntry() * -1, 2, ',', '.'));
-                }
+                $data->setEntry('R$ ' . number_format($data->getEntry(), 2, ',', '.'));
                 
                 $data->created_at = date('d/m/Y', strtotime($data->created_at));
                 $data->entry_type_value = $data->entry_type == 1 ? "Crédito" : "Débito";
@@ -200,13 +196,8 @@ class CashFlow extends Controller
         
         $user->setId($userData->id);
         $balanceValue = $cashFlow->calculateBalance($user);
-
-        if ($balanceValue < 0) {
-            $balance = !empty($balanceValue) ? 'R$ ' . number_format($balanceValue * -1, 2, ',', '.') : 0;
-        }else {
-            $balance = !empty($balanceValue) ? 'R$ ' . number_format($balanceValue, 2, ',', '.') : 0;
-        }
-
+        $balance = !empty($balanceValue) ? 'R$ ' . number_format($balanceValue, 2, ',', '.') : 0;
+        
         echo $this->view->render("admin/cash-flow-report", [
             "userFullName" => showUserFullName(),
             "endpoints" => ['/admin/cash-flow/form', "/admin/cash-flow/report"],

@@ -21,7 +21,14 @@ if (window.location.pathname == "/admin/cash-flow/report") {
         "responsive": true,
         "lengthChange": false, 
         "autoWidth": false,
-        "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
+        "buttons": [
+            "copy", 
+            "csv", 
+            "excel",
+            "pdf", 
+            "print", 
+            "colvis"
+        ],
         "initComplete": function () {
             this.api()
                 .buttons()
@@ -38,10 +45,6 @@ if (window.location.pathname == "/admin/cash-flow/report") {
             dataFilter.each(function(row) {
                 let entryValue = parseFloat(row[4].replace("R$", "")
                     .replace(".", "").replace(",", ".").trim())
-                
-                if (row[3] == 'Débito') {
-                    entryValue = entryValue * -1
-                }
 
                 balance += entryValue
             })
@@ -49,13 +52,8 @@ if (window.location.pathname == "/admin/cash-flow/report") {
             balance < 0 ? tFoot.style.color = "#ff0000" : balance == 0 ?
                 tFoot.removeAttribute("style") : tFoot.style.color = "#008000"
             
-            if (balance < 0) {
-                tFoot.children[4].innerHTML = (balance * -1)
-                    .toLocaleString("pt-br", {"currency": "BRL", "style": "currency"})
-            }else {
-                tFoot.children[4].innerHTML = balance
-                    .toLocaleString("pt-br", {"currency": "BRL", "style": "currency"})
-            }
+            tFoot.children[4].innerHTML = balance
+                .toLocaleString("pt-br", {"currency": "BRL", "style": "currency"})
         }
     })
 }
