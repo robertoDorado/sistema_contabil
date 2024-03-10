@@ -58,9 +58,9 @@
                                     </thead>
                                     <tbody>
                                         <?php if (is_array($cashFlowDataByUser) && !empty($cashFlowDataByUser)) : ?>
-                                            <?php foreach ($cashFlowDataByUser as $cashFlowData) : ?>
+                                            <?php foreach ($cashFlowDataByUser as $key => $cashFlowData) : ?>
                                                 <?php if (!empty($cashFlowData->entry_type)) : ?>
-                                                    <tr style="color:#008000">
+                                                    <tr data-key="<?= $key ?>" style="color:#008000">
                                                         <td>#<?= $cashFlowData->uuid_value ?></td>
                                                         <td><?= $cashFlowData->created_at ?></td>
                                                         <td><?= $cashFlowData->getHistory() ?></td>
@@ -70,7 +70,7 @@
                                                         <td><a class="icons" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a></td>
                                                     </tr>
                                                 <?php else : ?>
-                                                    <tr style="color:#ff0000">
+                                                    <tr data-key="<?= $key ?>" style="color:#ff0000">
                                                         <td>#<?= $cashFlowData->uuid_value ?></td>
                                                         <td><?= $cashFlowData->created_at ?></td>
                                                         <td><?= $cashFlowData->getHistory() ?></td>
@@ -122,7 +122,6 @@
                         <?php if (!empty($cashFlowEmptyMessage)) : ?>
                             <div id="jsonMessage" data-message='<?= $cashFlowEmptyMessage ?>' style="display:none"></div>
                         <?php endif ?>
-                        <div id="urlJson" style="display:none" data-url="<?= theme("assets/datatable/datatable.json") ?>"></div>
                     </div>
                 </div>
             </div>
