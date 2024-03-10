@@ -92,18 +92,47 @@ cashFlowFormFields.forEach(function(elem){elem.value=''})
 message=response.success
 message=message.charAt(0).toUpperCase()+message.slice(1)
 launchBtn.innerHTML='Enviar'
-toastr.success(message)})})};if(window.location.pathname=="/admin/cash-flow/report"){const jsonMessage=document.getElementById("jsonMessage")
+toastr.success(message)})})};if(window.location.pathname=="/admin/cash-flow/report"){$(document).ready(function(){$('#date-range').daterangepicker({opens:'left',locale:{format:'DD/MM/YYYY',separator:' - ',applyLabel:'Aplicar',cancelLabel:'Cancelar',}})});const jsonMessage=document.getElementById("jsonMessage")
 const urlJson=document.getElementById("urlJson").dataset.url
 let message={cash_flow_empty:''}
 if(jsonMessage){message=JSON.parse(jsonMessage.dataset.message)
 message.cash_flow_empty=message.cash_flow_empty.charAt(0).toUpperCase()+message.cash_flow_empty.slice(1)}
-const table=$("#cashFlowReport").DataTable({"order":[[0,"desc"]],"language":{"url":urlJson,"emptyTable":message.cash_flow_empty,},"responsive":!0,"lengthChange":!1,"autoWidth":!1,"buttons":["copy","csv","excel","pdf","print","colvis"],"initComplete":function(){this.api().buttons().container().appendTo("#widgets .col-md-6:eq(0)")}})
+const table=$("#cashFlowReport").DataTable({"order":[[0,"desc"]],"language":{"url":urlJson,"emptyTable":message.cash_flow_empty,},"responsive":!0,"lengthChange":!1,"autoWidth":!1,"buttons":["copy",{extend:"csv",charset:'utf-8',bom:!0,customize:function(csvData){let arrayCsvData=csvData.split('"')
+arrayCsvData=arrayCsvData.map(function(item){item=item.replace(/^Editar$/,"")
+item=item.replace(/^Excluir$/,"")
+return item})
+arrayCsvData=arrayCsvData.filter((string)=>string)
+for(let i=arrayCsvData.length-1;i>0;i--){if(arrayCsvData[i]==arrayCsvData[i-1]){arrayCsvData.splice(i-1,2)}}
+let templateCsv=arrayCsvData.join('"')
+if(!templateCsv.startsWith('"')){templateCsv=`"${templateCsv}`}
+if(!templateCsv.endsWith('"')){templateCsv=`${templateCsv}"`}
+return templateCsv}},{extend:"excel",customizeData:function(xlsxData){let balance=0
+let arrayXlsxData=Array.from(xlsxData.body)
+arrayXlsxData=arrayXlsxData.map(function(row){row[4]=parseFloat(row[4].replace("R$","").replace(".","").replace(",",".").trim())
+row=row.filter((data)=>data)
+balance+=row[4]
+return row})
+arrayXlsxData.push(['Total','','','',balance])
+xlsxData.header=xlsxData.header.filter((data)=>data!='Editar'&&data!='Excluir')
+xlsxData.body=arrayXlsxData}},{extend:"pdf",customize:function(pdfData){let arrayPdfData=Array.from(pdfData.content[1].table.body)
+let header=arrayPdfData.shift()
+let balance=0
+arrayPdfData=arrayPdfData.map(function(row){row[4].text=parseFloat(row[4].text.replace("R$","").replace(".","").replace(",",".").trim())
+balance+=row[4].text
+row[4].text=row[4].text.toLocaleString("pt-br",{"currency":"BRL","style":"currency"})
+row=row.filter((data)=>data.text)
+return row})
+balance=balance.toLocaleString("pt-br",{"currency":"BRL","style":"currency"})
+header=header.filter((item)=>item.text!="Editar"&&item.text!="Excluir")
+arrayPdfData.unshift(header)
+arrayPdfData.push([{text:'Total',style:'tableBodyOdd',fillColor:'#f1ff32'},{text:'',style:'tableBodyOdd',fillColor:'#f1ff32'},{text:'',style:'tableBodyOdd',fillColor:'#f1ff32'},{text:'',style:'tableBodyOdd',fillColor:'#f1ff32'},{text:balance,style:'tableBodyOdd',fillColor:'#f1ff32'}])
+pdfData.content[1].table.body=arrayPdfData}},"colvis"],"initComplete":function(){this.api().buttons().container().appendTo("#widgets .col-md-6:eq(0)")}})
 const tFoot=document.querySelector("tfoot").firstElementChild
-table.on('search.dt',function(){const dataFilter=table.rows({search:'applied'}).data();if(table.search()){let balance=0
+table.on('search.dt',function(){const dataFilter=table.rows({search:'applied'}).data();let balance=0
 dataFilter.each(function(row){let entryValue=parseFloat(row[4].replace("R$","").replace(".","").replace(",",".").trim())
 balance+=entryValue})
 balance<0?tFoot.style.color="#ff0000":balance==0?tFoot.removeAttribute("style"):tFoot.style.color="#008000"
-tFoot.children[4].innerHTML=balance.toLocaleString("pt-br",{"currency":"BRL","style":"currency"})}})};if(window.location.pathname=="/admin/login"){const loginForm=document.getElementById("loginForm")
+tFoot.children[4].innerHTML=balance.toLocaleString("pt-br",{"currency":"BRL","style":"currency"})})};if(window.location.pathname=="/admin/login"){const loginForm=document.getElementById("loginForm")
 loginForm.addEventListener("submit",function(event){event.preventDefault()
 const btnSubmit=this.querySelector(".btn.btn-primary.btn-block")
 if(!this.userData.value){toastr.warning("Campo nome de usuário deve ser obrigatório")
@@ -157,7 +186,6 @@ let url=`${window.location.origin}/admin/cash-flow/remove/${uuidParameter}`
 dataDelete.uuidParameter=uuidParameter
 dataDelete.url=url
 dataDelete.uuidReference=uuidReference
-dataDelete.row=row
 launchModal.click()})})
 launchModal.addEventListener("click",function(){modalContainerLabel.innerHTML="Atenção!"
 modalBody.innerHTML=`Você quer mesmo deletar o registro ${dataDelete.uuidReference}?`
@@ -166,41 +194,46 @@ fetch(`${window.location.origin}/admin/cash-flow/remove/${dataDelete.uuidParamet
 const totalRow=document.querySelector("tfoot").firstElementChild
 totalRow.style.color=response.color
 tFoot.forEach(function(element){if(element.innerHTML&&element.innerHTML!='Total'){element.innerHTML=response.balance}})
-if(response.success){dataDelete.row.style.display="none"
-saveChanges.innerHTML="Excluir"
-dismissModal.click()}})})})}};let parameter=window.location.pathname.split("/")
+if(response.success){window.location.href=window.location.href}})})})}};let parameter=window.location.pathname.split("/")
 parameter=parameter.pop()
 if(window.location.pathname==`/admin/cash-flow/update/form/${parameter}`){$("#launchValue").maskMoney({allowNegative:!1,thousands:'.',decimal:',',affixesStay:!1})
 const cashFlowForm=document.getElementById("cashFlowForm")
 cashFlowForm.addEventListener("submit",function(event){event.preventDefault()
-const launchBtn=document.getElementById("launchBtn")
+const updateBtn=document.getElementById("updateBtn")
 if(!this.launchValue.value){toastr.warning("Campo valor de lançamento não pode estar vazio")
 throw new Error("Campo valor de lançamento não pode estar vazio")}
 if(!this.releaseHistory.value){toastr.warning("Campo histórico não pode estar vazio")
 throw new Error("Campo histórico não pode estar vazio")}
+if(!this.createdAt.value){toastr.warning("Campo data não pode estar vazio")
+throw new Error("Campo data não pode estar vazio")}
 if(!this.entryType.value){toastr.warning("Tipo de entrada inválida")
 throw new Error("Tipo de entrada inválida")}
-showSpinner(launchBtn)
+showSpinner(updateBtn)
 const form=new FormData(this)
 fetch(window.location.href,{method:"POST",body:form}).then((response)=>response.json()).then(function(response){let message=''
 if(response.empty_cash_flow){message=response.empty_cash_flow
 message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)
-btnSubmit.innerHTML='Atualizar'
+updateBtn.innerHTML='Atualizar'
 throw new Error(message)}
 if(response.user_not_exists){message=response.user_not_exists
 message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)
-btnSubmit.innerHTML='Atualizar'
+updateBtn.innerHTML='Atualizar'
 throw new Error(message)}
 if(response.data_is_empty){message=response.data_is_empty
 message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)
-btnSubmit.innerHTML='Atualizar'
+updateBtn.innerHTML='Atualizar'
 throw new Error(message)}
 if(response.cash_flow_data_not_found){message=response.cash_flow_data_not_found
 message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)
-btnSubmit.innerHTML='Atualizar'
+updateBtn.innerHTML='Atualizar'
+throw new Error(message)}
+if(response.invalid_date){message=response.invalid_date
+message=message.charAt(0).toUpperCase()+message.slice(1)
+toastr.error(message)
+updateBtn.innerHTML='Atualizar'
 throw new Error(message)}
 if(response.success){window.location.href=response.url}})})}

@@ -14,7 +14,7 @@ if (window.location.pathname == `/admin/cash-flow/update/form/${parameter}`) {
     const cashFlowForm = document.getElementById("cashFlowForm")
     cashFlowForm.addEventListener("submit", function(event) {
         event.preventDefault()
-        const launchBtn = document.getElementById("launchBtn")
+        const updateBtn = document.getElementById("updateBtn")
 
         if (!this.launchValue.value) {
             toastr.warning("Campo valor de lançamento não pode estar vazio")
@@ -26,12 +26,17 @@ if (window.location.pathname == `/admin/cash-flow/update/form/${parameter}`) {
             throw new Error("Campo histórico não pode estar vazio")
         }
 
+        if (!this.createdAt.value) {
+            toastr.warning("Campo data não pode estar vazio")
+            throw new Error("Campo data não pode estar vazio")
+        }
+
         if (!this.entryType.value) {
             toastr.warning("Tipo de entrada inválida")
             throw new Error("Tipo de entrada inválida")
         }
 
-        showSpinner(launchBtn)
+        showSpinner(updateBtn)
         const form = new FormData(this)
         fetch(window.location.href, {
             method: "POST",
@@ -44,7 +49,7 @@ if (window.location.pathname == `/admin/cash-flow/update/form/${parameter}`) {
                 message = response.empty_cash_flow
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.error(message)
-                btnSubmit.innerHTML = 'Atualizar'
+                updateBtn.innerHTML = 'Atualizar'
                 throw new Error(message)
             }
 
@@ -52,7 +57,7 @@ if (window.location.pathname == `/admin/cash-flow/update/form/${parameter}`) {
                 message = response.user_not_exists
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.error(message)
-                btnSubmit.innerHTML = 'Atualizar'
+                updateBtn.innerHTML = 'Atualizar'
                 throw new Error(message)
             }
 
@@ -60,7 +65,7 @@ if (window.location.pathname == `/admin/cash-flow/update/form/${parameter}`) {
                 message = response.data_is_empty
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.error(message)
-                btnSubmit.innerHTML = 'Atualizar'
+                updateBtn.innerHTML = 'Atualizar'
                 throw new Error(message)
             }
 
@@ -68,7 +73,15 @@ if (window.location.pathname == `/admin/cash-flow/update/form/${parameter}`) {
                 message = response.cash_flow_data_not_found
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.error(message)
-                btnSubmit.innerHTML = 'Atualizar'
+                updateBtn.innerHTML = 'Atualizar'
+                throw new Error(message)
+            }
+
+            if (response.invalid_date) {
+                message = response.invalid_date
+                message = message.charAt(0).toUpperCase() + message.slice(1)
+                toastr.error(message)
+                updateBtn.innerHTML = 'Atualizar'
                 throw new Error(message)
             }
 

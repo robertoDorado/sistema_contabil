@@ -83,8 +83,14 @@ class CashFlow extends Controller
 
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
             $requestPost = $this->getRequests()
-            ->setRequiredFields(["launchValue", "releaseHistory", "entryType", "csrfToken"])
-            ->getAllPostData();
+            ->setRequiredFields(
+                [
+                    "launchValue", 
+                    "releaseHistory", 
+                    "entryType", 
+                    "csrfToken", 
+                    "createdAt"
+                ])->getAllPostData();
 
             $uriParameter = $this->getServer()->getServerByKey("REQUEST_URI");
             $uriParameter = explode("/", $uriParameter);
@@ -110,6 +116,11 @@ class CashFlow extends Controller
                 echo $cashFlowData;
                 die;
             }
+
+            if (strtotime($requestPost["createdAt"]) > strtotime(date("Y-m-d"))) {
+                echo json_encode(["invalid_date" => "Data de lançamento não pode ser futura"]);
+                die;
+            }
             
             $cashFlow = new ModelCashFlow();
             $response = $cashFlow->updateCashFlowByUuid([
@@ -118,7 +129,7 @@ class CashFlow extends Controller
                 "entry" => $requestPost["launchValue"],
                 "history" => $requestPost["releaseHistory"],
                 "entry_type" => $requestPost["entryType"],
-                "created_at" => $cashFlowData->created_at,
+                "created_at" => $requestPost["createdAt"],
                 "updated_at" => date("Y-m-d"),
                 "deleted" => 0
             ]);

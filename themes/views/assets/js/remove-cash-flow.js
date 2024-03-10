@@ -32,7 +32,6 @@ if (window.location.pathname == '/admin/cash-flow/report') {
                 dataDelete.uuidParameter = uuidParameter
                 dataDelete.url = url
                 dataDelete.uuidReference = uuidReference
-                dataDelete.row = row
                 launchModal.click()
             })
         })
@@ -58,9 +57,7 @@ if (window.location.pathname == '/admin/cash-flow/report') {
                     })
 
                     if (response.success) {
-                        dataDelete.row.style.display = "none"
-                        saveChanges.innerHTML = "Excluir"
-                        dismissModal.click()
+                        window.location.href = window.location.href
                     }
                 })
             })

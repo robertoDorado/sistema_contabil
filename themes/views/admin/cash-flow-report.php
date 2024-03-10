@@ -22,6 +22,20 @@
     <div class="content">
         <div class="container-fluid">
             <div class="row">
+                <div class="col-md-6 mb-5">
+                    <form method="get" action="<?= url("/admin/cash-flow/report") ?>">
+                        <div class="form-row">
+                            <div class="col-md-6">
+                                <label for="date-range">Busca por data:</label>
+                                <input type="text" name="daterange" id="date-range" class="form-control" />
+                            </div>
+                            <div class="col-md-2">
+                                <label>&nbsp;</label>
+                                <button type="submit" class="btn btn-primary btn-block" id="btn-search">Buscar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
                 <div class="col">
                     <div class="card">
                         <div class="card-header">

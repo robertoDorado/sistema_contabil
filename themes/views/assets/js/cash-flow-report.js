@@ -1,4 +1,16 @@
 if (window.location.pathname == "/admin/cash-flow/report") {
+    $(document).ready(function() {
+        $('#date-range').daterangepicker({
+            opens: 'left', // Configuração opcional para a posição do calendário
+            locale: {
+                format: 'DD/MM/YYYY',
+                separator: ' - ',
+                applyLabel: 'Aplicar',
+                cancelLabel: 'Cancelar',
+            }
+        });
+    });
+
     const jsonMessage = document.getElementById("jsonMessage")
     const urlJson = document.getElementById("urlJson").dataset.url
 
@@ -11,7 +23,7 @@ if (window.location.pathname == "/admin/cash-flow/report") {
         message.cash_flow_empty = message.cash_flow_empty.charAt(0).toUpperCase()
             + message.cash_flow_empty.slice(1)
     }
-
+    
     const table = $("#cashFlowReport").DataTable({
         "order": [[0, "desc"]],
         "language": {
@@ -19,14 +31,114 @@ if (window.location.pathname == "/admin/cash-flow/report") {
             "emptyTable": message.cash_flow_empty,
         },
         "responsive": true,
-        "lengthChange": false, 
+        "lengthChange": false,
         "autoWidth": false,
         "buttons": [
-            "copy", 
-            "csv", 
-            "excel",
-            "pdf", 
-            "print", 
+            "copy",
+            {
+                extend: "csv",
+                charset: 'utf-8',
+                bom: true,
+                customize: function (csvData) {
+                    let arrayCsvData = csvData.split('"')
+                    arrayCsvData = arrayCsvData.map(function (item) {
+                        item = item.replace(/^Editar$/, "")
+                        item = item.replace(/^Excluir$/, "")
+                        return item
+                    })
+                    arrayCsvData = arrayCsvData.filter((string) => string)
+
+                    for (let i = arrayCsvData.length - 1; i > 0; i--) {
+                        if (arrayCsvData[i] == arrayCsvData[i - 1]) {
+                            arrayCsvData.splice(i - 1, 2)
+                        }
+                    }
+
+                    let templateCsv = arrayCsvData.join('"')
+                    if (!templateCsv.startsWith('"')) {
+                        templateCsv = `"${templateCsv}`
+                    }
+
+                    if (!templateCsv.endsWith('"')) {
+                        templateCsv = `${templateCsv}"`
+                    }
+                    return templateCsv
+                }
+            },
+            {
+                extend: "excel",
+                customizeData: function (xlsxData) {
+                    let balance = 0
+                    let arrayXlsxData = Array.from(xlsxData.body)
+
+                    arrayXlsxData = arrayXlsxData.map(function (row) {
+                        row[4] = parseFloat(row[4].replace("R$", "")
+                            .replace(".", "").replace(",", ".").trim())
+                        row = row.filter((data) => data)
+                        balance += row[4]
+                        return row
+                    })
+
+                    arrayXlsxData.push(['Total', '', '', '', balance])
+                    xlsxData.header = xlsxData.header.filter((data) => data != 'Editar' && data != 'Excluir')
+                    xlsxData.body = arrayXlsxData
+                }
+            },
+            {
+                extend: "pdf",
+                customize: function (pdfData) {
+                    let arrayPdfData = Array.from(pdfData.content[1].table.body)
+                    let header = arrayPdfData.shift()
+                    let balance = 0
+
+                    arrayPdfData = arrayPdfData.map(function (row) {
+                        row[4].text = parseFloat(row[4].text.replace("R$", "")
+                            .replace(".", "").replace(",", ".").trim())
+                        balance += row[4].text
+
+                        row[4].text = row[4].text
+                            .toLocaleString("pt-br", { "currency": "BRL", "style": "currency" })
+
+                        row = row.filter((data) => data.text)
+                        return row
+                    })
+                    balance = balance
+                        .toLocaleString("pt-br", { "currency": "BRL", "style": "currency" })
+
+                    header = header.filter((item) => item.text != "Editar" && item.text != "Excluir")
+                    arrayPdfData.unshift(header)
+                    arrayPdfData.push(
+                        [
+                            {
+                                text: 'Total',
+                                style: 'tableBodyOdd',
+                                fillColor: '#f1ff32'
+                            },
+                            {
+                                text: '',
+                                style: 'tableBodyOdd',
+                                fillColor: '#f1ff32'
+                            },
+                            {
+                                text: '',
+                                style: 'tableBodyOdd',
+                                fillColor: '#f1ff32'
+                            },
+                            {
+                                text: '',
+                                style: 'tableBodyOdd',
+                                fillColor: '#f1ff32'
+                            },
+                            {
+                                text: balance,
+                                style: 'tableBodyOdd',
+                                fillColor: '#f1ff32'
+                            }
+                        ]
+                    )
+                    pdfData.content[1].table.body = arrayPdfData
+                }
+            },
             "colvis"
         ],
         "initComplete": function () {
@@ -36,24 +148,21 @@ if (window.location.pathname == "/admin/cash-flow/report") {
                 .appendTo("#widgets .col-md-6:eq(0)");
         }
     })
-
     const tFoot = document.querySelector("tfoot").firstElementChild
-    table.on('search.dt', function() {
+    table.on('search.dt', function () {
         const dataFilter = table.rows({ search: 'applied' }).data();
-        if (table.search()) {
-            let balance = 0
-            dataFilter.each(function(row) {
-                let entryValue = parseFloat(row[4].replace("R$", "")
-                    .replace(".", "").replace(",", ".").trim())
+        let balance = 0
+        dataFilter.each(function (row) {
+            let entryValue = parseFloat(row[4].replace("R$", "")
+                .replace(".", "").replace(",", ".").trim())
 
-                balance += entryValue
-            })
+            balance += entryValue
+        })
 
-            balance < 0 ? tFoot.style.color = "#ff0000" : balance == 0 ?
-                tFoot.removeAttribute("style") : tFoot.style.color = "#008000"
-            
-            tFoot.children[4].innerHTML = balance
-                .toLocaleString("pt-br", {"currency": "BRL", "style": "currency"})
-        }
+        balance < 0 ? tFoot.style.color = "#ff0000" : balance == 0 ?
+            tFoot.removeAttribute("style") : tFoot.style.color = "#008000"
+
+        tFoot.children[4].innerHTML = balance
+            .toLocaleString("pt-br", { "currency": "BRL", "style": "currency" })
     })
 }

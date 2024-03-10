@@ -30,6 +30,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link rel="stylesheet" href="<?= url(CONF_ADMIN_PATH . "/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css") ?>">
     <link rel="stylesheet" href="<?= url(CONF_ADMIN_PATH . "/plugins/datatables-responsive/css/responsive.bootstrap4.min.css") ?>">
     <link rel="stylesheet" href="<?= url(CONF_ADMIN_PATH . "/plugins/datatables-buttons/css/buttons.bootstrap4.min.css") ?>">
+    <!-- Date Picker -->
+    <link rel="stylesheet" href="<?= url(CONF_ADMIN_PATH . "/plugins/daterangepicker/daterangepicker.css") ?>">
     <!-- Laborcode css -->
     <link rel="stylesheet" href="<?= theme("assets/css/structure.css") ?>">
 </head>
@@ -59,6 +61,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <script src="<?= url(CONF_ADMIN_PATH . "/plugins/datatables-buttons/js/buttons.html5.min.js") ?>"></script>
     <script src="<?= url(CONF_ADMIN_PATH . "/plugins/datatables-buttons/js/buttons.print.min.js") ?>"></script>
     <script src="<?= url(CONF_ADMIN_PATH . "/plugins/datatables-buttons/js/buttons.colVis.min.js") ?>"></script>
+    <script src="<?= url(CONF_ADMIN_PATH . "/plugins/bootstrap/js/bootstrap.min.js") ?>"></script>
+    <script src="<?= url(CONF_ADMIN_PATH . "/plugins/moment/moment.min.js") ?>"></script>
+    <script src="<?= url(CONF_ADMIN_PATH . "/plugins/daterangepicker/daterangepicker.js") ?>"></script>
     <!-- Laborcode Scripts -->
     <script src="<?= theme("/assets/scripts.js") ?>"></script>
 </body>

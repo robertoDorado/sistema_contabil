@@ -9,7 +9,7 @@
                 </div><!-- /.col -->
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="<?= url("/admin") ?>">Página Inicial</a></li>
+                        <li class="breadcrumb-item"><a href="<?= url("/admin/cash-flow/report") ?>">Relatório fluxo de caixa</a></li>
                         <li class="breadcrumb-item active">Formulário de atualização do fluxo de caixa</li>
                     </ol>
                 </div><!-- /.col -->
@@ -38,6 +38,10 @@
                                     <input name="releaseHistory" value="<?= $cashFlowData->getHistory() ?>" id="releaseHistory"class="form-control" placeholder="Histórico de lançamento">
                                 </div>
                                 <div class="form-group">
+                                    <label for="createdAt">Data</label>
+                                    <input type="date" name="createdAt" value="<?= $cashFlowData->created_at ?>" id="createdAt" class="form-control" placeholder="Data de lançamento">
+                                </div>
+                                <div class="form-group">
                                     <label for="entryType">Tipo de entrada</label>
                                     <select name="entryType" id="entryType" class="form-control">
                                         <option value="" disabled>Selecione o tipo de entrada</option>
@@ -48,7 +52,7 @@
                             </div>
     
                             <div class="card-footer">
-                                <button type="submit" id="launchBtn" class="btn btn-primary">Atualizar</button>
+                                <button type="submit" id="updateBtn" class="btn btn-primary">Atualizar</button>
                             </div>
                         </form>
                     </div>
