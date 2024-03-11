@@ -486,4 +486,62 @@ class CashFlowTest extends TestCase
         $this->assertJsonStringEqualsJsonString($response,
             json_encode(["cash_flow_data_not_found" => "registro de fluxo de caixa não encontrado"]));
     }
+
+    public function testFindCashFlowDataByDate()
+    {
+        $this->user = new User();
+        $userData = [
+            "uuid" => "1eed7357-6e74-6096-abf0-0242ac120003",
+            "user_full_name" => "teste fulano de tal 2",
+            "user_nick_name" => "fulanoDeTal2",
+            "user_email" => "testefulano2@gmail.com",
+            "user_password" => password_hash("minhasenha1234", PASSWORD_DEFAULT),
+            "deleted" => 0
+        ];
+        
+        $this->user->persistData($userData);
+        $userId = $this->user->getId();
+        
+        $this->user = new User();
+        $this->user->setId($userId);
+
+        $this->cashFlow = new CashFlow();
+        $cashFlowData = [
+            "uuid" => "1eed7357-6e74-6096-abf0-0242ac120003",
+            "id_user" => $this->user,
+            "entry" => "1.750,45",
+            "history" => "venda realizada no dia " . date("d/m/Y"),
+            "entry_type" => 0,
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ];
+        $searchDate = date("d/m/Y", strtotime($cashFlowData["created_at"]));
+        $this->cashFlow->persistData($cashFlowData);
+        $cashFlowData = $this->cashFlow
+            ->findCashFlowDataByDate($searchDate . " - " . $searchDate, $this->user);
+        $this->assertIsArray($cashFlowData);
+        $this->user->dropUserById($userId);
+    }
+
+    public function testFindCashFlowDataByDateIsNull()
+    {
+        $this->user = new User();
+        $this->user->setId(1000000000000000000);
+        $this->cashFlow = new CashFlow();
+        $cashFlowData = $this->cashFlow
+            ->findCashFlowDataByDate("", $this->user);
+        $this->assertNull($cashFlowData);
+    }
+
+    public function testFindCashFlowDataByDateException()
+    {
+        $this->user = new User();
+        $this->user->setId(1000000000000000000);
+        $this->cashFlow = new CashFlow();
+        $searchDate = date("d/m/Y") . " - " . date("d/m/Y") . " - " . date("d/m/Y");
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("parametro dates inválido");
+        $this->cashFlow->findCashFlowDataByDate($searchDate, $this->user);
+    }
 }

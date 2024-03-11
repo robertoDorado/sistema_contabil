@@ -1,4 +1,3 @@
-const table = dataTableConfig()
 if (window.location.pathname == "/admin/cash-flow/report") {
     $(document).ready(function() {
         $('#date-range').daterangepicker({
@@ -12,8 +11,8 @@ if (window.location.pathname == "/admin/cash-flow/report") {
         });
     });
     const tFoot = document.querySelector("tfoot").firstElementChild
-    table.on('search.dt', function () {
-        const dataFilter = table.rows({ search: 'applied' }).data();
+    cashFlowTable.on('search.dt', function () {
+        const dataFilter = cashFlowTable.rows({ search: 'applied' }).data();
         let balance = 0
         dataFilter.each(function (row) {
             let entryValue = parseFloat(row[4].replace("R$", "")

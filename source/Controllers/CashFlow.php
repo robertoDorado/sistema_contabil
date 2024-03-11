@@ -182,8 +182,14 @@ class CashFlow extends Controller
         }
 
         $user->setId($userData->id);
+        
         $cashFlow = new ModelCashFlow();
         $cashFlowDataByUser = $cashFlow->findCashFlowByUser([], $user);
+
+        if (!empty($_GET["daterange"])) {
+            $cashFlow = new ModelCashFlow();
+            $cashFlowDataByUser = $cashFlow->findCashFlowDataByDate($_GET["daterange"], $user);
+        }
         
         $cashFlowEmptyMessage = "";
         if (is_string($cashFlowDataByUser) && json_decode($cashFlowDataByUser) != null) {
@@ -207,8 +213,12 @@ class CashFlow extends Controller
         
         $user->setId($userData->id);
         $balanceValue = $cashFlow->calculateBalance($user);
-        $balance = !empty($balanceValue) ? 'R$ ' . number_format($balanceValue, 2, ',', '.') : 0;
         
+        $balance = !empty($balanceValue) ? 'R$ ' . number_format($balanceValue, 2, ',', '.') : 0;
+        if (!empty($cashFlowDataByUser)) {
+            $cashFlowDataByUser = array_reverse($cashFlowDataByUser);
+        }
+
         echo $this->view->render("admin/cash-flow-report", [
             "userFullName" => showUserFullName(),
             "endpoints" => ['/admin/cash-flow/form', "/admin/cash-flow/report"],

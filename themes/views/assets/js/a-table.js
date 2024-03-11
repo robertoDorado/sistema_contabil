@@ -1,0 +1,1 @@
+const cashFlowTable = dataTableConfig()

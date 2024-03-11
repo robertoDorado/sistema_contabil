@@ -92,7 +92,7 @@ newValue+=settings.decimal+decimalPart;var rounded=Number.parseFloat((integerPar
 return setSymbol(newValue,settings)}
 function buildIntegerPart(integerPart,negative,settings){integerPart=integerPart.replace(/^0*/g,"");integerPart=integerPart.replace(/\B(?=(\d{3})+(?!\d))/g,settings.thousands);if(integerPart===""){integerPart="0"}
 return negative+integerPart}
-$.fn.maskMoney=function(method){if(methods[method]){return methods[method].apply(this,Array.prototype.slice.call(arguments,1))}else if(typeof method==="object"||!method){return methods.init.apply(this,arguments)}else{$.error("Method "+method+" does not exist on jQuery.maskMoney")}}})(window.jQuery||window.Zepto);if(window.location.pathname.match(/admin/)){window.addEventListener("load",function(){toastr.options={'closeButton':!0,'debug':!1,'newestOnTop':!1,'progressBar':!0,'positionClass':'toast-top-right','preventDuplicates':!1,'showDuration':'1000','hideDuration':'1000','timeOut':'5000','extendedTimeOut':'1000','showEasing':'swing','hideEasing':'linear','showMethod':'fadeIn','hideMethod':'fadeOut',}})};if(window.location.pathname=='/admin/cash-flow/form'){const cashFlowForm=document.getElementById("cashFlowForm")
+$.fn.maskMoney=function(method){if(methods[method]){return methods[method].apply(this,Array.prototype.slice.call(arguments,1))}else if(typeof method==="object"||!method){return methods.init.apply(this,arguments)}else{$.error("Method "+method+" does not exist on jQuery.maskMoney")}}})(window.jQuery||window.Zepto);const cashFlowTable=dataTableConfig();if(window.location.pathname.match(/admin/)){window.addEventListener("load",function(){toastr.options={'closeButton':!0,'debug':!1,'newestOnTop':!1,'progressBar':!0,'positionClass':'toast-top-right','preventDuplicates':!1,'showDuration':'1000','hideDuration':'1000','timeOut':'5000','extendedTimeOut':'1000','showEasing':'swing','hideEasing':'linear','showMethod':'fadeIn','hideMethod':'fadeOut',}})};if(window.location.pathname=='/admin/cash-flow/form'){const cashFlowForm=document.getElementById("cashFlowForm")
 $("#launchValue").maskMoney({allowNegative:!1,thousands:'.',decimal:',',affixesStay:!1})
 const launchBtn=document.getElementById("launchBtn")
 cashFlowForm.addEventListener("submit",function(event){event.preventDefault()
@@ -127,9 +127,8 @@ cashFlowFormFields.forEach(function(elem){elem.value=''})
 message=response.success
 message=message.charAt(0).toUpperCase()+message.slice(1)
 launchBtn.innerHTML='Enviar'
-toastr.success(message)})})};const table=dataTableConfig()
-if(window.location.pathname=="/admin/cash-flow/report"){$(document).ready(function(){$('#date-range').daterangepicker({opens:'left',locale:{format:'DD/MM/YYYY',separator:' - ',applyLabel:'Aplicar',cancelLabel:'Cancelar',}})});const tFoot=document.querySelector("tfoot").firstElementChild
-table.on('search.dt',function(){const dataFilter=table.rows({search:'applied'}).data();let balance=0
+toastr.success(message)})})};if(window.location.pathname=="/admin/cash-flow/report"){$(document).ready(function(){$('#date-range').daterangepicker({opens:'left',locale:{format:'DD/MM/YYYY',separator:' - ',applyLabel:'Aplicar',cancelLabel:'Cancelar',}})});const tFoot=document.querySelector("tfoot").firstElementChild
+cashFlowTable.on('search.dt',function(){const dataFilter=cashFlowTable.rows({search:'applied'}).data();let balance=0
 dataFilter.each(function(row){let entryValue=parseFloat(row[4].replace("R$","").replace(".","").replace(",",".").trim())
 balance+=entryValue})
 balance<0?tFoot.style.color="#ff0000":balance==0?tFoot.removeAttribute("style"):tFoot.style.color="#008000"
@@ -188,7 +187,6 @@ dataDelete.uuidParameter=uuidParameter
 dataDelete.url=url
 dataDelete.uuidReference=uuidReference
 dataDelete.row=row
-dataDelete.dataKey=row.dataset.key
 launchModal.click()})})
 launchModal.addEventListener("click",function(){modalContainerLabel.innerHTML="Atenção!"
 modalBody.innerHTML=`Você quer mesmo deletar o registro ${dataDelete.uuidReference}?`
@@ -197,10 +195,9 @@ fetch(`${window.location.origin}/admin/cash-flow/remove/${dataDelete.uuidParamet
 const totalRow=document.querySelector("tfoot").firstElementChild
 totalRow.style.color=response.color
 tFoot.forEach(function(element){if(element.innerHTML&&element.innerHTML!='Total'){element.innerHTML=response.balance}})
-if(response.success){dataDelete.row.remove()
+if(response.success){cashFlowTable.row(dataDelete.row).remove().draw()
 saveChanges.innerHTML="Excluir"
-dismissModal.click()
-table.row(dataDelete.dataKey).remove().draw()}})})})}};let parameter=window.location.pathname.split("/")
+dismissModal.click()}})})})}};let parameter=window.location.pathname.split("/")
 parameter=parameter.pop()
 if(window.location.pathname==`/admin/cash-flow/update/form/${parameter}`){$("#launchValue").maskMoney({allowNegative:!1,thousands:'.',decimal:',',affixesStay:!1})
 const cashFlowForm=document.getElementById("cashFlowForm")

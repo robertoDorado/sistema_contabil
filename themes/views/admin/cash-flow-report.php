@@ -58,9 +58,9 @@
                                     </thead>
                                     <tbody>
                                         <?php if (is_array($cashFlowDataByUser) && !empty($cashFlowDataByUser)) : ?>
-                                            <?php foreach ($cashFlowDataByUser as $key => $cashFlowData) : ?>
+                                            <?php foreach ($cashFlowDataByUser as $cashFlowData) : ?>
                                                 <?php if (!empty($cashFlowData->entry_type)) : ?>
-                                                    <tr data-key="<?= $key ?>" style="color:#008000">
+                                                    <tr style="color:#008000">
                                                         <td>#<?= $cashFlowData->uuid_value ?></td>
                                                         <td><?= $cashFlowData->created_at ?></td>
                                                         <td><?= $cashFlowData->getHistory() ?></td>
@@ -70,7 +70,7 @@
                                                         <td><a class="icons" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a></td>
                                                     </tr>
                                                 <?php else : ?>
-                                                    <tr data-key="<?= $key ?>" style="color:#ff0000">
+                                                    <tr style="color:#ff0000">
                                                         <td>#<?= $cashFlowData->uuid_value ?></td>
                                                         <td><?= $cashFlowData->created_at ?></td>
                                                         <td><?= $cashFlowData->getHistory() ?></td>

@@ -1,6 +1,7 @@
 <?php
 namespace Source\Domain\Model;
 
+use DateTime;
 use Exception;
 use PDOException;
 use Source\Core\Connect;
@@ -26,6 +27,28 @@ class CashFlow
     public function __construct()
     {
         $this->cashFlow = new ModelsCashFlow();
+    }
+
+    public function findCashFlowDataByDate(string $dates, User $user)
+    {
+        $dates = empty($dates) ? "" : explode("-", $dates);
+
+        if (is_array($dates) && !empty($dates)) {
+            if (count($dates) != 2) {
+                throw new \Exception("parametro dates inválido");
+            }
+
+            foreach ($dates as &$date) {
+                $date = date("Y-m-d", strtotime(str_replace("/", "-", $date)));
+            }
+
+            return $this->cashFlow
+                ->find("created_at BETWEEN :date1 and :date2 AND id_user=:id_user AND deleted=0", 
+                ":date1=" . $dates[0] . "&:date2=" . $dates[1] . "&:id_user=" . $user->getId() . "")
+                ->fetch(true);
+        }else {
+            return;
+        }
     }
 
     public function updateCashFlowByUuid(array $data)
