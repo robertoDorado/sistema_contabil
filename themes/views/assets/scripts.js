@@ -1,9 +1,9 @@
-function dataTableConfig(){const jsonMessage=document.getElementById("jsonMessage")
+function dataTableConfig(jQuerySelector){const jsonMessage=document.getElementById("jsonMessage")
 const urlJson=document.getElementById("urlJson").dataset.url
 let message={cash_flow_empty:''}
 if(jsonMessage){message=JSON.parse(jsonMessage.dataset.message)
 message.cash_flow_empty=message.cash_flow_empty.charAt(0).toUpperCase()+message.cash_flow_empty.slice(1)}
-return $("#cashFlowReport").DataTable({"order":[[0,"desc"]],"language":{"url":urlJson,"emptyTable":message.cash_flow_empty,},"responsive":!0,"lengthChange":!1,"autoWidth":!1,"buttons":["copy",{extend:"csv",charset:'utf-8',bom:!0,customize:function(csvData){let arrayCsvData=csvData.split('"')
+return jQuerySelector.DataTable({"order":[[0,"desc"]],"language":{"url":urlJson,"emptyTable":message.cash_flow_empty,},"responsive":!0,"lengthChange":!1,"autoWidth":!1,"buttons":["copy",{extend:"csv",charset:'utf-8',bom:!0,customize:function(csvData){let arrayCsvData=csvData.split('"')
 arrayCsvData=arrayCsvData.map(function(item){item=item.replace(/^Editar$/,"")
 item=item.replace(/^Excluir$/,"")
 return item})
@@ -92,7 +92,7 @@ newValue+=settings.decimal+decimalPart;var rounded=Number.parseFloat((integerPar
 return setSymbol(newValue,settings)}
 function buildIntegerPart(integerPart,negative,settings){integerPart=integerPart.replace(/^0*/g,"");integerPart=integerPart.replace(/\B(?=(\d{3})+(?!\d))/g,settings.thousands);if(integerPart===""){integerPart="0"}
 return negative+integerPart}
-$.fn.maskMoney=function(method){if(methods[method]){return methods[method].apply(this,Array.prototype.slice.call(arguments,1))}else if(typeof method==="object"||!method){return methods.init.apply(this,arguments)}else{$.error("Method "+method+" does not exist on jQuery.maskMoney")}}})(window.jQuery||window.Zepto);const cashFlowTable=dataTableConfig();if(window.location.pathname.match(/admin/)){window.addEventListener("load",function(){toastr.options={'closeButton':!0,'debug':!1,'newestOnTop':!1,'progressBar':!0,'positionClass':'toast-top-right','preventDuplicates':!1,'showDuration':'1000','hideDuration':'1000','timeOut':'5000','extendedTimeOut':'1000','showEasing':'swing','hideEasing':'linear','showMethod':'fadeIn','hideMethod':'fadeOut',}})};if(window.location.pathname=='/admin/cash-flow/form'){const cashFlowForm=document.getElementById("cashFlowForm")
+$.fn.maskMoney=function(method){if(methods[method]){return methods[method].apply(this,Array.prototype.slice.call(arguments,1))}else if(typeof method==="object"||!method){return methods.init.apply(this,arguments)}else{$.error("Method "+method+" does not exist on jQuery.maskMoney")}}})(window.jQuery||window.Zepto);const cashFlowTable=dataTableConfig($("#cashFlowReport"));if(window.location.pathname.match(/admin/)){window.addEventListener("load",function(){toastr.options={'closeButton':!0,'debug':!1,'newestOnTop':!1,'progressBar':!0,'positionClass':'toast-top-right','preventDuplicates':!1,'showDuration':'1000','hideDuration':'1000','timeOut':'5000','extendedTimeOut':'1000','showEasing':'swing','hideEasing':'linear','showMethod':'fadeIn','hideMethod':'fadeOut',}})};if(window.location.pathname=='/admin/cash-flow/form'){const cashFlowForm=document.getElementById("cashFlowForm")
 $("#launchValue").maskMoney({allowNegative:!1,thousands:'.',decimal:',',affixesStay:!1})
 const launchBtn=document.getElementById("launchBtn")
 cashFlowForm.addEventListener("submit",function(event){event.preventDefault()

@@ -1,4 +1,4 @@
-function dataTableConfig() {
+function dataTableConfig(jQuerySelector) {
     const jsonMessage = document.getElementById("jsonMessage")
     const urlJson = document.getElementById("urlJson").dataset.url
 
@@ -12,7 +12,7 @@ function dataTableConfig() {
             + message.cash_flow_empty.slice(1)
     }
     
-    return $("#cashFlowReport").DataTable({
+    return jQuerySelector.DataTable({
         "order": [[0, "desc"]],
         "language": {
             "url": urlJson,
