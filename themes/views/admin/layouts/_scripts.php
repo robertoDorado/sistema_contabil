@@ -23,6 +23,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link rel="icon" href="<?= theme("/assets/img/icons8-contabilidade-48.png") ?>" type="image/png">
     <!-- jQuery -->
     <script src="<?= url(CONF_ADMIN_PATH . "/plugins/jquery/jquery.min.js") ?>"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Toastr -->
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
@@ -33,7 +35,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- Date Picker -->
     <link rel="stylesheet" href="<?= url(CONF_ADMIN_PATH . "/plugins/daterangepicker/daterangepicker.css") ?>">
     <!-- Laborcode css -->
-    <link rel="stylesheet" href="<?= theme("assets/css/structure.css") ?>">
+    <link rel="stylesheet" href="<?= theme("assets/style.css") ?>">
 </head>
 
 <body class="hold-transition <?= $defineClass ?>">
