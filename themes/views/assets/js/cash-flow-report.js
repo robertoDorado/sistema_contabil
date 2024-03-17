@@ -1,7 +1,7 @@
 if (window.location.pathname == "/admin/cash-flow/report") {
     $(document).ready(function() {
         $('#date-range').daterangepicker({
-            opens: 'left', // Configuração opcional para a posição do calendário
+            opens: 'left',
             locale: {
                 format: 'DD/MM/YYYY',
                 separator: ' - ',

@@ -2,6 +2,8 @@
 namespace Source\Controllers;
 
 use DateTime;
+use Exception;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use Ramsey\Uuid\Uuid;
 use Source\Core\Controller;
 use Source\Domain\Model\CashFlow as ModelCashFlow;
@@ -21,6 +23,54 @@ class CashFlow extends Controller
     public function __construct()
     {
         parent::__construct();
+    }
+
+    public function importExcelFile()
+    {
+        if (empty(session()->user)) {
+            throw new \Exception("usuário inválido");
+        }
+
+        $file = $this->getRequestFiles()->getFile("excelFile");
+        $verifyExtensions = ["xls", "xlsx"];
+        
+        $fileExtension = explode(".", $file["name"]);
+        $fileExtension = strtolower(array_pop($fileExtension));
+        
+        if (!in_array($fileExtension, $verifyExtensions)) {
+            throw new \Exception("tipo de arquivo inválido");
+        }
+
+        $spreadSheetFile = IOFactory::load($file["tmp_name"]);
+        $data = $spreadSheetFile->getActiveSheet()->toArray();
+
+        $requiredFieldsExcelFile = [
+            "Data lançamento",
+            "Histórico",
+            "Tipo de entrada",
+            "Lançamento"
+        ];
+
+        $arrayHeader = array_shift($data);
+        if (!empty(array_diff($arrayHeader, $requiredFieldsExcelFile)) && !empty(array_diff($requiredFieldsExcelFile, $arrayHeader))) {
+            echo json_encode(["error" => "cabeçalho do arquivo inválido"]);
+            die;
+        }
+
+        if (empty($data)) {
+            echo json_encode(["error" => "os dados do arquivo não podem estar vazio"]);
+            die;
+        }
+
+        $excelData = [];
+        foreach ($data as $arrayData) {
+            foreach ($arrayData as $key => $value) {
+                $excelData[strtolower(substr($arrayHeader[$key], 0, 1))][] = $value;
+            }
+        }
+
+        $excelData = array_map("array_filter", $excelData);
+        print_r($excelData);
     }
 
     public function cashFlowRemoveRegister(array $data)
@@ -215,7 +265,8 @@ class CashFlow extends Controller
         $balanceValue = $cashFlow->calculateBalance($user);
         
         $balance = !empty($balanceValue) ? 'R$ ' . number_format($balanceValue, 2, ',', '.') : 0;
-        if (!empty($cashFlowDataByUser)) {
+        
+        if (!empty($cashFlowDataByUser) && is_array($cashFlowDataByUser)) {
             $cashFlowDataByUser = array_reverse($cashFlowDataByUser);
         }
 

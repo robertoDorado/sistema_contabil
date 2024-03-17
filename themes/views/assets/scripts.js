@@ -1,3 +1,4 @@
+function extensionFileName(value){return value.split(".").pop().toLowerCase()}
 function dataTableConfig(jQuerySelector){const jsonMessage=document.getElementById("jsonMessage")
 const urlJson=document.getElementById("urlJson").dataset.url
 let message={cash_flow_empty:''}
@@ -132,7 +133,26 @@ cashFlowTable.on('search.dt',function(){const dataFilter=cashFlowTable.rows({sea
 dataFilter.each(function(row){let entryValue=parseFloat(row[4].replace("R$","").replace(".","").replace(",",".").trim())
 balance+=entryValue})
 balance<0?tFoot.style.color="#ff0000":balance==0?tFoot.removeAttribute("style"):tFoot.style.color="#008000"
-tFoot.children[4].innerHTML=balance.toLocaleString("pt-br",{"currency":"BRL","style":"currency"})})};if(window.location.pathname=="/admin/login"){const loginForm=document.getElementById("loginForm")
+tFoot.children[4].innerHTML=balance.toLocaleString("pt-br",{"currency":"BRL","style":"currency"})})};if(window.location.pathname=='/admin/cash-flow/report'){const importExcelForm=document.getElementById("importExcelForm")
+const inputExcelFile=document.querySelector('[name="excelFile"]')
+const standardLabelNameExcelFile=inputExcelFile.nextElementSibling.innerHTML
+const verifyExtensionFile=["xls","xlsx"]
+inputExcelFile.addEventListener("change",function(){const extensionName=extensionFileName(this.value)
+if(verifyExtensionFile.indexOf(extensionName)==-1){this.value=""
+this.nextElementSibling.innerHTML=standardLabelNameExcelFile
+toastr.warning("Extensão do arquivo não permitida")
+throw new Error("Extensão do arquivo não permitida")}
+this.nextElementSibling.innerHTML=this.files[0].name})
+importExcelForm.addEventListener("submit",function(event){event.preventDefault()
+const extensionName=extensionFileName(this.excelFile.value)
+if(verifyExtensionFile.indexOf(extensionName)==-1){this.excelFile.value=""
+this.excelFile.nextElementSibling.innerHTML=standardLabelNameExcelFile
+toastr.warning("Extensão do arquivo não permitida")
+throw new Error("Extensão do arquivo não permitida")}
+const form=new FormData(this)
+fetch(window.location.origin+"/admin/cash-flow/import-excel",{method:'POST',body:form}).then(response=>response.json()).then(function(response){if(response.error){let message=response.error.charAt(0).toUpperCase()+response.error.slice(1)
+toastr.error(message)
+throw new Error(response.error)}})})};if(window.location.pathname=="/admin/login"){const loginForm=document.getElementById("loginForm")
 loginForm.addEventListener("submit",function(event){event.preventDefault()
 const btnSubmit=this.querySelector(".btn.btn-primary.btn-block")
 if(!this.userData.value){toastr.warning("Campo nome de usuário deve ser obrigatório")

@@ -1,6 +1,5 @@
 #  PHP Drivers
 FROM php:7.4-apache
-RUN docker-php-ext-install pdo pdo_mysql mysqli
 
 # Copiar certificados SSL para o conteiner php-apache
 COPY ssl/localhost.pem /etc/ssl/certs/localhost.pem
@@ -25,7 +24,14 @@ RUN chown -R www-data:www-data /var/www/html/
 # Instalação das dependências necessárias
 RUN apt-get update \
     && apt-get install -y \
-        unzip \
+    unzip \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libpng-dev \
+    zlib1g-dev \
+    libzip-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd zip pdo pdo_mysql mysqli \
     && rm -rf /var/lib/apt/lists/* \
     ca-certificates && \
     update-ca-certificates

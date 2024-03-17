@@ -1,3 +1,7 @@
+function extensionFileName(value) {
+    return value.split(".").pop().toLowerCase()
+}
+
 function dataTableConfig(jQuerySelector) {
     const jsonMessage = document.getElementById("jsonMessage")
     const urlJson = document.getElementById("urlJson").dataset.url
