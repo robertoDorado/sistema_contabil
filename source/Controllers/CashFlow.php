@@ -70,7 +70,94 @@ class CashFlow extends Controller
         }
 
         $excelData = array_map("array_filter", $excelData);
-        print_r($excelData);
+        $lengths = array_map('count', $excelData);
+        
+        if (count(array_unique($lengths)) != 1) {
+            echo json_encode(["error" => "alguns dados possuem valores a mais no arquivo"]);
+            die;
+        }
+
+        foreach ($excelData["d"] as $date) {
+            $dateObj = DateTime::createFromFormat("Y-m-d", $date);
+            if (!$dateObj) {
+                echo json_encode(["error" => "campo data no arquivo está mal formatado"]);
+                die;
+            }
+        }
+
+        $verifyTotalDataFromExcelFile = array_map("count", $excelData);
+        $verifyTotalDataFromExcelFile = array_unique($verifyTotalDataFromExcelFile);
+
+        if ($verifyTotalDataFromExcelFile["h"] > 100) {
+            echo json_encode(["error" => "o limite de importação é de 100 registros"]);
+            die;
+        }
+        
+        $user = new User();
+        $userData = $user->findUserByEmail(session()->user->user_email);
+        $user->setId($userData->id);
+        
+        $verifyEntryType = ["Crédito", "Débito"];
+        $arrayUuid = [];
+        $arrayEdit = [];
+        $arrayDelete = [];
+        
+        foreach ($excelData['h'] as $key => $history) {
+            if (!in_array($excelData["t"][$key], $verifyEntryType)) {
+                echo json_encode(["error" => "somente Débito ou Crédito são aceitos como tipo de entrada"]);
+                die;
+            }
+
+            $excelData["t"][$key] = $excelData["t"][$key] == "Crédito" ? 1 : 0;
+            $excelData["l"][$key] = trim(str_replace(["R$", ","], "", $excelData["l"][$key]));
+            $excelData["l"][$key] = number_format($excelData["l"][$key], 2, ",", ".");
+
+            $cashFlow = new ModelCashFlow();
+            $uuid = Uuid::uuid6();
+            
+            array_push($arrayUuid, $uuid);
+            array_push($arrayEdit, "<a class='icons' href=" . url("/admin/cash-flow/update/form/" . $uuid . "") . "><i class='fas fa-edit' aria-hidden='true'></i>");
+            array_push($arrayDelete, "<a class='icons' href='#'><i style='color:#ff0000' class='fa fa-trash' aria-hidden='true'></i></a>");
+            
+            $response = $cashFlow->persistData([
+                "uuid" => $uuid,
+                "id_user" => $user,
+                "entry" => $excelData["l"][$key],
+                "history" => $history,
+                "entry_type" => $excelData["t"][$key],
+                "created_at" => $excelData["d"][$key],
+                "updated_at" => date("Y-m-d"),
+                "deleted" => 0
+            ]);
+
+            if (!$response) {
+                echo json_encode(["error" => "erro genérico ao importar os dados"]);
+                die;
+            }
+
+        }
+
+        $excelData = [];
+        foreach ($data as $arrayData) {
+            foreach ($arrayData as $key => $value) {
+                $excelData[$arrayHeader[$key]][] = $value;
+            }
+        }
+
+        $excelData["Id"] = $arrayUuid;
+        $excelData["Editar"] = $arrayEdit;
+        $excelData["Excluir"] = $arrayDelete;
+
+        foreach ($excelData["Data lançamento"] as $key => &$date) {
+            $date = DateTime::createFromFormat("Y-m-d", $date)->format("d/m/Y");
+            $excelData["Lançamento"][$key] = $excelData["Tipo de entrada"][$key] == "Crédito" ? 
+                floatval(trim(str_replace([",", "R$"], "", $excelData["Lançamento"][$key]))) :
+                floatval(trim(str_replace([",", "R$"], "", $excelData["Lançamento"][$key]))) * -1;
+            
+            $excelData["Lançamento"][$key] = "R$ " . number_format($excelData["Lançamento"][$key], 2, ",", ".");
+        }
+        
+        echo json_encode(["success" => "arquivo importado com sucesso", "excelData" => json_encode($excelData)]);
     }
 
     public function cashFlowRemoveRegister(array $data)
@@ -252,9 +339,6 @@ class CashFlow extends Controller
                 
                 $data->created_at = date('d/m/Y', strtotime($data->created_at));
                 $data->entry_type_value = $data->entry_type == 1 ? "Crédito" : "Débito";
-                
-                $data->uuid_array = explode("-", $data->getUuid());
-                $data->uuid_value = $data->uuid_array[0];
             }
         }
         

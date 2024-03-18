@@ -24,14 +24,10 @@ if (window.location.pathname == '/admin/cash-flow/report') {
                 
                 uuidParameter = uuidParameter.href.split("/")
                 uuidParameter = uuidParameter.pop()
-                
-                let uuidReference = uuidParameter.split("-")
-                uuidReference = uuidReference.shift()
                 let url = `${window.location.origin}/admin/cash-flow/remove/${uuidParameter}`
 
                 dataDelete.uuidParameter = uuidParameter
                 dataDelete.url = url
-                dataDelete.uuidReference = uuidReference
                 dataDelete.row = row
                 launchModal.click()
             })
@@ -39,7 +35,7 @@ if (window.location.pathname == '/admin/cash-flow/report') {
 
         launchModal.addEventListener("click", function() {
             modalContainerLabel.innerHTML = "Atenção!"
-            modalBody.innerHTML = `Você quer mesmo deletar o registro ${dataDelete.uuidReference}?`
+            modalBody.innerHTML = `Você quer mesmo deletar o registro ${dataDelete.uuidParameter}?`
             
             saveChanges.addEventListener("click", function() {
                 showSpinner(saveChanges)
