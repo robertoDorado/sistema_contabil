@@ -5,6 +5,7 @@ use Exception;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 use Source\Domain\Model\CashFlow;
+use Source\Domain\Model\CashFlowGroup;
 use Source\Domain\Model\User;
 
 /**
@@ -21,13 +22,19 @@ class CashFlowTest extends TestCase
     /** @var User Modelo de dominio usuário */
     private User $user;
 
+    /** @var CashFlowGroup Modelo de Dominio para agrupamento do fluxo de caixa */
+    private CashFlowGroup $cashFlowGroup;
+
     public function testPersistDataColumnException()
     {
         $this->cashFlow = new CashFlow();
         $this->user = new User();
+        $this->cashFlowGroup = new CashFlowGroup();
+
         $cashFlowData = [
             "uuid" => Uuid::uuid6(),
             "id_user" => $this->user,
+            "id_cash_flow_group" => $this->cashFlowGroup,
             "entry" => 100.55,
             "history" => "venda realizada no dia" . date("d/m/Y"),
             "entry_typee" => 1,
@@ -45,9 +52,12 @@ class CashFlowTest extends TestCase
     {
         $this->cashFlow = new CashFlow();
         $this->user = new User();
+        $this->cashFlowGroup = new CashFlowGroup();
+
         $cashFlowData = [
             "uuid" => Uuid::uuid6(),
             "id_user" => $this->user,
+            "id_cash_flow_group" => $this->cashFlowGroup,
             "entry" => "---",
             "history" => "venda realizada no dia" . date("d/m/Y"),
             "entry_type" => 1,
@@ -64,9 +74,12 @@ class CashFlowTest extends TestCase
     public function testInvalidInstance()
     {
         $this->cashFlow = new CashFlow();
+        $this->cashFlowGroup = new CashFlowGroup();
+
         $cashFlowData = [
             "uuid" => Uuid::uuid6(),
             "id_user" => $this->cashFlow,
+            "id_cash_flow_group" => $this->cashFlowGroup,
             "entry" => "445.77",
             "history" => "venda realizada no dia" . date("d/m/Y"),
             "entry_type" => 1,
@@ -90,8 +103,10 @@ class CashFlowTest extends TestCase
 
     public function testPersistDataIsTrue()
     {
+        $this->cashFlowGroup = new CashFlowGroup();
         $this->cashFlow = new CashFlow();
         $this->user = new User();
+
         $userData = [
             "uuid" => Uuid::uuid6(),
             "user_full_name" => "teste fulano de tal 2",
@@ -100,15 +115,27 @@ class CashFlowTest extends TestCase
             "user_password" => password_hash("minhasenha1234", PASSWORD_DEFAULT),
             "deleted" => 0
         ];
+
         $this->user->persistData($userData);
-        $this->user = new User();
+        $userId = $this->user->getId();
+
+        $cashFlowGroupData = [
+            "uuid" => Uuid::uuid6(),
+            "group_name" => "novo grupo",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ];
+        $this->cashFlowGroup->persistData($cashFlowGroupData);
+        $cashFlowGroupId = $this->cashFlowGroup->getId();
         
-        $userData = $this->user->findUserByEmail($userData["user_email"]);
-        $this->user->setId($userData->id);
+        $this->cashFlowGroup = new CashFlowGroup();
+        $this->cashFlowGroup->setId($cashFlowGroupId);
 
         $cashFlowData = [
             "uuid" => Uuid::uuid6(),
             "id_user" => $this->user,
+            "id_cash_flow_group" => $this->cashFlowGroup,
             "entry" => "1.750,45",
             "history" => "venda realizada no dia " . date("d/m/Y"),
             "entry_type" => 1,
@@ -119,14 +146,17 @@ class CashFlowTest extends TestCase
 
         $response = $this->cashFlow->persistData($cashFlowData);
         $this->assertTrue($response, "erro ao persistir o registro do fluxo de caixa");
-        $this->user = new User();
         $this->cashFlow->dropCashFlowById($this->cashFlow->getId());
-        $this->user->dropUserById($userData->id);
+        $this->user = new User();
+        $this->user->dropUserById($userId);
+        $this->cashFlowGroup = new CashFlowGroup();
+        $this->cashFlowGroup->dropCashFlowGroupById($cashFlowGroupId);
     }
 
     public function testCalculateBalancePositive()
     {
         $cashFlowIds = [];
+        $cashFlowGroupUuids = [];
         $this->user = new User();
 
         $userData = [
@@ -143,10 +173,22 @@ class CashFlowTest extends TestCase
 
         for ($i = 0; $i < 3; $i++) {
             $this->cashFlow = new CashFlow();
+            $this->cashFlowGroup = new CashFlowGroup();
 
+            $cashFlowGroupUuid = Uuid::uuid6();
+            $cashFlowGroupData = [
+                "uuid" => $cashFlowGroupUuid,
+                "group_name" => "novo grupo",
+                "created_at" => date("Y-m-d"),
+                "updated_at" => date("Y-m-d"),
+                "deleted" => 0
+            ];
+
+            $this->cashFlowGroup->persistData($cashFlowGroupData);
             $cashFlowData = [
                 "uuid" => Uuid::uuid6(),
                 "id_user" => $this->user,
+                "id_cash_flow_group" => $this->cashFlowGroup,
                 "entry" => "1.750,45",
                 "history" => "venda realizada no dia " . date("d/m/Y"),
                 "entry_type" => 1,
@@ -156,6 +198,7 @@ class CashFlowTest extends TestCase
             ];
             $this->cashFlow->persistData($cashFlowData);
             array_push($cashFlowIds, $this->cashFlow->getId());
+            array_push($cashFlowGroupUuids, $cashFlowGroupUuid);
         }
 
         $balance = $this->cashFlow->calculateBalance($this->user);
@@ -168,13 +211,20 @@ class CashFlowTest extends TestCase
             }
         }
 
+        if (!empty($cashFlowGroupUuids)) {
+            for ($i = 0; $i < count($cashFlowGroupUuids); $i++) { 
+                $this->cashFlowGroup = new CashFlowGroup();
+                $this->cashFlowGroup->dropCashFlowGroupByUuid($cashFlowGroupUuids[$i]);
+            }
+        }
+
         $this->user = new User();
         $this->user->dropUserById($userId);
     }
 
     public function testCalculateBalanceNegative()
     {
-        $cashFlowIds = [];
+        $cashFlowGroupIds = [];
         $this->user = new User();
 
         $userData = [
@@ -191,10 +241,23 @@ class CashFlowTest extends TestCase
 
         for ($i = 0; $i < 3; $i++) {
             $this->cashFlow = new CashFlow();
+            $this->cashFlowGroup = new CashFlowGroup();
+
+            $cashFlowGroupData = [
+                "uuid" => Uuid::uuid6(),
+                "group_name" => "novo grupo",
+                "created_at" => date("Y-m-d"),
+                "updated_at" => date("Y-m-d"),
+                "deleted" => 0
+            ];
+
+            $this->cashFlowGroup->persistData($cashFlowGroupData);
+            $cashFlowGroupId = $this->cashFlowGroup->getId();
 
             $cashFlowData = [
                 "uuid" => Uuid::uuid6(),
                 "id_user" => $this->user,
+                "id_cash_flow_group" => $this->cashFlowGroup,
                 "entry" => "1.750,45",
                 "history" => "venda realizada no dia " . date("d/m/Y"),
                 "entry_type" => 0,
@@ -203,7 +266,7 @@ class CashFlowTest extends TestCase
                 "deleted" => 0
             ];
             $this->cashFlow->persistData($cashFlowData);
-            array_push($cashFlowIds, $this->cashFlow->getId());
+            array_push($cashFlowGroupIds, $cashFlowGroupId);
         }
 
         $balance = $this->cashFlow->calculateBalance($this->user);
@@ -218,6 +281,13 @@ class CashFlowTest extends TestCase
 
         $this->user = new User();
         $this->user->dropUserById($userId);
+
+        if (!empty($cashFlowGroupIds)) {
+            for ($i=0; $i < count($cashFlowGroupIds); $i++) { 
+                $this->cashFlowGroup = new CashFlowGroup();
+                $this->cashFlowGroup->dropCashFlowGroupById($cashFlowGroupIds[$i]);
+            }
+        }
     }
 
     public function testFindCashFlowByIdNotFound()
@@ -232,6 +302,8 @@ class CashFlowTest extends TestCase
     {
         $this->cashFlow = new CashFlow();
         $this->user = new User();
+        $this->cashFlowGroup = new CashFlowGroup();
+
         $userData = [
             "uuid" => Uuid::uuid6(),
             "user_full_name" => "teste fulano de tal 2",
@@ -241,10 +313,22 @@ class CashFlowTest extends TestCase
             "deleted" => 0
         ];
         $this->user->persistData($userData);
+
+        $cashFlowGroupData = [
+            "uuid" => Uuid::uuid6(),
+            "group_name" => "novo grupo",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ];
+
+        $this->cashFlowGroup->persistData($cashFlowGroupData);
+        $cashFlowGroupId = $this->cashFlowGroup->getId();
         
         $cashFlowData = [
             "uuid" => Uuid::uuid6(),
             "id_user" => $this->user,
+            "id_cash_flow_group" => $this->cashFlowGroup,
             "entry" => "1.750,45",
             "history" => "venda realizada no dia " . date("d/m/Y"),
             "entry_type" => 1,
@@ -259,10 +343,11 @@ class CashFlowTest extends TestCase
         $response = $this->cashFlow->findCashFlowById();
         $this->assertIsObject($response, 'erro ao retornar cashflow pelo id');
        
-        $this->cashFlow = new CashFlow();
-        $this->cashFlow->dropCashFlowById($response->id);
         $this->user = new User();
         $this->user->dropUserByEmail($userData["user_email"]);
+        
+        $this->cashFlowGroup = new CashFlowGroup();
+        $this->cashFlowGroup->dropCashFlowGroupById($cashFlowGroupId);
     }
 
     public function testGetIdIsEmpty()
@@ -307,10 +392,23 @@ class CashFlowTest extends TestCase
         $this->user->persistData($userData);
         $userId = $this->user->getId();
 
+        $this->cashFlowGroup = new CashFlowGroup();
+        $cashFlowGroupData = [
+            "uuid" => Uuid::uuid6(),
+            "group_name" => "novo grupo",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ];
+
+        $this->cashFlowGroup->persistData($cashFlowGroupData);
+        $cashFlowGroupId = $this->cashFlowGroup->getId();
+
         $this->cashFlow = new CashFlow();
         $cashFlowData = [
             "uuid" => Uuid::uuid6(),
             "id_user" => $this->user,
+            "id_cash_flow_group" => $this->cashFlowGroup,
             "entry" => "1.750,45",
             "history" => "venda realizada no dia " . date("d/m/Y"),
             "entry_type" => 1,
@@ -320,16 +418,15 @@ class CashFlowTest extends TestCase
         ];
         
         $this->cashFlow->persistData($cashFlowData);
-        $cashFlowId = $this->cashFlow->getId();
 
         $this->cashFlow = new CashFlow();
         $this->assertIsArray($this->cashFlow->findCashFlowByUser([], $this->user));
-
-        $this->cashFlow = new CashFlow();
-        $this->cashFlow->dropCashFlowById($cashFlowId);
         
         $this->user = new User();
         $this->user->dropUserById($userId);
+
+        $this->cashFlowGroup = new CashFlowGroup();
+        $this->cashFlowGroup->dropCashFlowGroupById($cashFlowGroupId);
     }
 
     public function testFindCashFlowByUuid()
@@ -347,10 +444,23 @@ class CashFlowTest extends TestCase
         $this->user->persistData($userData);
         $userId = $this->user->getId();
 
+        $this->cashFlowGroup = new CashFlowGroup();
+        $cashFlowGroupData = [
+            "uuid" => Uuid::uuid6(),
+            "group_name" => "novo grupo",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ];
+
+        $this->cashFlowGroup->persistData($cashFlowGroupData);
+        $cashFlowGroupId = $this->cashFlowGroup->getId();
+
         $this->cashFlow = new CashFlow();
         $cashFlowData = [
             "uuid" => "1eed7357-6e74-6096-abf0-0242ac120003",
             "id_user" => $this->user,
+            "id_cash_flow_group" => $this->cashFlowGroup,
             "entry" => "1.750,45",
             "history" => "venda realizada no dia " . date("d/m/Y"),
             "entry_type" => 1,
@@ -371,6 +481,9 @@ class CashFlowTest extends TestCase
         
         $this->user = new User();
         $this->user->dropUserById($userId);
+
+        $this->cashFlowGroup = new CashFlowGroup();
+        $this->cashFlowGroup->dropCashFlowGroupById($cashFlowGroupId);
     }
 
     public function testFindCashFlowByUuidNotFound()
@@ -396,10 +509,24 @@ class CashFlowTest extends TestCase
         $this->user->persistData($userData);
         $userId = $this->user->getId();
 
+        $this->cashFlowGroup = new CashFlowGroup();
+        $cashFlowGroupUuid = Uuid::uuid6();
+
+        $cashFlowGroupData = [
+            "uuid" => $cashFlowGroupUuid,
+            "group_name" => "novo grupo",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ];
+
+        $this->cashFlowGroup->persistData($cashFlowGroupData);
         $this->cashFlow = new CashFlow();
+        
         $cashFlowData = [
             "uuid" => Uuid::uuid6(),
             "id_user" => $this->user,
+            "id_cash_flow_group" => $this->cashFlowGroup,
             "entry" => "1.750,45",
             "history" => "venda realizada no dia " . date("d/m/Y"),
             "entry_type" => 0,
@@ -417,6 +544,9 @@ class CashFlowTest extends TestCase
         
         $this->user = new User();
         $this->user->dropUserById($userId);
+
+        $this->cashFlowGroup = new CashFlowGroup();
+        $this->cashFlowGroup->dropCashFlowGroupByUuid($cashFlowGroupUuid);
     }
 
     public function testUpdateCashFlowByUuidInstanceUserError()
@@ -432,11 +562,22 @@ class CashFlowTest extends TestCase
         ];
         
         $this->user->persistData($userData);
+        $this->cashFlowGroup = new CashFlowGroup();
 
+        $cashFlowGroupData = [
+            "uuid" => "1eed7357-6e74-6096-abf0-0242ac120003",
+            "group_name" => "novo grupo",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ];
+
+        $this->cashFlowGroup->persistData($cashFlowGroupData);
         $this->cashFlow = new CashFlow();
         $cashFlowData = [
             "uuid" => "1eed7357-6e74-6096-abf0-0242ac120003",
             "id_user" => $this->user,
+            "id_cash_flow_group" => $this->cashFlowGroup,
             "entry" => "1.750,45",
             "history" => "venda realizada no dia " . date("d/m/Y"),
             "entry_type" => 0,
@@ -458,6 +599,8 @@ class CashFlowTest extends TestCase
     {
         $this->user = new User();
         $response = $this->user->dropUserByUuid("1eed7357-6e74-6096-abf0-0242ac120003");
+        $this->cashFlowGroup = new CashFlowGroup();
+        $this->cashFlowGroup->dropCashFlowGroupByUuid("1eed7357-6e74-6096-abf0-0242ac120003");
         $this->assertNull($response);
     }
 
@@ -475,6 +618,7 @@ class CashFlowTest extends TestCase
         $cashFlowData = [
             "uuid" => Uuid::uuid6(),
             "id_user" => new User(),
+            "id_cash_flow_group" => new CashFlowGroup(),
             "entry" => "1.750,45",
             "history" => "venda realizada no dia " . date("d/m/Y"),
             "entry_type" => 0,
@@ -491,7 +635,7 @@ class CashFlowTest extends TestCase
     {
         $this->user = new User();
         $userData = [
-            "uuid" => "1eed7357-6e74-6096-abf0-0242ac120003",
+            "uuid" => Uuid::uuid6(),
             "user_full_name" => "teste fulano de tal 2",
             "user_nick_name" => "fulanoDeTal2",
             "user_email" => "testefulano2@gmail.com",
@@ -502,13 +646,23 @@ class CashFlowTest extends TestCase
         $this->user->persistData($userData);
         $userId = $this->user->getId();
         
-        $this->user = new User();
-        $this->user->setId($userId);
+        $this->cashFlowGroup = new CashFlowGroup();
+        $cashFlowGroupData = [
+            "uuid" => Uuid::uuid6(),
+            "group_name" => "novo grupo",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ];
+
+        $this->cashFlowGroup->persistData($cashFlowGroupData);
+        $cashFlowGroupId = $this->cashFlowGroup->getId();
 
         $this->cashFlow = new CashFlow();
         $cashFlowData = [
             "uuid" => "1eed7357-6e74-6096-abf0-0242ac120003",
             "id_user" => $this->user,
+            "id_cash_flow_group" => $this->cashFlowGroup,
             "entry" => "1.750,45",
             "history" => "venda realizada no dia " . date("d/m/Y"),
             "entry_type" => 0,
@@ -518,10 +672,16 @@ class CashFlowTest extends TestCase
         ];
         $searchDate = date("d/m/Y", strtotime($cashFlowData["created_at"]));
         $this->cashFlow->persistData($cashFlowData);
+        
         $cashFlowData = $this->cashFlow
-            ->findCashFlowDataByDate($searchDate . " - " . $searchDate, $this->user);
+        ->findCashFlowDataByDate($searchDate . " - " . $searchDate, $this->user);
         $this->assertIsArray($cashFlowData);
+        
+        $this->user = new User();
         $this->user->dropUserById($userId);
+        
+        $this->cashFlowGroup = new CashFlowGroup();
+        $this->cashFlowGroup->dropCashFlowGroupById($cashFlowGroupId);
     }
 
     public function testFindCashFlowDataByDateIsNull()
@@ -543,5 +703,128 @@ class CashFlowTest extends TestCase
         $this->expectException(Exception::class);
         $this->expectExceptionMessage("parametro dates inválido");
         $this->cashFlow->findCashFlowDataByDate($searchDate, $this->user);
+    }
+
+    public function testInvalidInstanceCashFlowGroupOnPersistData()
+    {
+        $this->user = new User();
+        $userData = [
+            "uuid" => "1eed7357-6e74-6096-abf0-0242ac120003",
+            "user_full_name" => "teste fulano de tal 2",
+            "user_nick_name" => "fulanoDeTal2",
+            "user_email" => "testefulano2@gmail.com",
+            "user_password" => password_hash("minhasenha1234", PASSWORD_DEFAULT),
+            "deleted" => 0
+        ];
+        
+        $this->user->persistData($userData);
+        $this->cashFlow = new CashFlow();
+        $cashFlowData = [
+            "uuid" => "1eed7357-6e74-6096-abf0-0242ac120003",
+            "id_user" => $this->user,
+            "id_cash_flow_group" => $this->user,
+            "entry" => "1.750,45",
+            "history" => "venda realizada no dia " . date("d/m/Y"),
+            "entry_type" => 0,
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ];
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("Instância inválida ao persistir o dado");
+        $this->cashFlow->persistData($cashFlowData);
+    }
+
+    public function testClearAllDataFromPreviousMethod()
+    {
+        $this->user = new User();
+        $response = $this->user->dropUserByUuid("1eed7357-6e74-6096-abf0-0242ac120003");
+        $this->assertNull($response);
+    }
+
+    public function testDropCashFlowByIdIsEmpty()
+    {
+        $this->cashFlow = new CashFlow();
+        $response = $this->cashFlow->dropCashFlowById(0);
+        $this->assertJsonStringEqualsJsonString(
+            json_encode(["error" => "id não pode estar vazio"]),
+            $response
+        );
+    }
+
+    public function testFindCashFlowByUuidIsEmpty()
+    {
+        $this->cashFlow = new CashFlow();
+        $response = $this->cashFlow->findCashFlowByUuid("");
+        $this->assertJsonStringEqualsJsonString(
+            json_encode(["error" => "uuid não pode estar vazio"]), 
+            $response
+        );
+    }
+
+    public function testDropCashFlowByUuidIsEmpty()
+    {
+        $this->cashFlow = new CashFlow();
+        $response = $this->cashFlow->dropCashFlowByUuid("");
+        $this->assertJsonStringEqualsJsonString(
+            json_encode(["error" => "uuid não pode estar vazio"]),
+            $response
+        );
+    }
+
+    public function testInvalidInstanceCashFlowGroupOnUpdate()
+    {
+        $this->user = new User();
+        $userData = [
+            "uuid" => "1eed7357-6e74-6096-abf0-0242ac120003",
+            "user_full_name" => "teste fulano de tal 2",
+            "user_nick_name" => "fulanoDeTal2",
+            "user_email" => "testefulano2@gmail.com",
+            "user_password" => password_hash("minhasenha1234", PASSWORD_DEFAULT),
+            "deleted" => 0
+        ];
+        
+        $this->user->persistData($userData);
+        $this->cashFlowGroup = new CashFlowGroup();
+
+        $cashFlowGroupData = [
+            "uuid" => "1eed7357-6e74-6096-abf0-0242ac120003",
+            "group_name" => "novo grupo",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ];
+
+        $this->cashFlowGroup->persistData($cashFlowGroupData);
+        $this->cashFlow = new CashFlow();
+
+        $cashFlowData = [
+            "uuid" => "1eed7357-6e74-6096-abf0-0242ac120003",
+            "id_user" => $this->user,
+            "id_cash_flow_group" => $this->cashFlowGroup,
+            "entry" => "1.750,45",
+            "history" => "venda realizada no dia " . date("d/m/Y"),
+            "entry_type" => 0,
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ];
+        
+        $this->cashFlow->persistData($cashFlowData);
+        $cashFlowData["id_cash_flow_group"] = $this->user;
+        $this->expectException(Exception::class);
+        
+        $this->expectExceptionMessage("Instância inválida ao atualizar o dado");
+        $this->cashFlow->updateCashFlowByUuid($cashFlowData);
+    }
+
+    public function testClearAllDataFromPreviousMethod2()
+    {
+        $this->user = new User();
+        $this->user->dropUserByUuid("1eed7357-6e74-6096-abf0-0242ac120003");
+        $this->cashFlowGroup = new CashFlowGroup();
+        $response = $this->cashFlowGroup->dropCashFlowGroupByUuid("1eed7357-6e74-6096-abf0-0242ac120003");
+        $this->assertNull($response);
     }
 }

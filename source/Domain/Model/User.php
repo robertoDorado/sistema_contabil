@@ -43,9 +43,7 @@ class User
             $userData->$key = $value;
         }
         
-        validateModelProperties(ModelsUser::class, $data);
         $userData->setRequiredFields(array_keys($data));
-
         if (!$userData->save()) {
             if (!empty($userData->fail())) {
                 throw new PDOException($userData->fail()->getMessage());
@@ -64,7 +62,11 @@ class User
         }
         
         if (!$userData->destroy()) {
-            throw new PDOException($userData->fail()->getMessage());
+            if (!empty($userData->fail())) {
+                throw new PDOException($userData->fail()->getMessage());
+            }else {
+                throw new Exception($userData->message()->getText());
+            }
         }
     }
 
@@ -110,7 +112,11 @@ class User
         }
 
         if (!$user->destroy()) {
-            throw new \PDOException($user->fail()->getMessage());
+            if (!empty($user->fail())) {
+                throw new PDOException($user->fail()->getMessage());
+            }else {
+                throw new Exception($user->message()->getText());
+            }
         }
         return true;
     }
@@ -153,11 +159,14 @@ class User
             throw new \Exception("usuario nao encontrado");
         }
 
-        try {
-            return $user->destroy();
-        } catch (\PDOException $_) {
-            throw new \PDOException($user->fail()->getMessage());
+        if (!$user->destroy()) {
+            if (!empty($user->fail())) {
+                throw new PDOException($user->fail()->getMessage());
+            }else {
+                throw new Exception($user->message()->getText());
+            }
         }
+        return true;
     }
 
     public function login(string $userEmail, string $userNickName, string $userPassword)
@@ -216,7 +225,7 @@ class User
             if (!empty($this->user->fail())) {
                 throw new PDOException($this->user->fail()->getMessage());
             }else {
-                throw new PDOException($this->user->message()->getText());
+                throw new Exception($this->user->message()->getText());
             }
         }
 

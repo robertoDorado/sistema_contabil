@@ -63,6 +63,13 @@ class CashFlow
         }
 
         $verifyKeys = [
+            "id_cash_flow_group" => function ($value) {
+                if (!$value instanceof CashFlowGroup) {
+                    throw new Exception("Instância inválida ao atualizar o dado");
+                }
+                return $value->getId();
+            },
+
             "id_user" => function ($value) {
                 if (!$value instanceof User) {
                     throw new Exception("Instância inválida ao atualizar o dado");
@@ -99,6 +106,10 @@ class CashFlow
 
     public function dropCashFlowByUuid(string $uuid)
     {
+        if (empty($uuid)) {
+            return json_encode(["error" => "uuid não pode estar vazio"]);
+        }
+
         $cashFlowData = $this->cashFlow
             ->find("uuid=:uuid", ":uuid={$uuid}")
             ->fetch();
@@ -114,6 +125,10 @@ class CashFlow
 
     public function findCashFlowByUuid(string $uuid)
     {
+        if (empty($uuid)) {
+            return json_encode(["error" => "uuid não pode estar vazio"]);
+        }
+
         $cashFlowData = $this->cashFlow
             ->find("uuid=:uuid", ":uuid={$uuid}")
             ->fetch();
@@ -160,6 +175,10 @@ class CashFlow
 
     public function dropCashFlowById(int $id)
     {
+        if (empty($id)) {
+            return json_encode(["error" => "id não pode estar vazio"]);
+        }
+        
         $cashFlowData = $this->cashFlow->findById($id);
         if (!$cashFlowData->destroy()) {
             if (!empty($cashFlowData->fail())) {
@@ -199,6 +218,13 @@ class CashFlow
         }
         
         $verifyKeys = [
+            "id_cash_flow_group" => function ($value) {
+                if (!$value instanceof CashFlowGroup) {
+                    throw new Exception("Instância inválida ao persistir o dado");
+                }
+                return $value->getId();
+            },
+
             "id_user" => function ($value) {
                 if (!$value instanceof User) {
                     throw new Exception("Instância inválida ao persistir o dado");

@@ -1,4 +1,5 @@
 <?php
+
 namespace Source\Models;
 
 use Source\Core\Model;
@@ -36,9 +37,9 @@ class User extends Model
     {
         parent::__construct(CONF_DB_NAME . ".user", ["id"], [
             $this->uuid,
-            $this->userFullName, 
-            $this->userNickName, 
-            $this->userEmail, 
+            $this->userFullName,
+            $this->userNickName,
+            $this->userEmail,
             $this->userPassword,
             $this->deleted
         ]);
@@ -49,7 +50,8 @@ class User extends Model
         return $this->deleted;
     }
 
-    public function setDeleted(int $delete) {
+    public function setDeleted(int $delete)
+    {
         $this->deleted = $delete;
     }
 

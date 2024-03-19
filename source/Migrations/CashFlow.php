@@ -34,10 +34,12 @@ class CashFlow
     {
         $this->ddl->setClassProperties();
         $this->ddl->setProperty('');
+        $this->ddl->setProperty('');
         $this->ddl->setKeysToProperties(["BIGINT AUTO_INCREMENT PRIMARY KEY", "VARCHAR(36) UNIQUE NOT NULL",
-        "BIGINT NOT NULL", "DECIMAL(10, 2) NOT NULL", "VARCHAR(255) NOT NULL",
-        "TINYINT(1) NOT NULL", "DATE", "DATE", "TINYINT(1) NOT NULL",
-        "CONSTRAINT fk_cash_flow FOREIGN KEY (id_user) REFERENCES user(id) ON DELETE CASCADE"]);
+        "BIGINT NOT NULL", "BIGINT NOT NULL", "DECIMAL(10, 2) NOT NULL", "VARCHAR(255) NOT NULL",
+        "TINYINT(1) NOT NULL", "DATE NOT NULL", "DATE NOT NULL", "TINYINT(1) NOT NULL",
+        "CONSTRAINT fk_cash_flow FOREIGN KEY (id_user) REFERENCES user(id) ON DELETE CASCADE",
+        "CONSTRAINT fk_cashflow_group FOREIGN KEY (id_cash_flow_group) REFERENCES cash_flow_group(id)"]);
         $this->ddl->dropTableIfExists()->createTableQuery();
         $this->ddl->executeQuery();
     }

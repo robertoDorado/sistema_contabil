@@ -14,8 +14,11 @@ class CashFlow extends Model
     /** @var string Uuid do fluxo de caixa */
     protected string $uuid = "uuid";
 
-    /** @var string Uuid do usuário (chave de relacionamento) */
+    /** @var string id do usuário (chave de relacionamento) */
     protected string $idUser = "id_user";
+
+    /** @var string id do agrupamento de fluxo de caixa */
+    protected string $idCashFlowGroup = "id_cash_flow_group";
 
     /** @var string Valor de entrada */
     protected string $entry = "entry";
@@ -42,7 +45,8 @@ class CashFlow extends Model
     {
         parent::__construct(CONF_DB_NAME . ".cash_flow", ["id"], [
             $this->uuid,
-            $this->idUser, 
+            $this->idUser,
+            $this->idCashFlowGroup,
             $this->entry,
             $this->history,
             $this->entryType,
