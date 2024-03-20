@@ -44,13 +44,23 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
+                                <a href="<?= url("admin/cash-flow-group/form") ?>" class="nav-link <?= $_SERVER['REQUEST_URI'] == '/admin/cash-flow-group/form' ? 'active' : '' ?>">
+                                    <p>Lançar grupo de contas</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?= url("admin/cash-flow-group/report") ?>" class="nav-link <?= $_SERVER['REQUEST_URI'] == '/admin/cash-flow-group/report' ? 'active' : '' ?>">
+                                    <p>Relatório grupo de contas</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a href="<?= url("admin/cash-flow/form") ?>" class="nav-link <?= $_SERVER['REQUEST_URI'] == '/admin/cash-flow/form' ? 'active' : '' ?>">
-                                    <p>Fazer um lançamento</p>
+                                    <p>Lançar nova conta</p>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a href="<?= url("admin/cash-flow/report") ?>" class="nav-link <?= $_SERVER['REQUEST_URI'] == '/admin/cash-flow/report' ? 'active' : '' ?>">
-                                    <p>Relatório</p>
+                                    <p>Relatório de contas</p>
                                 </a>
                             </li>
                         </ul>

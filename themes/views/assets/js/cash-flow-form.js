@@ -48,12 +48,12 @@ if (window.location.pathname == '/admin/cash-flow/form') {
         ).then((response) => response.json())
         .then(function(response) {
             let message = ''
+            launchBtn.innerHTML = 'Enviar'
 
             if (response.user_not_exists) {
                 message = response.user_not_exists
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.error(message)
-                launchBtn.innerHTML = 'Enviar'
                 throw new Error(message)
             }
 
@@ -61,7 +61,6 @@ if (window.location.pathname == '/admin/cash-flow/form') {
                 message = response.invalid_entry_type
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.error(message)
-                launchBtn.innerHTML = 'Enviar'
                 throw new Error(message)
             }
 
@@ -69,7 +68,6 @@ if (window.location.pathname == '/admin/cash-flow/form') {
                 message = response.invalid_persist_data
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.error(message)
-                launchBtn.innerHTML = 'Enviar'
                 throw new Error(message)
             }
             
@@ -79,7 +77,6 @@ if (window.location.pathname == '/admin/cash-flow/form') {
             
             message = response.success
             message = message.charAt(0).toUpperCase() + message.slice(1)
-            launchBtn.innerHTML = 'Enviar'
             toastr.success(message)
         })
     })

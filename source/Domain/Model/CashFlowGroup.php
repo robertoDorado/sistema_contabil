@@ -28,6 +28,19 @@ class CashFlowGroup
         $this->cashFlowGroup = new ModelsCashFlowGroup();
     }
 
+    public function findCashFlowGroupByUser(array $columns = [], User $user)
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        $data = $this->cashFlowGroup->find("id_user=:id_user AND deleted=:deleted", 
+            ":id_user=" . $user->getId() . "&:deleted=0", $columns)->fetch(true);
+        
+        if (empty($data)) {
+            return json_encode(["error" => "nenhum registro foi encontrado"]);
+        }
+        
+        return $data;
+    }
+
     public function findCashFlowGroupByUuid(string $uuid)
     {
         if (empty($uuid)) {
@@ -89,10 +102,24 @@ class CashFlowGroup
             return json_encode(["error" => "grupo fluxo de caixa não encontrado"]);
         }
 
-        foreach ($data as $key => $value) {
-            $cashFlowGroupData->$key = $value;
-        }
+        $verifyKeys = [
+            "id_user" => function ($value) {
+                if (!$value instanceof User) {
+                    throw new Exception("Instância inválida ao atualizar o dado");
+                }
+                return $value->getId();
+            },
+        ];
 
+        foreach ($data as $key => &$value) {
+            if (!empty($verifyKeys[$key])) {
+                $value = $verifyKeys[$key]($value);
+                $cashFlowGroupData->$key = $value;
+            }else {
+                $cashFlowGroupData->$key = $value;
+            }
+        }
+        
         $cashFlowGroupData->setRequiredFields(array_keys($data));
         if (!$cashFlowGroupData->save()) {
             if (!empty($cashFlowGroupData->fail())) {
@@ -123,8 +150,23 @@ class CashFlowGroup
         }
 
         validateModelProperties(ModelsCashFlowGroup::class, $data);
-        foreach ($data as $key => $value) {
-            $this->cashFlowGroup->$key = $value;
+        
+        $verifyKeys = [
+            "id_user" => function ($value) {
+                if (!$value instanceof User) {
+                    throw new Exception("Instância inválida ao persistir o dado");
+                }
+                return $value->getId();
+            },
+        ];
+
+        foreach ($data as $key => &$value) {
+            if (!empty($verifyKeys[$key])) {
+                $value = $verifyKeys[$key]($value);
+                $this->cashFlowGroup->$key = $value;
+            }else {
+                $this->cashFlowGroup->$key = $value;
+            }
         }
 
         if (!$this->cashFlowGroup->save()) {

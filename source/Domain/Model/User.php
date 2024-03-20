@@ -90,7 +90,7 @@ class User
 
         $columns = empty($columns) ? "*" : implode(", ", $columns);
         $data = $this->user
-            ->find("user_email=:user_email", ":user_email=" . $email . "", $columns)->fetch();
+        ->find("user_email=:user_email", ":user_email=" . $email . "", $columns)->fetch();
         
         if (empty($data)) {
             return json_encode(["user_not_exists" => "usuário não existe"]);

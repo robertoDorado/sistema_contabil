@@ -47,6 +47,11 @@ $route->get("/cash-flow/update/form/{uuid}", "CashFlow::cashFlowUpdateForm");
 $route->post("/cash-flow/update/form/{uuid}", "CashFlow::cashFlowUpdateForm");
 $route->post("/cash-flow/remove/{uuid}", "CashFlow::cashFlowRemoveRegister");
 $route->post("/cash-flow/import-excel", "CashFlow::importExcelFile");
+$route->get("/cash-flow-group/form", "CashFlowGroup::cashFlowGroupForm");
+$route->post("/cash-flow-group/form", "CashFlowGroup::cashFlowGroupForm");
+$route->get("/cash-flow-group/report", "CashFlowGroup::cashFlowGroupReport");
+$route->get("/cash-flow-group/update/form/{uuid}", "CashFlowGroup::cashFlowGroupFormUpdate");
+$route->post("/cash-flow-group/update/form/{uuid}", "CashFlowGroup::cashFlowGroupFormUpdate");
 
 
 /**
@@ -55,7 +60,7 @@ $route->post("/cash-flow/import-excel", "CashFlow::importExcelFile");
 $module = "ops";
 $route->namespace("Source\Controllers");
 $route->group($module);
-$route->get("/error/{error_code}", "Admin::error");
+$route->get("/error/{error_code}", "Site::error");
 
 
 /**

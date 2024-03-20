@@ -299,7 +299,7 @@ class CashFlow extends Controller
 
         echo $this->view->render("admin/cash-flow-form-update", [
             "userFullName" => showUserFullName(),
-            "endpoints" => ['/admin/cash-flow/form', "/admin/cash-flow/report"],
+            "endpoints" => ["/admin/cash-flow/form", "/admin/cash-flow/report"],
             "cashFlowData" => $cashFlowData
         ]);
     }
@@ -356,7 +356,7 @@ class CashFlow extends Controller
 
         echo $this->view->render("admin/cash-flow-report", [
             "userFullName" => showUserFullName(),
-            "endpoints" => ['/admin/cash-flow/form', "/admin/cash-flow/report"],
+            "endpoints" => ["/admin/cash-flow/form", "/admin/cash-flow/report"],
             "cashFlowDataByUser" => $cashFlowDataByUser,
             "cashFlowEmptyMessage" => $cashFlowEmptyMessage,
             "balance" => $balance,
@@ -417,7 +417,7 @@ class CashFlow extends Controller
         
         echo $this->view->render("admin/cash-flow-form", [
             "userFullName" => showUserFullName(),
-            "endpoints" => ['/admin/cash-flow/form', "/admin/cash-flow/report"]
+            "endpoints" => ["/admin/cash-flow/form", "/admin/cash-flow/report"]
         ]);
     }
 }

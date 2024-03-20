@@ -14,6 +14,9 @@ class CashFlowGroup extends Model
     /** @var string uuid de identificação */
     protected string $uuid = "uuid";
 
+    /** @var string  id do usuário */
+    protected string $idUser = "id_user";
+
     /** @var string nome do grupo */
     protected string $groupName = "group_name";
 
@@ -33,6 +36,7 @@ class CashFlowGroup extends Model
     {
         parent::__construct(CONF_DB_NAME . ".cash_flow_group", ["id"], [
             $this->uuid,
+            $this->id_user,
             $this->groupName,
             $this->createdAt,
             $this->updatedAt,

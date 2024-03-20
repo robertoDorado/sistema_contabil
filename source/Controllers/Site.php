@@ -36,7 +36,7 @@ class Site extends Controller
         ]);
     }
 
-    public function error()
+    public function error(array $data)
     {
         redirect("/admin");
     }

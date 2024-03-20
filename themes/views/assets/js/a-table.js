@@ -1,1 +1,0 @@
-const cashFlowTable = dataTableConfig($("#cashFlowReport"))

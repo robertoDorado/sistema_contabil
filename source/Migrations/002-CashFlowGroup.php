@@ -28,10 +28,12 @@ class CashFlowGroup
     public function defineTable()
     {
         $this->ddl->setClassProperties();
+        $this->ddl->setProperty('');
         $this->ddl->setKeysToProperties(["BIGINT AUTO_INCREMENT PRIMARY KEY",
-        "VARCHAR(36) UNIQUE NOT NULL", "VARCHAR(255) NOT NULL", "DATE NOT NULL", "DATE NOT NULL",
-        "TINYINT(1) NOT NULL"]);
-        $this->ddl->dropTableIfExists()->createTableQuery();
+        "VARCHAR(36) UNIQUE NOT NULL", "BIGINT NOT NULL", "VARCHAR(255) NOT NULL", 
+        "DATE NOT NULL", "DATE NOT NULL", "TINYINT(1) NOT NULL", 
+        "CONSTRAINT fk_cash_flow_group_user FOREIGN KEY (id_user) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE"]);
+        $this->ddl->setForeignKeyChecks(0)->dropTableIfExists()->createTableQuery()->setForeignKeyChecks(1);
         $this->ddl->executeQuery();
     }
 }
