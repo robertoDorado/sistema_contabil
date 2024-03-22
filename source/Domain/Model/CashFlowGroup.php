@@ -28,6 +28,20 @@ class CashFlowGroup
         $this->cashFlowGroup = new ModelsCashFlowGroup();
     }
 
+    public function findCashFlowGroupByName(string $groupName, User $user, array $columns = [])
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        $data = $this->cashFlowGroup->find("id_user=:id_user AND deleted=:deleted
+        AND group_name=:group_name", ":id_user=" . $user->getId() .
+        "&:deleted=0&:group_name=" . $groupName . "", $columns)->fetch();
+        
+        if (empty($data)) {
+            return json_encode(["error" => "nenhum registro foi encontrado"]);
+        }
+        
+        return $data;
+    }
+
     public function findCashFlowGroupByUser(array $columns = [], User $user)
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
@@ -128,6 +142,7 @@ class CashFlowGroup
                 throw new Exception($cashFlowGroupData->message()->getText());
             }
         }
+        return true;
     }
 
     public function getId()

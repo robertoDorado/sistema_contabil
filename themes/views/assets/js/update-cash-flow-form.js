@@ -1,7 +1,7 @@
-let parameter = window.location.pathname.split("/")
-parameter = parameter.pop()
+let cashFlowParameter = window.location.pathname.split("/")
+cashFlowParameter = cashFlowParameter.pop()
 
-if (window.location.pathname == `/admin/cash-flow/update/form/${parameter}`) {
+if (window.location.pathname == `/admin/cash-flow/update/form/${cashFlowParameter}`) {
     $("#launchValue").maskMoney(
         {
             allowNegative: false, 

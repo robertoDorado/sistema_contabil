@@ -41,10 +41,12 @@ class CashFlow
             foreach ($dates as &$date) {
                 $date = date("Y-m-d", strtotime(str_replace("/", "-", $date)));
             }
-
+            
             return $this->cashFlow
-                ->find("created_at BETWEEN :date1 and :date2 AND id_user=:id_user AND deleted=0", 
-                ":date1=" . $dates[0] . "&:date2=" . $dates[1] . "&:id_user=" . $user->getId() . "")
+                ->find("created_at BETWEEN :date_init and :date_end AND id_user=:id_user AND deleted=0", 
+                ":date_init=" . $dates[0] . "&:date_end=" . $dates[1] . "&:id_user=" . $user->getId() . "")
+                ->join("cash_flow_group", "id", "deleted=:deleted AND id_user=:id_user",
+                ":deleted=0&:id_user=" . $user->getId() . "", "group_name", "id_cash_flow_group", "cash_flow")
                 ->fetch(true);
         }else {
             return;
@@ -130,8 +132,10 @@ class CashFlow
         }
 
         $cashFlowData = $this->cashFlow
-            ->find("uuid=:uuid", ":uuid={$uuid}")
-            ->fetch();
+        ->find("uuid=:uuid", ":uuid={$uuid}")
+        ->join("cash_flow_group", "id", 
+        "deleted=:deleted", ":deleted=0", "group_name", "id_cash_flow_group", "cash_flow")
+        ->fetch();
         
         if (empty($cashFlowData)) {
             return json_encode(["empty_cash_flow" => "o registro fluxo de caixa não existe"]);
@@ -144,7 +148,10 @@ class CashFlow
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
         $data = $this->cashFlow->find("id_user=:id_user AND deleted=:deleted", 
-            ":id_user=" . $user->getId() . "&:deleted=0", $columns)->fetch(true);
+        ":id_user=" . $user->getId() . "&:deleted=0", $columns)
+        ->join("cash_flow_group", "id", "deleted=:deleted AND id_user=:id_user",
+        ":deleted=0&:id_user=" . $user->getId() . "", "group_name", "id_cash_flow_group", "cash_flow")
+        ->fetch(true);
         
         if (empty($data)) {
             return json_encode(["cash_flow_empty" => "nenhum registro foi encontrado"]);

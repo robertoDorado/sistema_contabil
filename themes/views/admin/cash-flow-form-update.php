@@ -49,6 +49,17 @@
                                         <option value="0" <?= empty($cashFlowData->entry_type) ? "selected" : "" ?>>Débito</option>
                                     </select>
                                 </div>
+                                <div class="form-group">
+                                    <label for="accountGroup">Grupo de conta</label>
+                                    <select name="accountGroup" id="accountGroup" class="form-control">
+                                        <option value="" disabled selected>Selecione um grupo de contas</option>
+                                        <?php if (!empty($cashFlowGroupData)) : ?>
+                                            <?php foreach($cashFlowGroupData as $value): ?>
+                                                <option value="<?= $value->getUuid() ?>" <?= $cashFlowData->group_name == $value->group_name ? "selected" : "" ?>><?= $value->group_name ?></option>
+                                            <?php endforeach ?>
+                                        <?php endif ?>
+                                    </select>
+                                </div>
                             </div>
     
                             <div class="card-footer">

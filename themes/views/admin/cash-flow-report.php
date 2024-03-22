@@ -64,6 +64,7 @@
                                     <thead>
                                         <tr>
                                             <th>Id</th>
+                                            <th>Grupo de contas</th>
                                             <th>Data lançamento</th>
                                             <th>Histórico</th>
                                             <th>Tipo de entrada</th>
@@ -73,11 +74,12 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php if (is_array($cashFlowDataByUser) && !empty($cashFlowDataByUser)) : ?>
+                                        <?php if (!empty($cashFlowDataByUser)) : ?>
                                             <?php foreach ($cashFlowDataByUser as $cashFlowData) : ?>
                                                 <?php if (!empty($cashFlowData->entry_type)) : ?>
                                                     <tr style="color:#008000">
                                                         <td><?= $cashFlowData->getUuid() ?></td>
+                                                        <td><?= $cashFlowData->group_name ?></td>
                                                         <td><?= $cashFlowData->created_at ?></td>
                                                         <td><?= $cashFlowData->getHistory() ?></td>
                                                         <td><?= $cashFlowData->entry_type_value ?></td>
@@ -88,6 +90,7 @@
                                                 <?php else : ?>
                                                     <tr style="color:#ff0000">
                                                         <td><?= $cashFlowData->getUuid() ?></td>
+                                                        <td><?= $cashFlowData->group_name ?></td>
                                                         <td><?= $cashFlowData->created_at ?></td>
                                                         <td><?= $cashFlowData->getHistory() ?></td>
                                                         <td><?= $cashFlowData->entry_type_value ?></td>
@@ -106,6 +109,7 @@
                                                 <th rowspan="1" colspan="1"></th>
                                                 <th rowspan="1" colspan="1"></th>
                                                 <th rowspan="1" colspan="1"></th>
+                                                <th rowspan="1" colspan="1"></th>
                                                 <th rowspan="1" colspan="1"><?= $balance ?></th>
                                                 <th rowspan="1" colspan="1"></th>
                                                 <th rowspan="1" colspan="1"></th>
@@ -113,6 +117,7 @@
                                         <?php elseif (empty($balanceValue)) : ?>
                                             <tr>
                                                 <th rowspan="1" colspan="1">Total</th>
+                                                <th rowspan="1" colspan="1"></th>
                                                 <th rowspan="1" colspan="1"></th>
                                                 <th rowspan="1" colspan="1"></th>
                                                 <th rowspan="1" colspan="1"></th>
@@ -126,6 +131,7 @@
                                                 <th rowspan="1" colspan="1"></th>
                                                 <th rowspan="1" colspan="1"></th>
                                                 <th rowspan="1" colspan="1"></th>
+                                                <th rowspan="1" colspan="1"></th>
                                                 <th rowspan="1" colspan="1"><?= $balance ?></th>
                                                 <th rowspan="1" colspan="1"></th>
                                                 <th rowspan="1" colspan="1"></th>
@@ -135,9 +141,6 @@
                                 </table>
                             </div>
                         </div>
-                        <?php if (!empty($cashFlowEmptyMessage)) : ?>
-                            <div id="jsonMessage" data-message='<?= $cashFlowEmptyMessage ?>' style="display:none"></div>
-                        <?php endif ?>
                     </div>
                 </div>
             </div>

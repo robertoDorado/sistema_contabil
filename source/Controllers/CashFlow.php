@@ -1,4 +1,5 @@
 <?php
+
 namespace Source\Controllers;
 
 use DateTime;
@@ -7,6 +8,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use Ramsey\Uuid\Uuid;
 use Source\Core\Controller;
 use Source\Domain\Model\CashFlow as ModelCashFlow;
+use Source\Domain\Model\CashFlowGroup;
 use Source\Domain\Model\User;
 
 /**
@@ -28,17 +30,17 @@ class CashFlow extends Controller
     public function importExcelFile()
     {
         if (empty(session()->user)) {
-            throw new \Exception("usuário inválido");
+            throw new \Exception("usuário inválido", 500);
         }
 
         $file = $this->getRequestFiles()->getFile("excelFile");
         $verifyExtensions = ["xls", "xlsx"];
-        
+
         $fileExtension = explode(".", $file["name"]);
         $fileExtension = strtolower(array_pop($fileExtension));
-        
+
         if (!in_array($fileExtension, $verifyExtensions)) {
-            throw new \Exception("tipo de arquivo inválido");
+            throw new \Exception("tipo de arquivo inválido", 500);
         }
 
         $spreadSheetFile = IOFactory::load($file["tmp_name"]);
@@ -53,11 +55,13 @@ class CashFlow extends Controller
 
         $arrayHeader = array_shift($data);
         if (!empty(array_diff($arrayHeader, $requiredFieldsExcelFile)) && !empty(array_diff($requiredFieldsExcelFile, $arrayHeader))) {
+            http_response_code(500);
             echo json_encode(["error" => "cabeçalho do arquivo inválido"]);
             die;
         }
 
         if (empty($data)) {
+            http_response_code(500);
             echo json_encode(["error" => "os dados do arquivo não podem estar vazio"]);
             die;
         }
@@ -71,8 +75,9 @@ class CashFlow extends Controller
 
         $excelData = array_map("array_filter", $excelData);
         $lengths = array_map('count', $excelData);
-        
+
         if (count(array_unique($lengths)) != 1) {
+            http_response_code(500);
             echo json_encode(["error" => "alguns dados possuem valores a mais no arquivo"]);
             die;
         }
@@ -80,6 +85,7 @@ class CashFlow extends Controller
         foreach ($excelData["d"] as $date) {
             $dateObj = DateTime::createFromFormat("Y-m-d", $date);
             if (!$dateObj) {
+                http_response_code(500);
                 echo json_encode(["error" => "campo data no arquivo está mal formatado"]);
                 die;
             }
@@ -88,22 +94,24 @@ class CashFlow extends Controller
         $verifyTotalDataFromExcelFile = array_map("count", $excelData);
         $verifyTotalDataFromExcelFile = array_unique($verifyTotalDataFromExcelFile);
 
-        if ($verifyTotalDataFromExcelFile["h"] > 100) {
+        if ($verifyTotalDataFromExcelFile["i"] > 100) {
+            http_response_code(500);
             echo json_encode(["error" => "o limite de importação é de 100 registros"]);
             die;
         }
-        
+
         $user = new User();
         $userData = $user->findUserByEmail(session()->user->user_email);
         $user->setId($userData->id);
-        
+
         $verifyEntryType = ["Crédito", "Débito"];
         $arrayUuid = [];
         $arrayEdit = [];
         $arrayDelete = [];
-        
+
         foreach ($excelData['h'] as $key => $history) {
             if (!in_array($excelData["t"][$key], $verifyEntryType)) {
+                http_response_code(500);
                 echo json_encode(["error" => "somente Débito ou Crédito são aceitos como tipo de entrada"]);
                 die;
             }
@@ -112,16 +120,27 @@ class CashFlow extends Controller
             $excelData["l"][$key] = trim(str_replace(["R$", ","], "", $excelData["l"][$key]));
             $excelData["l"][$key] = number_format($excelData["l"][$key], 2, ",", ".");
 
+            $cashFlowGroup = new CashFlowGroup();
+            $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByName($excelData["g"][$key], $user);
+
+            if (is_string($cashFlowGroupData) && json_decode($cashFlowGroupData) != null) {
+                http_response_code(500);
+                echo json_encode(["error" => "grupo de contas inválido"]);
+                die;
+            }
+
+            $cashFlowGroup->setId($cashFlowGroupData->id);
             $cashFlow = new ModelCashFlow();
             $uuid = Uuid::uuid6();
-            
+
             array_push($arrayUuid, $uuid);
             array_push($arrayEdit, "<a class='icons' href=" . url("/admin/cash-flow/update/form/" . $uuid . "") . "><i class='fas fa-edit' aria-hidden='true'></i>");
             array_push($arrayDelete, "<a class='icons' href='#'><i style='color:#ff0000' class='fa fa-trash' aria-hidden='true'></i></a>");
-            
+
             $response = $cashFlow->persistData([
                 "uuid" => $uuid,
                 "id_user" => $user,
+                "id_cash_flow_group" => $cashFlowGroup,
                 "entry" => $excelData["l"][$key],
                 "history" => $history,
                 "entry_type" => $excelData["t"][$key],
@@ -131,10 +150,10 @@ class CashFlow extends Controller
             ]);
 
             if (!$response) {
-                echo json_encode(["error" => "erro genérico ao importar os dados"]);
+                http_response_code(500);
+                echo json_encode(["error" => "erro interno ao importar os dados"]);
                 die;
             }
-
         }
 
         $excelData = [];
@@ -150,35 +169,35 @@ class CashFlow extends Controller
 
         foreach ($excelData["Data lançamento"] as $key => &$date) {
             $date = DateTime::createFromFormat("Y-m-d", $date)->format("d/m/Y");
-            $excelData["Lançamento"][$key] = $excelData["Tipo de entrada"][$key] == "Crédito" ? 
+            $excelData["Lançamento"][$key] = $excelData["Tipo de entrada"][$key] == "Crédito" ?
                 floatval(trim(str_replace([",", "R$"], "", $excelData["Lançamento"][$key]))) :
                 floatval(trim(str_replace([",", "R$"], "", $excelData["Lançamento"][$key]))) * -1;
-            
+
             $excelData["Lançamento"][$key] = "R$ " . number_format($excelData["Lançamento"][$key], 2, ",", ".");
         }
-        
+
         echo json_encode(["success" => "arquivo importado com sucesso", "excelData" => json_encode($excelData)]);
     }
 
     public function cashFlowRemoveRegister(array $data)
     {
         if (empty(session()->user)) {
-            throw new \Exception("usuário inválido");
+            throw new \Exception("usuário inválido", 500);
         }
 
         if (empty($data["uuid"])) {
-            throw new \Exception("uuid inválido");
-        }    
-        
+            throw new \Exception("uuid inválido", 500);
+        }
+
         $uuid = $data["uuid"];
         $cashFlow = new ModelCashFlow();
         $cashFlowData = $cashFlow->findCashFlowByUuid($uuid);
-        
+
         if (is_string($cashFlowData) && json_decode($cashFlowData) != null) {
-            throw new \Exception("registro inválido");
+            throw new \Exception("registro inválido", 500);
         }
 
-        $cashFlow = new ModelCashFlow();        
+        $cashFlow = new ModelCashFlow();
         $response = $cashFlow->updateCashFlowByUuid([
             "uuid" => $cashFlowData->getUuid(),
             "updated_at" => date("Y-m-d"),
@@ -186,26 +205,27 @@ class CashFlow extends Controller
         ]);
 
         if (is_string($response) && json_decode($response) != null) {
-            throw new \Exception($response);
+            throw new \Exception($response, 500);
         }
 
         $user = new User();
         $userData = $user->findUserByEmail(session()->user->user_email);
 
         if (is_string($userData) && json_decode($userData) != null) {
-            throw new \Exception($userData);
+            throw new \Exception($userData, 500);
         }
-        
+
         $user->setId($userData->id);
         $cashFlow = new ModelCashFlow();
-        
+
         $balance = $cashFlow->calculateBalance($user);
         $color = ($balance < 0 ? "#ff0000" : ($balance > 0 ? "#008000" : ""));
         $balance = ($balance < 0 ? $balance * -1 : $balance);
 
         echo json_encode(
             [
-                "success" => true, 
+                "success" => true,
+                "message" => "registro removido com sucesso",
                 "balance" => "R$ " . number_format($balance, 2, ",", "."),
                 "color" => $color
             ]
@@ -220,14 +240,16 @@ class CashFlow extends Controller
 
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
             $requestPost = $this->getRequests()
-            ->setRequiredFields(
-                [
-                    "launchValue", 
-                    "releaseHistory", 
-                    "entryType", 
-                    "csrfToken", 
-                    "createdAt"
-                ])->getAllPostData();
+                ->setRequiredFields(
+                    [
+                        "launchValue",
+                        "releaseHistory",
+                        "entryType",
+                        "csrfToken",
+                        "createdAt",
+                        "accountGroup"
+                    ]
+                )->getAllPostData();
 
             $uriParameter = $this->getServer()->getServerByKey("REQUEST_URI");
             $uriParameter = explode("/", $uriParameter);
@@ -236,7 +258,7 @@ class CashFlow extends Controller
             if (empty($uriParameter)) {
                 throw new \Exception("parametro vazio ou inválido para atualização do fluxo de caixa");
             }
-            
+
             $user = new User();
             $userData = $user->findUserByEmail(session()->user->user_email);
 
@@ -248,17 +270,22 @@ class CashFlow extends Controller
             $user->setId($userData->id);
             $cashFlow = new ModelCashFlow();
             $cashFlowData = $cashFlow->findCashFlowByUuid($uriParameter);
-            
+
             if (is_string($cashFlowData) && json_decode($cashFlowData) != null) {
+                http_response_code(500);
                 echo $cashFlowData;
                 die;
             }
 
             if (strtotime($requestPost["createdAt"]) > strtotime(date("Y-m-d"))) {
+                http_response_code(500);
                 echo json_encode(["invalid_date" => "Data de lançamento não pode ser futura"]);
                 die;
             }
-            
+
+            $cashFlowGroup = new CashFlowGroup();
+            $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid($requestPost["accountGroup"]);
+
             $cashFlow = new ModelCashFlow();
             $response = $cashFlow->updateCashFlowByUuid([
                 "uuid" => $uriParameter,
@@ -272,6 +299,7 @@ class CashFlow extends Controller
             ]);
 
             if (is_string($response) && json_decode($response) != null) {
+                http_response_code(500);
                 echo $response;
                 die;
             }
@@ -283,24 +311,35 @@ class CashFlow extends Controller
         if (empty($data["uuid"])) {
             redirect("/admin/cash-flow/report");
         }
-        
+
         $uuid = $data["uuid"];
         $cashFlow = new ModelCashFlow();
-        
+
         $cashFlowData = $cashFlow->findCashFlowByUuid($uuid);
-        
         if (is_string($cashFlowData) && json_decode($cashFlowData) != null) {
             redirect("/admin/cash-flow/report");
         }
-        
+
         if ($cashFlowData->getEntry() < 0) {
             $cashFlowData->setEntry($cashFlowData->getEntry() * -1);
         }
 
+        $user = new User();
+        $userData = $user->findUserByEmail(session()->user->user_email);
+
+        if (is_string($userData) && json_decode($userData) != null) {
+            throw new Exception($userData, 500);
+        }
+
+        $user->setId($userData->id);
+        $cashFlowGroup = new CashFlowGroup();
+        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUser([], $user);
+
         echo $this->view->render("admin/cash-flow-form-update", [
             "userFullName" => showUserFullName(),
             "endpoints" => ["/admin/cash-flow/form", "/admin/cash-flow/report"],
-            "cashFlowData" => $cashFlowData
+            "cashFlowData" => $cashFlowData,
+            "cashFlowGroupData" => $cashFlowGroupData
         ]);
     }
 
@@ -319,7 +358,7 @@ class CashFlow extends Controller
         }
 
         $user->setId($userData->id);
-        
+
         $cashFlow = new ModelCashFlow();
         $cashFlowDataByUser = $cashFlow->findCashFlowByUser([], $user);
 
@@ -327,29 +366,28 @@ class CashFlow extends Controller
             $cashFlow = new ModelCashFlow();
             $cashFlowDataByUser = $cashFlow->findCashFlowDataByDate($_GET["daterange"], $user);
         }
-        
-        $cashFlowEmptyMessage = "";
+
         if (is_string($cashFlowDataByUser) && json_decode($cashFlowDataByUser) != null) {
-            $cashFlowEmptyMessage = $cashFlowDataByUser;
+            $cashFlowDataByUser = null;
         }
-        
+
         if (is_array($cashFlowDataByUser) && !empty($cashFlowDataByUser)) {
-            foreach($cashFlowDataByUser as &$data) {
+            foreach ($cashFlowDataByUser as &$data) {
                 $data->setEntry('R$ ' . number_format($data->getEntry(), 2, ',', '.'));
-                
+
                 $data->created_at = date('d/m/Y', strtotime($data->created_at));
                 $data->entry_type_value = $data->entry_type == 1 ? "Crédito" : "Débito";
             }
         }
-        
+
         $cashFlow = new ModelCashFlow();
         $user = new User();
-        
+
         $user->setId($userData->id);
         $balanceValue = $cashFlow->calculateBalance($user);
-        
+
         $balance = !empty($balanceValue) ? 'R$ ' . number_format($balanceValue, 2, ',', '.') : 0;
-        
+
         if (!empty($cashFlowDataByUser) && is_array($cashFlowDataByUser)) {
             $cashFlowDataByUser = array_reverse($cashFlowDataByUser);
         }
@@ -358,7 +396,6 @@ class CashFlow extends Controller
             "userFullName" => showUserFullName(),
             "endpoints" => ["/admin/cash-flow/form", "/admin/cash-flow/report"],
             "cashFlowDataByUser" => $cashFlowDataByUser,
-            "cashFlowEmptyMessage" => $cashFlowEmptyMessage,
             "balance" => $balance,
             "balanceValue" => $balanceValue
         ]);
@@ -372,32 +409,54 @@ class CashFlow extends Controller
 
         if ($this->getServer()->getServerByKey('REQUEST_METHOD') == 'POST') {
             $requestPost = $this->getRequests()
-                ->setRequiredFields(["launchValue", "releaseHistory", "entryType", "csrfToken"])
-                ->getAllPostData();
-            
+                ->setRequiredFields(
+                    [
+                        "launchValue",
+                        "releaseHistory",
+                        "entryType",
+                        "csrfToken",
+                        "accountGroup"
+                    ]
+                )->getAllPostData();
+
             $entryTypeFields = [
                 0 => 'success',
                 1 => 'success',
             ];
+
             if (empty($entryTypeFields[$requestPost["entryType"]])) {
+                http_response_code(500);
                 echo json_encode(["invalid_entry_type" => "erro na verificação do tipo de entrada"]);
                 die;
             }
-            
+
             $user = new User();
             $userData = $user->findUserByEmail(session()->user->user_email);
 
             if (is_string($userData) && json_decode($userData) != null) {
+                http_response_code(500);
                 echo $userData;
                 die;
             }
 
             $user->setId($userData->id);
-            $cashFlow = new ModelCashFlow();
+            $cashFlowGroup = new CashFlowGroup();
+            $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid($requestPost["accountGroup"]);
 
+            if (is_string($cashFlowGroupData) && json_decode($cashFlowGroupData)) {
+                http_response_code(500);
+                echo $cashFlowGroupData;
+                die;
+            }
+            
+            $cashFlowGroup->setId($cashFlowGroupData->id);
+            $user->setId($userData->id);
+            
+            $cashFlow = new ModelCashFlow();
             $response = $cashFlow->persistData([
                 "uuid" => Uuid::uuid6(),
                 "id_user" => $user,
+                "id_cash_flow_group" => $cashFlowGroup,
                 "entry" => $requestPost["launchValue"],
                 "history" => $requestPost["releaseHistory"],
                 "entry_type" => $requestPost["entryType"],
@@ -407,17 +466,30 @@ class CashFlow extends Controller
             ]);
 
             if (is_string($response) && json_decode($response) != null) {
+                http_response_code(500);
                 echo $response;
                 die;
             }
-            
+
             echo json_encode(['success' => 'lançamento realizado com sucesso']);
             die;
         }
-        
+
+        $user = new User();
+        $userData = $user->findUserByEmail(session()->user->user_email);
+        $user->setId($userData->id);
+
+        $cashFlowGroup = new CashFlowGroup();
+        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUser([], $user);
+
+        if (is_string($cashFlowGroupData) && json_decode($cashFlowGroupData) != null) {
+            $cashFlowGroupData = null;
+        }
+
         echo $this->view->render("admin/cash-flow-form", [
             "userFullName" => showUserFullName(),
-            "endpoints" => ["/admin/cash-flow/form", "/admin/cash-flow/report"]
+            "endpoints" => ["/admin/cash-flow/form", "/admin/cash-flow/report"],
+            "cashFlowGroupData" => $cashFlowGroupData
         ]);
     }
 }

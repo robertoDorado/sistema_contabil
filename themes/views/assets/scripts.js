@@ -59,12 +59,8 @@ newValue+=settings.decimal+decimalPart;var rounded=Number.parseFloat((integerPar
 return setSymbol(newValue,settings)}
 function buildIntegerPart(integerPart,negative,settings){integerPart=integerPart.replace(/^0*/g,"");integerPart=integerPart.replace(/\B(?=(\d{3})+(?!\d))/g,settings.thousands);if(integerPart===""){integerPart="0"}
 return negative+integerPart}
-$.fn.maskMoney=function(method){if(methods[method]){return methods[method].apply(this,Array.prototype.slice.call(arguments,1))}else if(typeof method==="object"||!method){return methods.init.apply(this,arguments)}else{$.error("Method "+method+" does not exist on jQuery.maskMoney")}}})(window.jQuery||window.Zepto);const jsonMessage=document.getElementById("jsonMessage")
-const urlJson=document.getElementById("urlJson").dataset.url
-let message={cash_flow_empty:''}
-if(jsonMessage){message=JSON.parse(jsonMessage.dataset.message)
-message.cash_flow_empty=message.cash_flow_empty.charAt(0).toUpperCase()+message.cash_flow_empty.slice(1)}
-const cashFlowTable=dataTableConfig($("#cashFlowReport"),{"order":[[0,"desc"]],"language":{"url":urlJson,"emptyTable":message.cash_flow_empty,},"responsive":!0,"lengthChange":!1,"autoWidth":!1,"buttons":["copy",{extend:"csv",charset:'utf-8',bom:!0,customize:function(csvData){let arrayCsvData=csvData.split('"')
+$.fn.maskMoney=function(method){if(methods[method]){return methods[method].apply(this,Array.prototype.slice.call(arguments,1))}else if(typeof method==="object"||!method){return methods.init.apply(this,arguments)}else{$.error("Method "+method+" does not exist on jQuery.maskMoney")}}})(window.jQuery||window.Zepto);const urlJson=document.getElementById("urlJson").dataset.url
+const cashFlowTable=dataTableConfig($("#cashFlowReport"),{"order":[[0,"desc"]],"language":{"url":urlJson},"responsive":!0,"lengthChange":!1,"autoWidth":!1,"buttons":["copy",{extend:"csv",charset:'utf-8',bom:!0,customize:function(csvData){let arrayCsvData=csvData.split('"')
 arrayCsvData=arrayCsvData.map(function(item){item=item.replace(/^Editar$/,"")
 item=item.replace(/^Excluir$/,"")
 return item})
@@ -75,26 +71,25 @@ if(!templateCsv.startsWith('"')){templateCsv=`"${templateCsv}`}
 if(!templateCsv.endsWith('"')){templateCsv=`${templateCsv}"`}
 return templateCsv}},{extend:"excel",customizeData:function(xlsxData){let balance=0
 let arrayXlsxData=Array.from(xlsxData.body)
-arrayXlsxData=arrayXlsxData.map(function(row){row[4]=parseFloat(row[4].replace("R$","").replace(".","").replace(",",".").trim())
+arrayXlsxData=arrayXlsxData.map(function(row){row[5]=parseFloat(row[5].replace("R$","").replace(".","").replace(",",".").trim())
 row=row.filter((data)=>data)
-balance+=row[4]
+balance+=row[5]
 return row})
-arrayXlsxData.push(['Total','','','',balance])
+arrayXlsxData.push(['Total','','','','',balance])
 xlsxData.header=xlsxData.header.filter((data)=>data!='Editar'&&data!='Excluir')
 xlsxData.body=arrayXlsxData}},{extend:"pdf",customize:function(pdfData){let arrayPdfData=Array.from(pdfData.content[1].table.body)
 let header=arrayPdfData.shift()
 let balance=0
-arrayPdfData=arrayPdfData.map(function(row){row[4].text=parseFloat(row[4].text.replace("R$","").replace(".","").replace(",",".").trim())
-balance+=row[4].text
-row[4].text=row[4].text.toLocaleString("pt-br",{"currency":"BRL","style":"currency"})
-row=row.filter((data)=>data.text)
-return row})
+arrayPdfData=arrayPdfData.map(function(row){row[5].text=parseFloat(row[5].text.replace("R$","").replace(".","").replace(",",".").trim())
+balance+=row[5].text
+row[5].text=row[5].text.toLocaleString("pt-br",{"currency":"BRL","style":"currency"})
+return row.filter((data)=>data.text)})
 balance=balance.toLocaleString("pt-br",{"currency":"BRL","style":"currency"})
 header=header.filter((item)=>item.text!="Editar"&&item.text!="Excluir")
 arrayPdfData.unshift(header)
-arrayPdfData.push([{text:'Total',style:'tableBodyOdd',fillColor:'#f1ff32'},{text:'',style:'tableBodyOdd',fillColor:'#f1ff32'},{text:'',style:'tableBodyOdd',fillColor:'#f1ff32'},{text:'',style:'tableBodyOdd',fillColor:'#f1ff32'},{text:balance,style:'tableBodyOdd',fillColor:'#f1ff32'}])
+arrayPdfData.push([{text:'Total',style:'tableBodyOdd',fillColor:'#f1ff32'},{text:'',style:'tableBodyOdd',fillColor:'#f1ff32'},{text:'',style:'tableBodyOdd',fillColor:'#f1ff32'},{text:'',style:'tableBodyOdd',fillColor:'#f1ff32'},{text:'',style:'tableBodyOdd',fillColor:'#f1ff32'},{text:balance,style:'tableBodyOdd',fillColor:'#f1ff32'}])
 pdfData.content[1].table.body=arrayPdfData}},"colvis"],"initComplete":function(){this.api().buttons().container().appendTo("#widgets .col-md-6:eq(0)")}})
-const cashFlowGroupReport=dataTableConfig($("#cashFlowGroupReport"));if(window.location.pathname.match(/admin/)){window.addEventListener("load",function(){toastr.options={'closeButton':!0,'debug':!1,'newestOnTop':!1,'progressBar':!0,'positionClass':'toast-top-right','preventDuplicates':!1,'showDuration':'1000','hideDuration':'1000','timeOut':'5000','extendedTimeOut':'1000','showEasing':'swing','hideEasing':'linear','showMethod':'fadeIn','hideMethod':'fadeOut',}})};if(window.location.pathname=='/admin/cash-flow/form'){const cashFlowForm=document.getElementById("cashFlowForm")
+const cashFlowGroupTable=dataTableConfig($("#cashFlowGroupReport"),{"language":{"url":urlJson}});if(window.location.pathname.match(/admin/)){window.addEventListener("load",function(){toastr.options={'closeButton':!0,'debug':!1,'newestOnTop':!1,'progressBar':!0,'positionClass':'toast-top-right','preventDuplicates':!1,'showDuration':'1000','hideDuration':'1000','timeOut':'5000','extendedTimeOut':'1000','showEasing':'swing','hideEasing':'linear','showMethod':'fadeIn','hideMethod':'fadeOut',}})};if(window.location.pathname=='/admin/cash-flow/form'){const cashFlowForm=document.getElementById("cashFlowForm")
 $("#launchValue").maskMoney({allowNegative:!1,thousands:'.',decimal:',',affixesStay:!1})
 const launchBtn=document.getElementById("launchBtn")
 cashFlowForm.addEventListener("submit",function(event){event.preventDefault()
@@ -106,7 +101,9 @@ if(!this.releaseHistory.value){toastr.warning("Campo histórico inválido")
 throw new Error("Campo histórico inválido")}
 if(!this.entryType.value){toastr.warning("Campo tipo de entrada inválido")
 throw new Error("Campo tipo de entrada inválido")}
-const cashFlowFormFields=[this.launchValue,this.releaseHistory,this.entryType]
+if(!this.accountGroup.value){toastr.warning("Campo grupo de contas inválido")
+throw new Error("Campo grupo de contas inválido")}
+const cashFlowFormFields=[this.launchValue,this.releaseHistory,this.entryType,this.accountGroup]
 showSpinner(launchBtn)
 const form=new FormData(this)
 fetch(window.location.href,{method:"POST",body:form}).then((response)=>response.json()).then(function(response){let message=''
@@ -120,6 +117,10 @@ message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)
 throw new Error(message)}
 if(response.invalid_persist_data){message=response.invalid_persist_data
+message=message.charAt(0).toUpperCase()+message.slice(1)
+toastr.error(message)
+throw new Error(message)}
+if(response.error){message=response.error
 message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)
 throw new Error(message)}
@@ -145,10 +146,10 @@ accountGroup.value=""
 message=response.success.charAt(0).toUpperCase()+response.success.slice(1)
 toastr.success(message)})})};if(window.location.pathname=="/admin/cash-flow/report"){$(document).ready(function(){$('#date-range').daterangepicker({opens:'left',locale:{format:'DD/MM/YYYY',separator:' - ',applyLabel:'Aplicar',cancelLabel:'Cancelar',}})});const tFoot=document.querySelector("tfoot").firstElementChild
 cashFlowTable.on('search.dt',function(){const dataFilter=cashFlowTable.rows({search:'applied'}).data();let balance=0
-dataFilter.each(function(row){let entryValue=parseFloat(row[4].replace("R$","").replace(".","").replace(",",".").trim())
+dataFilter.each(function(row){let entryValue=parseFloat(row[5].replace("R$","").replace(".","").replace(",",".").trim())
 balance+=entryValue})
 balance<0?tFoot.style.color="#ff0000":balance==0?tFoot.removeAttribute("style"):tFoot.style.color="#008000"
-tFoot.children[4].innerHTML=balance.toLocaleString("pt-br",{"currency":"BRL","style":"currency"})})};if(window.location.pathname=='/admin/cash-flow/report'){const importExcelForm=document.getElementById("importExcelForm")
+tFoot.children[5].innerHTML=balance.toLocaleString("pt-br",{"currency":"BRL","style":"currency"})})};if(window.location.pathname=='/admin/cash-flow/report'){const importExcelForm=document.getElementById("importExcelForm")
 const inputExcelFile=document.querySelector('[name="excelFile"]')
 const standardLabelNameExcelFile=inputExcelFile.nextElementSibling.innerHTML
 const verifyExtensionFile=["xls","xlsx"]
@@ -184,7 +185,7 @@ btnSubmit.append(importIcon," Importar ")
 excelFile.value=""
 excelLabel.innerHTML=standardLabelNameExcelFile
 const excelData=JSON.parse(response.excelData)
-for(let i=0;i<excelData.Histórico.length;i++){cashFlowTable.row.add([excelData.Id[i],excelData["Data lançamento"][i],excelData.Histórico[i],excelData["Tipo de entrada"][i],excelData.Lançamento[i],excelData.Editar[i],excelData.Excluir[i]]).draw(!1)}
+for(let i=0;i<excelData.Histórico.length;i++){cashFlowTable.row.add([excelData.Id[i],excelData["Data lançamento"][i],excelData["Grupo de contas"][i],excelData.Histórico[i],excelData["Tipo de entrada"][i],excelData.Lançamento[i],excelData.Editar[i],excelData.Excluir[i]]).draw(!1)}
 message=response.success.charAt(0).toUpperCase()+response.success.slice(1)
 toastr.success(message)}})})};if(window.location.pathname=="/admin/login"){const loginForm=document.getElementById("loginForm")
 loginForm.addEventListener("submit",function(event){event.preventDefault()
@@ -217,7 +218,43 @@ if(response.login_success){window.location.href=response.url}})})};if(window.loc
 logoutBtn.addEventListener("click",function(event){event.preventDefault()
 const form=new FormData()
 form.append('request',JSON.stringify({logout:!0}))
-fetch(window.location.origin+"/admin/logout",{method:"POST",body:form}).then((response)=>response.json()).then(function(response){if(response.logout_success){window.location.href=window.location.href}})})};if(window.location.pathname=='/admin/cash-flow/report'){const trashIconBtn=Array.from(document.querySelectorAll(".fa.fa-trash"))
+fetch(window.location.origin+"/admin/logout",{method:"POST",body:form}).then((response)=>response.json()).then(function(response){if(response.logout_success){window.location.href=window.location.href}})})};if(window.location.pathname=='/admin/cash-flow-group/report'){const trashIconBtn=Array.from(document.querySelectorAll(".fa.fa-trash"))
+if(trashIconBtn){const launchModal=document.getElementById("launchModal")
+const modalContainerLabel=document.getElementById("modalContainerLabel")
+const modalBody=document.querySelector(".modal-body")
+const saveChanges=document.getElementById("saveChanges")
+saveChanges.classList.remove("btn-primary")
+saveChanges.classList.add("btn-danger")
+saveChanges.innerHTML="Excluir"
+const dismissModal=document.getElementById("dismissModal")
+dismissModal.innerHTML="Voltar"
+const dataDelete={}
+trashIconBtn.forEach(function(element){const linkDelete=element.parentElement
+linkDelete.addEventListener("click",function(event){event.preventDefault()
+const row=this.parentElement.parentElement
+let uuidParameter=this.parentElement.previousElementSibling.firstElementChild
+uuidParameter=uuidParameter.href.split("/")
+uuidParameter=uuidParameter.pop()
+let url=`${window.location.origin}/admin/cash-flow-group/remove/${uuidParameter}`
+dataDelete.uuidParameter=uuidParameter
+dataDelete.url=url
+dataDelete.row=row
+launchModal.click()})})
+launchModal.addEventListener("click",function(){modalContainerLabel.innerHTML="Atenção!"
+modalBody.innerHTML=`Você quer mesmo deletar o registro ${dataDelete.uuidParameter}?`})
+saveChanges.addEventListener("click",function(){showSpinner(saveChanges)
+fetch(`${window.location.origin}/admin/cash-flow-group/remove/${dataDelete.uuidParameter}`,{method:"POST"}).then((response)=>response.json()).then(function(response){let message=""
+if(response.error){saveChanges.innerHTML="Excluir"
+message=response.error
+message=message.charAt(0).toLocaleUpperCase()+message.slice(1)
+toastr.error(message)
+throw new Error(message)}
+if(response.success){message=response.success
+message=message.charAt(0).toUpperCase()+message.slice(1)
+toastr.success(message)
+cashFlowGroupTable.row(dataDelete.row).remove().draw()
+saveChanges.innerHTML="Excluir"
+dismissModal.click()}})})}};if(window.location.pathname=='/admin/cash-flow/report'){const trashIconBtn=Array.from(document.querySelectorAll(".fa.fa-trash"))
 if(trashIconBtn){const launchModal=document.getElementById("launchModal")
 const modalContainerLabel=document.getElementById("modalContainerLabel")
 const modalBody=document.querySelector(".modal-body")
@@ -240,17 +277,29 @@ dataDelete.url=url
 dataDelete.row=row
 launchModal.click()})})
 launchModal.addEventListener("click",function(){modalContainerLabel.innerHTML="Atenção!"
-modalBody.innerHTML=`Você quer mesmo deletar o registro ${dataDelete.uuidParameter}?`
+modalBody.innerHTML=`Você quer mesmo deletar o registro ${dataDelete.uuidParameter}?`})
 saveChanges.addEventListener("click",function(){showSpinner(saveChanges)
-fetch(`${window.location.origin}/admin/cash-flow/remove/${dataDelete.uuidParameter}`,{method:"POST"}).then((response)=>response.json()).then(function(response){const tFoot=Array.from(document.querySelector("tfoot").firstElementChild.children)
+fetch(`${window.location.origin}/admin/cash-flow/remove/${dataDelete.uuidParameter}`,{method:"POST"}).then((response)=>response.json()).then(function(response){let message=""
+const tFoot=Array.from(document.querySelector("tfoot").firstElementChild.children)
 const totalRow=document.querySelector("tfoot").firstElementChild
 totalRow.style.color=response.color
 tFoot.forEach(function(element){if(element.innerHTML&&element.innerHTML!='Total'){element.innerHTML=response.balance}})
-if(response.success){cashFlowTable.row(dataDelete.row).remove().draw()
-saveChanges.innerHTML="Excluir"
-dismissModal.click()}})})})}};let parameter=window.location.pathname.split("/")
-parameter=parameter.pop()
-if(window.location.pathname==`/admin/cash-flow/update/form/${parameter}`){$("#launchValue").maskMoney({allowNegative:!1,thousands:'.',decimal:',',affixesStay:!1})
+if(response.data_is_empty){message=response.data_is_empty
+message=message.charAt(0).toUpperCase()+message.slice(1)
+toastr.error(message)
+throw new Error(message)}
+if(response.cash_flow_data_not_found){message=response.cash_flow_data_not_found
+message=message.charAt(0).toUpperCase()+message.slice(1)
+toastr.error(message)
+throw new Error(message)}
+if(response.success){saveChanges.innerHTML="Excluir"
+message=response.message
+message=message.charAt(0).toUpperCase()+message.slice(1)
+toastr.success(message)
+cashFlowTable.row(dataDelete.row).remove().draw()
+dismissModal.click()}})})}};let cashFlowParameter=window.location.pathname.split("/")
+cashFlowParameter=cashFlowParameter.pop()
+if(window.location.pathname==`/admin/cash-flow/update/form/${cashFlowParameter}`){$("#launchValue").maskMoney({allowNegative:!1,thousands:'.',decimal:',',affixesStay:!1})
 const cashFlowForm=document.getElementById("cashFlowForm")
 cashFlowForm.addEventListener("submit",function(event){event.preventDefault()
 const updateBtn=document.getElementById("updateBtn")
@@ -289,5 +338,22 @@ if(response.invalid_date){message=response.invalid_date
 message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)
 updateBtn.innerHTML='Atualizar'
+throw new Error(message)}
+if(response.success){window.location.href=response.url}})})};let cashFlowGroupParameter=window.location.pathname.split("/")
+cashFlowGroupParameter=cashFlowGroupParameter.pop()
+if(window.location.pathname==`/admin/cash-flow-group/update/form/${cashFlowGroupParameter}`){const cashFlowGroupForm=document.getElementById("cashFlowGroupForm")
+cashFlowGroupForm.addEventListener("submit",function(event){event.preventDefault()
+const btnSubmit=this.querySelector("[type='submit']")
+if(!this.accountGroup.value){toastr.warning("Campo nome grupo de contas é obrigatório")
+throw new Error("Campo nome grupo de contas é obrigatório")}
+if(!this.csrfToken.value){toastr.warning("Campo token é obrigatório")
+throw new Error("Campo token é obrigatório")}
+const form=new FormData(this)
+showSpinner(btnSubmit)
+fetch(window.location.href,{method:"POST",body:form}).then(response=>response.json()).then(function(response){let message=""
+if(response.error){btnSubmit.innerHTML="Atualizar"
+message=response.error
+message=message.charAt(0).toUpperCase()+message.slice(1)
+toastr.error(message)
 throw new Error(message)}
 if(response.success){window.location.href=response.url}})})}

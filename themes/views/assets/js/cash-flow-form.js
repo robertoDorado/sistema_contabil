@@ -33,10 +33,16 @@ if (window.location.pathname == '/admin/cash-flow/form') {
             throw new Error("Campo tipo de entrada inválido")
         }
 
+        if (!this.accountGroup.value) {
+            toastr.warning("Campo grupo de contas inválido")
+            throw new Error("Campo grupo de contas inválido")
+        }
+
         const cashFlowFormFields = [
             this.launchValue,
             this.releaseHistory,
-            this.entryType
+            this.entryType,
+            this.accountGroup
         ]
         showSpinner(launchBtn)
         const form = new FormData(this)
@@ -45,8 +51,7 @@ if (window.location.pathname == '/admin/cash-flow/form') {
             method: "POST",
             body: form
         }
-        ).then((response) => response.json())
-        .then(function(response) {
+        ).then((response) => response.json()).then(function(response) {
             let message = ''
             launchBtn.innerHTML = 'Enviar'
 
@@ -66,6 +71,13 @@ if (window.location.pathname == '/admin/cash-flow/form') {
 
             if (response.invalid_persist_data) {
                 message = response.invalid_persist_data
+                message = message.charAt(0).toUpperCase() + message.slice(1)
+                toastr.error(message)
+                throw new Error(message)
+            }
+
+            if (response.error) {
+                message = response.error
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.error(message)
                 throw new Error(message)

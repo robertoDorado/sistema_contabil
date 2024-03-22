@@ -52,6 +52,7 @@ $route->post("/cash-flow-group/form", "CashFlowGroup::cashFlowGroupForm");
 $route->get("/cash-flow-group/report", "CashFlowGroup::cashFlowGroupReport");
 $route->get("/cash-flow-group/update/form/{uuid}", "CashFlowGroup::cashFlowGroupFormUpdate");
 $route->post("/cash-flow-group/update/form/{uuid}", "CashFlowGroup::cashFlowGroupFormUpdate");
+$route->post("/cash-flow-group/remove/{uuid}", "CashFlowGroup::cashFlowGroupRemoveRegister");
 
 
 /**

@@ -66,6 +66,7 @@ if (window.location.pathname == '/admin/cash-flow/report') {
                     cashFlowTable.row.add([
                         excelData["Id"][i],
                         excelData["Data lançamento"][i],
+                        excelData["Grupo de contas"][i],
                         excelData["Histórico"][i],
                         excelData["Tipo de entrada"][i],
                         excelData["Lançamento"][i],

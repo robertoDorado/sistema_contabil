@@ -1,5 +1,5 @@
 if (window.location.pathname == "/admin/cash-flow/report") {
-    $(document).ready(function() {
+    $(document).ready(function () {
         $('#date-range').daterangepicker({
             opens: 'left',
             locale: {
@@ -15,7 +15,7 @@ if (window.location.pathname == "/admin/cash-flow/report") {
         const dataFilter = cashFlowTable.rows({ search: 'applied' }).data();
         let balance = 0
         dataFilter.each(function (row) {
-            let entryValue = parseFloat(row[4].replace("R$", "")
+            let entryValue = parseFloat(row[5].replace("R$", "")
                 .replace(".", "").replace(",", ".").trim())
 
             balance += entryValue
@@ -24,7 +24,7 @@ if (window.location.pathname == "/admin/cash-flow/report") {
         balance < 0 ? tFoot.style.color = "#ff0000" : balance == 0 ?
             tFoot.removeAttribute("style") : tFoot.style.color = "#008000"
 
-        tFoot.children[4].innerHTML = balance
+        tFoot.children[5].innerHTML = balance
             .toLocaleString("pt-br", { "currency": "BRL", "style": "currency" })
     })
 }

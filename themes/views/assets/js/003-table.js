@@ -1,21 +1,9 @@
-const jsonMessage = document.getElementById("jsonMessage")
 const urlJson = document.getElementById("urlJson").dataset.url
-
-let message = {
-    cash_flow_empty: ''
-}
-
-if (jsonMessage) {
-    message = JSON.parse(jsonMessage.dataset.message)
-    message.cash_flow_empty = message.cash_flow_empty.charAt(0).toUpperCase()
-    + message.cash_flow_empty.slice(1)
-}
 const cashFlowTable = dataTableConfig($("#cashFlowReport"),
 {
     "order": [[0, "desc"]],
     "language": {
-        "url": urlJson,
-        "emptyTable": message.cash_flow_empty,
+        "url": urlJson
     },
     "responsive": true,
     "lengthChange": false,
@@ -59,14 +47,14 @@ const cashFlowTable = dataTableConfig($("#cashFlowReport"),
                 let arrayXlsxData = Array.from(xlsxData.body)
 
                 arrayXlsxData = arrayXlsxData.map(function (row) {
-                    row[4] = parseFloat(row[4].replace("R$", "")
+                    row[5] = parseFloat(row[5].replace("R$", "")
                         .replace(".", "").replace(",", ".").trim())
                     row = row.filter((data) => data)
-                    balance += row[4]
+                    balance += row[5]
                     return row
                 })
 
-                arrayXlsxData.push(['Total', '', '', '', balance])
+                arrayXlsxData.push(['Total', '', '', '', '', balance])
                 xlsxData.header = xlsxData.header.filter((data) => data != 'Editar' && data != 'Excluir')
                 xlsxData.body = arrayXlsxData
             }
@@ -79,25 +67,29 @@ const cashFlowTable = dataTableConfig($("#cashFlowReport"),
                 let balance = 0
 
                 arrayPdfData = arrayPdfData.map(function (row) {
-                    row[4].text = parseFloat(row[4].text.replace("R$", "")
-                        .replace(".", "").replace(",", ".").trim())
-                    balance += row[4].text
+                    row[5].text = parseFloat(row[5].text.replace("R$", "")
+                    .replace(".", "").replace(",", ".").trim())
+                    balance += row[5].text
 
-                    row[4].text = row[4].text
-                        .toLocaleString("pt-br", { "currency": "BRL", "style": "currency" })
-
-                    row = row.filter((data) => data.text)
-                    return row
-                })
-                balance = balance
+                    row[5].text = row[5].text
                     .toLocaleString("pt-br", { "currency": "BRL", "style": "currency" })
 
+                    return row.filter((data) => data.text)
+                })
+
+                balance = balance.toLocaleString("pt-br", { "currency": "BRL", "style": "currency" })
                 header = header.filter((item) => item.text != "Editar" && item.text != "Excluir")
+                
                 arrayPdfData.unshift(header)
                 arrayPdfData.push(
                     [
                         {
                             text: 'Total',
+                            style: 'tableBodyOdd',
+                            fillColor: '#f1ff32'
+                        },
+                        {
+                            text: '',
                             style: 'tableBodyOdd',
                             fillColor: '#f1ff32'
                         },
@@ -123,6 +115,7 @@ const cashFlowTable = dataTableConfig($("#cashFlowReport"),
                         }
                     ]
                 )
+                
                 pdfData.content[1].table.body = arrayPdfData
             }
         },
@@ -135,4 +128,9 @@ const cashFlowTable = dataTableConfig($("#cashFlowReport"),
             .appendTo("#widgets .col-md-6:eq(0)");
     }
 })
-const cashFlowGroupReport = dataTableConfig($("#cashFlowGroupReport"))
+const cashFlowGroupTable = dataTableConfig($("#cashFlowGroupReport"), 
+{
+    "language": {
+        "url": urlJson
+    }
+})
