@@ -94,9 +94,10 @@ class CashFlow extends Controller
         $verifyTotalDataFromExcelFile = array_map("count", $excelData);
         $verifyTotalDataFromExcelFile = array_unique($verifyTotalDataFromExcelFile);
 
-        if ($verifyTotalDataFromExcelFile["i"] > 100) {
+        $limit = 100;
+        if ($verifyTotalDataFromExcelFile["i"] > $limit) {
             http_response_code(500);
-            echo json_encode(["error" => "o limite de importação é de 100 registros"]);
+            echo json_encode(["error" => "o limite de importação é de {$limit} registros"]);
             die;
         }
 
@@ -286,10 +287,19 @@ class CashFlow extends Controller
             $cashFlowGroup = new CashFlowGroup();
             $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid($requestPost["accountGroup"]);
 
+            if (is_string($cashFlowGroupData) && json_decode($cashFlowGroupData) != null) {
+                http_response_code(500);
+                echo $cashFlowGroupData;
+                die;
+            }
+
+            $cashFlowGroup->setId($cashFlowGroupData->id);
             $cashFlow = new ModelCashFlow();
+            
             $response = $cashFlow->updateCashFlowByUuid([
                 "uuid" => $uriParameter,
                 "id_user" => $user,
+                "id_cash_flow_group" => $cashFlowGroup,
                 "entry" => $requestPost["launchValue"],
                 "history" => $requestPost["releaseHistory"],
                 "entry_type" => $requestPost["entryType"],

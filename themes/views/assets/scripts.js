@@ -144,7 +144,10 @@ toastr.error(message)
 throw new Error(message)}
 accountGroup.value=""
 message=response.success.charAt(0).toUpperCase()+response.success.slice(1)
-toastr.success(message)})})};if(window.location.pathname=="/admin/cash-flow/report"){$(document).ready(function(){$('#date-range').daterangepicker({opens:'left',locale:{format:'DD/MM/YYYY',separator:' - ',applyLabel:'Aplicar',cancelLabel:'Cancelar',}})});const tFoot=document.querySelector("tfoot").firstElementChild
+toastr.success(message)})})};if(window.location.pathname=="/admin/cash-flow/report"){async function teste(){const{element}=await fetch("https://jsonplaceholder.typicode.com/posts")
+return element}
+teste().then(function(response){console.log(response)})
+$(document).ready(function(){$('#date-range').daterangepicker({opens:'left',locale:{format:'DD/MM/YYYY',separator:' - ',applyLabel:'Aplicar',cancelLabel:'Cancelar',}})});const tFoot=document.querySelector("tfoot").firstElementChild
 cashFlowTable.on('search.dt',function(){const dataFilter=cashFlowTable.rows({search:'applied'}).data();let balance=0
 dataFilter.each(function(row){let entryValue=parseFloat(row[5].replace("R$","").replace(".","").replace(",",".").trim())
 balance+=entryValue})
@@ -335,6 +338,11 @@ toastr.error(message)
 updateBtn.innerHTML='Atualizar'
 throw new Error(message)}
 if(response.invalid_date){message=response.invalid_date
+message=message.charAt(0).toUpperCase()+message.slice(1)
+toastr.error(message)
+updateBtn.innerHTML='Atualizar'
+throw new Error(message)}
+if(response.error){message=response.error
 message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)
 updateBtn.innerHTML='Atualizar'

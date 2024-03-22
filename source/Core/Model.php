@@ -2,6 +2,7 @@
 
 namespace Source\Core;
 
+use Exception;
 use Source\Support\Message;
 
 /**
@@ -31,7 +32,8 @@ abstract class Model
     /** @var string */
     protected $terms;
 
-    protected $params = [];
+    /** @var array */
+    protected $params;
 
     /** @var string */
     protected $columns;
@@ -54,6 +56,9 @@ abstract class Model
     /** @var array $entity database table */
     protected $required;
 
+    /** @var string */
+    protected $between;
+
     /**
      * Model contructor
      * @param string $entity database table name
@@ -65,6 +70,7 @@ abstract class Model
         $this->entity = $entity;
         $this->protected = $protected;
         $this->required = $required;
+        $this->params = [];
         $this->message = new Message();
     }
 
@@ -126,6 +132,40 @@ abstract class Model
     }
 
     /**
+     * Query between
+     *
+     * @param string $betweenColumn
+     * @param string $betweenEntity
+     * @param array $betweenData
+     * @return Model
+     */
+    public function between(string $betweenColumn, string $betweenEntity, array $betweenData): Model
+    {
+        if (count($betweenData) != 2) {
+            throw new Exception("o array between precisa conter somente 2 valores");
+        }
+
+        $betweenColumn = trim($betweenColumn);
+        $betweenKeys = array_keys($betweenData);
+
+        $betweenKeys = array_map(function ($item) {
+            return ":{$item}";
+        }, $betweenKeys);
+
+        $parameters = "";
+        foreach ($betweenData as $key => $value) {
+            $parameters .= ":{$key}={$value}&";
+        }
+
+        $parameters = rtrim($parameters, "&");
+        $this->between = $betweenColumn . " BETWEEN " . implode(" AND ", $betweenKeys);
+
+        $this->setTerms("", $parameters, $betweenEntity, $this->params);
+        $this->setQuery();
+        return $this;
+    }
+
+    /**
      * Este método vai montar a query juntando o distinct, column, entity, terms e join
      * 
      * @return Model
@@ -137,12 +177,13 @@ abstract class Model
         if (!empty($distinct) && !empty($this->columns)) {
             $distinct .= ", ";
         }
-        
+
         $this->query = "
             SELECT {$distinct}{$this->columns} 
             FROM {$this->entity} 
             {$this->join} 
             {$this->terms}
+            {$this->between}
             {$this->in}
         ";
         return $this;
@@ -163,10 +204,11 @@ abstract class Model
 
     /**
      * Adiciona termos a query . Já coloca o nome da tabela automaticamente
-     * 
-     * @param string $terms ex.: nome = :nome AND idade = :idade
-     * @param string $params ex.: nome={$nome}&idade={$idade}
-     * @param string $entity Nome da tabela, se nulo vai pegar a do model
+     *
+     * @param string $terms
+     * @param string $params
+     * @param string|null $entity
+     * @param array $data
      * @return Model
      */
     private function setTerms(string $terms, string $params, ?string $entity = null, array &$data): Model

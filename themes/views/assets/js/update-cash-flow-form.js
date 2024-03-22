@@ -85,6 +85,14 @@ if (window.location.pathname == `/admin/cash-flow/update/form/${cashFlowParamete
                 throw new Error(message)
             }
 
+            if (response.error) {
+                message = response.error
+                message = message.charAt(0).toUpperCase() + message.slice(1)
+                toastr.error(message)
+                updateBtn.innerHTML = 'Atualizar'
+                throw new Error(message)
+            }
+
             if (response.success) {
                 window.location.href = response.url
             }

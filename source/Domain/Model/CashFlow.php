@@ -43,11 +43,15 @@ class CashFlow
             }
             
             return $this->cashFlow
-                ->find("created_at BETWEEN :date_init and :date_end AND id_user=:id_user AND deleted=0", 
-                ":date_init=" . $dates[0] . "&:date_end=" . $dates[1] . "&:id_user=" . $user->getId() . "")
-                ->join("cash_flow_group", "id", "deleted=:deleted AND id_user=:id_user",
-                ":deleted=0&:id_user=" . $user->getId() . "", "group_name", "id_cash_flow_group", "cash_flow")
-                ->fetch(true);
+                ->find("id_user=:id_user AND deleted=0", 
+                ":id_user=" . $user->getId() . "")
+                ->join("cash_flow_group", "id", "deleted=0 AND id_user=:id_user",
+                ":id_user=" . $user->getId() . "", "group_name", "id_cash_flow_group", "cash_flow")
+                ->between("created_at", "sistema_contabil.cash_flow", 
+                [
+                    "date_init" => $dates[0], 
+                    "date_end" => $dates[1]
+                ])->fetch(true);
         }else {
             return;
         }
