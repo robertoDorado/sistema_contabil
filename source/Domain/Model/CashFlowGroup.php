@@ -76,13 +76,7 @@ class CashFlowGroup
         }
 
         $cashFlowGroupData = $this->cashFlowGroup->findById($id);
-        if (!$cashFlowGroupData->destroy()) {
-            if (!empty($cashFlowGroupData->fail())) {
-                throw new PDOException($cashFlowGroupData->fail()->getMessage());
-            }else {
-                throw new Exception($cashFlowGroupData->message()->getText());
-            }
-        }
+        $cashFlowGroupData->destroy();
     }
 
     public function dropCashFlowGroupByUuid(string $uuid)
@@ -95,14 +89,8 @@ class CashFlowGroup
         if (empty($cashFlowGroupData)) {
             return json_encode(["error" => "o registro não existe"]);
         }
-
-        if (!$cashFlowGroupData->destroy()) {
-            if (!empty($cashFlowGroupData->fail())) {
-                throw new PDOException($cashFlowGroupData->fail()->getMessage());
-            }else {
-                throw new Exception($cashFlowGroupData->message()->getText());
-            }
-        }
+        
+        $cashFlowGroupData->destroy();
     }
 
     public function updateCashFlowGroupByUuid(array $data)
@@ -135,14 +123,7 @@ class CashFlowGroup
         }
         
         $cashFlowGroupData->setRequiredFields(array_keys($data));
-        if (!$cashFlowGroupData->save()) {
-            if (!empty($cashFlowGroupData->fail())) {
-                throw new PDOException($cashFlowGroupData->fail()->getMessage());
-            }else {
-                throw new Exception($cashFlowGroupData->message()->getText());
-            }
-        }
-        return true;
+        return $cashFlowGroupData->save();
     }
 
     public function getId()
@@ -184,14 +165,7 @@ class CashFlowGroup
             }
         }
 
-        if (!$this->cashFlowGroup->save()) {
-            if (!empty($this->cashFlowGroup->fail())) {
-                throw new PDOException($this->cashFlowGroup->fail()->getMessage());
-            }else {
-                throw new Exception($this->cashFlowGroup->message()->getText());
-            }
-        }
-
+        $this->cashFlowGroup->save();
         $this->setId(Connect::getInstance()->lastInsertId());
         return true;
     }

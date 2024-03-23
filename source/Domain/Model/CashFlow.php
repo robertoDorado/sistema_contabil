@@ -100,14 +100,7 @@ class CashFlow
         }
         
         $cashFlowData->setRequiredFields(array_keys($data));
-        if (!$cashFlowData->save()) {
-            if (!empty($cashFlowData->fail())) {
-                throw new PDOException($cashFlowData->fail()->getMessage());
-            }else {
-                throw new Exception($cashFlowData->message()->getText());
-            }
-        }
-        return true;
+        return $cashFlowData->save();
     }
 
     public function dropCashFlowByUuid(string $uuid)
@@ -120,13 +113,7 @@ class CashFlow
             ->find("uuid=:uuid", ":uuid={$uuid}")
             ->fetch();
         
-        if (!$cashFlowData->destroy()) {
-            if (!empty($cashFlowData->fail())) {
-                throw new PDOException($cashFlowData->fail()->getMessage());
-            }else {
-                throw new Exception($cashFlowData->message()->getText());
-            }
-        }
+        $cashFlowData->destroy();
     }
 
     public function findCashFlowByUuid(string $uuid)
@@ -191,13 +178,7 @@ class CashFlow
         }
         
         $cashFlowData = $this->cashFlow->findById($id);
-        if (!$cashFlowData->destroy()) {
-            if (!empty($cashFlowData->fail())) {
-                throw new PDOException($cashFlowData->fail()->getMessage());
-            }else {
-                throw new Exception($cashFlowData->message()->getText());
-            }
-        }
+        $cashFlowData->destroy();
     }
 
     public function calculateBalance(User $user)
@@ -259,14 +240,7 @@ class CashFlow
             }
         }
 
-        if (!$this->cashFlow->save()) {
-            if (!empty($this->cashFlow->fail())) {
-                throw new PDOException($this->cashFlow->fail()->getMessage());
-            }else {
-                throw new Exception($this->cashFlow->message()->getText());
-            }
-        }
-
+        $this->cashFlow->save();
         $this->setId(Connect::getInstance()->lastInsertId());
         return true;
     }

@@ -44,14 +44,7 @@ class User
         }
         
         $userData->setRequiredFields(array_keys($data));
-        if (!$userData->save()) {
-            if (!empty($userData->fail())) {
-                throw new PDOException($userData->fail()->getMessage());
-            }else {
-                throw new Exception($userData->message()->getText());
-            }
-        }
-        return true;
+        return $userData->save();
     }
 
     public function dropUserByUuid(string $uuid)
@@ -60,14 +53,7 @@ class User
         if (empty($userData)) {
             throw new \Exception("usuário não encontrado");
         }
-        
-        if (!$userData->destroy()) {
-            if (!empty($userData->fail())) {
-                throw new PDOException($userData->fail()->getMessage());
-            }else {
-                throw new Exception($userData->message()->getText());
-            }
-        }
+        $userData->destroy();
     }
 
     public function findUserByUuid(string $uuid)
@@ -111,14 +97,7 @@ class User
             throw new \Exception("usuario nao encontrado");
         }
 
-        if (!$user->destroy()) {
-            if (!empty($user->fail())) {
-                throw new PDOException($user->fail()->getMessage());
-            }else {
-                throw new Exception($user->message()->getText());
-            }
-        }
-        return true;
+        return $user->destroy();
     }
 
     public function getId()
@@ -159,14 +138,7 @@ class User
             throw new \Exception("usuario nao encontrado");
         }
 
-        if (!$user->destroy()) {
-            if (!empty($user->fail())) {
-                throw new PDOException($user->fail()->getMessage());
-            }else {
-                throw new Exception($user->message()->getText());
-            }
-        }
-        return true;
+        return $user->destroy();
     }
 
     public function login(string $userEmail, string $userNickName, string $userPassword)
@@ -221,14 +193,7 @@ class User
             $this->user->$key = $value;
         }
 
-        if (!$this->user->save()) {
-            if (!empty($this->user->fail())) {
-                throw new PDOException($this->user->fail()->getMessage());
-            }else {
-                throw new Exception($this->user->message()->getText());
-            }
-        }
-
+        $this->user->save();
         $this->setId(Connect::getInstance()->lastInsertId());
         return true;
     }

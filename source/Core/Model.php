@@ -3,6 +3,7 @@
 namespace Source\Core;
 
 use Exception;
+use PDOException;
 use Source\Support\Message;
 
 /**
@@ -658,26 +659,23 @@ abstract class Model
     public function save(): bool
     {
         if (!$this->required()) {
-            $this->message->warning("Informe todos os campos obrigatórios");
-            return false;
+            throw new Exception("Informe todos os campos obrigatórios");
         }
 
         /** Update */
         if (!empty($this->id)) {
             $id = $this->id;
             $this->update($this->safe(), "id = :id", "id={$id}");
-            if ($this->fail()) {
-                $this->message->error("Falha na atualização");
-                return false;
+            if (!empty($this->fail())) {
+                throw new PDOException($this->fail()->getMessage() . " " . $this->queryExecuted());
             }
         }
 
         /** Create */
         if (empty($this->id)) {
             $id = $this->create($this->safe());
-            if ($this->fail()) {
-                $this->message->error("Falha ao inserir!");
-                return false;
+            if (!empty($this->fail())) {
+                throw new PDOException($this->fail()->getMessage() . " " . $this->queryExecuted());
             }
         }
 
@@ -718,7 +716,12 @@ abstract class Model
         }
 
         $destroy = $this->delete("id = :id", "id={$this->id}");
-        return $destroy;
+        if (!$destroy) {
+            if (!empty($this->fail())) {
+                throw new PDOException($this->fail()->getMessage() . " " . $this->queryExecuted());
+            }
+        }
+        return true;
     }
 
     /**
