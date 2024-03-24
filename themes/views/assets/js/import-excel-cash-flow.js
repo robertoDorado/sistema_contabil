@@ -62,6 +62,7 @@ if (window.location.pathname == '/admin/cash-flow/report') {
                 excelLabel.innerHTML = standardLabelNameExcelFile
                 
                 const excelData = JSON.parse(response.excelData)
+                console.log(excelData)
                 for (let i = 0; i < excelData["Histórico"].length; i++) {
                     cashFlowTable.row.add([
                         excelData["Id"][i],
@@ -72,7 +73,7 @@ if (window.location.pathname == '/admin/cash-flow/report') {
                         excelData["Lançamento"][i],
                         excelData["Editar"][i],
                         excelData["Excluir"][i]
-                    ]).draw(false);
+                    ]).draw();
                 }
                 
                 message = response.success.charAt(0).toUpperCase() + response.success.slice(1)

@@ -29,9 +29,10 @@ class CashFlow
         $this->cashFlow = new ModelsCashFlow();
     }
 
-    public function findCashFlowDataByDate(string $dates, User $user)
+    public function findCashFlowDataByDate(string $dates, User $user, array $columns = [])
     {
         $dates = empty($dates) ? "" : explode("-", $dates);
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
 
         if (is_array($dates) && !empty($dates)) {
             if (count($dates) != 2) {
@@ -44,7 +45,7 @@ class CashFlow
             
             return $this->cashFlow
                 ->find("id_user=:id_user AND deleted=0", 
-                ":id_user=" . $user->getId() . "")
+                ":id_user=" . $user->getId() . "", $columns)
                 ->join("cash_flow_group", "id", "deleted=0 AND id_user=:id_user",
                 ":id_user=" . $user->getId() . "", "group_name", "id_cash_flow_group", "cash_flow")
                 ->between("created_at", "sistema_contabil.cash_flow", 

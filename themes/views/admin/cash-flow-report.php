@@ -143,6 +143,9 @@
                         </div>
                     </div>
                 </div>
+                <div id="containerChartLine" class="col-md-6 mt-5 mb-5" style="display:none">
+                    <canvas id="chartCashFlowReport" width="800" height="400"></canvas>
+                </div>
             </div>
         </div>
     </div>

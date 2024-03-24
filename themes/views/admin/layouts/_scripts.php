@@ -34,6 +34,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link rel="stylesheet" href="<?= url(CONF_ADMIN_PATH . "/plugins/datatables-buttons/css/buttons.bootstrap4.min.css") ?>">
     <!-- Date Picker -->
     <link rel="stylesheet" href="<?= url(CONF_ADMIN_PATH . "/plugins/daterangepicker/daterangepicker.css") ?>">
+    <!-- Chartjs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Laborcode css -->
     <link rel="stylesheet" href="<?= theme("assets/style.css") ?>">
 </head>

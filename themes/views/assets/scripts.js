@@ -144,7 +144,9 @@ toastr.error(message)
 throw new Error(message)}
 accountGroup.value=""
 message=response.success.charAt(0).toUpperCase()+response.success.slice(1)
-toastr.success(message)})})};if(window.location.pathname=="/admin/cash-flow/report"){$(document).ready(function(){$('#date-range').daterangepicker({opens:'left',locale:{format:'DD/MM/YYYY',separator:' - ',applyLabel:'Aplicar',cancelLabel:'Cancelar',}})});const tFoot=document.querySelector("tfoot").firstElementChild
+toastr.success(message)})})};if(window.location.pathname=="/admin/cash-flow/report"){fetch(window.location.origin+"/admin/cash-flow/chart-data"+window.location.search).then(response=>response.json()).then(function(response){const containerChartLine=document.getElementById("containerChartLine")
+if(response.created_at&&response.entry){containerChartLine.style.display="block"
+const financeData={labels:response.created_at,datasets:[{label:"Projeção financeira",data:response.entry,borderColor:'rgb(75, 192, 192)',borderWidth:1,fill:!1}]};const chartOptions={scales:{y:{title:{display:!0,text:'Valor Financeiro'},ticks:{autoSkip:!0,maxTicksLimit:10,callback:function(value){return'R$ '+value.toLocaleString('pt-BR')}}},x:{title:{display:!0,text:'Tempo (Dias)'},ticks:{autoSkip:!0,maxTicksLimit:10}}}};const ctx=document.getElementById('chartCashFlowReport').getContext('2d');new Chart(ctx,{type:'line',data:financeData,options:chartOptions})}})};if(window.location.pathname=="/admin/cash-flow/report"){$(document).ready(function(){$('#date-range').daterangepicker({opens:'left',locale:{format:'DD/MM/YYYY',separator:' - ',applyLabel:'Aplicar',cancelLabel:'Cancelar',}})});const tFoot=document.querySelector("tfoot").firstElementChild
 cashFlowTable.on('search.dt',function(){const dataFilter=cashFlowTable.rows({search:'applied'}).data();let balance=0
 dataFilter.each(function(row){let entryValue=parseFloat(row[5].replace("R$","").replace(".","").replace(",",".").trim())
 balance+=entryValue})
@@ -185,7 +187,8 @@ btnSubmit.append(importIcon," Importar ")
 excelFile.value=""
 excelLabel.innerHTML=standardLabelNameExcelFile
 const excelData=JSON.parse(response.excelData)
-for(let i=0;i<excelData.Histórico.length;i++){cashFlowTable.row.add([excelData.Id[i],excelData["Data lançamento"][i],excelData["Grupo de contas"][i],excelData.Histórico[i],excelData["Tipo de entrada"][i],excelData.Lançamento[i],excelData.Editar[i],excelData.Excluir[i]]).draw(!1)}
+console.log(excelData)
+for(let i=0;i<excelData.Histórico.length;i++){cashFlowTable.row.add([excelData.Id[i],excelData["Data lançamento"][i],excelData["Grupo de contas"][i],excelData.Histórico[i],excelData["Tipo de entrada"][i],excelData.Lançamento[i],excelData.Editar[i],excelData.Excluir[i]]).draw()}
 message=response.success.charAt(0).toUpperCase()+response.success.slice(1)
 toastr.success(message)}})})};if(window.location.pathname=="/admin/login"){const loginForm=document.getElementById("loginForm")
 loginForm.addEventListener("submit",function(event){event.preventDefault()
