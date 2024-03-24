@@ -72,13 +72,6 @@
                                                     estratégicas fundamentada, auxiliando na alocação eficiente de recursos 
                                                     e na identificação de oportunidades de investimento.
                                                 </li>
-                                                <li>
-                                                    <strong>Alertas Automáticos:</strong>
-                                                    Receba alertas automáticos para eventos críticos, 
-                                                    como saldos baixos ou previsões de fluxo de caixa negativas. 
-                                                    Essa funcionalidade proativa ajuda a evitar surpresas financeiras indesejadas 
-                                                    e a implementar medidas corretivas antes que problemas se agravem.
-                                                </li>
                                             </ul>
                                             O Fluxo de Caixa Dinâmico do nosso sistema não apenas simplifica a gestão diária das finanças, 
                                             mas também se torna uma ferramenta estratégica vital para o crescimento sustentável 

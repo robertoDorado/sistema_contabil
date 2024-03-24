@@ -600,9 +600,8 @@ abstract class Model
 
             $stmt->execute();
             return $stmt;
-        } catch (\PDOException $exception) {
-            $this->fail = $exception;
-            return null;
+        } catch (PDOException $exception) {
+            throw new PDOException($exception->getMessage());
         }
     }
 

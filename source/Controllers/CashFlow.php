@@ -27,20 +27,35 @@ class CashFlow extends Controller
         parent::__construct();
     }
 
-    public function findCashFlowDataForChart()
+    public function findCashFlowDataForChartPie()
     {
-        if (empty(session()->user)) {
-            throw new \Exception("usuário inválido", 500);
+        $user = basicsValidatesForChartsRender();
+        $cashFlow = new ModelCashFlow();
+        $cashFlowData = $cashFlow->findGroupAccountsAgrupped($user);
+        
+        if (empty($cashFlowData)) {
+            echo json_encode([]);
+            die;
         }
 
-        $user = new User();
-        $userData = $user->findUserByEmail(session()->user->user_email);
+        $accountsData = [];
+        $totalAccounts = [];
 
-        if (is_string($userData) && json_decode($userData) != null) {
-            throw new Exception($userData, 500);
+        foreach ($cashFlowData as $arrayData) {
+            array_push($accountsData, $arrayData->group_name);
+            array_push($totalAccounts, $arrayData->total_accounts);
         }
 
-        $user->setId($userData->id);
+        echo json_encode(
+            [
+                "total_accounts" => $totalAccounts, 
+                "accounts_data" => $accountsData
+            ]);
+    }
+
+    public function findCashFlowDataForChartLine()
+    {
+        $user = basicsValidatesForChartsRender();
         $cashFlow = new ModelCashFlow();
         $cashFlowData = $cashFlow->findCashFlowByUser(["entry", "created_at"], $user);
 
@@ -55,9 +70,26 @@ class CashFlow extends Controller
             die;
         }
 
+        $orderByDate = function($a, $b) {
+            $monthA = date("n", strtotime($a));
+            $monthB = date("n", strtotime($b));
+            
+            $dayA = date("j", strtotime($a));
+            $dayB = date("j", strtotime($b));
+
+            if ($monthA == $monthB) {
+                if ($dayA == $dayB) {
+                    return 0;
+                }
+
+                return $dayA < $dayB ? -1 : 1;
+            }
+            return $monthA < $monthB ? -1 : 1;
+        };
+
         $groupByDate = [];
         foreach ($cashFlowData as $value) {
-            $date = date("d/m", strtotime($value->created_at));
+            $date = $value->created_at;
             $entryValue = $value->getEntry();
 
             if (array_key_exists($date, $groupByDate)) {
@@ -67,13 +99,19 @@ class CashFlow extends Controller
             }
         }
 
+        uksort($groupByDate, $orderByDate);
+        $formatDate = function ($date) {
+            return date("d/m", strtotime($date));
+        };
+
         $response = [];
         $response["created_at"] = array_keys($groupByDate);
+        $response["created_at"] = array_map($formatDate, $response["created_at"]);
+
         $response["entry"] = array_values($groupByDate);
-
-        $response["created_at"] = array_slice($response["created_at"], 0, 10);
-        $response["entry"] = array_slice($response["entry"], 0, 10);
-
+        $response["created_at"] = array_slice($response["created_at"], 0, 31);
+        
+        $response["entry"] = array_slice($response["entry"], 0, 31);
         echo json_encode($response);
     }
 
@@ -161,14 +199,17 @@ class CashFlow extends Controller
         $arrayUuid = [];
         $arrayEdit = [];
         $arrayDelete = [];
+        $errorMessage = "";
 
         foreach ($excelData['h'] as $key => $history) {
             if (!in_array($excelData["t"][$key], $verifyEntryType)) {
+                $errorMessage = json_encode(["error" => "tipo de entrada inválida"]);
                 continue;
             }
 
             $verifyDateData = strtotime($excelData["d"][$key]);
             if (strtotime(date("Y-m-d")) < $verifyDateData) {
+                $errorMessage = json_encode(["error" => "a data de lançamento não pode ser uma data futura"]);
                 continue;
             }
 
@@ -180,6 +221,7 @@ class CashFlow extends Controller
             $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByName($excelData["g"][$key], $user);
 
             if (is_string($cashFlowGroupData) && json_decode($cashFlowGroupData) != null) {
+                $errorMessage = json_encode(["error" => "grupo de contas inexistente"]);
                 continue;
             }
 
@@ -205,61 +247,48 @@ class CashFlow extends Controller
 
             if (!$response) {
                 http_response_code(500);
-                echo json_encode(["error" => "erro interno ao importar os dados"]);
-                die;
+                $errorMessage = json_encode(["error" => "erro interno ao importar os dados"]);
+                continue;
             }
+        }
+
+        if (!empty($errorMessage)) {
+            http_response_code(500);
+            echo $errorMessage;
+            die;
+        }
+
+        $accountGroup = [];
+        $launchDate = [];
+        $history = [];
+        $entryType = [];
+        $launchValue = [];
+
+        foreach ($arrayUuid as $uuid) {
+            $cashFlow = new ModelCashFlow();
+            $cashFlowData = $cashFlow->findCashFlowByUuid($uuid);
+            
+            array_push($accountGroup, $cashFlowData->group_name);
+            array_push($launchDate, date("d/m/Y", strtotime($cashFlowData->created_at)));
+            
+            array_push($history, $cashFlowData->getHistory());
+            $entryTypeString = $cashFlowData->entry_type == 0 ? "Débito" : "Crédito";
+            
+            array_push($entryType, $entryTypeString);
+            $entryValue = "R$ " . number_format($cashFlowData->getEntry(), 2, ",", ".");
+            array_push($launchValue, $entryValue);
         }
 
         $excelData = [];
-        foreach ($data as $arrayData) {
-            foreach ($arrayData as $key => $value) {
-                $excelData[$arrayHeader[$key]][] = $value;
-            }
-        }
-
         $excelData["Id"] = $arrayUuid;
         $excelData["Editar"] = $arrayEdit;
         $excelData["Excluir"] = $arrayDelete;
-
-        foreach ($excelData["Data lançamento"] as $key => &$date) {
-            if (!in_array($excelData["Tipo de entrada"][$key], $verifyEntryType)) {
-                unset($excelData["Grupo de contas"][$key]);
-                unset($excelData["Data lançamento"][$key]);
-                unset($excelData["Histórico"][$key]);
-                unset($excelData["Tipo de entrada"][$key]);
-                unset($excelData["Lançamento"][$key]);
-                continue;
-            }
-
-            $verifyDateData = strtotime($excelData["Data lançamento"][$key]);
-            if (strtotime(date("Y-m-d")) < $verifyDateData) {
-                unset($excelData["Grupo de contas"][$key]);
-                unset($excelData["Data lançamento"][$key]);
-                unset($excelData["Histórico"][$key]);
-                unset($excelData["Tipo de entrada"][$key]);
-                unset($excelData["Lançamento"][$key]);
-                continue;
-            }
-
-            $cashFlowGroup = new CashFlowGroup();
-            $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByName($excelData["Grupo de contas"][$key], $user);
-
-            if (is_string($cashFlowGroupData) && json_decode($cashFlowGroupData) != null) {
-                unset($excelData["Grupo de contas"][$key]);
-                unset($excelData["Data lançamento"][$key]);
-                unset($excelData["Histórico"][$key]);
-                unset($excelData["Tipo de entrada"][$key]);
-                unset($excelData["Lançamento"][$key]);
-                continue;
-            }
-
-            $date = DateTime::createFromFormat("Y-m-d", $date)->format("d/m/Y");
-            $excelData["Lançamento"][$key] = $excelData["Tipo de entrada"][$key] == "Crédito" ?
-                floatval(trim(str_replace([",", "R$", "-"], "", $excelData["Lançamento"][$key]))) :
-                floatval(trim(str_replace([",", "R$", "-"], "", $excelData["Lançamento"][$key]))) * -1;
-
-            $excelData["Lançamento"][$key] = "R$ " . number_format($excelData["Lançamento"][$key], 2, ",", ".");
-        }
+        $excelData["Tipo de entrada"] = $entryType;
+        $excelData["Grupo de contas"] = $accountGroup;
+        $excelData["Data lançamento"] = $launchDate;
+        $excelData["Histórico"] = $history;
+        $excelData["Tipo de entrada"] = $entryType;
+        $excelData["Lançamento"] = $launchValue;
 
         echo json_encode(["success" => "arquivo importado com sucesso", "excelData" => json_encode($excelData)]);
     }

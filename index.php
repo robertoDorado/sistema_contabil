@@ -53,7 +53,8 @@ $route->get("/cash-flow-group/report", "CashFlowGroup::cashFlowGroupReport");
 $route->get("/cash-flow-group/update/form/{uuid}", "CashFlowGroup::cashFlowGroupFormUpdate");
 $route->post("/cash-flow-group/update/form/{uuid}", "CashFlowGroup::cashFlowGroupFormUpdate");
 $route->post("/cash-flow-group/remove/{uuid}", "CashFlowGroup::cashFlowGroupRemoveRegister");
-$route->get("/cash-flow/chart-data", "CashFlow::findCashFlowDataForChart");
+$route->get("/cash-flow/chart-line-data", "CashFlow::findCashFlowDataForChartLine");
+$route->get("/cash-flow/chart-pie-data", "CashFlow::findCashFlowDataForChartPie");
 
 
 /**

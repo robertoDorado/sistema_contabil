@@ -2,6 +2,7 @@
 namespace Source\Models;
 
 use Source\Core\Model;
+use Source\Domain\Model\User;
 
 /**
  * CashFlow Models
@@ -54,6 +55,22 @@ class CashFlow extends Model
             $this->updatedAt,
             $this->deleted
         ]);
+    }
+
+    public function findGroupAccountsAgrupped(User $user)
+    {
+        $stmt = $this->read("SELECT cg.group_name, 
+        COUNT(cg.group_name) AS total_accounts FROM sistema_contabil.cash_flow c
+        INNER JOIN sistema_contabil.cash_flow_group cg ON cg.id = c.id_cash_flow_group
+        WHERE cg.id_user=:id_user_cg AND c.id_user=:id_user_c AND c.deleted=0 AND cg.deleted=0
+        GROUP BY cg.group_name",
+        "id_user_cg=" . $user->getId() . "&id_user_c=" . $user->getId() . "");
+
+        if ($stmt->rowCount() == 0) {
+            return null;
+        }
+
+        return $stmt->fetchAll(\PDO::FETCH_OBJ);
     }
 
     public function getDeleted()

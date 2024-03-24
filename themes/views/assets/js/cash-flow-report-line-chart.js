@@ -1,6 +1,5 @@
 if (window.location.pathname == "/admin/cash-flow/report") {
-    
-    fetch(window.location.origin + "/admin/cash-flow/chart-data" + window.location.search)
+    fetch(window.location.origin + "/admin/cash-flow/chart-line-data" + window.location.search)
     .then(response => response.json()).then(function(response) {
         const containerChartLine = document.getElementById("containerChartLine")
 
@@ -25,8 +24,6 @@ if (window.location.pathname == "/admin/cash-flow/report") {
                             text: 'Valor Financeiro'
                         },
                         ticks: {
-                            autoSkip: true,
-                            maxTicksLimit: 10,
                             callback: function(value) {
                                 return 'R$ ' + value.toLocaleString('pt-BR');
                             }
@@ -36,16 +33,12 @@ if (window.location.pathname == "/admin/cash-flow/report") {
                         title: {
                             display: true,
                             text: 'Tempo (Dias)'
-                        },
-                        ticks: {
-                            autoSkip: true,
-                            maxTicksLimit: 10
                         }
                     }
                 }
             };
         
-            const ctx = document.getElementById('chartCashFlowReport').getContext('2d');
+            const ctx = document.getElementById('lineChartCashFlowReport').getContext('2d');
              new Chart(ctx, {
                 type: 'line',
                 data: financeData,

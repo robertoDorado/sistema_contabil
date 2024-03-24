@@ -29,6 +29,11 @@ class CashFlow
         $this->cashFlow = new ModelsCashFlow();
     }
 
+    public function findGroupAccountsAgrupped(User $user)
+    {
+        return $this->cashFlow->findGroupAccountsAgrupped($user);
+    }
+
     public function findCashFlowDataByDate(string $dates, User $user, array $columns = [])
     {
         $dates = empty($dates) ? "" : explode("-", $dates);

@@ -1,5 +1,22 @@
 <?php
 
+function basicsValidatesForChartsRender(): \Source\Domain\Model\User
+{
+    if (empty(session()->user)) {
+        throw new \Exception("usuário inválido", 500);
+    }
+
+    $user = new \Source\Domain\Model\User();
+    $userData = $user->findUserByEmail(session()->user->user_email);
+
+    if (is_string($userData) && json_decode($userData) != null) {
+        throw new Exception($userData, 500);
+    }
+
+    $user->setId($userData->id);
+    return $user;
+}
+
 function setCurrentMenuActive(array $endpoints = [])
 {
     if (!empty($endpoints)) {
