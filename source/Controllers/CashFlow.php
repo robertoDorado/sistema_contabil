@@ -203,13 +203,13 @@ class CashFlow extends Controller
 
         foreach ($excelData['h'] as $key => $history) {
             if (!in_array($excelData["t"][$key], $verifyEntryType)) {
-                $errorMessage = json_encode(["error" => "tipo de entrada inválida"]);
+                $errorMessage = "tipo de entrada inválida";
                 continue;
             }
 
             $verifyDateData = strtotime($excelData["d"][$key]);
             if (strtotime(date("Y-m-d")) < $verifyDateData) {
-                $errorMessage = json_encode(["error" => "a data de lançamento não pode ser uma data futura"]);
+                $errorMessage = "a data de lançamento não pode ser uma data futura";
                 continue;
             }
 
@@ -221,7 +221,7 @@ class CashFlow extends Controller
             $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByName($excelData["g"][$key], $user);
 
             if (is_string($cashFlowGroupData) && json_decode($cashFlowGroupData) != null) {
-                $errorMessage = json_encode(["error" => "grupo de contas inexistente"]);
+                $errorMessage = "grupo de contas inexistente";
                 continue;
             }
 
@@ -247,15 +247,9 @@ class CashFlow extends Controller
 
             if (!$response) {
                 http_response_code(500);
-                $errorMessage = json_encode(["error" => "erro interno ao importar os dados"]);
+                $errorMessage = "erro interno ao importar os dados";
                 continue;
             }
-        }
-
-        if (!empty($errorMessage)) {
-            http_response_code(500);
-            echo $errorMessage;
-            die;
         }
 
         $accountGroup = [];
@@ -290,7 +284,21 @@ class CashFlow extends Controller
         $excelData["Tipo de entrada"] = $entryType;
         $excelData["Lançamento"] = $launchValue;
 
-        echo json_encode(["success" => "arquivo importado com sucesso", "excelData" => json_encode($excelData)]);
+        $response = [
+            "full_success" => "arquivo importado com sucesso", 
+            "excelData" => json_encode($excelData)
+        ];
+
+        if (!empty($errorMessage)) {
+            http_response_code(500);
+            unset($response["full_success"]);
+            $response["success"] = true;
+            $response["error"] = $errorMessage;
+            echo json_encode($response);
+            die;
+        }
+
+        echo json_encode($response);
     }
 
     public function cashFlowRemoveRegister(array $data)

@@ -176,21 +176,19 @@ throw new Error("Extensão do arquivo não permitida")}
 showSpinner(btnSubmit)
 const spinner=btnSubmit.querySelector(".fas.fa-spinner.fa-spin")
 const form=new FormData(this)
-fetch(window.location.origin+"/admin/cash-flow/import-excel",{method:'POST',body:form}).then(response=>response.json()).then(function(response){let message=""
-if(response.error){spinner.remove()
+fetch(window.location.origin+"/admin/cash-flow/import-excel",{method:'POST',body:form}).then(response=>response.json()).then(function(response){spinner.remove()
 btnSubmit.append(importIcon," Importar ")
-excelFile.value=""
+let message=""
+if(response.error){excelFile.value=""
 excelLabel.innerHTML=standardLabelNameExcelFile
 message=response.error.charAt(0).toUpperCase()+response.error.slice(1)
-toastr.error(message)
-throw new Error(response.error)}
-if(response.success){spinner.remove()
-btnSubmit.append(importIcon," Importar ")
-excelFile.value=""
+toastr.error(message)}
+if(response.success||response.full_success){excelFile.value=""
 excelLabel.innerHTML=standardLabelNameExcelFile
 const excelData=JSON.parse(response.excelData)
 for(let i=0;i<excelData.Histórico.length;i++){cashFlowTable.row.add([excelData.Id[i],excelData["Grupo de contas"][i],excelData["Data lançamento"][i],excelData.Histórico[i],excelData["Tipo de entrada"][i],excelData.Lançamento[i],excelData.Editar[i],excelData.Excluir[i]]).draw(!1)}
-message=response.success.charAt(0).toUpperCase()+response.success.slice(1)
+message=response.full_success
+message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.success(message)}})})};if(window.location.pathname=="/admin/login"){const loginForm=document.getElementById("loginForm")
 loginForm.addEventListener("submit",function(event){event.preventDefault()
 const btnSubmit=this.querySelector(".btn.btn-primary.btn-block")

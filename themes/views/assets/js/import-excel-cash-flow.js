@@ -40,24 +40,20 @@ if (window.location.pathname == '/admin/cash-flow/report') {
             method: 'POST',
             body: form
         }).then(response => response.json()).then(function(response) {
-            
-            let message = ""    
+            spinner.remove()
+            btnSubmit.append(importIcon, " Importar ")
+            let message = ""
+
             if (response.error) {
-                spinner.remove()
-                btnSubmit.append(importIcon, " Importar ")
                 
                 excelFile.value = ""
                 excelLabel.innerHTML = standardLabelNameExcelFile
                 
                 message = response.error.charAt(0).toUpperCase() + response.error.slice(1)
                 toastr.error(message)
-                throw new Error(response.error)
             }
 
-            if (response.success) {
-                spinner.remove()
-                btnSubmit.append(importIcon, " Importar ")
-                
+            if (response.success || response.full_success) {
                 excelFile.value = ""
                 excelLabel.innerHTML = standardLabelNameExcelFile
                 
@@ -74,8 +70,9 @@ if (window.location.pathname == '/admin/cash-flow/report') {
                         excelData["Excluir"][i]
                     ]).draw(false);
                 }
-                
-                message = response.success.charAt(0).toUpperCase() + response.success.slice(1)
+
+                message = response.full_success
+                message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.success(message)
             }
         })
