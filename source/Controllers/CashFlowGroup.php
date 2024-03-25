@@ -23,6 +23,77 @@ class CashFlowGroup extends Controller
         parent::__construct();
     }
 
+    public function cashFlowGroupModiFyData(array $data)
+    {
+        if (empty(session()->user)) {
+            throw new Exception("usuário inválido", 500);
+        }
+
+        if (empty($data["uuid"])) {
+            throw new Exception("parametro uuid não pode estar vazio", 500);
+        }
+
+        $requestPost = $this->getRequests()
+        ->setRequiredFields(["destroy", "restore"])->getAllPostData();
+        $requestPost["restore"] = filter_var($requestPost["restore"], FILTER_VALIDATE_BOOLEAN);
+        $requestPost["destroy"] = filter_var($requestPost["destroy"], FILTER_VALIDATE_BOOLEAN);
+
+        $cashFlowGroup = new ModelCashFlowGroup();
+        $response = false;
+        if ($requestPost["restore"]) {
+            $response = $cashFlowGroup->updateCashFlowGroupByUuid([
+                "uuid"=> $data["uuid"],
+                "deleted" => 0
+            ]);
+        }
+
+        if ($requestPost["destroy"]) {
+            $response = $cashFlowGroup->dropCashFlowGroupByUuid($data["uuid"]);
+        }
+
+        if (is_string($response) && json_decode($response) != null) {
+            http_response_code(500);
+            echo $response;
+            die;
+        }
+
+        if (!$response) {
+            http_response_code(500);
+            echo json_encode(["error" => "erro interno no sistema"]);
+            die;
+        }
+
+        echo json_encode(["success" => "registro modificado com sucesso"]);
+    }
+
+    public function cashFlowGroupBackupReport()
+    {
+        if (empty(session()->user)) {
+            throw new Exception("usuário inválido", 500);
+        }
+
+        $user = new User();
+        $userData = $user->findUserByEmail(session()->user->user_email);
+
+        if (is_string($userData) && json_decode($userData) != null) {
+            throw new Exception($userData);
+        }
+
+        $user->setId($userData->id);
+        $cashFlowGroup = new ModelCashFlowGroup();
+        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupDeletedTrue([], $user);
+
+        if (is_string($cashFlowGroupData) && json_decode($cashFlowGroupData) != null) {
+            $cashFlowGroupData = null;
+        }
+
+        echo $this->view->render("admin/cash-flow-group-backup-report", [
+            "cashFlowGroupData" => $cashFlowGroupData,
+            "userFullName" => showUserFullName(),
+            "endpoints" => ["/admin/cash-flow-group/backup/report"],
+        ]);
+    }
+
     public function cashFlowGroupRemoveRegister(array $data)
     {
         if (empty(session()->user)) {

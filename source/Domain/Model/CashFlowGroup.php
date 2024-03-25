@@ -28,6 +28,20 @@ class CashFlowGroup
         $this->cashFlowGroup = new ModelsCashFlowGroup();
     }
 
+    public function findCashFlowGroupDeletedTrue(array $columns, User $user)
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        $cashFlowGroupData = $this->cashFlowGroup
+        ->find("id_user=:id_user AND deleted=1", ":id_user=" . $user->getId() . "", $columns)
+        ->fetch(true);
+
+        if (empty($cashFlowGroupData)) {
+            return json_encode(["error" => "não há registros deletados"]);
+        }
+
+        return $cashFlowGroupData;
+    }
+
     public function findCashFlowGroupByName(string $groupName, User $user, array $columns = [])
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
@@ -76,7 +90,7 @@ class CashFlowGroup
         }
 
         $cashFlowGroupData = $this->cashFlowGroup->findById($id);
-        $cashFlowGroupData->destroy();
+        return $cashFlowGroupData->destroy();
     }
 
     public function dropCashFlowGroupByUuid(string $uuid)
@@ -90,7 +104,7 @@ class CashFlowGroup
             return json_encode(["error" => "o registro não existe"]);
         }
         
-        $cashFlowGroupData->destroy();
+        return $cashFlowGroupData->destroy();
     }
 
     public function updateCashFlowGroupByUuid(array $data)

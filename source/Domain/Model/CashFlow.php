@@ -29,6 +29,22 @@ class CashFlow
         $this->cashFlow = new ModelsCashFlow();
     }
 
+    public function findCashFlowDeletedTrue(array $columns, User $user)
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        $cashFlowData = $this->cashFlow
+        ->find("id_user=:id_user AND deleted=1", ":id_user=" . $user->getId() . "", $columns)
+        ->join("cash_flow_group", "id", "id_user=:id_user AND deleted=0",
+        ":id_user=" . $user->getId() . "", "group_name", "id_cash_flow_group", "cash_flow")
+        ->fetch(true);
+
+        if (empty($cashFlowData)) {
+            return json_encode(["error" => "não há registros deletados"]);
+        }
+
+        return $cashFlowData;
+    }
+
     public function findGroupAccountsAgrupped(User $user)
     {
         return $this->cashFlow->findGroupAccountsAgrupped($user);
@@ -119,7 +135,7 @@ class CashFlow
             ->find("uuid=:uuid", ":uuid={$uuid}")
             ->fetch();
         
-        $cashFlowData->destroy();
+        return $cashFlowData->destroy();
     }
 
     public function findCashFlowByUuid(string $uuid)
@@ -184,7 +200,7 @@ class CashFlow
         }
         
         $cashFlowData = $this->cashFlow->findById($id);
-        $cashFlowData->destroy();
+        return $cashFlowData->destroy();
     }
 
     public function calculateBalance(User $user)

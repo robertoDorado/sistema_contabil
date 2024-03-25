@@ -134,3 +134,14 @@ const cashFlowGroupTable = dataTableConfig($("#cashFlowGroupReport"),
         "url": urlJson
     }
 })
+const cashFlowGroupDeletedReport = dataTableConfig($("#cashFlowGroupDeletedReport"), 
+{
+    "language": {
+        "url": urlJson
+    }
+})
+const cashFlowDeletedReport = dataTableConfig($("#cashFlowDeletedReport"), {
+    "language": {
+        "url": urlJson
+    }
+})

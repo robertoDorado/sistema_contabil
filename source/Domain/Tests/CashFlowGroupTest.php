@@ -320,7 +320,7 @@ class CashFlowGroupTest extends TestCase
         $cashFlowGroupId = $this->cashFlowGroup->getId();
 
         $response = $this->cashFlowGroup->dropCashFlowGroupById($cashFlowGroupId);
-        $this->assertNull($response);
+        $this->assertTrue($response);
 
         $this->user = new User();
         $this->user->dropUserById($userId);
@@ -436,7 +436,7 @@ class CashFlowGroupTest extends TestCase
 
         $this->cashFlowGroup->persistData($cashFlowGroupData);
         $response = $this->cashFlowGroup->dropCashFlowGroupByUuid($cashFlowGroupUuid);
-        $this->assertNull($response);
+        $this->assertTrue($response);
 
         $this->user = new User();
         $this->user->dropUserById($userId);

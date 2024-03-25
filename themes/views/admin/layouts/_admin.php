@@ -63,6 +63,16 @@
                                     <p>Relatório de contas</p>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="<?= url("admin/cash-flow-group/backup/report") ?>" class="nav-link <?= $_SERVER['REQUEST_URI'] == '/admin/cash-flow-group/backup/report' ? 'active' : '' ?>">
+                                    <p>Backup grupo de contas</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?= url("admin/cash-flow/backup/report") ?>" class="nav-link <?= $_SERVER['REQUEST_URI'] == '/admin/cash-flow/backup/report' ? 'active' : '' ?>">
+                                    <p>Backup de contas</p>
+                                </a>
+                            </li>
                         </ul>
                     </li>
                 </ul>

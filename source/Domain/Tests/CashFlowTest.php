@@ -809,7 +809,7 @@ class CashFlowTest extends TestCase
         $this->cashFlow = new CashFlow();
         $response = $this->cashFlow->dropCashFlowByUuid("1eed7357-6e74-6096-abf0-0242ac120003");
         
-        $this->assertNull($response);
+        $this->assertTrue($response);
         $this->user = new User();
         $this->user->dropUserById($userId);
     }

@@ -27,6 +27,85 @@ class CashFlow extends Controller
         parent::__construct();
     }
 
+    public function cashFlowModifyData(array $data)
+    {
+        if (empty(session()->user)) {
+            throw new Exception("usuário inválido", 500);
+        }
+
+        if (empty($data["uuid"])) {
+            throw new Exception("parametro uuid não pode estar vazio", 500);
+        }
+
+        $requestPost = $this->getRequests()
+        ->setRequiredFields(["destroy", "restore"])->getAllPostData();
+        $requestPost["restore"] = filter_var($requestPost["restore"], FILTER_VALIDATE_BOOLEAN);
+        $requestPost["destroy"] = filter_var($requestPost["destroy"], FILTER_VALIDATE_BOOLEAN);
+
+        $cashFlow = new ModelCashFlow();
+        $response = false;
+        if ($requestPost["restore"]) {
+            $response = $cashFlow->updateCashFlowByUuid([
+                "uuid"=> $data["uuid"],
+                "deleted" => 0
+            ]);
+        }
+
+        if ($requestPost["destroy"]) {
+            $response = $cashFlow->dropCashFlowByUuid($data["uuid"]);
+        }
+
+        if (is_string($response) && json_decode($response) != null) {
+            http_response_code(500);
+            echo $response;
+            die;
+        }
+
+        if (!$response) {
+            http_response_code(500);
+            echo json_encode(["error" => "erro interno no sistema"]);
+            die;
+        }
+
+        echo json_encode(["success" => "registro modificado com sucesso"]);
+    }
+
+    public function cashFlowBackupReport()
+    {
+        if (empty(session()->user)) {
+            throw new Exception("usuário inválido", 500);
+        }
+
+        $user = new User();
+        $userData = $user->findUserByEmail(session()->user->user_email);
+
+        if (is_string($userData) && json_decode($userData) != null) {
+            throw new Exception($userData);
+        }
+
+        $user->setId($userData->id);
+        $cashFlow = new ModelCashFlow();
+        $cashFlowDataByUser = $cashFlow->findCashFlowDeletedTrue([], $user);
+
+        if (is_string($cashFlowDataByUser) && json_decode($cashFlowDataByUser) != null) {
+            $cashFlowDataByUser = null;
+        }
+
+        if (!empty($cashFlowDataByUser)) {
+            foreach ($cashFlowDataByUser as &$value) {
+                $value->setEntry("R$ " . number_format($value->getEntry(), 2, ",", "."));
+                $value->created_at = date("d/m/Y", strtotime($value->created_at));
+                $value->entry_type_value = empty($value->entry_type) ? "Débito" : "Crédito";
+            }
+        }
+
+        echo $this->view->render("admin/cash-flow-backup-report", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => ["/admin/cash-flow/backup/report"],
+            "cashFlowDataByUser" => $cashFlowDataByUser
+        ]);
+    }
+
     public function findCashFlowDataForChartPie()
     {
         $user = basicsValidatesForChartsRender();
