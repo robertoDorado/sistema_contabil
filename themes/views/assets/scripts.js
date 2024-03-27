@@ -2,6 +2,7 @@ function extensionFileName(value){return value.split(".").pop().toLowerCase()}
 function dataTableConfig(jQuerySelector,objectConfigDataTable={}){return jQuerySelector.DataTable(objectConfigDataTable)}
 function showSpinner(btn){const spinner=document.createElement("i")
 spinner.classList.add("fas","fa-spinner","fa-spin")
+btn.setAttribute("disabled","")
 btn.innerHTML=''
 btn.appendChild(spinner)};(function($){"use strict";if(!$.browser){$.browser={};$.browser.mozilla=/mozilla/.test(navigator.userAgent.toLowerCase())&&!/webkit/.test(navigator.userAgent.toLowerCase());$.browser.webkit=/webkit/.test(navigator.userAgent.toLowerCase());$.browser.opera=/opera/.test(navigator.userAgent.toLowerCase());$.browser.msie=/msie/.test(navigator.userAgent.toLowerCase());$.browser.device=/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase())}
 var defaultOptions={prefix:"",suffix:"",affixesStay:!0,thousands:",",decimal:".",precision:2,allowZero:!1,allowNegative:!1,doubleClickSelection:!0,allowEmpty:!1,bringCaretAtEndOnFocus:!0},methods={destroy:function(){$(this).unbind(".maskMoney");if($.browser.msie){this.onpaste=null}
@@ -133,6 +134,7 @@ form.append("destroy",data.destroy)
 form.append("restore",data.restore)
 fetch(window.location.origin+`/admin/cash-flow/modify/${data.uuid}`,{method:"POST",body:form}).then(response=>response.json()).then(function(response){let message=""
 saveChanges.innerHTML="Restaurar"
+saveChanges.removeAttribute("disabled")
 if(response.error){message=response.error
 message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)
@@ -160,6 +162,7 @@ showSpinner(launchBtn)
 const form=new FormData(this)
 fetch(window.location.href,{method:"POST",body:form}).then((response)=>response.json()).then(function(response){let message=''
 launchBtn.innerHTML='Enviar'
+launchBtn.removeAttribute("disabled")
 if(response.user_not_exists){message=response.user_not_exists
 message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)
@@ -221,6 +224,7 @@ form.append("destroy",data.destroy)
 form.append("restore",data.restore)
 fetch(window.location.origin+`/admin/cash-flow-group/modify/${data.uuid}`,{method:"POST",body:form}).then(response=>response.json()).then(function(response){let message=""
 saveChanges.innerHTML="Restaurar"
+saveChanges.removeAttribute("disabled")
 if(response.error){message=response.error
 message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)
@@ -241,6 +245,7 @@ showSpinner(btnSubmit)
 const form=new FormData(this)
 fetch(window.location.origin+"/admin/cash-flow-group/form",{method:"POST",body:form}).then((response)=>response.json()).then(function(response){let message=""
 btnSubmit.innerHTML="Enviar"
+btnSubmit.removeAttribute("disabled")
 if(response.error){message=response.error.charAt(0).toUpperCase()+response.error.slice(1)
 toastr.error(message)
 throw new Error(message)}
@@ -280,6 +285,7 @@ const spinner=btnSubmit.querySelector(".fas.fa-spinner.fa-spin")
 const form=new FormData(this)
 fetch(window.location.origin+"/admin/cash-flow/import-excel",{method:'POST',body:form}).then(response=>response.json()).then(function(response){spinner.remove()
 btnSubmit.append(importIcon," Importar ")
+btnSubmit.removeAttribute("disabled")
 let message=""
 if(response.error){excelFile.value=""
 excelLabel.innerHTML=standardLabelNameExcelFile
@@ -307,16 +313,19 @@ if(response.invalid_login_data){message=response.invalid_login_data
 message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)
 btnSubmit.innerHTML='Login'
+btnSubmit.removeAttribute("disabled")
 throw new Error(message)}
 if(response.user_not_register){message=response.user_not_register
 message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)
 btnSubmit.innerHTML='Login'
+btnSubmit.removeAttribute("disabled")
 throw new Error(message)}
 if(response.user_not_auth){message=response.user_not_auth
 message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)
 btnSubmit.innerHTML='Login'
+btnSubmit.removeAttribute("disabled")
 throw new Error(message)}
 if(response.login_success){window.location.href=response.url}})})};if(window.location.pathname!='/admin/login'){const logoutBtn=document.getElementById("logout")
 logoutBtn.addEventListener("click",function(event){event.preventDefault()
@@ -348,8 +357,9 @@ launchModal.addEventListener("click",function(){modalContainerLabel.innerHTML="A
 modalBody.innerHTML=`Você quer mesmo deletar o registro ${dataDelete.uuidParameter}?`})
 saveChanges.addEventListener("click",function(){showSpinner(saveChanges)
 fetch(`${window.location.origin}/admin/cash-flow-group/remove/${dataDelete.uuidParameter}`,{method:"POST"}).then((response)=>response.json()).then(function(response){let message=""
-if(response.error){saveChanges.innerHTML="Excluir"
-message=response.error
+saveChanges.innerHTML="Excluir"
+saveChanges.removeAttribute("disabled")
+if(response.error){message=response.error
 message=message.charAt(0).toLocaleUpperCase()+message.slice(1)
 toastr.error(message)
 throw new Error(message)}
@@ -357,7 +367,6 @@ if(response.success){message=response.success
 message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.success(message)
 cashFlowGroupTable.row(dataDelete.row).remove().draw()
-saveChanges.innerHTML="Excluir"
 dismissModal.click()}})})}};if(window.location.pathname=='/admin/cash-flow/report'){const trashIconBtn=Array.from(document.querySelectorAll(".fa.fa-trash"))
 if(trashIconBtn){const launchModal=document.getElementById("launchModal")
 const modalContainerLabel=document.getElementById("modalContainerLabel")
@@ -387,6 +396,8 @@ fetch(`${window.location.origin}/admin/cash-flow/remove/${dataDelete.uuidParamet
 const tFoot=Array.from(document.querySelector("tfoot").firstElementChild.children)
 const totalRow=document.querySelector("tfoot").firstElementChild
 totalRow.style.color=response.color
+saveChanges.innerHTML="Excluir"
+saveChanges.removeAttribute("disabled")
 tFoot.forEach(function(element){if(element.innerHTML&&element.innerHTML!='Total'){element.innerHTML=response.balance}})
 if(response.data_is_empty){message=response.data_is_empty
 message=message.charAt(0).toUpperCase()+message.slice(1)
@@ -396,12 +407,15 @@ if(response.cash_flow_data_not_found){message=response.cash_flow_data_not_found
 message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)
 throw new Error(message)}
-if(response.success){saveChanges.innerHTML="Excluir"
-message=response.message
+if(response.success){message=response.message
 message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.success(message)
 cashFlowTable.row(dataDelete.row).remove().draw()
-dismissModal.click()}})})}};let cashFlowParameter=window.location.pathname.split("/")
+dismissModal.click()}})})}};if(window.location.pathname+window.location.search==`/admin/cash-flow/report${window.location.search}`){const searchCashFlowById=document.getElementById("searchCashFlowById")
+searchCashFlowById.addEventListener("submit",function(event){event.preventDefault()
+const btnSubmit=this.querySelector("[type='submit']")
+showSpinner(btnSubmit)
+this.submit()})};let cashFlowParameter=window.location.pathname.split("/")
 cashFlowParameter=cashFlowParameter.pop()
 if(window.location.pathname==`/admin/cash-flow/update/form/${cashFlowParameter}`){$("#launchValue").maskMoney({allowNegative:!1,thousands:'.',decimal:',',affixesStay:!1})
 const cashFlowForm=document.getElementById("cashFlowForm")
@@ -418,35 +432,41 @@ throw new Error("Tipo de entrada inválida")}
 showSpinner(updateBtn)
 const form=new FormData(this)
 fetch(window.location.href,{method:"POST",body:form}).then((response)=>response.json()).then(function(response){let message=''
-if(response.empty_cash_flow){message=response.empty_cash_flow
+if(response.empty_cash_flow){updateBtn.innerHTML='Atualizar'
+updateBtn.removeAttribute("disabled")
+message=response.empty_cash_flow
 message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)
-updateBtn.innerHTML='Atualizar'
 throw new Error(message)}
-if(response.user_not_exists){message=response.user_not_exists
+if(response.user_not_exists){updateBtn.innerHTML='Atualizar'
+updateBtn.removeAttribute("disabled")
+message=response.user_not_exists
 message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)
-updateBtn.innerHTML='Atualizar'
 throw new Error(message)}
-if(response.data_is_empty){message=response.data_is_empty
+if(response.data_is_empty){updateBtn.innerHTML='Atualizar'
+updateBtn.removeAttribute("disabled")
+message=response.data_is_empty
 message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)
-updateBtn.innerHTML='Atualizar'
 throw new Error(message)}
-if(response.cash_flow_data_not_found){message=response.cash_flow_data_not_found
+if(response.cash_flow_data_not_found){updateBtn.innerHTML='Atualizar'
+updateBtn.removeAttribute("disabled")
+message=response.cash_flow_data_not_found
 message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)
-updateBtn.innerHTML='Atualizar'
 throw new Error(message)}
-if(response.invalid_date){message=response.invalid_date
+if(response.invalid_date){updateBtn.innerHTML='Atualizar'
+updateBtn.removeAttribute("disabled")
+message=response.invalid_date
 message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)
-updateBtn.innerHTML='Atualizar'
 throw new Error(message)}
-if(response.error){message=response.error
+if(response.error){updateBtn.innerHTML='Atualizar'
+updateBtn.removeAttribute("disabled")
+message=response.error
 message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)
-updateBtn.innerHTML='Atualizar'
 throw new Error(message)}
 if(response.success){window.location.href=response.url}})})};let cashFlowGroupParameter=window.location.pathname.split("/")
 cashFlowGroupParameter=cashFlowGroupParameter.pop()
@@ -461,6 +481,7 @@ const form=new FormData(this)
 showSpinner(btnSubmit)
 fetch(window.location.href,{method:"POST",body:form}).then(response=>response.json()).then(function(response){let message=""
 if(response.error){btnSubmit.innerHTML="Atualizar"
+btnSubmit.removeAttribute("disabled")
 message=response.error
 message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)

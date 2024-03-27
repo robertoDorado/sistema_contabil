@@ -44,9 +44,10 @@ if (window.location.pathname == '/admin/cash-flow-group/report') {
             { method: "POST" })
             .then((response) => response.json()).then(function(response) {
                 let message = ""
+                saveChanges.innerHTML = "Excluir"
+                saveChanges.removeAttribute("disabled")
                 
                 if (response.error) {
-                    saveChanges.innerHTML = "Excluir"
                     message = response.error
                     message = message.charAt(0).toLocaleUpperCase() + message.slice(1)
                     toastr.error(message)
@@ -58,7 +59,6 @@ if (window.location.pathname == '/admin/cash-flow-group/report') {
                     message = message.charAt(0).toUpperCase() + message.slice(1)
                     toastr.success(message)
                     cashFlowGroupTable.row(dataDelete.row).remove().draw()
-                    saveChanges.innerHTML = "Excluir"
                     dismissModal.click()
                 }
             })

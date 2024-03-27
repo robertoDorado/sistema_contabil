@@ -25,9 +25,10 @@ if (window.location.pathname == `/admin/cash-flow-group/update/form/${cashFlowGr
             body: form
         }).then(response => response.json()).then(function(response) {
             let message = ""
-
+            
             if (response.error) {
                 btnSubmit.innerHTML = "Atualizar"
+                btnSubmit.removeAttribute("disabled")
                 message = response.error
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.error(message)

@@ -47,6 +47,8 @@ if (window.location.pathname == '/admin/cash-flow/report') {
                 const tFoot = Array.from(document.querySelector("tfoot").firstElementChild.children)
                 const totalRow = document.querySelector("tfoot").firstElementChild
                 totalRow.style.color = response.color
+                saveChanges.innerHTML = "Excluir"
+                saveChanges.removeAttribute("disabled")
 
                 tFoot.forEach(function(element) {
                     if (element.innerHTML && element.innerHTML != 'Total') {
@@ -69,7 +71,6 @@ if (window.location.pathname == '/admin/cash-flow/report') {
                 }
 
                 if (response.success) {
-                    saveChanges.innerHTML = "Excluir"
                     message = response.message
                     message = message.charAt(0).toUpperCase() + message.slice(1)
                     toastr.success(message)

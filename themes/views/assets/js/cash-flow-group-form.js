@@ -23,6 +23,7 @@ if (window.location.pathname == "/admin/cash-flow-group/form") {
         }).then((response) => response.json()).then(function(response) {
             let message = ""
             btnSubmit.innerHTML = "Enviar"
+            btnSubmit.removeAttribute("disabled")
 
             if (response.error) {
                 message = response.error.charAt(0).toUpperCase() + response.error.slice(1)

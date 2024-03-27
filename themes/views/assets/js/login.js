@@ -33,6 +33,7 @@ if (window.location.pathname == "/admin/login") {
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.error(message)
                 btnSubmit.innerHTML = 'Login'
+                btnSubmit.removeAttribute("disabled")
                 throw new Error(message)
             }
 
@@ -41,6 +42,7 @@ if (window.location.pathname == "/admin/login") {
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.error(message)
                 btnSubmit.innerHTML = 'Login'
+                btnSubmit.removeAttribute("disabled")
                 throw new Error(message)
             }
 
@@ -49,6 +51,7 @@ if (window.location.pathname == "/admin/login") {
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.error(message)
                 btnSubmit.innerHTML = 'Login'
+                btnSubmit.removeAttribute("disabled")
                 throw new Error(message)
             }
 

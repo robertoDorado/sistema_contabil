@@ -46,50 +46,56 @@ if (window.location.pathname == `/admin/cash-flow/update/form/${cashFlowParamete
             let message = ''
 
             if (response.empty_cash_flow) {
+                updateBtn.innerHTML = 'Atualizar'
+                updateBtn.removeAttribute("disabled")
                 message = response.empty_cash_flow
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.error(message)
-                updateBtn.innerHTML = 'Atualizar'
                 throw new Error(message)
             }
 
             if (response.user_not_exists) {
+                updateBtn.innerHTML = 'Atualizar'
+                updateBtn.removeAttribute("disabled")
                 message = response.user_not_exists
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.error(message)
-                updateBtn.innerHTML = 'Atualizar'
                 throw new Error(message)
             }
 
             if (response.data_is_empty) {
+                updateBtn.innerHTML = 'Atualizar'
+                updateBtn.removeAttribute("disabled")
                 message = response.data_is_empty
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.error(message)
-                updateBtn.innerHTML = 'Atualizar'
                 throw new Error(message)
             }
 
             if (response.cash_flow_data_not_found) {
+                updateBtn.innerHTML = 'Atualizar'
+                updateBtn.removeAttribute("disabled")
                 message = response.cash_flow_data_not_found
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.error(message)
-                updateBtn.innerHTML = 'Atualizar'
                 throw new Error(message)
             }
 
             if (response.invalid_date) {
+                updateBtn.innerHTML = 'Atualizar'
+                updateBtn.removeAttribute("disabled")
                 message = response.invalid_date
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.error(message)
-                updateBtn.innerHTML = 'Atualizar'
                 throw new Error(message)
             }
 
             if (response.error) {
+                updateBtn.innerHTML = 'Atualizar'
+                updateBtn.removeAttribute("disabled")
                 message = response.error
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.error(message)
-                updateBtn.innerHTML = 'Atualizar'
                 throw new Error(message)
             }
 

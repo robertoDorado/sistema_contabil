@@ -23,7 +23,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-6 mb-5">
-                    <form method="get" action="<?= url("/admin/cash-flow/report") ?>">
+                    <form id="searchCashFlowById" method="get" action="<?= url("/admin/cash-flow/report") ?>">
                         <div class="form-row">
                             <div class="col-md-6">
                                 <label for="date-range">Busca por data:</label>

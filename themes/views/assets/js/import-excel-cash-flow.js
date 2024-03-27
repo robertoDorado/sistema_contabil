@@ -42,13 +42,12 @@ if (window.location.pathname == '/admin/cash-flow/report') {
         }).then(response => response.json()).then(function(response) {
             spinner.remove()
             btnSubmit.append(importIcon, " Importar ")
+            btnSubmit.removeAttribute("disabled")
             let message = ""
 
             if (response.error) {
-                
                 excelFile.value = ""
                 excelLabel.innerHTML = standardLabelNameExcelFile
-                
                 message = response.error.charAt(0).toUpperCase() + response.error.slice(1)
                 toastr.error(message)
             }

@@ -87,6 +87,7 @@ if (window.location.pathname == "/admin/cash-flow/backup/report") {
         }).then(response => response.json()).then(function(response) {
             let message = ""
             saveChanges.innerHTML = "Restaurar"
+            saveChanges.removeAttribute("disabled")
 
             if (response.error) {
                 message = response.error

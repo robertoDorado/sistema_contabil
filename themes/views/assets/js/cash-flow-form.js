@@ -54,6 +54,7 @@ if (window.location.pathname == '/admin/cash-flow/form') {
         ).then((response) => response.json()).then(function(response) {
             let message = ''
             launchBtn.innerHTML = 'Enviar'
+            launchBtn.removeAttribute("disabled")
 
             if (response.user_not_exists) {
                 message = response.user_not_exists
