@@ -500,4 +500,51 @@ class CashFlowGroupTest extends TestCase
         );
         $this->user->dropUserById($userId);
     }
+
+    public function testFindCashFlowGroupDeletedTrue()
+    {
+        $this->cashFlowGroup = new CashFlowGroup();
+        $this->user = new User();
+
+        $userData = [
+            "uuid" => "1eed7357-6e74-6096-abf0-0242ac120003",
+            "user_full_name" => "teste fulano de tal 2",
+            "user_nick_name" => "fulanoDeTal2",
+            "user_email" => "testefulano2@gmail.com",
+            "user_password" => password_hash("minhasenha1234", PASSWORD_DEFAULT),
+            "deleted" => 0
+        ];
+
+        $this->user->persistData($userData);
+        $userId = $this->user->getId();
+        $cashFlowGroupUuid = Uuid::uuid6();
+        
+        $cashFlowGroupData = [
+            "uuid" => $cashFlowGroupUuid,
+            "id_user" => $this->user,
+            "group_name" => "novo grupo",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 1
+        ];
+
+        $this->cashFlowGroup->persistData($cashFlowGroupData);
+        $response = $this->cashFlowGroup->findCashFlowGroupDeletedTrue([], $this->user);
+        
+        $this->assertIsArray($response);
+        $this->user->dropUserById($userId);
+    }
+
+    public function testFindCashFlowGroupDeletedTrueIsEmpty()
+    {
+        $this->user = new User();
+        $this->user->setId(1000000000000);
+        $this->cashFlowGroup = new CashFlowGroup();
+        
+        $response = $this->cashFlowGroup->findCashFlowGroupDeletedTrue([], $this->user);
+        $this->assertJsonStringEqualsJsonString(
+            json_encode(["error" => "não há registros deletados"]),
+            $response
+        );
+    }
 }

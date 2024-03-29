@@ -872,4 +872,64 @@ class CashFlowTest extends TestCase
         $cashFlowData = $this->cashFlow->findGroupAccountsAgrupped($this->user);
         $this->assertEmpty($cashFlowData);
     }
+
+    public function testFindCashFlowDeletedTrue()
+    {
+        $this->user = new User();
+        $userData = [
+            "uuid" => "1eed7357-6e74-6096-abf0-0242ac120003",
+            "user_full_name" => "teste fulano de tal 2",
+            "user_nick_name" => "fulanoDeTal2",
+            "user_email" => "testefulano2@gmail.com",
+            "user_password" => password_hash("minhasenha1234", PASSWORD_DEFAULT),
+            "deleted" => 0
+        ];
+        
+        $this->user->persistData($userData);
+        $userId = $this->user->getId();
+        $this->cashFlowGroup = new CashFlowGroup();
+
+        $cashFlowGroupData = [
+            "uuid" => "1eed7357-6e74-6096-abf0-0242ac120003",
+            "id_user" => $this->user,
+            "group_name" => "novo grupo",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ];
+
+        $this->cashFlowGroup->persistData($cashFlowGroupData);
+        $this->cashFlow = new CashFlow();
+
+        $cashFlowData = [
+            "uuid" => "1eed7357-6e74-6096-abf0-0242ac120003",
+            "id_user" => $this->user,
+            "id_cash_flow_group" => $this->cashFlowGroup,
+            "entry" => "1.750,45",
+            "history" => "venda realizada no dia " . date("d/m/Y"),
+            "entry_type" => 0,
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 1
+        ];
+        
+        $this->cashFlow->persistData($cashFlowData);
+        $cashFlowData = $this->cashFlow->findCashFlowDeletedTrue([], $this->user);
+        $this->assertIsArray($cashFlowData);
+        $this->user->dropUserById($userId);
+    }
+
+    public function testFindCashFlowDeletedTrueIsEmpty()
+    {
+        $this->user = new User();
+        $this->user->setId(10000000000000);
+        
+        $this->cashFlow = new CashFlow();
+        $cashFlowData = $this->cashFlow->findCashFlowDeletedTrue([], $this->user);
+        
+        $this->assertJsonStringEqualsJsonString(
+            json_encode(["error" => "não há registros deletados"]),
+            $cashFlowData
+        );
+    }
 }
