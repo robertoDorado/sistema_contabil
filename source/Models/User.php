@@ -15,6 +15,9 @@ class User extends Model
     /** @var string Uuid do usuário */
     protected string $uuid = "uuid";
 
+    /** @var string  Id do cliente */
+    protected string $idCustomer = "id_customer";
+
     /** @var string Nome completo do usuário */
     protected string $userFullName = "user_full_name";
 
@@ -37,6 +40,7 @@ class User extends Model
     {
         parent::__construct(CONF_DB_NAME . ".user", ["id"], [
             $this->uuid,
+            $this->idCustomer,
             $this->userFullName,
             $this->userNickName,
             $this->userEmail,

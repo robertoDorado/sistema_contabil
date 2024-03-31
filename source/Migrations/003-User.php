@@ -39,10 +39,14 @@ class User
     public function defineTable()
     {
         $this->ddl->setClassProperties();
-        $this->ddl->setKeysToProperties(["BIGINT AUTO_INCREMENT PRIMARY KEY","VARCHAR(36) UNIQUE NOT NULL", "VARCHAR(355) NOT NULL",
-        "VARCHAR(355) NOT NULL", "VARCHAR(355) NOT NULL", "VARCHAR(355) NOT NULL", "TINYINT(1) NOT NULL"]);
+        $this->ddl->setProperty('');
+        $this->ddl->setKeysToProperties(["BIGINT AUTO_INCREMENT PRIMARY KEY",
+        "VARCHAR(36) UNIQUE NOT NULL", "BIGINT NOT NULL", "VARCHAR(355) NOT NULL",
+        "VARCHAR(355) NOT NULL", "VARCHAR(355) NOT NULL", "VARCHAR(355) NOT NULL", 
+        "TINYINT(1) NOT NULL", "CONSTRAINT fk_customer FOREIGN KEY (id_customer) 
+        REFERENCES customer(id) ON UPDATE CASCADE ON DELETE CASCADE"]);
         $this->ddl->setForeignKeyChecks(0)->dropTableIfExists()->createTableQuery()->setForeignKeyChecks(1);
-        return $this->ddl->executeQuery();
+        $this->ddl->executeQuery();
     }
 }
 executeMigrations(User::class);

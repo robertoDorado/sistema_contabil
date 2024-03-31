@@ -7,7 +7,8 @@ function basicsValidatesForChartsRender(): \Source\Domain\Model\User
     }
 
     $user = new \Source\Domain\Model\User();
-    $userData = $user->findUserByEmail(session()->user->user_email);
+    $user->setEmail(session()->user->user_email);
+    $userData = $user->findUserByEmail();
 
     if (is_string($userData) && json_decode($userData) != null) {
         throw new Exception($userData, 500);
@@ -28,7 +29,8 @@ function setCurrentMenuActive(array $endpoints = [])
 function showUserFullName(): string
 {
     $user = new Source\Domain\Model\User();
-    $userData = $user->findUserByEmail(session()->user->user_email);
+    $user->setEmail(session()->user->user_email);
+    $userData = $user->findUserByEmail();
 
     if (is_string($userData) && json_decode($userData) != null) {
         throw new \Exception($userData);

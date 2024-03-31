@@ -28,26 +28,8 @@ if (window.location.pathname == "/admin/login") {
         }).then(response => response.json()).then(function(response) {
             let message = ''
 
-            if (response.invalid_login_data) {
-                message = response.invalid_login_data
-                message = message.charAt(0).toUpperCase() + message.slice(1)
-                toastr.error(message)
-                btnSubmit.innerHTML = 'Login'
-                btnSubmit.removeAttribute("disabled")
-                throw new Error(message)
-            }
-
-            if (response.user_not_register) {
-                message = response.user_not_register
-                message = message.charAt(0).toUpperCase() + message.slice(1)
-                toastr.error(message)
-                btnSubmit.innerHTML = 'Login'
-                btnSubmit.removeAttribute("disabled")
-                throw new Error(message)
-            }
-
-            if (response.user_not_auth) {
-                message = response.user_not_auth
+            if (response.error) {
+                message = response.error
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.error(message)
                 btnSubmit.innerHTML = 'Login'

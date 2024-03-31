@@ -20,7 +20,7 @@ class Customer extends Model
     /** @var string Documento, cpf, rg, cnpj */
     protected string $customerDocument = "customer_document";
 
-    /** Data de aniversário */
+    /** @var string Data de aniversário */
     protected string $birthDate = "birth_date";
 
     /** @var string Gênero, masculino ou feminino */
@@ -53,6 +53,15 @@ class Customer extends Model
     /** @var string Celular */
     protected string $cellPhone = "cell_phone";
 
+    /** @var string Data de criação do registro */
+    protected string $createdAt = "created_at";
+
+    /** @var string Data de atualização */
+    protected string $updatedAt = "updated_at";
+
+    /** @var string Soft delete do registro */
+    protected string  $deleted = "deleted";
+
     /**
      * Customer constructor
      */
@@ -70,8 +79,21 @@ class Customer extends Model
             $this->customerNumber,
             $this->customerNeighborhood,
             $this->customerCity,
-            $this->customerState
+            $this->customerState,
+            $this->createdAt,
+            $this->updatedAt,
+            $this->deleted
         ]);
+    }
+
+    public function getDeleted()
+    {
+        return $this->deleted;
+    }
+
+    public function setDeleted(int $delete)
+    {
+        $this->deleted = $delete;
     }
 
     public function setUuid(string $uuid)

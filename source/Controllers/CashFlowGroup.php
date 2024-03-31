@@ -73,7 +73,8 @@ class CashFlowGroup extends Controller
         }
 
         $user = new User();
-        $userData = $user->findUserByEmail(session()->user->user_email);
+        $user->setEmail(session()->user->user_email);
+        $userData = $user->findUserByEmail();
 
         if (is_string($userData) && json_decode($userData) != null) {
             throw new Exception($userData);
@@ -149,7 +150,8 @@ class CashFlowGroup extends Controller
             }
 
             $user = new User();
-            $userData = $user->findUserByEmail(session()->user->user_email);
+            $user->setEmail(session()->user->user_email);
+            $userData = $user->findUserByEmail();
 
             if (is_string($userData) && json_decode($userData) != null) {
                 throw new Exception($userData, 500);
@@ -205,7 +207,8 @@ class CashFlowGroup extends Controller
 
         $cashFlowGroup = new ModelCashFlowGroup();
         $user = new User();
-        $userData = $user->findUserByEmail(session()->user->user_email, []);
+        $user->setEmail(session()->user->user_email);
+        $userData = $user->findUserByEmail();
 
         if (is_string($userData) && json_decode($userData) != null) {
             throw new Exception($userData, 500);
@@ -236,7 +239,8 @@ class CashFlowGroup extends Controller
             ->setRequiredFields(["csrfToken", "accountGroup"])->getAllPostData();
 
             $user = new User();
-            $userData = $user->findUserByEmail(session()->user->user_email);
+            $user->setEmail(session()->user->user_email);
+            $userData = $user->findUserByEmail();
 
             if (is_string($userData) && json_decode($userData) != null) {
                 throw new Exception($userData, 500);

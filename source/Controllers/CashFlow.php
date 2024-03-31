@@ -77,7 +77,8 @@ class CashFlow extends Controller
         }
 
         $user = new User();
-        $userData = $user->findUserByEmail(session()->user->user_email);
+        $user->setEmail(session()->user->user_email);
+        $userData = $user->findUserByEmail();
 
         if (is_string($userData) && json_decode($userData) != null) {
             throw new Exception($userData);
@@ -271,7 +272,8 @@ class CashFlow extends Controller
         }
 
         $user = new User();
-        $userData = $user->findUserByEmail(session()->user->user_email);
+        $user->setEmail(session()->user->user_email);
+        $userData = $user->findUserByEmail();
         $user->setId($userData->id);
 
         $verifyEntryType = ["Crédito", "Débito"];
@@ -410,7 +412,8 @@ class CashFlow extends Controller
         }
 
         $user = new User();
-        $userData = $user->findUserByEmail(session()->user->user_email);
+        $user->setEmail(session()->user->user_email);
+        $userData = $user->findUserByEmail();
 
         if (is_string($userData) && json_decode($userData) != null) {
             throw new \Exception($userData, 500);
@@ -461,7 +464,8 @@ class CashFlow extends Controller
             }
 
             $user = new User();
-            $userData = $user->findUserByEmail(session()->user->user_email);
+            $user->setEmail(session()->user->user_email);
+            $userData = $user->findUserByEmail();
 
             if (is_string($userData) && json_decode($userData) != null) {
                 echo $userData;
@@ -535,7 +539,8 @@ class CashFlow extends Controller
         }
 
         $user = new User();
-        $userData = $user->findUserByEmail(session()->user->user_email);
+        $user->setEmail(session()->user->user_email);
+        $userData = $user->findUserByEmail();
 
         if (is_string($userData) && json_decode($userData) != null) {
             throw new Exception($userData, 500);
@@ -560,7 +565,8 @@ class CashFlow extends Controller
         }
 
         $user = new User();
-        $userData = $user->findUserByEmail(session()->user->user_email);
+        $user->setEmail(session()->user->user_email);
+        $userData = $user->findUserByEmail();
 
         if (is_string($userData) && json_decode($userData) != null) {
             echo $userData;
@@ -642,7 +648,8 @@ class CashFlow extends Controller
             }
 
             $user = new User();
-            $userData = $user->findUserByEmail(session()->user->user_email);
+            $user->setEmail(session()->user->user_email);
+            $userData = $user->findUserByEmail();
 
             if (is_string($userData) && json_decode($userData) != null) {
                 http_response_code(500);
@@ -687,7 +694,8 @@ class CashFlow extends Controller
         }
 
         $user = new User();
-        $userData = $user->findUserByEmail(session()->user->user_email);
+        $user->setEmail(session()->user->user_email);
+        $userData = $user->findUserByEmail();
         $user->setId($userData->id);
 
         $cashFlowGroup = new CashFlowGroup();

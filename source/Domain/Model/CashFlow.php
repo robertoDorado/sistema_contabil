@@ -115,10 +115,10 @@ class CashFlow
         foreach($data as $key => &$value) {
             if (!empty($verifyKeys[$key])) {
                 $value = $verifyKeys[$key]($value);
-                $cashFlowData->$key = $value;
             }else {
-                $cashFlowData->$key = $value;
+                $value = $value;
             }
+            $cashFlowData->$key = $value;
         }
         
         $cashFlowData->setRequiredFields(array_keys($data));
@@ -193,13 +193,12 @@ class CashFlow
             ":id=" . $this->getId() . "&:deleted=0")->fetch();
     }
 
-    public function dropCashFlowById(int $id)
+    public function dropCashFlowById(CashFlow $cashFlow)
     {
-        if (empty($id)) {
-            return json_encode(["error" => "id não pode estar vazio"]);
+        $cashFlowData = $this->cashFlow->findById($cashFlow->getId());
+        if (empty($cashFlowData)) {
+            throw new Exception("conta não encontrada");
         }
-        
-        $cashFlowData = $this->cashFlow->findById($id);
         return $cashFlowData->destroy();
     }
 
@@ -256,10 +255,10 @@ class CashFlow
         foreach($data as $key => &$value) {
             if (!empty($verifyKeys[$key])) {
                 $value = $verifyKeys[$key]($value);
-                $this->cashFlow->$key = $value;
             }else {
-                $this->cashFlow->$key = $value;
+                $value = $value;
             }
+            $this->cashFlow->$key = $value;
         }
 
         $this->cashFlow->save();

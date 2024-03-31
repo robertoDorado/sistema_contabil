@@ -44,11 +44,15 @@ class Login extends Controller
             ->setRequiredFields(["csrfToken", "userData", "userPassword"])->getAllPostData();
             
             $user = new User();
-            $userDataOrErrorMessage = $user
-                ->login($requestPost["userData"], $requestPost["userData"], $requestPost["userPassword"]);
+            if (filter_var($requestPost["userData"], FILTER_VALIDATE_EMAIL)) {
+                $user->setEmail($requestPost["userData"]);
+            }else {
+                $user->setNickName($requestPost["userData"]);
+            }
 
-            if (is_string($userDataOrErrorMessage) && json_decode($userDataOrErrorMessage) !== null) {
-                echo $userDataOrErrorMessage;
+            $userData = $user->login($requestPost["userPassword"]);
+            if (is_string($userData) && json_decode($userData) !== null) {
+                echo $userData;
                 die;
             }
 
@@ -58,9 +62,10 @@ class Login extends Controller
             }
 
             session()->set("user", [
-                "user_full_name" => $userDataOrErrorMessage->user_full_name,
-                "user_nick_name" => $userDataOrErrorMessage->user_nick_name,
-                "user_email" => $userDataOrErrorMessage->user_email
+                "id_customer" => $userData->id_customer,
+                "user_full_name" => $userData->user_full_name,
+                "user_nick_name" => $userData->user_nick_name,
+                "user_email" => $userData->user_email
             ]);
             
             echo json_encode(["login_success" => true, "url" => url("/admin")]);

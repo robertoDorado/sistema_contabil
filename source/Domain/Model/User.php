@@ -3,6 +3,7 @@ namespace Source\Domain\Model;
 
 use Exception;
 use PDOException;
+use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Connect;
 use Source\Models\User as ModelsUser;
 
@@ -20,6 +21,15 @@ class User
     /** @var int Id do usuário */
     private int $id;
 
+    /** @var string Uuid do usuário */
+    private string $uuid;
+
+    /** @var string E-mail do usuário */
+    private string $email;
+
+    /** @var string Nickname do usuário */
+    private string $nickName;
+
     /**
      * User constructor
      */
@@ -28,55 +38,27 @@ class User
         $this->user = new ModelsUser();
     }
 
-    public function updateUserByUuid(array $data)
+    public function getUuid()
     {
-        if (empty($data)) {
-            return json_encode(["data_is_empty" => "data não pode ser vazio"]);
+        if (empty($this->uuid)) {
+            throw new Exception("uuid do usuário não pode estar vazio");
         }
-
-        $userData = $this->user->find("uuid=:uuid", ":uuid={$data['uuid']}")->fetch();
-        if (empty($userData)) {
-            return json_encode(["user_not_found" => "usuário não encontrado"]);
-        }
-        
-        foreach($data as $key => $value) {
-            $userData->$key = $value;
-        }
-        
-        $userData->setRequiredFields(array_keys($data));
-        return $userData->save();
+        return $this->uuid;
     }
 
-    public function dropUserByUuid(string $uuid)
+    public function setUuid(string $uuid)
     {
-        $userData = $this->user->find("uuid=:uuid", ":uuid={$uuid}")->fetch();
-        if (empty($userData)) {
-            throw new \Exception("usuário não encontrado");
+        if (!Uuid::isValid($uuid)) {
+            throw new Exception("uuid do usuário é inválido");
         }
-        $userData->destroy();
+        $this->uuid = $uuid;
     }
 
-    public function findUserByUuid(string $uuid)
+    public function findUserByEmail(array $columns = [])
     {
-        $userData = $this->user->find("uuid=:uuid", ":uuid={$uuid}")->fetch();
-        if (empty($userData)) {
-            return json_encode(["user_not_found" => "usuário não encontrado"]);
-        }
-
-        if (!empty($userData->getDeleted())) {
-            return json_encode(["access_denied" => "acesso negado"]);
-        }
-
-        return $userData;
-    }
-
-    public function findUserByEmail(string $email, array $columns = [])
-    {
-        $this->user = new ModelsUser();
-
         $columns = empty($columns) ? "*" : implode(", ", $columns);
         $data = $this->user
-        ->find("user_email=:user_email", ":user_email=" . $email . "", $columns)->fetch();
+        ->find("user_email=:user_email", ":user_email=" . $this->getEmail() . "", $columns)->fetch();
         
         if (empty($data)) {
             return json_encode(["user_not_exists" => "usuário não existe"]);
@@ -89,15 +71,20 @@ class User
         return $data;
     }
 
-    public function dropUserById(int $id)
+    public function getEmail()
     {
-        $user = $this->user->findById($id);
-
-        if (empty($user)) {
-            throw new \Exception("usuario nao encontrado");
+        if (empty($this->email)) {
+            throw new Exception("E-mail do usuário não encontrado");
         }
+        return $this->email;
+    }
 
-        return $user->destroy();
+    public function setEmail(string $email)
+    {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            throw new Exception("E-mail inválido");
+        }
+        $this->email = $email;
     }
 
     public function getId()
@@ -110,66 +97,59 @@ class User
 
     public function setId(int $id)
     {
+        if (!filter_var($id, FILTER_VALIDATE_INT)) {
+            throw new Exception("valor do id precisa ser do tipo inteiro");
+        }
         $this->id = $id;
     }
 
-    public function findUserById(array $columns = [])
-    {
-        $columns = empty($columns) ? "*" : implode(", ", $columns);
-        $data = $this->user->findById($this->getId(), $columns);
-        
-        if (empty($data)) {
-            return json_encode(["user_not_found" => "usuário não encontrado"]);
-        }
-
-        if (!empty($data->getDeleted())) {
-            return json_encode(["access_denied" => "acesso negado"]);
-        }
-
-        return $data;
-    }
-
-    public function dropUserByEmail(string $userEmail)
+    public function login(string $password)
     {
         $user = $this->user->find("user_email=:user_email",
-            ":user_email=" . $userEmail . "")->fetch();
-
-        if (empty($user)) {
-            throw new \Exception("usuario nao encontrado");
-        }
-
-        return $user->destroy();
-    }
-
-    public function login(string $userEmail, string $userNickName, string $userPassword)
-    {
-        if (empty($userEmail) || empty($userPassword)) {
-            return json_encode(["invalid_login_data" => "dados iválidos"]);
-        }
-
-        $user = $this->user->find("user_email=:user_email",
-            ":user_email=" . $userEmail . "")->fetch();
+            ":user_email=" . $this->getEmail() . "")->fetch();
         
         if (empty($user)) {
             $user = new ModelsUser();
             $user = $user->find("user_nick_name=:user_nick_name",
-            ":user_nick_name=" . $userNickName . "")->fetch();
+            ":user_nick_name=" . $this->getNickName() . "")->fetch();
         }
         
         if (empty($user)) {
-            return json_encode(["user_not_register" => "usuário não registrado"]);
+            return json_encode(["error" => "usuário não registrado"]);
         }
 
         if (!empty($user->getDeleted())) {
-            return json_encode(["access_denied" => "acesso negado"]);
-        }
-        
-        if (!password_verify($userPassword, $user->user_password)) {
-            return json_encode(["user_not_auth" => "usuário não autenticado"]);
+            return json_encode(["error" => "acesso negado"]);
         }
 
-        return $user;
-        
+        if ($this->validatePassword($password, $user)) {
+            return $user;
+        }
+    }
+
+    private function validatePassword(string $password, mixed $userData)
+    {
+        if (!password_verify($password, $userData->user_password)) {
+            return json_encode(["error" => "usuário não autenticado"]);
+        }
+        return true;
+    }
+
+    public function getNickName()
+    {
+        if (empty($this->nickName)) {
+            throw new Exception("nickname não foi atribuido");
+        }
+        return $this->nickName;
+    }
+
+    public function setNickName(string $nickName)
+    {
+        if (preg_match("/^@/", $nickName)) {
+            $this->nickName = $nickName;
+        }else {
+            $this->nickName = "@" . $nickName;
+        }
     }
 
     public function persistData(array $data)
@@ -189,7 +169,21 @@ class User
             }
         }
 
-        foreach ($data as $key => $value) {
+        $verifyKeys = [
+            "id_customer" => function($value) {
+                if (!$value instanceof Customer) {
+                    throw new Exception("instância do cliente está incorreta");
+                }
+                return $value->getId();
+            }
+        ];
+
+        foreach ($data as $key => &$value) {
+            if (!empty($verifyKeys[$key])) {
+                $value = $verifyKeys[$key]($value);
+            }else {
+                $value = $value;
+            }
             $this->user->$key = $value;
         }
 

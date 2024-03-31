@@ -83,13 +83,12 @@ class CashFlowGroup
         return $cashFlowGroupData;
     }
 
-    public function dropCashFlowGroupById(int $id)
+    public function dropCashFlowGroupById(CashFlowGroup $cashFlowGroup)
     {
-        if (empty($id)) {
-            return json_encode(["error" => "id não pode estar vazio"]);
+        $cashFlowGroupData = $this->cashFlowGroup->findById($cashFlowGroup->getId());
+        if (empty($cashFlowGroupData)) {
+            throw new Exception("grupo de contas não encontrado");
         }
-
-        $cashFlowGroupData = $this->cashFlowGroup->findById($id);
         return $cashFlowGroupData->destroy();
     }
 
@@ -130,10 +129,10 @@ class CashFlowGroup
         foreach ($data as $key => &$value) {
             if (!empty($verifyKeys[$key])) {
                 $value = $verifyKeys[$key]($value);
-                $cashFlowGroupData->$key = $value;
             }else {
-                $cashFlowGroupData->$key = $value;
+                $value = $value;
             }
+            $cashFlowGroupData->$key = $value;
         }
         
         $cashFlowGroupData->setRequiredFields(array_keys($data));
@@ -173,10 +172,10 @@ class CashFlowGroup
         foreach ($data as $key => &$value) {
             if (!empty($verifyKeys[$key])) {
                 $value = $verifyKeys[$key]($value);
-                $this->cashFlowGroup->$key = $value;
             }else {
-                $this->cashFlowGroup->$key = $value;
+                $value = $value;
             }
+            $this->cashFlowGroup->$key = $value;
         }
 
         $this->cashFlowGroup->save();
