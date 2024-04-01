@@ -4,6 +4,7 @@ namespace Source\Domain\Model;
 use DateTime;
 use Exception;
 use PDOException;
+use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Connect;
 use Source\Models\CashFlow as ModelsCashFlow;
 
@@ -20,6 +21,9 @@ class CashFlow
 
     /** @var int Id da tabela cash_flow */
     private int $id;
+
+    /** @var string Uuid do cliente */
+    private string $uuid;
 
     /**
      * CashFlow constructor
@@ -125,27 +129,23 @@ class CashFlow
         return $cashFlowData->save();
     }
 
-    public function dropCashFlowByUuid(string $uuid)
+    public function dropCashFlowByUuid()
     {
-        if (empty($uuid)) {
-            return json_encode(["error" => "uuid não pode estar vazio"]);
-        }
-
         $cashFlowData = $this->cashFlow
-            ->find("uuid=:uuid", ":uuid={$uuid}")
-            ->fetch();
+        ->find("uuid=:uuid", ":uuid={$this->getUuid()}")
+        ->fetch();
         
         return $cashFlowData->destroy();
     }
 
-    public function findCashFlowByUuid(string $uuid)
+    public function findCashFlowByUuid()
     {
         if (empty($uuid)) {
             return json_encode(["error" => "uuid não pode estar vazio"]);
         }
 
         $cashFlowData = $this->cashFlow
-        ->find("uuid=:uuid", ":uuid={$uuid}")
+        ->find("uuid=:uuid", ":uuid={$this->getUuid()}")
         ->join("cash_flow_group", "id", 
         "deleted=:deleted", ":deleted=0", "group_name", "id_cash_flow_group", "cash_flow")
         ->fetch();
@@ -155,6 +155,22 @@ class CashFlow
         }
 
         return $cashFlowData;
+    }
+
+    public function getUuid()
+    {
+        if (empty($this->uuid)) {
+            throw new Exception("uuid não foi atribuido");
+        }
+        return $this->uuid;
+    }
+
+    public function setUuid(string $uuid)
+    {
+        if (!Uuid::isValid($uuid)) {
+            throw new Exception("uuid inválido");
+        }
+        $this->uuid = $uuid;
     }
 
     public function findCashFlowByUser(array $columns = [], User $user)
@@ -184,22 +200,6 @@ class CashFlow
     public function setId(int $id)
     {
         $this->id = $id;
-    }
-
-    public function findCashFlowById(array $columns = [])
-    {
-        $columns = empty($columns) ? "*" : implode(", ", $columns);
-        return $this->cashFlow->find("id=:id AND deleted=:deleted",
-            ":id=" . $this->getId() . "&:deleted=0")->fetch();
-    }
-
-    public function dropCashFlowById(CashFlow $cashFlow)
-    {
-        $cashFlowData = $this->cashFlow->findById($cashFlow->getId());
-        if (empty($cashFlowData)) {
-            throw new Exception("conta não encontrada");
-        }
-        return $cashFlowData->destroy();
     }
 
     public function calculateBalance(User $user)

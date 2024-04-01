@@ -52,7 +52,8 @@ class CashFlow extends Controller
         }
 
         if ($requestPost["destroy"]) {
-            $response = $cashFlow->dropCashFlowByUuid($data["uuid"]);
+            $cashFlow->setUuid($data["uuid"]);
+            $response = $cashFlow->dropCashFlowByUuid();
         }
 
         if (is_string($response) && json_decode($response) != null) {
@@ -341,7 +342,8 @@ class CashFlow extends Controller
 
         foreach ($arrayUuid as $uuid) {
             $cashFlow = new ModelCashFlow();
-            $cashFlowData = $cashFlow->findCashFlowByUuid($uuid);
+            $cashFlow->setUuid($uuid);
+            $cashFlowData = $cashFlow->findCashFlowByUuid();
             
             array_push($accountGroup, $cashFlowData->group_name);
             array_push($launchDate, date("d/m/Y", strtotime($cashFlowData->created_at)));
@@ -394,7 +396,8 @@ class CashFlow extends Controller
 
         $uuid = $data["uuid"];
         $cashFlow = new ModelCashFlow();
-        $cashFlowData = $cashFlow->findCashFlowByUuid($uuid);
+        $cashFlow->setUuid($uuid);
+        $cashFlowData = $cashFlow->findCashFlowByUuid();
 
         if (is_string($cashFlowData) && json_decode($cashFlowData) != null) {
             throw new \Exception("registro inválido", 500);
@@ -474,7 +477,8 @@ class CashFlow extends Controller
 
             $user->setId($userData->id);
             $cashFlow = new ModelCashFlow();
-            $cashFlowData = $cashFlow->findCashFlowByUuid($uriParameter);
+            $cashFlow->setUuid($uriParameter);
+            $cashFlowData = $cashFlow->findCashFlowByUuid();
 
             if (is_string($cashFlowData) && json_decode($cashFlowData) != null) {
                 http_response_code(500);
@@ -489,7 +493,8 @@ class CashFlow extends Controller
             }
 
             $cashFlowGroup = new CashFlowGroup();
-            $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid($requestPost["accountGroup"]);
+            $cashFlowGroup->setUuid($requestPost["accountGroup"]);
+            $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid();
 
             if (is_string($cashFlowGroupData) && json_decode($cashFlowGroupData) != null) {
                 http_response_code(500);
@@ -528,8 +533,8 @@ class CashFlow extends Controller
 
         $uuid = $data["uuid"];
         $cashFlow = new ModelCashFlow();
-
-        $cashFlowData = $cashFlow->findCashFlowByUuid($uuid);
+        $cashFlow->setUuid($uuid);
+        $cashFlowData = $cashFlow->findCashFlowByUuid();
         if (is_string($cashFlowData) && json_decode($cashFlowData) != null) {
             redirect("/admin/cash-flow/report");
         }
@@ -659,7 +664,8 @@ class CashFlow extends Controller
 
             $user->setId($userData->id);
             $cashFlowGroup = new CashFlowGroup();
-            $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid($requestPost["accountGroup"]);
+            $cashFlowGroup->setUuid($requestPost["accountGroup"]);
+            $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid();
 
             if (is_string($cashFlowGroupData) && json_decode($cashFlowGroupData)) {
                 http_response_code(500);

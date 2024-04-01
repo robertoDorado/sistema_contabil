@@ -3,6 +3,7 @@ namespace Source\Domain\Model;
 
 use Exception;
 use PDOException;
+use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Connect;
 use Source\Models\CashFlowGroup as ModelsCashFlowGroup;
 
@@ -16,6 +17,9 @@ class CashFlowGroup
 {
     /** @var int Id da tabela */
     private int $id;
+
+    /** @var string Uuid do grupo de contas */
+    private string $uuid;
 
     /** @var ModelsCashFlowGroup Modelo de persistência para agrupamento do fluxo de caixa */
     private ModelsCashFlowGroup $cashFlowGroup;
@@ -69,13 +73,9 @@ class CashFlowGroup
         return $data;
     }
 
-    public function findCashFlowGroupByUuid(string $uuid)
+    public function findCashFlowGroupByUuid()
     {
-        if (empty($uuid)) {
-            return json_encode(["error" => "uuid não pode estar vazio"]);
-        }
-
-        $cashFlowGroupData = $this->cashFlowGroup->find("uuid=:uuid", ":uuid={$uuid}")->fetch();
+        $cashFlowGroupData = $this->cashFlowGroup->find("uuid=:uuid", ":uuid={$this->getUuid()}")->fetch();
         if (empty($cashFlowGroupData)) {
             return json_encode(["error" => "registro não encontrado"]);
         }
@@ -83,27 +83,30 @@ class CashFlowGroup
         return $cashFlowGroupData;
     }
 
-    public function dropCashFlowGroupById(CashFlowGroup $cashFlowGroup)
+    public function dropCashFlowGroupByUuid()
     {
-        $cashFlowGroupData = $this->cashFlowGroup->findById($cashFlowGroup->getId());
-        if (empty($cashFlowGroupData)) {
-            throw new Exception("grupo de contas não encontrado");
-        }
-        return $cashFlowGroupData->destroy();
-    }
-
-    public function dropCashFlowGroupByUuid(string $uuid)
-    {
-        if (empty($uuid)) {
-            return json_encode(["error" => "uuid não pode estar vazio"]);
-        }
-
-        $cashFlowGroupData = $this->cashFlowGroup->find("uuid=:uuid", ":uuid={$uuid}")->fetch();
+        $cashFlowGroupData = $this->cashFlowGroup->find("uuid=:uuid", ":uuid={$this->getUuid()}")->fetch();
         if (empty($cashFlowGroupData)) {
             return json_encode(["error" => "o registro não existe"]);
         }
         
         return $cashFlowGroupData->destroy();
+    }
+
+    public function getUuid()
+    {
+        if (empty($this->uuid)) {
+            throw new Exception("uuid está vazio");
+        }
+        return $this->uuid;
+    }
+
+    public function setUuid(string $uuid)
+    {
+        if (!Uuid::isValid($uuid)) {
+            throw new Exception("uuid inválido");
+        }
+        $this->uuid = $uuid;
     }
 
     public function updateCashFlowGroupByUuid(array $data)

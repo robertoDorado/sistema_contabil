@@ -48,7 +48,8 @@ class CashFlowGroup extends Controller
         }
 
         if ($requestPost["destroy"]) {
-            $response = $cashFlowGroup->dropCashFlowGroupByUuid($data["uuid"]);
+            $cashFlowGroup->setUuid($data["uuid"]);
+            $response = $cashFlowGroup->dropCashFlowGroupByUuid();
         }
 
         if (is_string($response) && json_decode($response) != null) {
@@ -107,7 +108,8 @@ class CashFlowGroup extends Controller
 
         $uuid = $data["uuid"];
         $cashFlowGroup = new ModelCashFlowGroup();
-        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid($uuid);
+        $cashFlowGroup->setUuid($uuid);
+        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid();
 
         if (is_string($cashFlowGroupData) && json_decode($cashFlowGroupData) != null) {
             http_response_code(500);
@@ -160,7 +162,8 @@ class CashFlowGroup extends Controller
 
             $user->setId($userData->id);
             $cashFlowGroup = new ModelCashFlowGroup();
-            $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid($uriParameter);
+            $cashFlowGroup->setUuid($uriParameter);
+            $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid();
 
             if (is_string($cashFlowGroupData) && json_decode($cashFlowGroupData) != null) {
                 http_response_code(500);
@@ -186,7 +189,8 @@ class CashFlowGroup extends Controller
         }
 
         $cashFlowGroup = new ModelCashFlowGroup();
-        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid($data["uuid"]);
+        $cashFlowGroup->setUuid($data["uuid"]);
+        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid();
 
         if (is_string($cashFlowGroupData) && json_decode($cashFlowGroupData) != null) {
             redirect("/admin/cash-flow-group/report");

@@ -31,10 +31,10 @@ class Customer
         $this->customer = new ModelsCustomer();
     }
 
-    public function dropCustomerByUuid(Customer $customer)
+    public function dropCustomerByUuid()
     {
         $customerData = $this->customer
-        ->find("uuid=:uuid", ":uuid=" . $customer->getUuid() . "")
+        ->find("uuid=:uuid", ":uuid=" . $this->getUuid() . "")
         ->fetch();
 
         if (empty($customerData)) {
@@ -44,11 +44,11 @@ class Customer
         return $customerData->destroy();
     }
 
-    public function findCustomerByUuid(array $columns, Customer $customer)
+    public function findCustomerByUuid(array $columns)
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
         $customerData = $this->customer
-        ->find("uuid=:uuid", ":uuid=" . $customer->getUuid() . "")->fetch();
+        ->find("uuid=:uuid", ":uuid=" . $this->getUuid() . "")->fetch();
         
         if (empty($customerData)) {
             return json_encode(["error" => "cliente não encontrado"]);
@@ -71,15 +71,6 @@ class Customer
             throw new Exception("uuid inválido");
         }
         $this->uuid = $uuid;
-    }
-
-    public function dropCustomerById(Customer $customer)
-    {
-        $customer = $this->customer->findById($customer->getId());
-        if (empty($customer)) {
-            throw new Exception("cliente nao encontrado");
-        }
-        return $customer->destroy();
     }
 
     public function getId()

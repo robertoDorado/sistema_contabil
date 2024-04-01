@@ -12,7 +12,7 @@ use Source\Core\Model;
 class Customer extends Model
 {
     /** @var string Uuid de identificação  */
-    protected string $uuid;
+    protected string $uuid = "uuid";
 
     /** @var string Nome do cliente */
     protected string $customerName = "customer_name";
