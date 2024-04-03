@@ -145,11 +145,7 @@ class User
 
     public function setNickName(string $nickName)
     {
-        if (preg_match("/^@/", $nickName)) {
-            $this->nickName = $nickName;
-        }else {
-            $this->nickName = "@" . $nickName;
-        }
+        $this->nickName = $nickName;
     }
 
     public function persistData(array $data)
