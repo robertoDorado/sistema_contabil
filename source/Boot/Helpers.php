@@ -1,5 +1,28 @@
 <?php
 
+function validateRequestData(array $requiredKeys, array &$requestData) {
+    if (empty($requestData)) {
+        throw new \Exception("dados do cliente não pode estar vazio");
+    }
+
+    if (empty($requiredKeys)) {
+        throw new \Exception("dados de verificação não pode estar vazio");
+    }
+
+    $requestDataKeys = array_keys($requestData);
+    foreach ($requiredKeys as $value) {
+        if (!in_array($value, $requestDataKeys)) {
+            throw new \Exception("a chave {$value} é obrigatória");
+        }
+    }
+
+    foreach ($requestData as $key => $value) {
+        if (empty($value)) {
+            throw new \Exception("chave da requisição {$key} não pode estar vazio");
+        }
+    }
+}
+
 function basicsValidatesForChartsRender(): \Source\Domain\Model\User
 {
     if (empty(session()->user)) {

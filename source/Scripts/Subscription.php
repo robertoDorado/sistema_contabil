@@ -62,15 +62,15 @@ try {
 
     print_r($subscription);
 }catch (\Stripe\Exception\CardException $e) {
-    throw new Exception($e->getError()->message);
+    throw new Exception("Erro no cartão de crédito: " . $e->getError()->message);
 } catch (\Stripe\Exception\InvalidRequestException $e) {
-    throw new Exception($e->getError()->message);
+    throw new Exception("Requisição inválida: " . $e->getError()->message);
 } catch (\Stripe\Exception\AuthenticationException $e) {
-    throw new Exception($e->getError()->message);
+    throw new Exception("Erro na autenticação: " . $e->getError()->message);
 } catch (\Stripe\Exception\ApiConnectionException $e) {
-   throw new Exception($e->getError()->message);
+   throw new Exception("Erro na conexão com a api: " . $e->getError()->message);
 } catch (\Stripe\Exception\ApiErrorException $e) {
-    throw new Exception($e->getError()->message);
+    throw new Exception("Erro na api: " . $e->getError()->message);
 } catch (Exception $e) {
     throw new Exception($e->getMessage());
 }
