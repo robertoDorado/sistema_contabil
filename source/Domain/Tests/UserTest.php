@@ -2,6 +2,7 @@
 namespace Source\Domain\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Source\Domain\Model\Customer;
 use Source\Domain\Model\User;
 
 /**
@@ -14,6 +15,9 @@ class UserTest extends TestCase
 {
     /** @var User Usuário */
     private User $user;
+
+    /** @var Customer Customer */
+    private Customer $customer;
 
     public function testInvalidPersistData()
     {

@@ -2,6 +2,7 @@
 
 use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Domain\Model\Customer;
+use Source\Domain\Model\Subscription;
 use Source\Domain\Model\User;
 
 require dirname(dirname(__DIR__)) . "/vendor/autoload.php";
@@ -73,9 +74,12 @@ $requestPost = [
     "updated_at" => date("Y-m-d"),
     "deleted" => 0,
 ];
-$customer->persistData($requestPost);
-$user = new User();
 
+if (!$customer->persistData($requestPost)) {
+    throw new Exception("erro ao criar o cliente");
+}
+
+$user = new User();
 $userData = [
     "id_customer" => $customer,
     "uuid" => Uuid::uuid6(),
@@ -88,6 +92,24 @@ $userData = [
 
 if (!$user->persistData($userData)) {
     throw new \Exception("erro ao criar usuário");
+}
+
+$subscription = new Subscription();
+$subscriptionData = [
+    "uuid" => Uuid::uuid6(),
+    "subscription_id" => "sub_" . bin2hex(random_bytes(16)),
+    "customer_id" => $customer,
+    "charge_id" => "ch_" . bin2hex(random_bytes(16)),
+    "product_description" => "sistema_contabil R$ 69,90 1x",
+    "period_end" => date("Y-m-d"),
+    "period_start" => date("Y-m-d"),
+    "created_at" => date("Y-m-d"),
+    "updated_at" => date("Y-m-d"),
+    "status" => "active"
+];
+
+if (!$subscription->persistData($subscriptionData)) {
+    throw new Exception("erro ao persistir assinatura");
 }
 
 echo "usuário criado com sucesso" . "\n";
