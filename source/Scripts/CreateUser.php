@@ -94,22 +94,4 @@ if (!$user->persistData($userData)) {
     throw new \Exception("erro ao criar usuário");
 }
 
-$subscription = new Subscription();
-$subscriptionData = [
-    "uuid" => Uuid::uuid6(),
-    "subscription_id" => "sub_" . bin2hex(random_bytes(16)),
-    "customer_id" => $customer,
-    "charge_id" => "ch_" . bin2hex(random_bytes(16)),
-    "product_description" => "sistema_contabil R$ 69,90 1x",
-    "period_end" => date("Y-m-d"),
-    "period_start" => date("Y-m-d"),
-    "created_at" => date("Y-m-d"),
-    "updated_at" => date("Y-m-d"),
-    "status" => "active"
-];
-
-if (!$subscription->persistData($subscriptionData)) {
-    throw new Exception("erro ao persistir assinatura");
-}
-
 echo "usuário criado com sucesso" . "\n";

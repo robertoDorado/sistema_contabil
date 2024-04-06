@@ -158,7 +158,8 @@ class User
 
         if (!empty($data["user_email"])) {
             $user = $this->user
-                ->find("user_email=:user_email", ":user_email=" . $data["user_email"] . "")->fetch();
+            ->find("user_email=:user_email", ":user_email=" . $data["user_email"] . "")
+            ->fetch();
             
             if (!empty($user)) {
                 return json_encode(["error_user_exists" => "este usuário já foi cadastrado"]);
@@ -171,14 +172,18 @@ class User
                     throw new Exception("instância do cliente está incorreta");
                 }
                 return $value->getId();
+            },
+            "uuid" => function($value) {
+                if (!Uuid::isValid($value)) {
+                    throw new Exception("uuid inválido");
+                }
+                return $value;
             }
         ];
 
         foreach ($data as $key => &$value) {
             if (!empty($verifyKeys[$key])) {
                 $value = $verifyKeys[$key]($value);
-            }else {
-                $value = $value;
             }
             $this->user->$key = $value;
         }

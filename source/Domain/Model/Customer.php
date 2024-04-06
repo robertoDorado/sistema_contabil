@@ -104,7 +104,19 @@ class Customer
             }
         }
 
-        foreach ($data as $key => $value) {
+        $verifyKeys = [
+            "uuid" => function($value) {
+                if (!Uuid::isValid($value)) {
+                    throw new  Exception("invalid uuid");
+                }
+                return $value;
+            }
+        ];
+
+        foreach ($data as $key => &$value) {
+            if (!empty($verifyKeys[$key])) {
+                $value = $verifyKeys[$key]($value);
+            }
             $this->customer->$key = $value;
         }
 
