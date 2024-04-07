@@ -6,6 +6,7 @@ use PDOException;
 use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Connect;
 use Source\Models\User as ModelsUser;
+use Source\Support\Message;
 
 /**
  * User Domain\Model
@@ -30,23 +31,35 @@ class User
     /** @var string Nickname do usuário */
     private string $nickName;
 
+    /** @var object|null */
+    public object $data;
+
     /**
      * User constructor
      */
     public function __construct()
     {
         $this->user = new ModelsUser();
+        $this->email = "";
+        $this->data = new \stdClass();
     }
 
-    public function getUuid()
+    public function __set($name, $value)
     {
-        if (empty($this->uuid)) {
-            throw new Exception("uuid do usuário não pode estar vazio");
-        }
+        $this->data->$name = $value;
+    }
+
+    public function __get($name)
+    {
+        return $this->data->$name ?? null;
+    }
+
+    public function getUuid(): string
+    {
         return $this->uuid;
     }
 
-    public function setUuid(string $uuid)
+    public function setUuid(string $uuid): void
     {
         if (!Uuid::isValid($uuid)) {
             throw new Exception("uuid do usuário é inválido");
@@ -54,32 +67,34 @@ class User
         $this->uuid = $uuid;
     }
 
-    public function findUserByEmail(array $columns = [])
+    public function findUserByEmail(array $columns = []): ?ModelsUser
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
         $data = $this->user
         ->find("user_email=:user_email", ":user_email=" . $this->getEmail() . "", $columns)->fetch();
         
+        $message = new Message();
         if (empty($data)) {
-            return json_encode(["user_not_exists" => "usuário não existe"]);
+            $message->error("usuário não existe");
+            $this->data->message = $message;
+            return null;
         }
         
         if (!empty($data->getDeleted())) {
-            return json_encode(["access_denied" => "acesso negado"]);
+            $message->error("acesso negado");
+            $this->data->message = $message;
+            return null;
         }
 
         return $data;
     }
 
-    public function getEmail()
+    public function getEmail(): string
     {
-        if (empty($this->email)) {
-            throw new Exception("E-mail do usuário não encontrado");
-        }
         return $this->email;
     }
 
-    public function setEmail(string $email)
+    public function setEmail(string $email): void
     {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             throw new Exception("E-mail inválido");
@@ -87,27 +102,25 @@ class User
         $this->email = $email;
     }
 
-    public function getId()
+    public function getId(): int
     {
         if (empty($this->id)) {
-            throw new \Exception("id não atribuido");
+            throw new Exception("id não atribuido");
         }
         return $this->id;
     }
 
-    public function setId(int $id)
+    public function setId(int $id): void
     {
-        if (!filter_var($id, FILTER_VALIDATE_INT)) {
-            throw new Exception("valor do id precisa ser do tipo inteiro");
-        }
         $this->id = $id;
     }
 
-    public function login(string $password)
+    public function login(string $password): ?ModelsUser
     {
         $user = $this->user->find("user_email=:user_email",
-            ":user_email=" . $this->getEmail() . "")->fetch();
+        ":user_email=" . $this->getEmail() . "")->fetch();
         
+        $message = new Message();
         if (empty($user)) {
             $user = new ModelsUser();
             $user = $user->find("user_nick_name=:user_nick_name",
@@ -115,27 +128,35 @@ class User
         }
         
         if (empty($user)) {
-            return json_encode(["error" => "usuário não registrado"]);
+            $message->error("usuário não registrado");
+            $this->data->message = $message;
+            return null;
         }
 
         if (!empty($user->getDeleted())) {
-            return json_encode(["error" => "acesso negado"]);
+            $message->error("acesso negado");
+            $this->data->message = $message;
+            return null;
         }
 
-        if ($this->validatePassword($password, $user)) {
-            return $user;
+        $response = $this->validatePassword($password, $user);
+        if (empty($response)) {
+            $message->error("usuário não autenticado");
+            $this->data->message = $message;
+            return null;
         }
+        return $user;
     }
 
-    private function validatePassword(string $password, mixed $userData)
+    private function validatePassword(string $password, ModelsUser $userData): bool
     {
         if (!password_verify($password, $userData->user_password)) {
-            return json_encode(["error" => "usuário não autenticado"]);
+            return false;
         }
         return true;
     }
 
-    public function getNickName()
+    public function getNickName(): string
     {
         if (empty($this->nickName)) {
             throw new Exception("nickname não foi atribuido");
@@ -143,15 +164,18 @@ class User
         return $this->nickName;
     }
 
-    public function setNickName(string $nickName)
+    public function setNickName(string $nickName): void
     {
         $this->nickName = $nickName;
     }
 
-    public function persistData(array $data)
+    public function persistData(array $data): bool
     {
+        $message = new Message();
         if (empty($data)) {
-            return json_encode(["invalid_persist_data" => "dados inválidos"]);
+            $message->error("dados inválidos");
+            $this->data->message = $message;
+            return false;
         }
 
         validateModelProperties(ModelsUser::class, $data);
@@ -162,7 +186,9 @@ class User
             ->fetch();
             
             if (!empty($user)) {
-                return json_encode(["error_user_exists" => "este usuário já foi cadastrado"]);
+                $message->error("este usuário já foi cadastrado");
+                $this->data->message = $message;
+                return false;
             }
         }
 

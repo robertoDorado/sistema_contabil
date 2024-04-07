@@ -5,6 +5,7 @@ use Exception;
 use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Connect;
 use Source\Models\Customer as ModelsCustomer;
+use Source\Support\Message;
 
 /**
  * Customer Model
@@ -23,15 +24,29 @@ class Customer
     /** @var string Uuid do cliente */
     private string $uuid;
 
+    /** @var object|null */
+    public object $data;
+
     /**
      * Customer constructor
      */
     public function __construct()
     {
         $this->customer = new ModelsCustomer();
+        $this->data = new \stdClass();
     }
 
-    public function dropCustomerByUuid()
+    public function __get($name)
+    {
+        return $this->data->$name ?? null;
+    }
+
+    public function __set($name, $value)
+    {
+        $this->data->$name = $value;
+    }
+
+    public function dropCustomerByUuid(): bool
     {
         $customerData = $this->customer
         ->find("uuid=:uuid", ":uuid=" . $this->getUuid() . "")
@@ -44,28 +59,28 @@ class Customer
         return $customerData->destroy();
     }
 
-    public function findCustomerByUuid(array $columns)
+    public function findCustomerByUuid(array $columns): ?ModelsCustomer
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
         $customerData = $this->customer
         ->find("uuid=:uuid", ":uuid=" . $this->getUuid() . "")->fetch();
         
+        $message = new Message();
         if (empty($customerData)) {
-            return json_encode(["error" => "cliente não encontrado"]);
+            $message->error("cliente não encontrado");
+            $this->data->message = $message;
+            return null;
         }
 
         return $customerData;
     }
 
-    public function getUuid()
+    public function getUuid(): string
     {
-        if (empty($this->uuid)) {
-            throw new Exception("uuid não pode estar vazio");
-        }
         return $this->uuid;
     }
 
-    public function setUuid(string $uuid)
+    public function setUuid(string $uuid): void
     {
         if (!Uuid::isValid($uuid)) {
             throw new Exception("uuid inválido");
@@ -73,7 +88,7 @@ class Customer
         $this->uuid = $uuid;
     }
 
-    public function getId()
+    public function getId(): int
     {
         if (empty($this->id)) {
             throw new \Exception("id não atribuido");
@@ -81,15 +96,18 @@ class Customer
         return $this->id;
     }
 
-    public function setId(int $id)
+    public function setId(int $id): void
     {
         $this->id = $id;
     }
 
-    public function persistData(array $data)
+    public function persistData(array $data): bool
     {
+        $message = new Message();
         if (empty($data)) {
-            return json_encode(["error" => "dados inválidos"]);
+            $message->error("dados inválidos");
+            $this->data->message = $message;
+            return false;
         }
 
         validateModelProperties(ModelsCustomer::class, $data);
@@ -100,14 +118,16 @@ class Customer
             ->fetch();
             
             if (!empty($customer)) {
-                return json_encode(["error" => "este cliente já foi cadastrado"]);
+                $message->error("este cliente já foi cadastrado");
+                $this->data->message = $message;
+                return false;
             }
         }
 
         $verifyKeys = [
             "uuid" => function($value) {
                 if (!Uuid::isValid($value)) {
-                    throw new  Exception("invalid uuid");
+                    throw new Exception("uuid inválido");
                 }
                 return $value;
             }

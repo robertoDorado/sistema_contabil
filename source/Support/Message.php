@@ -106,9 +106,10 @@ class Message
     /**
      * @return void
      */
-    public function json()
+    public function json(bool $assoc = true): string
     {
-        return json_encode(["error", $this->getText()]);
+        return $assoc ? json_encode(["error" => $this->getText()]) :
+        json_encode(["error", $this->getText()]);
     }
 
     /**
