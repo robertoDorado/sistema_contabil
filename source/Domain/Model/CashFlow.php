@@ -48,7 +48,8 @@ class CashFlow
         return $this->data->$name ?? null;
     }
 
-    public function findCashFlowDeletedTrue(array $columns, User $user): ?ModelsCashFlow
+    /** @return ModelsCashFlow[] */
+    public function findCashFlowDeletedTrue(array $columns, User $user): array
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
         $cashFlowData = $this->cashFlow
@@ -61,18 +62,19 @@ class CashFlow
         if (empty($cashFlowData)) {
             $message->error("não há registros deletados");
             $this->data->message = $message;
-            return null;
+            return [];
         }
 
         return $cashFlowData;
     }
 
-    public function findGroupAccountsAgrupped(User $user)
+    public function findGroupAccountsAgrupped(User $user): array
     {
         return $this->cashFlow->findGroupAccountsAgrupped($user);
     }
 
-    public function findCashFlowDataByDate(string $dates, User $user, array $columns = []): ?ModelsCashFlow
+    /** @return ModelsCashFlow[] */
+    public function findCashFlowDataByDate(string $dates, User $user, array $columns = []): array
     {
         $dates = empty($dates) ? "" : explode("-", $dates);
         $columns = empty($columns) ? "*" : implode(", ", $columns);
@@ -97,7 +99,7 @@ class CashFlow
                     "date_end" => $dates[1]
                 ])->fetch(true);
         }else {
-            return null;
+            return [];
         }
     }
 
@@ -105,7 +107,7 @@ class CashFlow
     {
         $message = new Message();
         if (empty($data)) {
-            $message->error("data não pode ser vazio");
+            $message->error("parametro data não pode ser vazio");
             $this->data->message = $message;
             return false;
         }
@@ -161,10 +163,6 @@ class CashFlow
 
     public function findCashFlowByUuid(): ?ModelsCashFlow
     {
-        if (empty($uuid)) {
-            return json_encode(["error" => "uuid não pode estar vazio"]);
-        }
-
         $cashFlowData = $this->cashFlow
         ->find("uuid=:uuid", ":uuid={$this->getUuid()}")
         ->join("cash_flow_group", "id", 
@@ -183,9 +181,6 @@ class CashFlow
 
     public function getUuid(): string
     {
-        if (empty($this->uuid)) {
-            throw new Exception("uuid não foi atribuido");
-        }
         return $this->uuid;
     }
 
@@ -197,7 +192,8 @@ class CashFlow
         $this->uuid = $uuid;
     }
 
-    public function findCashFlowByUser(array $columns = [], User $user): ?ModelsCashFlow
+    /** @return ModelsCashFlow[] */
+    public function findCashFlowByUser(array $columns = [], User $user): array
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
         $data = $this->cashFlow->find("id_user=:id_user AND deleted=:deleted", 
@@ -210,7 +206,7 @@ class CashFlow
         if (empty($data)) {
             $message->error("nenhum registro foi encontrado");
             $this->data->message = $message;
-            return null;
+            return [];
         }
         
         return $data;

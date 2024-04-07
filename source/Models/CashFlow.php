@@ -57,7 +57,7 @@ class CashFlow extends Model
         ]);
     }
 
-    public function findGroupAccountsAgrupped(User $user)
+    public function findGroupAccountsAgrupped(User $user): array
     {
         $stmt = $this->read("SELECT cg.group_name, 
         COUNT(cg.group_name) AS total_accounts FROM sistema_contabil.cash_flow c
@@ -67,7 +67,7 @@ class CashFlow extends Model
         "id_user_cg=" . $user->getId() . "&id_user_c=" . $user->getId() . "");
 
         if ($stmt->rowCount() == 0) {
-            return null;
+            return [];
         }
 
         return $stmt->fetchAll(\PDO::FETCH_OBJ);
