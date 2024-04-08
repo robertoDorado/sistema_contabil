@@ -6,6 +6,7 @@ use PDOException;
 use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Connect;
 use Source\Models\CashFlowGroup as ModelsCashFlowGroup;
+use Source\Support\Message;
 
 /**
  * CashFlowGroup Model
@@ -24,84 +25,114 @@ class CashFlowGroup
     /** @var ModelsCashFlowGroup Modelo de persistência para agrupamento do fluxo de caixa */
     private ModelsCashFlowGroup $cashFlowGroup;
 
+    /** @var object|null */
+    private object $data;
+
     /**
      * CashFlowGroup constructor
      */
     public function __construct()
     {
         $this->cashFlowGroup = new ModelsCashFlowGroup();
+        $this->data = new \stdClass();
     }
 
-    public function findCashFlowGroupDeletedTrue(array $columns, User $user)
+    public function __get($name)
+    {
+        return $this->data->$name ?? null;
+    }
+
+    public function __set($name, $value)
+    {
+        $this->data->$name = $value;
+    }
+
+    /** @return ModelsCashFlowGroup[] */
+    public function findCashFlowGroupDeletedTrue(array $columns, User $user): array
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
         $cashFlowGroupData = $this->cashFlowGroup
         ->find("id_user=:id_user AND deleted=1", ":id_user=" . $user->getId() . "", $columns)
         ->fetch(true);
 
+        $message = new Message();
         if (empty($cashFlowGroupData)) {
-            return json_encode(["error" => "não há registros deletados"]);
+            $message->error("não há registros deletados");
+            $this->data->message = $message;
+            return [];
         }
 
         return $cashFlowGroupData;
     }
 
-    public function findCashFlowGroupByName(string $groupName, User $user, array $columns = [])
+    public function findCashFlowGroupByName(string $groupName, User $user, array $columns = []): ?ModelsCashFlowGroup
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
         $data = $this->cashFlowGroup->find("id_user=:id_user AND deleted=:deleted
         AND group_name=:group_name", ":id_user=" . $user->getId() .
         "&:deleted=0&:group_name=" . $groupName . "", $columns)->fetch();
         
+        $message = new Message();
         if (empty($data)) {
-            return json_encode(["error" => "nenhum registro foi encontrado"]);
+            $message->error("nenhum registro foi encontrado");
+            $this->data->message = $message;
+            return null;
         }
         
         return $data;
     }
 
-    public function findCashFlowGroupByUser(array $columns = [], User $user)
+    /** @return ModelsCashFlowGroup[] */
+    public function findCashFlowGroupByUser(array $columns = [], User $user): array
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
         $data = $this->cashFlowGroup->find("id_user=:id_user AND deleted=:deleted", 
             ":id_user=" . $user->getId() . "&:deleted=0", $columns)->fetch(true);
         
+        $message = new Message();
         if (empty($data)) {
-            return json_encode(["error" => "nenhum registro foi encontrado"]);
+            $message->error("nenhum registro foi encontrado");
+            $this->data->message = $message;
+            return [];
         }
         
         return $data;
     }
 
-    public function findCashFlowGroupByUuid()
+    public function findCashFlowGroupByUuid(): ?ModelsCashFlowGroup
     {
         $cashFlowGroupData = $this->cashFlowGroup->find("uuid=:uuid", ":uuid={$this->getUuid()}")->fetch();
+        $message = new Message();
+        
         if (empty($cashFlowGroupData)) {
-            return json_encode(["error" => "registro não encontrado"]);
+            $message->error("registro não encontrado");
+            $this->data->message = $message;
+            return null;
         }
 
         return $cashFlowGroupData;
     }
 
-    public function dropCashFlowGroupByUuid()
+    public function dropCashFlowGroupByUuid(): bool
     {
         $cashFlowGroupData = $this->cashFlowGroup->find("uuid=:uuid", ":uuid={$this->getUuid()}")->fetch();
+        $message = new Message();
+        
         if (empty($cashFlowGroupData)) {
-            return json_encode(["error" => "o registro não existe"]);
+            $message->error("o registro não existe");
+            $this->data->message = $message;
+            return false;
         }
         
         return $cashFlowGroupData->destroy();
     }
 
-    public function getUuid()
+    public function getUuid(): string
     {
-        if (empty($this->uuid)) {
-            throw new Exception("uuid está vazio");
-        }
         return $this->uuid;
     }
 
-    public function setUuid(string $uuid)
+    public function setUuid(string $uuid): void
     {
         if (!Uuid::isValid($uuid)) {
             throw new Exception("uuid inválido");
@@ -109,15 +140,20 @@ class CashFlowGroup
         $this->uuid = $uuid;
     }
 
-    public function updateCashFlowGroupByUuid(array $data)
+    public function updateCashFlowGroupByUuid(array $data): bool
     {
+        $message = new Message();
         if (empty($data)) {
-            return json_encode(["error" => "data não pode ser vazio"]);
+            $message->error("parametro data não pode ser vazio");
+            $this->data->message = $message;
+            return false;
         }
 
         $cashFlowGroupData = $this->cashFlowGroup->find("uuid=:uuid", ":uuid={$data['uuid']}")->fetch();
         if (empty($cashFlowGroupData)) {
-            return json_encode(["error" => "grupo fluxo de caixa não encontrado"]);
+            $message->error("grupo fluxo de caixa não encontrado");
+            $this->data->message = $message;
+            return false;
         }
 
         $verifyKeys = [
@@ -132,8 +168,6 @@ class CashFlowGroup
         foreach ($data as $key => &$value) {
             if (!empty($verifyKeys[$key])) {
                 $value = $verifyKeys[$key]($value);
-            }else {
-                $value = $value;
             }
             $cashFlowGroupData->$key = $value;
         }
@@ -142,7 +176,7 @@ class CashFlowGroup
         return $cashFlowGroupData->save();
     }
 
-    public function getId()
+    public function getId(): int
     {
         if (empty($this->id)) {
             throw new Exception("Id não atribuido");
@@ -150,15 +184,18 @@ class CashFlowGroup
         return $this->id;
     }
 
-    public function setId(int $id)
+    public function setId(int $id): void
     {
         $this->id = $id;
     }
 
-    public function persistData(array $data)
+    public function persistData(array $data): bool
     {
+        $message = new Message();
         if (empty($data)) {
-            return json_encode(["error" => "dados inválidos"]);
+            $message->error("dados inválidos");
+            $this->data->message = $message;
+            return false;
         }
 
         validateModelProperties(ModelsCashFlowGroup::class, $data);
@@ -175,8 +212,6 @@ class CashFlowGroup
         foreach ($data as $key => &$value) {
             if (!empty($verifyKeys[$key])) {
                 $value = $verifyKeys[$key]($value);
-            }else {
-                $value = $value;
             }
             $this->cashFlowGroup->$key = $value;
         }

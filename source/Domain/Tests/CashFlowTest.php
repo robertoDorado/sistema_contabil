@@ -435,8 +435,6 @@ class CashFlowTest extends TestCase
         $this->cashFlow = new CashFlow();
 
         $cashFlowUuid = Uuid::uuid6();
-        $this->cashFlow->setUuid($cashFlowUuid);
-
         $cashFlowData = [
             "uuid" => $cashFlowUuid,
             "id_user" => $this->user,
@@ -450,6 +448,9 @@ class CashFlowTest extends TestCase
         ];
 
         $this->cashFlow->persistData($cashFlowData);
+        $this->cashFlow = new CashFlow();
+        
+        $this->cashFlow->setUuid($cashFlowUuid);
         $cashFlowData = $this->cashFlow->findCashFlowByUuid();
 
         $this->assertInstanceOf(ModelsCashFlow::class, $cashFlowData);
@@ -524,8 +525,6 @@ class CashFlowTest extends TestCase
         $this->cashFlow = new CashFlow();
 
         $cashFlowUuid = Uuid::uuid6();
-        $this->cashFlow->setUuid($cashFlowUuid);
-
         $cashFlowData = [
             "uuid" => $cashFlowUuid,
             "id_user" => $this->user,
@@ -539,6 +538,9 @@ class CashFlowTest extends TestCase
         ];
 
         $this->cashFlow->persistData($cashFlowData);
+        $this->cashFlow = new CashFlow();
+        
+        $this->cashFlow->setUuid($cashFlowUuid);
         $response = $this->cashFlow->dropCashFlowByUuid();
 
         $this->assertTrue($response);
@@ -598,9 +600,7 @@ class CashFlowTest extends TestCase
 
         $this->cashFlowGroup->persistData($cashFlowGroupData);
         $this->cashFlow = new CashFlow();
-
         $cashFlowUuid = Uuid::uuid6();
-        $this->cashFlow->setUuid($cashFlowUuid);
 
         $cashFlowData = [
             "uuid" => $cashFlowUuid,
@@ -617,10 +617,15 @@ class CashFlowTest extends TestCase
         $this->cashFlow->persistData($cashFlowData);
         $cashFlowData["history"] = "Receita total do mês";
 
+        $this->cashFlow = new CashFlow();
         $response = $this->cashFlow->updateCashFlowByUuid($cashFlowData);
+        
         $this->assertTrue($response);
-
+        $this->cashFlow = new CashFlow();
+        
+        $this->cashFlow->setUuid($cashFlowUuid);
         $cashFlowData = $this->cashFlow->findCashFlowByUuid();
+        
         $this->assertEquals("Receita total do mês", $cashFlowData->getHistory());
         $this->customer->dropCustomerByUuid();
     }
@@ -889,7 +894,8 @@ class CashFlowTest extends TestCase
         ];
 
         $this->cashFlow->persistData($cashFlowData);
-        $response = $this->cashFlow->findCashFlowDataByDate("07/04/2024-07/04/2024", $this->user);
+        $response = $this->cashFlow
+        ->findCashFlowDataByDate(date("d/m/Y") . "-" . date("d/m/Y"), $this->user);
         $this->assertIsArray($response);
         if (!empty($response)) {
             foreach ($response as $object) {
