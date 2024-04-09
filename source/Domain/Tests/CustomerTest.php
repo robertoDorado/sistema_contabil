@@ -127,7 +127,6 @@ class CustomerTest extends TestCase
     {
         $this->customer = new Customer();
         $customerUuid = Uuid::uuid6();
-        $this->customer->setUuid($customerUuid);
 
         $requestPost = [
             "uuid" => $customerUuid,
@@ -150,6 +149,9 @@ class CustomerTest extends TestCase
         ];
 
         $this->customer->persistData($requestPost);
+        $this->customer = new Customer();
+        
+        $this->customer->setUuid($customerUuid);
         $response = $this->customer->findCustomerByUuid([]);
         
         $this->assertInstanceOf(ModelsCustomer::class, $response);

@@ -201,6 +201,12 @@ class CashFlowGroup
         validateModelProperties(ModelsCashFlowGroup::class, $data);
         
         $verifyKeys = [
+            "uuid" => function($value) {
+                if (!Uuid::isValid($value)) {
+                    throw new Exception("uuid inválido");
+                }
+                return $value;
+            },
             "id_user" => function ($value) {
                 if (!$value instanceof User) {
                     throw new Exception("Instância inválida ao persistir o dado");

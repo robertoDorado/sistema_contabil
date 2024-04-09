@@ -76,7 +76,7 @@ class StripePayment
         return $subscription;
     }
 
-    public function createPrice(array $requestData)
+    public function createPrice(array $requestData): void
     {
         if (empty($this->product)) {
             throw new Exception("objeto produto não pode estar vazio");
@@ -90,13 +90,13 @@ class StripePayment
         $this->price = $this->stripeClient->prices->create($requestData);
     }
 
-    public function createProduct(array $requestData)
+    public function createProduct(array $requestData): void
     {
         validateRequestData(["name", "description"], $requestData);
         $this->product = $this->stripeClient->products->create($requestData);
     }
 
-    public function createCustomer(array $requestData)
+    public function createCustomer(array $requestData): void
     {
         validateRequestData(["id", "name", "email", "source"], $requestData);
         $this->customer = $this->stripeClient->customers->create($requestData);

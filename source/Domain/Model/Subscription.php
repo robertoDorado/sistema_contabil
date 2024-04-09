@@ -5,6 +5,7 @@ use Exception;
 use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Connect;
 use Source\Models\Subscription as ModelsSubscription;
+use Source\Support\Message;
 
 /**
  * Subscription Domain\Model
@@ -20,31 +21,48 @@ class Subscription
     /** @var int Id */
     private int $id;
 
+    /** @var object */
+    private object $data;
+
     /**
      * Subscription constructor
      */
     public function __construct()
     {
-        $this->subscription = new ModelsSubscription();    
+        $this->subscription = new ModelsSubscription();
+        $this->data = new \stdClass();
     }
 
-    public function getId()
+    public function __get($name)
+    {
+        return $this->data->$name ?? null;
+    }
+
+    public function __set($name, $value)
+    {
+        $this->data->$name = $value;
+    }
+
+    public function getId(): int
     {
         if (empty($this->id)) {
-            throw new Exception("id não atribuido");;
+            throw new Exception("id não atribuido");
         }
         return $this->id;
     }
 
-    public function setId(int $id)
+    public function setId(int $id): void
     {
         $this->id = $id;
     }
 
-    public function persistData(array $data)
+    public function persistData(array $data): bool
     {
+        $message = new Message();
         if (empty($data)) {
-            return json_encode(["invalid_persist_data" => "dados inválidos"]);
+            $message->error("dados inválidos");
+            $this->data->message = $message;
+            return false;
         }
 
         validateModelProperties(ModelsSubscription::class, $data);
@@ -78,8 +96,6 @@ class Subscription
         foreach ($data as $key => &$value) {
             if (!empty($verifyKeys[$key])) {
                 $value = $verifyKeys[$key]($value);
-            }else {
-                $value = $value;
             }
             $this->subscription->$key = $value;
         }

@@ -39,6 +39,26 @@ class CashFlowGroupTest extends TestCase
         }
     }
 
+    public function testInvalidUuidOnPersistData()
+    {
+        $this->user = new User();
+        $this->user->setId(362589);
+        
+        $this->cashFlowGroup = new CashFlowGroup();
+        $cashFlowGroupData = [
+            "uuid" => "-----",
+            "id_user" => $this->user,
+            "group_name" => "Receitas",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ];
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("uuid inválido");
+        $this->cashFlowGroup->persistData($cashFlowGroupData);
+    }
+
     public function testPersistCashFlowGroup()
     {
         $this->customer = new Customer();

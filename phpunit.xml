@@ -3,7 +3,6 @@
   <coverage>
     <include>
       <directory suffix=".php">source/Domain/Model/</directory>
-      <directory suffix=".php">source/Support/StripePayment.php</directory>
     </include>
   </coverage>
   <testsuites>
