@@ -1,9 +1,7 @@
 <?php
 namespace Source\Domain\Model;
 
-use DateTime;
 use Exception;
-use PDOException;
 use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Connect;
 use Source\Models\CashFlow as ModelsCashFlow;

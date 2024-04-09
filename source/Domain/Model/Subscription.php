@@ -43,6 +43,25 @@ class Subscription
         $this->data->$name = $value;
     }
 
+    public function findSubsCriptionByCustomerId(array $columns): ?ModelsSubscription
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        $customerId = empty($this->data->customer_id) ? 0 : $this->data->customer_id;
+        
+        $subscriptionData = $this->subscription
+        ->find("customer_id=:customer_id", ":customer_id={$customerId}", $columns)
+        ->fetch();
+
+        $message = new Message();
+        if (empty($subscriptionData)) {
+            $message->error("assinatura não encontrada");
+            $this->data->message = $message;
+            return null;
+        }
+
+        return $subscriptionData;
+    }
+
     public function getId(): int
     {
         if (empty($this->id)) {

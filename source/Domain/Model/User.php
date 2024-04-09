@@ -2,7 +2,6 @@
 namespace Source\Domain\Model;
 
 use Exception;
-use PDOException;
 use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Connect;
 use Source\Models\User as ModelsUser;

@@ -2,6 +2,7 @@
 namespace Source\Controllers;
 
 use Source\Core\Controller;
+use Source\Domain\Model\Subscription;
 use Source\Domain\Model\User;
 
 /**
@@ -51,8 +52,8 @@ class Login extends Controller
             }
 
             $userData = $user->login($requestPost["userPassword"]);
-            if (is_string($userData) && json_decode($userData) !== null) {
-                echo $userData;
+            if (empty($userData)) {
+                echo $user->message->json();
                 die;
             }
 
@@ -61,7 +62,17 @@ class Login extends Controller
                 setcookie("user_password", $requestPost["userPassword"], time() + 3600);
             }
 
+            $subscription = new Subscription();
+            $subscription->customer_id = $userData->customer_id;
+            $subscriptionData = $subscription->findSubsCriptionByCustomerId(["status"]);
+            
+            if (empty($subscriptionData)) {
+                $subscriptionData = new \stdClass();
+                $subscriptionData->status = "free";
+            }
+
             session()->set("user", [
+                "subscription" => $subscriptionData->status,
                 "id_customer" => $userData->id_customer,
                 "user_full_name" => $userData->user_full_name,
                 "user_nick_name" => $userData->user_nick_name,
