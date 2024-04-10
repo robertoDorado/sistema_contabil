@@ -40,6 +40,7 @@ class User
     {
         $this->user = new ModelsUser();
         $this->email = "";
+        $this->nickName = "";
         $this->data = new \stdClass();
     }
 
@@ -157,9 +158,6 @@ class User
 
     public function getNickName(): string
     {
-        if (empty($this->nickName)) {
-            throw new Exception("nickname não foi atribuido");
-        }
         return $this->nickName;
     }
 

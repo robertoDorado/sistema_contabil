@@ -53,6 +53,7 @@ class Login extends Controller
 
             $userData = $user->login($requestPost["userPassword"]);
             if (empty($userData)) {
+                http_response_code(500);
                 echo $user->message->json();
                 die;
             }

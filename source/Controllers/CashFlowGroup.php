@@ -52,15 +52,9 @@ class CashFlowGroup extends Controller
             $response = $cashFlowGroup->dropCashFlowGroupByUuid();
         }
 
-        if (is_string($response) && json_decode($response) != null) {
+        if (empty($response)) {
             http_response_code(500);
-            echo $response;
-            die;
-        }
-
-        if (!$response) {
-            http_response_code(500);
-            echo json_encode(["error" => "erro interno no sistema"]);
+            echo $cashFlowGroup->message->json();
             die;
         }
 
@@ -77,17 +71,13 @@ class CashFlowGroup extends Controller
         $user->setEmail(session()->user->user_email);
         $userData = $user->findUserByEmail();
 
-        if (is_string($userData) && json_decode($userData) != null) {
-            throw new Exception($userData);
+        if (empty($userData)) {
+            throw new Exception($user->message->json(), 500);
         }
 
         $user->setId($userData->id);
         $cashFlowGroup = new ModelCashFlowGroup();
         $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupDeletedTrue([], $user);
-
-        if (is_string($cashFlowGroupData) && json_decode($cashFlowGroupData) != null) {
-            $cashFlowGroupData = null;
-        }
 
         echo $this->view->render("admin/cash-flow-group-backup-report", [
             "cashFlowGroupData" => $cashFlowGroupData,
@@ -111,9 +101,9 @@ class CashFlowGroup extends Controller
         $cashFlowGroup->setUuid($uuid);
         $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid();
 
-        if (is_string($cashFlowGroupData) && json_decode($cashFlowGroupData) != null) {
+        if (empty($cashFlowGroupData)) {
             http_response_code(500);
-            echo $cashFlowGroupData;
+            echo $cashFlowGroup->message->json();
             die;
         }
 
@@ -124,9 +114,9 @@ class CashFlowGroup extends Controller
             "deleted" => 1
         ]);
 
-        if (!$response) {
+        if (empty($response)) {
             http_response_code(500);
-            echo json_encode(["error" => "erro interno ao tentar deletar o registro"]);
+            echo $cashFlowGroup->message->json();
             die;
         }
 
@@ -155,9 +145,8 @@ class CashFlowGroup extends Controller
             $user->setEmail(session()->user->user_email);
             $userData = $user->findUserByEmail();
 
-            if (is_string($userData) && json_decode($userData) != null) {
-                throw new Exception($userData, 500);
-                die;
+            if (empty($userData)) {
+                throw new Exception($user->message->json(), 500);
             }
 
             $user->setId($userData->id);
@@ -165,9 +154,9 @@ class CashFlowGroup extends Controller
             $cashFlowGroup->setUuid($uriParameter);
             $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid();
 
-            if (is_string($cashFlowGroupData) && json_decode($cashFlowGroupData) != null) {
+            if (empty($cashFlowGroupData)) {
                 http_response_code(500);
-                echo $cashFlowGroupData;
+                echo $cashFlowGroup->message->json();
                 die;
             }
 
@@ -192,7 +181,7 @@ class CashFlowGroup extends Controller
         $cashFlowGroup->setUuid($data["uuid"]);
         $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid();
 
-        if (is_string($cashFlowGroupData) && json_decode($cashFlowGroupData) != null) {
+        if (empty($cashFlowGroupData)) {
             redirect("/admin/cash-flow-group/report");
         }
 
@@ -214,16 +203,12 @@ class CashFlowGroup extends Controller
         $user->setEmail(session()->user->user_email);
         $userData = $user->findUserByEmail();
 
-        if (is_string($userData) && json_decode($userData) != null) {
-            throw new Exception($userData, 500);
+        if (empty($userData)) {
+            throw new Exception($user->message->json(), 500);
         }
 
         $user->setId($userData->id);
         $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUser([], $user);
-
-        if (is_string($cashFlowGroupData) && json_decode($cashFlowGroupData) != null) {
-            $cashFlowGroupData = null;
-        }
 
         echo $this->view->render("admin/cash-flow-group-report", [
             "userFullName" => showUserFullName(),
@@ -246,8 +231,8 @@ class CashFlowGroup extends Controller
             $user->setEmail(session()->user->user_email);
             $userData = $user->findUserByEmail();
 
-            if (is_string($userData) && json_decode($userData) != null) {
-                throw new Exception($userData, 500);
+            if (empty($userData)) {
+                throw new Exception($user->message->json(), 500);
             }
 
             $user->setId($userData->id);
@@ -262,15 +247,9 @@ class CashFlowGroup extends Controller
                 "deleted" => 0
             ]);
 
-            if (is_string($response) && json_decode($response) != null) {
+            if (empty($response)) {
                 http_response_code(500);
-                echo $response;
-                die;
-            }
-
-            if (!$response) {
-                http_response_code(500);
-                json_encode(["error" => "erro interno ao tentar criar o grupo"]);
+                echo $cashFlowGroup->message->json();
                 die;
             }
 

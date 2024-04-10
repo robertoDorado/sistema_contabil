@@ -186,15 +186,6 @@ class UserTest extends TestCase
         $this->assertIsString($response);
     }
 
-    public function testInvalidNickName()
-    {
-        $this->user = new User();
-        $this->user->setNickName("");
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage("nickname não foi atribuido");
-        $this->user->getNickName();
-    }
-
     public function testLoginSetEmail()
     {
         $this->customer = new Customer();

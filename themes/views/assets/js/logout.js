@@ -13,6 +13,14 @@ if (window.location.pathname != '/admin/login') {
             }
         ).then((response) => response.json())
             .then(function (response) {
+                
+                if (response.error) {
+                    let message = response.error
+                    message = message.charAt(0).toUpperCase() + message.slice(1)
+                    toastr.error(message)
+                    throw new Error(message)
+                }
+
                 if (response.logout_success) {
                     window.location.href = window.location.href
                 }

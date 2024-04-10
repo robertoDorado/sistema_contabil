@@ -70,6 +70,13 @@ if (window.location.pathname == '/admin/cash-flow/report') {
                     throw new Error(message)
                 }
 
+                if (response.error) {
+                    message = response.error
+                    message = message.charAt(0).toUpperCase() + message.slice(1)
+                    toastr.error(message)
+                    throw new Error(message)
+                }
+
                 if (response.success) {
                     message = response.message
                     message = message.charAt(0).toUpperCase() + message.slice(1)

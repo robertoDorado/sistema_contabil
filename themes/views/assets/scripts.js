@@ -319,7 +319,11 @@ if(response.login_success){window.location.href=response.url}})})};if(window.loc
 logoutBtn.addEventListener("click",function(event){event.preventDefault()
 const form=new FormData()
 form.append('request',JSON.stringify({logout:!0}))
-fetch(window.location.origin+"/admin/logout",{method:"POST",body:form}).then((response)=>response.json()).then(function(response){if(response.logout_success){window.location.href=window.location.href}})})};if(window.location.pathname=='/admin/cash-flow-group/report'){const trashIconBtn=Array.from(document.querySelectorAll(".fa.fa-trash"))
+fetch(window.location.origin+"/admin/logout",{method:"POST",body:form}).then((response)=>response.json()).then(function(response){if(response.error){let message=response.error
+message=message.charAt(0).toUpperCase()+message.slice(1)
+toastr.error(message)
+throw new Error(message)}
+if(response.logout_success){window.location.href=window.location.href}})})};if(window.location.pathname=='/admin/cash-flow-group/report'){const trashIconBtn=Array.from(document.querySelectorAll(".fa.fa-trash"))
 if(trashIconBtn){const launchModal=document.getElementById("launchModal")
 const modalContainerLabel=document.getElementById("modalContainerLabel")
 const modalBody=document.querySelector(".modal-body")
@@ -392,6 +396,10 @@ message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)
 throw new Error(message)}
 if(response.cash_flow_data_not_found){message=response.cash_flow_data_not_found
+message=message.charAt(0).toUpperCase()+message.slice(1)
+toastr.error(message)
+throw new Error(message)}
+if(response.error){message=response.error
 message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)
 throw new Error(message)}
