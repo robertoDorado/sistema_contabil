@@ -26,7 +26,7 @@ class CashFlowGroup extends Controller
     public function cashFlowGroupModiFyData(array $data)
     {
         if (empty(session()->user)) {
-            throw new Exception("usuário inválido", 500);
+            redirect("/admin/login");
         }
 
         if (empty($data["uuid"])) {
@@ -64,7 +64,7 @@ class CashFlowGroup extends Controller
     public function cashFlowGroupBackupReport()
     {
         if (empty(session()->user)) {
-            throw new Exception("usuário inválido", 500);
+            redirect("/admin/login");
         }
 
         $user = new User();
@@ -89,7 +89,7 @@ class CashFlowGroup extends Controller
     public function cashFlowGroupRemoveRegister(array $data)
     {
         if (empty(session()->user)) {
-            throw new \Exception("usuário inválido", 500);
+            redirect("/admin/login");
         }
 
         if (empty($data["uuid"])) {

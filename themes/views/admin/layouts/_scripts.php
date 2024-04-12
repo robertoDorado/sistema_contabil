@@ -1,5 +1,6 @@
 <?php
-$defineClass = preg_match("/login/", $_SERVER["REDIRECT_URL"]) ? "login-page" : "sidebar-mini";
+$verifyEndpoints = ["/admin/login", "/customer/subscribe"];
+$defineClass = in_array($_SERVER["REDIRECT_URL"], $verifyEndpoints) ? "login-page" : "sidebar-mini";
 ?>
 <!DOCTYPE html>
 <!--
@@ -36,8 +37,16 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link rel="stylesheet" href="<?= url(CONF_ADMIN_PATH . "/plugins/daterangepicker/daterangepicker.css") ?>">
     <!-- Chartjs -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Arquivo JS do Datepicker -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <!-- Arquivo de localização do Datepicker (opcional) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.pt-BR.min.js"></script>
+    <!-- Arquivo CSS do Datepicker -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet">
     <!-- Laborcode css -->
     <link rel="stylesheet" href="<?= theme("assets/style.css") ?>">
+    <!-- Stripe JS -->
+    <script src="https://js.stripe.com/v3/"></script>
 </head>
 
 <body class="hold-transition <?= $defineClass ?>">

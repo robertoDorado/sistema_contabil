@@ -30,7 +30,7 @@ class CashFlow extends Controller
     public function cashFlowModifyData(array $data)
     {
         if (empty(session()->user)) {
-            throw new Exception("usuário inválido", 500);
+            redirect("/admin/login");
         }
 
         if (empty($data["uuid"])) {
@@ -68,7 +68,7 @@ class CashFlow extends Controller
     public function cashFlowBackupReport()
     {
         if (empty(session()->user)) {
-            throw new Exception("usuário inválido", 500);
+            redirect("/admin/login");
         }
 
         $user = new User();
@@ -189,7 +189,7 @@ class CashFlow extends Controller
     public function importExcelFile()
     {
         if (empty(session()->user)) {
-            throw new \Exception("usuário inválido", 500);
+            redirect("/admin/login");
         }
 
         $file = $this->getRequestFiles()->getFile("excelFile");
@@ -377,7 +377,7 @@ class CashFlow extends Controller
     public function cashFlowRemoveRegister(array $data)
     {
         if (empty(session()->user)) {
-            throw new \Exception("usuário inválido", 500);
+            redirect("/admin/login");
         }
 
         if (empty($data["uuid"])) {

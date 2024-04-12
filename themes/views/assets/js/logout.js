@@ -1,4 +1,5 @@
-if (window.location.pathname != '/admin/login') {
+const verifyPath = ['/admin/login', '/customer/subscribe']
+if (!verifyPath.includes(window.location.pathname)) {
     const logoutBtn = document.getElementById("logout")
     logoutBtn.addEventListener("click", function (event) {
         event.preventDefault()
@@ -12,18 +13,18 @@ if (window.location.pathname != '/admin/login') {
                 body: form
             }
         ).then((response) => response.json())
-            .then(function (response) {
-                
-                if (response.error) {
-                    let message = response.error
-                    message = message.charAt(0).toUpperCase() + message.slice(1)
-                    toastr.error(message)
-                    throw new Error(message)
-                }
+        .then(function (response) {
+            
+            if (response.error) {
+                let message = response.error
+                message = message.charAt(0).toUpperCase() + message.slice(1)
+                toastr.error(message)
+                throw new Error(message)
+            }
 
-                if (response.logout_success) {
-                    window.location.href = window.location.href
-                }
-            })
+            if (response.logout_success) {
+                window.location.href = window.location.href
+            }
+        })
     })
 }

@@ -60,6 +60,14 @@ $route->get("/cash-flow/backup/report", "CashFlow::cashFlowBackupReport");
 $route->post("/cash-flow-group/modify/{uuid}", "CashFlowGroup::cashFlowGroupModiFyData");
 $route->post("/cash-flow/modify/{uuid}", "CashFlow::cashFlowModifyData");
 
+/** 
+ * Assinatura do cliente
+ */
+$module = "customer";
+$route->namespace("Source\Controllers");
+$route->group($module);
+$route->get("/subscribe", "Customer::customerSubscribeForm");
+
 
 /**
  * Error Route
