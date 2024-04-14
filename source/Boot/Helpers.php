@@ -61,7 +61,7 @@ function showUserFullName(): string
 
     $userFullNameData = explode(" ", $userData->user_full_name);
     $userFullName = [];
-    $keys = [0, 1];
+    $keys = [0, 1, 2];
 
     foreach ($userFullNameData as $key => $value) {
         if (in_array($key, $keys)) {

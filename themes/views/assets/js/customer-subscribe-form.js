@@ -150,9 +150,14 @@ if (window.location.pathname == "/customer/subscribe") {
         showSpinner(btnSubmit)
 
         stripe.createToken(card).then(function(response) {
+            let message = ""
             if (response.error) {
-                toastr.error(`Erro ao processar cartão de crédito: ${response.error.message}`)
-                throw new Error("Erro ao processar cartão de crédito")
+                btnSubmit.innerHTML = "Comprar assinatura"
+                btnSubmit.removeAttribute("disabled")
+                message = response.error.message
+                message = message.charAt(0).toUpperCase() + message.slice(1)
+                toastr.error(message)
+                throw new Error(message)
             }
             
             form.append("cardToken", response.token.id)
@@ -164,7 +169,7 @@ if (window.location.pathname == "/customer/subscribe") {
                 if (response.error) {
                     btnSubmit.innerHTML = "Comprar assinatura"
                     btnSubmit.removeAttribute("disabled")
-                    let message = response.error
+                    message = response.error
                     message = message.charAt(0).toUpperCase() + message.slice(1)
                     toastr.error(message)
                     throw new Error(message)

@@ -300,12 +300,17 @@ if(this.password.value!=this.confirmPassword.value){toastr.warning("As senhas n�
 throw new Error("As senhas não conferem")}
 const form=new FormData(this)
 showSpinner(btnSubmit)
-stripe.createToken(card).then(function(response){if(response.error){toastr.error(`Erro ao processar cartão de crédito: ${response.error.message}`)
-throw new Error("Erro ao processar cartão de crédito")}
+stripe.createToken(card).then(function(response){let message=""
+if(response.error){btnSubmit.innerHTML="Comprar assinatura"
+btnSubmit.removeAttribute("disabled")
+message=response.error.message
+message=message.charAt(0).toUpperCase()+message.slice(1)
+toastr.error(message)
+throw new Error(message)}
 form.append("cardToken",response.token.id)
 fetch(window.location.origin+"/customer/subscription/process-payment",{method:"POST",body:form}).then(response=>response.json()).then(function(response){if(response.error){btnSubmit.innerHTML="Comprar assinatura"
 btnSubmit.removeAttribute("disabled")
-let message=response.error
+message=response.error
 message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)
 throw new Error(message)}

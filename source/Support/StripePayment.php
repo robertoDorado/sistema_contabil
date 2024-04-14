@@ -1,4 +1,5 @@
 <?php
+
 namespace Source\Support;
 
 use Exception;
@@ -57,19 +58,26 @@ class StripePayment
 
     public function cancelSubscription(string $subscriptionId): Subscription
     {
-        if (empty($subscriptionId)) {
-            throw new Exception("id da assinatura não pode estar vazio");
+        $message = new Message();
+        try {
+            if (empty($subscriptionId)) {
+                throw new Exception("id da assinatura não pode estar vazio");
+            }
+
+            if (!preg_match("/^sub_/", $subscriptionId)) {
+                throw new Exception("Id da assinatura inválido");
+            }
+
+            $response = $this->stripeClient->subscriptions->update($subscriptionId, [
+                'cancel_at_period_end' => true
+            ]);
+
+            return $response;
+        } catch (ApiErrorException $e) {
+            $message->error("Erro interno no servidor: " . $e->getError()->message);
+            $this->data->message = $message;
+            return null;
         }
-
-        if (!preg_match("/^sub_/", $subscriptionId)) {
-            throw new Exception("Id da assinatura inválido");
-        }
-
-        $response = $this->stripeClient->subscriptions->update($subscriptionId, [
-            'cancel_at_period_end' => true
-        ]);
-
-        return $response;
     }
 
     public function createSubscription(array $requestData): Subscription
@@ -79,66 +87,80 @@ class StripePayment
             if (empty($this->customer)) {
                 throw new Exception("objeto cliente não pode estar vazio");
             }
-    
+
             if (empty($this->price)) {
                 throw new Exception("objeto preço não pode estar vazio");
             }
-    
+
             if (empty($requestData["customer"])) {
                 $requestData["customer"] = $this->customer->id;
             }
-    
+
             if (empty($requestData["items"])) {
                 $requestData["items"] = [["price" => $this->price->id]];
             }
-            
+
             validateRequestData(["customer", "items", "expand"], $requestData);
             $subscription = $this->stripeClient->subscriptions->create($requestData);
             return $subscription;
-
-        }catch (CardException $e) {
-            $message->error("Erro no cartão de crédito: " . $e->getError()->message);
-            $this->data->message = $message;
-            return null;
-        } catch (InvalidRequestException $e) {
-            throw new Exception("Requisição inválida: " . $e->getError()->message);
-        } catch (AuthenticationException $e) {
-            throw new Exception("Erro na autenticação: " . $e->getError()->message);
-        } catch (ApiConnectionException $e) {
-           throw new Exception("Erro na conexão com a api: " . $e->getError()->message);
         } catch (ApiErrorException $e) {
-            $message->error("Erro no cartão de crédito: " . $e->getError()->message);
+            $message->error("Erro interno no servidor: " . $e->getError()->message);
             $this->data->message = $message;
             return null;
-            // throw new Exception("Erro na api: " . $e->getError()->message);
-        } catch (Exception $e) {
-            throw new Exception($e->getMessage());
         }
     }
 
-    public function createPrice(array $requestData): void
+    public function createPrice(array $requestData): bool
     {
-        if (empty($this->product)) {
-            throw new Exception("objeto produto não pode estar vazio");
-        }
+        $message = new Message();
+        try {
+            if (empty($this->product)) {
+                throw new Exception("objeto produto não pode estar vazio");
+            }
 
-        if (empty($requestData["product"])) {
-            $requestData["product"] = $this->product->id;
-        }
+            if (empty($requestData["product"])) {
+                $requestData["product"] = $this->product->id;
+            }
 
-        validateRequestData(["currency", "unit_amount", "recurring", "product"], $requestData);
-        $this->price = $this->stripeClient->prices->create($requestData);
+            validateRequestData(["currency", "unit_amount", "recurring", "product"], $requestData);
+            $this->price = $this->stripeClient->prices->create($requestData);
+            return true;
+        } catch (ApiErrorException $e) {
+            $message->error("Erro interno no servidor: " . $e->getError()->message);
+            $this->data->message = $message;
+            return false;
+        }
     }
 
-    public function createProduct(array $requestData): void
+    public function createProduct(array $requestData): bool
     {
-        validateRequestData(["name", "description"], $requestData);
-        $this->product = $this->stripeClient->products->create($requestData);
+        $message = new Message();
+        try {
+            validateRequestData(["name", "description"], $requestData);
+            $this->product = $this->stripeClient->products->create($requestData);
+            return true;
+        } catch (ApiErrorException $e) {
+            $message->error("Erro interno no servidor: " . $e->getError()->message);
+            $this->data->message = $message;
+            return false;
+        }
     }
 
-    public function createCustomer(array $requestData): void
+    public function createCustomer(array $requestData): bool
     {
-        validateRequestData(["id", "name", "email", "source"], $requestData);
-        $this->customer = $this->stripeClient->customers->create($requestData);
+        $message = new Message();
+        try {
+            validateRequestData(["id", "name", "email", "source"], $requestData);
+            $this->customer = $this->stripeClient->customers->create($requestData);
+            return true;
+        } catch (CardException $e) {
+            $message->error("Erro ao processar o cartão de crédito: " . $e->getError()->message);
+            $this->data->message = $message;
+            return false;
+        } catch (ApiErrorException $e) {
+            $message->error("Erro interno no servidor: " . $e->getError()->message);
+            $this->data->message = $message;
+            return false;
+        }
     }
 }

@@ -18,9 +18,9 @@
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
         <a href="<?= url("/admin") ?>" class="brand-link text-center">
-            <span class="brand-text font-weight-light">Sistema Contabil</span><br/>
-            <span class="right badge badge-danger"><?= (!empty(session()->user->subscription) && 
-            session()->user->subscription == "active" ? "Assinatura ativa" : "Conta grátis") ?></span>
+            <span class="brand-text font-weight-light">Sistema Contabil</span><br />
+            <span class="right badge badge-danger"><?= (!empty(session()->user->subscription) &&
+                                                        session()->user->subscription == "active" ? "Assinatura ativa" : "Conta grátis") ?></span>
         </a>
 
         <!-- Sidebar -->
@@ -33,8 +33,6 @@
             <!-- Sidebar Menu -->
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                    <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
                     <li class="nav-item <?= setCurrentMenuActive($endpoints) ? 'menu-open' : '' ?>">
                         <a href="#" class="nav-link active">
                             <i class="nav-icon fas fa-dollar-sign"></i>
@@ -72,6 +70,32 @@
                             <li class="nav-item">
                                 <a href="<?= url("admin/cash-flow/backup/report") ?>" class="nav-link <?= $_SERVER['REQUEST_URI'] == '/admin/cash-flow/backup/report' ? 'active' : '' ?>">
                                     <p>Backup de contas</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fa-solid fa-user"></i>
+                            <p>
+                                Cliente
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <p>Formulário do cliente</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <p>Comprar assinatura mensal</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <p>Cancelar assinatura</p>
                                 </a>
                             </li>
                         </ul>

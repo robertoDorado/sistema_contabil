@@ -43,6 +43,63 @@ class Subscription
         $this->data->$name = $value;
     }
 
+    public function updateSubscriptionBySubscriptionId(array $data) : bool
+    {
+        $message = new Message();
+        if (empty($data)) {
+            $message->error("parametro data não pode ser vazio");
+            $this->data->message = $message;
+            return false;
+        }
+
+        $subscriptionData = $this->subscription
+        ->find("subscription_id=:subscription_id", ":subscription_id={$data['subscription_id']}")
+        ->fetch();
+
+        if (empty($subscriptionData)) {
+            $message->error("assinatura não localizada");
+            $this->data->message = $message;
+            return false;
+        }
+
+        $verifyKeys = [
+            "subscription_id" => function($value) {
+                if (!preg_match("/^sub_/", $value)) {
+                    throw new Exception("id da assinatura inválida");
+                }
+            }
+        ];
+
+        foreach ($data as $key => &$value) {
+            if (!empty($verifyKeys[$key])) {
+                $value = $verifyKeys[$key]($value);
+            }
+            $subscriptionData->$key = $value;
+        }
+
+        $subscriptionData->setRequiredFields(array_keys($data));
+        return $subscriptionData->save();
+    }
+
+    public function findSubsCriptionBySubscriptionId(array $columns): ?ModelsSubscription
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        $subscriptionId = empty($this->data->subscription_id) ? 0 : $this->data->subscription_id;
+        
+        $subscriptionData = $this->subscription
+        ->find("subscription_id=:subscription_id", ":subscription_id={$subscriptionId}", $columns)
+        ->fetch();
+
+        $message = new Message();
+        if (empty($subscriptionData)) {
+            $message->error("assinatura não encontrada");
+            $this->data->message = $message;
+            return null;
+        }
+
+        return $subscriptionData;
+    }
+
     public function findSubsCriptionByCustomerId(array $columns): ?ModelsSubscription
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);

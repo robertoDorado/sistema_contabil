@@ -141,14 +141,19 @@ class Subscription extends Controller
         }
 
         $stripePayment = new StripePayment();
-        $stripePayment->createCustomer([
+        $response = $stripePayment->createCustomer([
             "id" => $customerUuid,
             "name" => $requestPost["fullName"],
             "email" => $requestPost["email"],
             "source" => $requestPost["cardToken"]
         ]);
 
-        $stripePayment->createProduct([
+        if (empty($response)) {
+            echo $stripePayment->message->json();
+            die;
+        }
+
+        $response = $stripePayment->createProduct([
             "name" => "sistema_contabil premium",
             "description" => "Assinatura premium do Sistema Contábil. 
             Projetada para atender às demandas mais exigentes de empresas 
@@ -156,12 +161,22 @@ class Subscription extends Controller
             confiabilidade e eficiência no mundo da contabilidade."
         ]);
 
-        $stripePayment->createPrice([
+        if (empty($response)) {
+            echo $stripePayment->message->json();
+            die;
+        }
+
+        $response = $stripePayment->createPrice([
             "currency" => "brl",
             "unit_amount" => 6990,
             "recurring" => ["interval" => "month"],
             "product" => $stripePayment->product->id
         ]);
+
+        if (empty($response)) {
+            echo $stripePayment->message->json();
+            die;
+        }
 
         $response = $stripePayment->createSubscription([
             "customer" => $stripePayment->customer->id,

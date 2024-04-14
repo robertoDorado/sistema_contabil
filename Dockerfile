@@ -1,6 +1,32 @@
 #  PHP Drivers
 FROM php:7.4-apache
 
+# Instalação das dependências necessárias
+RUN apt-get update \
+    && apt-get install -y \
+    unzip \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libpng-dev \
+    zlib1g-dev \
+    libzip-dev \
+    ca-certificates && \
+    update-ca-certificates \
+    curl \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd zip pdo pdo_mysql mysqli \
+    && rm -rf /var/lib/apt/lists/*
+
+# Baixe e instale o stripe-cli
+RUN curl -L -O https://github.com/stripe/stripe-cli/releases/download/v1.19.4/stripe_1.19.4_linux_arm64.tar.gz
+
+# Extraia o stripe-cli
+RUN tar -xzf stripe_1.19.4_linux_arm64.tar.gz -C /usr/local/bin/
+RUN chmod +x /usr/local/bin/stripe
+
+# Remova o arquivo tar.gz
+RUN rm stripe_1.19.4_linux_arm64.tar.gz
+
 # Copiar certificados SSL para o conteiner php-apache
 COPY ssl/localhost.pem /etc/ssl/certs/localhost.pem
 COPY ssl/localhost-key.pem /etc/ssl/private/localhost-key.pem
@@ -20,21 +46,6 @@ RUN service apache2 restart
 
 # Definir permissões
 RUN chown -R www-data:www-data /var/www/html/
-
-# Instalação das dependências necessárias
-RUN apt-get update \
-    && apt-get install -y \
-    unzip \
-    libfreetype6-dev \
-    libjpeg62-turbo-dev \
-    libpng-dev \
-    zlib1g-dev \
-    libzip-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) gd zip pdo pdo_mysql mysqli \
-    && rm -rf /var/lib/apt/lists/* \
-    ca-certificates && \
-    update-ca-certificates
 
 # Instalação do Xdebug
 RUN pecl install xdebug-3.0.4 \

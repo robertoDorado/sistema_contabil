@@ -70,6 +70,14 @@ $route->get("/subscribe", "Customer::customerSubscribeForm");
 $route->post("/subscription/process-payment", "Subscription::processSubscription");
 $route->get("/subscription/thanks-purchase", "Customer::thanksPurchase");
 
+/**
+ * Webhook da stripe
+ */
+$module = "stripe";
+$route->namespace("Source\Controllers");
+$route->group($module);
+$route->post("/webhook/update/subscription", "Server::webhookUpdateSubscription");
+
 
 /**
  * Error Route
