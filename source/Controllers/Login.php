@@ -64,16 +64,19 @@ class Login extends Controller
             }
 
             $subscription = new Subscription();
-            $subscription->customer_id = $userData->customer_id;
+            $subscription->customer_id = $userData->id_customer;
             $subscriptionData = $subscription->findSubsCriptionByCustomerId(["status"]);
             
             if (empty($subscriptionData)) {
-                $subscriptionData = new \stdClass();
-                $subscriptionData->status = "free";
+                $subscriptionStatus = new \stdClass();
+                $subscriptionStatus->status = "free";
             }
 
+            $status = empty($subscriptionData) 
+            ? $subscriptionStatus->status : $subscriptionData->getStatus();
+
             session()->set("user", [
-                "subscription" => $subscriptionData->status,
+                "subscription" => $status,
                 "id_customer" => $userData->id_customer,
                 "user_full_name" => $userData->user_full_name,
                 "user_nick_name" => $userData->user_nick_name,

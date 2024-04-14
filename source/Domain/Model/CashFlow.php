@@ -118,6 +118,13 @@ class CashFlow
         }
 
         $verifyKeys = [
+            "uuid" => function($value) {
+                if (!Uuid::isValid($value)) {
+                    throw new Exception("uuid inválido");
+                }
+                return $value;
+            },
+            
             "id_cash_flow_group" => function ($value) {
                 if (!$value instanceof CashFlowGroup) {
                     throw new Exception("Instância inválida ao atualizar o dado");

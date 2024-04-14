@@ -54,6 +54,44 @@ class User
         return $this->data->$name ?? null;
     }
 
+    public function updateUserByEmail(array $data): bool
+    {
+        $message = new Message();
+        if (empty($data)) {
+            $message->error("array data não pode estar vazio");
+            $this->data->message = $message;
+            return false;
+        }
+        
+        $userData = $this->user
+        ->find("user_email=:user_email", ":user_email={$this->getEmail()}")->fetch();
+
+        if (empty($userData)) {
+            $message->error("usuário não encontrado");
+            $this->data->message = $message;
+            return false;
+        }
+
+        $verifyKeys = [
+            "id_customer" => function($value) {
+                if (!$value instanceof Customer) {
+                    throw new Exception("instância do cliente inválida");
+                }
+                return $value->getId();
+            }
+        ];
+
+        foreach ($data as $key => &$value) {
+            if (!empty($verifyKeys[$key])) {
+                $value = $verifyKeys[$key]($value);
+            }
+            $userData->$key = $value;
+        }
+
+        $userData->setRequiredFields(array_keys($data));
+        return $userData->save();
+    }
+
     public function getUuid(): string
     {
         return $this->uuid;

@@ -1,4 +1,3 @@
-const verifyPath = ['/admin/login', '/customer/subscribe']
 if (!verifyPath.includes(window.location.pathname)) {
     const logoutBtn = document.getElementById("logout")
     logoutBtn.addEventListener("click", function (event) {

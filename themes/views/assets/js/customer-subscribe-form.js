@@ -64,34 +64,66 @@ if (window.location.pathname == "/customer/subscribe") {
         }
     })
 
-    const stripe = Stripe("pk_test_51OEIojC1Uv10wqUudCsaCYGleVine1HcYMo3kLbOJDbFnetTHFMLkCEiCt24J256ahte6UCvHkBfFMrlEIT7qFlE00LQx8SDKD")
-    const elements = stripe.elements()
+    const phone = document.querySelector("[name='phone']")
+    phone.addEventListener("input", function() {
+        this.value = this.value
+        .replace(/\D/g, "")
+        .replace(/(\d{2})(\d)/, "($1) $2")
+        .replace(/(\d{4})(\d)/, "$1-$2")
+        .replace(/(-\d{4})\d+?$/, "$1")
+    })
 
+    const cellPhone = document.querySelector("[name='cellPhone']")
+    cellPhone.addEventListener("input", function() {
+        this.value = this.value
+        .replace(/\D/g, "")
+        .replace(/(\d{2})(\d)/, "($1) $2")
+        .replace(/(\d{5})(\d)/, "$1-$2")
+        .replace(/(-\d{4})\d+?$/, "$1")
+    })
+
+    const stripe = Stripe("pk_test_51OEIojC1Uv10wqUudCsaCYGleVine1HcYMo3kLbOJDbFnetTHFMLkCEiCt24J256ahte6UCvHkBfFMrlEIT7qFlE00LQx8SDKD", {
+        locale: "pt-BR"
+    })
+
+    const elements = stripe.elements()
     const style = {
         base: {
             fontSize: '16px',
             fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
             fontSmoothing: 'antialiased',
-            lineHeight: '1.5',
             color: '#555',
             '::placeholder': {
                 color: '#999'
             }
+        },
+        invalid: {
+            color: '#fa755a',
+            iconColor: '#fa755a'
         }
     }
 
-    const card = elements.create('card', { style: style })
-    const cardMount = document.getElementById("cardMount")
-    
-    card.mount(cardMount)
-    const subscriptionForm = document.getElementById("subscriptionForm")
+    const card = elements.create('card', { 
+        style: style 
+    })
 
+    const cardMount = document.getElementById("cardMount")
+    card.mount(cardMount)
+
+    const subscriptionForm = document.getElementById("subscriptionForm")
     subscriptionForm.addEventListener("submit", function(event) {
         event.preventDefault()
-        let validateBlankInput = Array.from(this.getElementsByTagName("input"))
 
+        const btnSubmit = this.querySelector("button[type='submit']")
+        if (/\s/.test(this.userName.value)) {
+            toastr.warning("Nome de usuário não pode conter espaços em branco")
+            throw new Error("Nome de usuário não pode conter espaços em branco")
+        }
+
+        let validateBlankInput = Array.from(this.getElementsByTagName("input"))
         validateBlankInput = validateBlankInput.filter(function(element) {
-            if (!element.classList.contains("__PrivateStripeElement-input")) {
+            if (!element.classList.contains("__PrivateStripeElement-input")
+            && element.name != "phone" && element.name != "cellPhone") {
                 return element
             }
         })
@@ -103,18 +135,45 @@ if (window.location.pathname == "/customer/subscribe") {
             }
         })
 
-        if (this.password.value != this.confirmPassword.value) {
-            toastr.warning("As senhas não conferem")
-            throw new Error("As senhas não conferem")
-        }
-
         const selectField = this.querySelector("select")
         if (!selectField.value) {
             toastr.warning(`Campos obrigatórios não foram preenchidos`)
             throw new Error(`Campos obrigatórios não foram preenchidos`)
         }
+
+        if (this.password.value != this.confirmPassword.value) {
+            toastr.warning("As senhas não conferem")
+            throw new Error("As senhas não conferem")
+        }
+
+        const form = new FormData(this)
+        showSpinner(btnSubmit)
+
         stripe.createToken(card).then(function(response) {
-            console.log(response)
+            if (response.error) {
+                toastr.error(`Erro ao processar cartão de crédito: ${response.error.message}`)
+                throw new Error("Erro ao processar cartão de crédito")
+            }
+            
+            form.append("cardToken", response.token.id)
+            fetch(window.location.origin + "/customer/subscription/process-payment", {
+                method: "POST",
+                body: form
+            }).then(response => response.json()).then(function(response) {
+
+                if (response.error) {
+                    btnSubmit.innerHTML = "Comprar assinatura"
+                    btnSubmit.removeAttribute("disabled")
+                    let message = response.error
+                    message = message.charAt(0).toUpperCase() + message.slice(1)
+                    toastr.error(message)
+                    throw new Error(message)
+                }
+
+                if (response.success) {
+                    window.location.href = response.url
+                }
+            })
         })
     })
 }

@@ -5,7 +5,7 @@
             <a href="#" class="h1"><b>Assinatura Mensal</a>
         </div>
         <div class="card-body">
-            <p class="login-box-msg">Faça a sua assinatura do sistema contabil</p>
+            <p class="login-box-msg">Faça a sua assinatura do sistema contabil por R$ 69,90 por mês.</p>
 
             <form action="#" method="post" id="subscriptionForm">
                 <div class="input-group mb-3">
@@ -100,7 +100,30 @@
                         </div>
                     </div>
                 </div>
-                <div id="cardMount"></div>
+                <div class="input-group mb-3">
+                    <input type="text" name="phone" class="form-control" placeholder="Telefone fixo">
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <i class="fa-solid fa-phone"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="text" name="cellPhone" class="form-control" placeholder="Telefone celular">
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <i class="fa fa-mobile"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="text" name="userName" class="form-control" placeholder="Nome de usuário">
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-user"></span>
+                        </div>
+                    </div>
+                </div>
                 <div class="input-group mb-3">
                     <input type="password" name="password" class="form-control" placeholder="Senha">
                     <div class="input-group-append">
@@ -111,22 +134,20 @@
                 </div>
                 <div class="input-group mb-3">
                     <input type="password" name="confirmPassword" class="form-control" placeholder="Confirme a senha">
+                    <input type="hidden" name="csrfToken" value="<?= $csrfToken ?>">
                     <div class="input-group-append">
                         <div class="input-group-text">
                             <span class="fas fa-lock"></span>
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <!-- /.col -->
-                    <div class="col-4">
-                        <button type="submit" class="btn btn-primary btn-block">Comprar</button>
+                <div id="cardMount"></div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary btn-block">Comprar assinatura</button>
                     </div>
-                    <!-- /.col -->
                 </div>
             </form>
         </div>
-        <!-- /.form-box -->
-    </div><!-- /.card -->
+    </div>
 </div>
-<!-- /.register-box -->

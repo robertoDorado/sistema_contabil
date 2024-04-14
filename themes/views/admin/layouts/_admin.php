@@ -1,6 +1,5 @@
 <?php $v->layout("admin/layouts/_scripts") ?>
 <div class="wrapper">
-
     <!-- Navbar -->
     <nav class="main-header navbar navbar-expand navbar-white navbar-light">
         <!-- Left navbar links -->
@@ -19,7 +18,9 @@
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
         <a href="<?= url("/admin") ?>" class="brand-link text-center">
-            <span class="brand-text font-weight-light">Sistema Contabil</span>
+            <span class="brand-text font-weight-light">Sistema Contabil</span><br/>
+            <span class="right badge badge-danger"><?= (!empty(session()->user->subscription) && 
+            session()->user->subscription == "active" ? "Assinatura ativa" : "Conta grátis") ?></span>
         </a>
 
         <!-- Sidebar -->

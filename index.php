@@ -67,6 +67,8 @@ $module = "customer";
 $route->namespace("Source\Controllers");
 $route->group($module);
 $route->get("/subscribe", "Customer::customerSubscribeForm");
+$route->post("/subscription/process-payment", "Subscription::processSubscription");
+$route->get("/subscription/thanks-purchase", "Customer::thanksPurchase");
 
 
 /**

@@ -3,6 +3,11 @@ namespace Source\Support;
 
 use Exception;
 use Stripe\Customer;
+use Stripe\Exception\ApiConnectionException;
+use Stripe\Exception\ApiErrorException;
+use Stripe\Exception\AuthenticationException;
+use Stripe\Exception\CardException;
+use Stripe\Exception\OAuth\InvalidRequestException;
 use Stripe\Price;
 use Stripe\Product;
 use Stripe\StripeClient;
@@ -20,13 +25,16 @@ class StripePayment
     private StripeClient $stripeClient;
 
     /** @var Product Produto */
-    private Product $product;
+    public Product $product;
 
     /** @var Price Preço */
-    private Price $price;
+    public Price $price;
 
     /** @var Customer Cliente */
-    private Customer $customer;
+    public Customer $customer;
+
+    /** @var object $data */
+    private object $data;
 
     /**
      * StripePayment constructor
@@ -34,6 +42,17 @@ class StripePayment
     public function __construct()
     {
         $this->stripeClient = new StripeClient(STRIPE_TEST_SECRET_KEY);
+        $this->data = new \stdClass();
+    }
+
+    public function __set($name, $value)
+    {
+        $this->data->$name = $value;
+    }
+
+    public function __get($name)
+    {
+        return $this->data->$name ?? null;
     }
 
     public function cancelSubscription(string $subscriptionId): Subscription
@@ -55,25 +74,46 @@ class StripePayment
 
     public function createSubscription(array $requestData): Subscription
     {
-        if (empty($this->customer)) {
-            throw new Exception("objeto cliente não pode estar vazio");
-        }
+        $message = new Message();
+        try {
+            if (empty($this->customer)) {
+                throw new Exception("objeto cliente não pode estar vazio");
+            }
+    
+            if (empty($this->price)) {
+                throw new Exception("objeto preço não pode estar vazio");
+            }
+    
+            if (empty($requestData["customer"])) {
+                $requestData["customer"] = $this->customer->id;
+            }
+    
+            if (empty($requestData["items"])) {
+                $requestData["items"] = [["price" => $this->price->id]];
+            }
+            
+            validateRequestData(["customer", "items", "expand"], $requestData);
+            $subscription = $this->stripeClient->subscriptions->create($requestData);
+            return $subscription;
 
-        if (empty($this->price)) {
-            throw new Exception("objeto preço não pode estar vazio");
+        }catch (CardException $e) {
+            $message->error("Erro no cartão de crédito: " . $e->getError()->message);
+            $this->data->message = $message;
+            return null;
+        } catch (InvalidRequestException $e) {
+            throw new Exception("Requisição inválida: " . $e->getError()->message);
+        } catch (AuthenticationException $e) {
+            throw new Exception("Erro na autenticação: " . $e->getError()->message);
+        } catch (ApiConnectionException $e) {
+           throw new Exception("Erro na conexão com a api: " . $e->getError()->message);
+        } catch (ApiErrorException $e) {
+            $message->error("Erro no cartão de crédito: " . $e->getError()->message);
+            $this->data->message = $message;
+            return null;
+            // throw new Exception("Erro na api: " . $e->getError()->message);
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
         }
-
-        if (empty($requestData["customer"])) {
-            $requestData["customer"] = $this->customer->id;
-        }
-
-        if (empty($requestData["items"])) {
-            $requestData["items"] = [["price" => $this->price->id]];
-        }
-        
-        validateRequestData(["customer", "items", "expand"], $requestData);
-        $subscription = $this->stripeClient->subscriptions->create($requestData);
-        return $subscription;
     }
 
     public function createPrice(array $requestData): void
