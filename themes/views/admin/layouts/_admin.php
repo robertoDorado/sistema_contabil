@@ -31,10 +31,10 @@
             </div>
 
             <!-- Sidebar Menu -->
-            <nav class="mt-2">
+            <nav class="mt-2" sidebarMenu>
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                    <li class="nav-item <?= setCurrentMenuActive($endpoints) ? 'menu-open' : '' ?>">
-                        <a href="#" class="nav-link active">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-dollar-sign"></i>
                             <p>
                                 Fluxo de Caixa
@@ -43,32 +43,32 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="<?= url("admin/cash-flow-group/form") ?>" class="nav-link <?= $_SERVER['REQUEST_URI'] == '/admin/cash-flow-group/form' ? 'active' : '' ?>">
+                                <a href="<?= url("admin/cash-flow-group/form") ?>" class="nav-link">
                                     <p>Lançar grupo de contas</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="<?= url("admin/cash-flow-group/report") ?>" class="nav-link <?= $_SERVER['REQUEST_URI'] == '/admin/cash-flow-group/report' ? 'active' : '' ?>">
+                                <a href="<?= url("admin/cash-flow-group/report") ?>" class="nav-link">
                                     <p>Relatório grupo de contas</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="<?= url("admin/cash-flow/form") ?>" class="nav-link <?= $_SERVER['REQUEST_URI'] == '/admin/cash-flow/form' ? 'active' : '' ?>">
+                                <a href="<?= url("admin/cash-flow/form") ?>" class="nav-link">
                                     <p>Lançar nova conta</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="<?= url("admin/cash-flow/report") ?>" class="nav-link <?= $_SERVER['REQUEST_URI'] == '/admin/cash-flow/report' ? 'active' : '' ?>">
+                                <a href="<?= url("admin/cash-flow/report") ?>" class="nav-link">
                                     <p>Relatório de contas</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="<?= url("admin/cash-flow-group/backup/report") ?>" class="nav-link <?= $_SERVER['REQUEST_URI'] == '/admin/cash-flow-group/backup/report' ? 'active' : '' ?>">
+                                <a href="<?= url("admin/cash-flow-group/backup/report") ?>" class="nav-link">
                                     <p>Backup grupo de contas</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="<?= url("admin/cash-flow/backup/report") ?>" class="nav-link <?= $_SERVER['REQUEST_URI'] == '/admin/cash-flow/backup/report' ? 'active' : '' ?>">
+                                <a href="<?= url("admin/cash-flow/backup/report") ?>" class="nav-link">
                                     <p>Backup de contas</p>
                                 </a>
                             </li>
@@ -84,7 +84,7 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="#" class="nav-link">
+                                <a href="<?= url("/admin/customer/update-data/form") ?>" class="nav-link">
                                     <p>Formulário do cliente</p>
                                 </a>
                             </li>
@@ -129,4 +129,5 @@
         <strong>Copyright &copy; 2024-<?= date('Y') ?> <a href="<?= url("/admin") ?>">Laborcode</a>.</strong> Todos os direitos reservados.
     </footer>
 </div>
+<div endpoints='<?= json_encode($endpoints) ?>' style="display:none"></div>
 <!-- ./wrapper -->

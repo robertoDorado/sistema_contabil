@@ -2,7 +2,6 @@
 
 use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Domain\Model\Customer;
-use Source\Domain\Model\Subscription;
 use Source\Domain\Model\User;
 
 require dirname(dirname(__DIR__)) . "/vendor/autoload.php";
@@ -25,20 +24,35 @@ $gender = trim(fgets(STDIN));
 echo "Digite o cep do usuário: ";
 $zipcode = trim(fgets(STDIN));
 
-echo "Digite o endereço do usuário: ";
-$address = trim(fgets(STDIN));
+$curl = curl_init();
 
+curl_setopt_array($curl, array(
+  CURLOPT_URL => "https://brasilapi.com.br/api/cep/v1/{$zipcode}",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => '',
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 0,
+  CURLOPT_FOLLOWLOCATION => true,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => 'GET',
+));
+
+$response = curl_exec($curl);
+
+curl_close($curl);
+$response = json_decode($response);
+
+if (empty($response->street)) {
+    throw new Exception(json_encode($response));
+}
+
+$address = $response->street;
 echo "Digite o número endereço do usuário: ";
 $addressNumber = trim(fgets(STDIN));
 
-echo "Digite o bairro do usuário: ";
-$neighborhood = trim(fgets(STDIN));
-
-echo "Digite a cidade do usuário: ";
-$city = trim(fgets(STDIN));
-
-echo "Digite o estado do usuário: ";
-$state = trim(fgets(STDIN));
+$neighborhood = $response->neighborhood;
+$city = $response->city;
+$state = $response->state;
 
 echo "Digite o telefone fixo do usuário: ";
 $phone = trim(fgets(STDIN));

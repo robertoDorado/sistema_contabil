@@ -1,13 +1,5 @@
 if (window.location.pathname == "/customer/subscribe") {
     $(document).ready(function () {
-        $('[name="monthYearPicker"]').datepicker({
-            format: "mm/yyyy",
-            startView: "months",
-            minViewMode: "months",
-            language: "pt-BR",
-            autoclose: true
-        });
-
         $("[name='birthDate']").datepicker({
             format: "dd/mm/yyyy",
             language: "pt-BR",
@@ -47,7 +39,7 @@ if (window.location.pathname == "/customer/subscribe") {
 
     const zipcode = document.querySelector("[name='zipcode']")
     zipcode.addEventListener("input", function() {
-        this.value = this.value.replace(/(\d{5})(\d)/, "$1-$2")
+        this.value = this.value.replace(/\D/g, "").replace(/(\d{5})(\d)/, "$1-$2")
         .replace(/(-\d{3})\d+?$/, "$1")
 
         const searchValue = this.value.replace(/[^\d]+/, "")
@@ -62,6 +54,17 @@ if (window.location.pathname == "/customer/subscribe") {
                 }
             })
         }
+    })
+
+    const addressNumber = document.querySelector("[name='number']")
+    addressNumber.addEventListener("input", function() {
+        this.value = this.value.replace(/\D/g, "")
+    })
+
+    const state = document.querySelector("[name='state']")
+    state.addEventListener("input", function() {
+        this.value = this.value.replace(/[^A-Za-z]+/g, '')
+        .toUpperCase().replace(/([A-Z]{2})[A-Z]+?$/, "$1")
     })
 
     const phone = document.querySelector("[name='phone']")

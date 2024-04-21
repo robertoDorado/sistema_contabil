@@ -92,7 +92,15 @@ arrayPdfData.push([{text:'Total',style:'tableBodyOdd',fillColor:'#f1ff32'},{text
 pdfData.content[1].table.body=arrayPdfData}},"colvis"],"initComplete":function(){this.api().buttons().container().appendTo("#widgets .col-md-6:eq(0)")}})
 const cashFlowGroupTable=dataTableConfig($("#cashFlowGroupReport"),{"language":{"url":urlJson}})
 const cashFlowGroupDeletedReport=dataTableConfig($("#cashFlowGroupDeletedReport"),{"language":{"url":urlJson}})
-const cashFlowDeletedReport=dataTableConfig($("#cashFlowDeletedReport"),{"language":{"url":urlJson}});if(window.location.pathname.match(/admin/)){window.addEventListener("load",function(){toastr.options={'closeButton':!0,'debug':!1,'newestOnTop':!1,'progressBar':!0,'positionClass':'toast-top-right','preventDuplicates':!1,'showDuration':'1000','hideDuration':'1000','timeOut':'5000','extendedTimeOut':'1000','showEasing':'swing','hideEasing':'linear','showMethod':'fadeIn','hideMethod':'fadeOut',}})};const verifyPath=['/admin/login','/customer/subscribe','/customer/subscription/thanks-purchase'];if(window.location.pathname=="/admin/cash-flow/backup/report"){const cashFlowDeletedTableReport=document.getElementById("cashFlowDeletedReport")
+const cashFlowDeletedReport=dataTableConfig($("#cashFlowDeletedReport"),{"language":{"url":urlJson}});if(window.location.pathname.match(/admin/)){window.addEventListener("load",function(){toastr.options={'closeButton':!0,'debug':!1,'newestOnTop':!1,'progressBar':!0,'positionClass':'toast-top-right','preventDuplicates':!1,'showDuration':'1000','hideDuration':'1000','timeOut':'5000','extendedTimeOut':'1000','showEasing':'swing','hideEasing':'linear','showMethod':'fadeIn','hideMethod':'fadeOut',}})};const verifyPath=['/admin/login','/customer/subscribe','/customer/subscription/thanks-purchase'];const endpointsElement=document.querySelector("[endpoints]")
+if(endpointsElement){let endpoints=JSON.parse(endpointsElement.getAttribute("endpoints"))
+if(endpoints.length>0){const sidebarMenu=document.querySelector("[sidebarMenu]")
+const menuAdmin=Array.from(sidebarMenu.firstElementChild.children)
+menuAdmin.forEach(function(element){const navItem=element.querySelectorAll(".nav-item")
+navItem.forEach(function(element){const navLink=element.firstElementChild
+if(navLink.href==window.location.href){navLink.classList.add("active")
+element.parentElement.parentElement.classList.add("menu-open")
+element.parentElement.parentElement.firstElementChild.classList.add("active")}})})}};if(window.location.pathname=="/admin/cash-flow/backup/report"){const cashFlowDeletedTableReport=document.getElementById("cashFlowDeletedReport")
 const launchModal=document.getElementById("launchModal")
 const modalContainer=document.getElementById("modalContainer")
 const saveChanges=modalContainer.querySelector("#saveChanges")
@@ -260,7 +268,7 @@ cashFlowTable.on('search.dt',function(){const dataFilter=cashFlowTable.rows({sea
 dataFilter.each(function(row){let entryValue=parseFloat(row[5].replace("R$","").replace(".","").replace(",",".").trim())
 balance+=entryValue})
 balance<0?tFoot.style.color="#ff0000":balance==0?tFoot.removeAttribute("style"):tFoot.style.color="#008000"
-tFoot.children[5].innerHTML=balance.toLocaleString("pt-br",{"currency":"BRL","style":"currency"})})};if(window.location.pathname=="/customer/subscribe"){$(document).ready(function(){$('[name="monthYearPicker"]').datepicker({format:"mm/yyyy",startView:"months",minViewMode:"months",language:"pt-BR",autoclose:!0});$("[name='birthDate']").datepicker({format:"dd/mm/yyyy",language:"pt-BR",autoclose:!0})});const verifyDocument={"14":function(value){return value.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,"$1.$2.$3/$4-$5")},"11":function(value){return value.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/,"$1.$2.$3-$4")}}
+tFoot.children[5].innerHTML=balance.toLocaleString("pt-br",{"currency":"BRL","style":"currency"})})};if(window.location.pathname=="/customer/subscribe"){$(document).ready(function(){$("[name='birthDate']").datepicker({format:"dd/mm/yyyy",language:"pt-BR",autoclose:!0})});const verifyDocument={"14":function(value){return value.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,"$1.$2.$3/$4-$5")},"11":function(value){return value.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/,"$1.$2.$3-$4")}}
 const documentData=document.querySelector("[name='document']")
 documentData.addEventListener("input",function(){this.value=this.value.replace(/\D/g,"")
 if(typeof verifyDocument[this.value.length]=="function"){this.value=verifyDocument[this.value.length](this.value)}
@@ -268,12 +276,16 @@ if(this.value.length>=14){this.maxLength=18}})
 const birthDate=document.querySelector("[name='birthDate']")
 birthDate.addEventListener("input",function(){this.value=this.value.replace(/\D/g,"").replace(/(\d{2})(\d)/,"$1/$2").replace(/(\d{2})(\d)/,"$1/$2").replace(/(\/\d{4})\d+?$/,"$1")})
 const zipcode=document.querySelector("[name='zipcode']")
-zipcode.addEventListener("input",function(){this.value=this.value.replace(/(\d{5})(\d)/,"$1-$2").replace(/(-\d{3})\d+?$/,"$1")
+zipcode.addEventListener("input",function(){this.value=this.value.replace(/\D/g,"").replace(/(\d{5})(\d)/,"$1-$2").replace(/(-\d{3})\d+?$/,"$1")
 const searchValue=this.value.replace(/[^\d]+/,"")
 if(searchValue.length>=8){fetch(`https://brasilapi.com.br/api/cep/v1/${searchValue}`).then(response=>response.json()).then(function(response){if(response.cep){document.querySelector('[name="address"]').value=response.street
 document.querySelector('[name="neighborhood"]').value=response.neighborhood
 document.querySelector('[name="city"]').value=response.city
 document.querySelector('[name="state"]').value=response.state}})}})
+const addressNumber=document.querySelector("[name='number']")
+addressNumber.addEventListener("input",function(){this.value=this.value.replace(/\D/g,"")})
+const state=document.querySelector("[name='state']")
+state.addEventListener("input",function(){this.value=this.value.replace(/[^A-Za-z]+/g,'').toUpperCase().replace(/([A-Z]{2})[A-Z]+?$/,"$1")})
 const phone=document.querySelector("[name='phone']")
 phone.addEventListener("input",function(){this.value=this.value.replace(/\D/g,"").replace(/(\d{2})(\d)/,"($1) $2").replace(/(\d{4})(\d)/,"$1-$2").replace(/(-\d{4})\d+?$/,"$1")})
 const cellPhone=document.querySelector("[name='cellPhone']")
@@ -314,7 +326,28 @@ message=response.error
 message=message.charAt(0).toUpperCase()+message.slice(1)
 toastr.error(message)
 throw new Error(message)}
-if(response.success){window.location.href=response.url}})})})};if(window.location.pathname=='/admin/cash-flow/report'){const importExcelForm=document.getElementById("importExcelForm")
+if(response.success){window.location.href=response.url}})})})};if(window.location.pathname=="/admin/customer/update-data/form"){$(document).ready(function(){$("[name='birthDate']").datepicker({format:"dd/mm/yyyy",language:"pt-BR",autoclose:!0})});const maskDocument={"11":function(value){return value.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/,"$1.$2.$3-$4")},"14":function(value){return value.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,"$1.$2.$3/$4-$5")}}
+const customerDocument=document.querySelector("[name='document']")
+customerDocument.addEventListener("input",function(){this.value=this.value.replace(/\D/g,"")
+if(typeof maskDocument[this.value.length]=="function"){this.value=maskDocument[this.value.length](this.value)}
+if(this.value.length>=14){this.maxLength=18}})
+const birthDate=document.querySelector("[name='birthDate']")
+birthDate.addEventListener("input",function(){this.value=this.value.replace(/\D/g,"").replace(/(\d{2})(\d)/,"$1/$2").replace(/(\d{2})(\d)/,"$1/$2").replace(/(\/\d{4})\d+?$/,"$1")})
+const zipcode=document.querySelector("[name='zipcode']")
+zipcode.addEventListener("input",function(){this.value=this.value.replace(/\D/g,"").replace(/(\d{5})(\d)/,"$1-$2").replace(/(-\d{3})\d+?$/,"$1")
+const searchValue=this.value.replace(/[^\d]+/,"")
+if(searchValue.length>=8){fetch(`https://brasilapi.com.br/api/cep/v1/${searchValue}`).then(response=>response.json()).then(function(response){if(response.cep){document.querySelector('[name="address"]').value=response.street
+document.querySelector('[name="neighborhood"]').value=response.neighborhood
+document.querySelector('[name="city"]').value=response.city
+document.querySelector('[name="state"]').value=response.state}})}})
+const addressNumber=document.querySelector("[name='number']")
+addressNumber.addEventListener("input",function(){this.value=this.value.replace(/\D/g,"")})
+const state=document.querySelector("[name='state']")
+state.addEventListener("input",function(){this.value=this.value.replace(/[^A-Za-z]+/g,'').toUpperCase().replace(/([A-Z]{2})[A-Z]+?$/,"$1")})
+const phone=document.querySelector("[name='phone']")
+phone.addEventListener("input",function(){this.value=this.value.replace(/\D/g,"").replace(/(\d{2})(\d)/,"($1) $2").replace(/(\d{4})(\d)/,"$1-$2").replace(/(-\d{4})\d+?$/,"$1")})
+const cellPhone=document.querySelector("[name='cellPhone']")
+cellPhone.addEventListener("input",function(){this.value=this.value.replace(/\D/g,"").replace(/(\d{2})(\d)/,"($1) $2").replace(/(\d{5})(\d)/,"$1-$2").replace(/(-\d{4})\d+?$/,"$1")})};if(window.location.pathname=='/admin/cash-flow/report'){const importExcelForm=document.getElementById("importExcelForm")
 const inputExcelFile=document.querySelector('[name="excelFile"]')
 const standardLabelNameExcelFile=inputExcelFile.nextElementSibling.innerHTML
 const verifyExtensionFile=["xls","xlsx"]

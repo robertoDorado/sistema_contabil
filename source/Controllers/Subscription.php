@@ -47,6 +47,20 @@ class Subscription extends Controller
             "csrfToken",
             "cardToken"
         ])->getAllPostData();
+
+        if (!preg_match("/^[A-Z]{2}$/", $requestPost["state"])) {
+            throw new Exception("estado inválido");
+        }
+
+        $verifyZipcode = preg_replace("/[^\d]+/", "", $requestPost["zipcode"]);
+        if (strlen($verifyZipcode) > 8) {
+            throw new Exception("cep inválido");
+        }
+
+        $verifyDocument = preg_replace("/[^\d]+/", "", $requestPost["document"]);
+        if (strlen($verifyDocument) > 14) {
+            throw new Exception("documento inválido");
+        }
         
         if ($requestPost["password"] != $requestPost["confirmPassword"]) {
             throw new Exception("as senhas não conferem");

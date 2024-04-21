@@ -41,14 +41,6 @@ function basicsValidatesForChartsRender(): \Source\Domain\Model\User
     return $user;
 }
 
-function setCurrentMenuActive(array $endpoints = [])
-{
-    if (!empty($endpoints)) {
-        return in_array($_SERVER['REQUEST_URI'], $endpoints) ? true : false;
-    }
-    return false;
-}
-
 function showUserFullName(): string
 {
     $user = new Source\Domain\Model\User();
