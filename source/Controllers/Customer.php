@@ -107,7 +107,10 @@ class Customer extends Controller
             session()->user->user_full_name = $requestPost["fullName"];
             session()->user->user_nick_name = $requestPost["userName"];
             session()->user->user_email = $requestPost["email"];
-            echo json_encode(["success" => "cliente atualizado com sucesso"]);
+            echo json_encode([
+                "success" => "cliente atualizado com sucesso", 
+                "fullName" => session()->user->user_full_name
+            ]);
             die;
         }
 

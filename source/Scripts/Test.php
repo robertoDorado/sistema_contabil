@@ -1,23 +1,17 @@
 <?php
 
-$requestPost = [
-    "state" => "SP",
-    "zipcode" => "02723-050",
-    "document" => "47.503.014/0001-91"
-];
-
-if (!preg_match("/^[A-Z]{2}$/", $requestPost["state"])) {
-    throw new Exception("estado inválido");
+$value = "1.545,23";
+if (empty($value)) {
+    throw new \Exception("Valor a ser convertido não pode estar vazio.");
 }
 
-$verifyZipcode = preg_replace("/[^\d]+/", "", $requestPost["zipcode"]);
-if (strlen($verifyZipcode) > 8) {
-    throw new Exception("cep inválido");
+$value = preg_replace("/[^\d\.,]+/", "", $value);
+$value = str_replace(".", "", $value);
+$value = str_replace(",", ".", $value);
+$value = floatval($value);
+
+if (gettype($value) !== "double") {
+    throw new \Exception("Erro na conversão do valor para float");
 }
 
-$verifyDocument = preg_replace("/[^\d]+/", "", $requestPost["document"]);
-if (strlen($verifyDocument) > 14) {
-    throw new Exception("documento inválido");
-}
-
-echo "ok" . PHP_EOL;
+echo $value . PHP_EOL;

@@ -33,8 +33,9 @@ function basicsValidatesForChartsRender(): \Source\Domain\Model\User
     $user->setEmail(session()->user->user_email);
     $userData = $user->findUserByEmail();
 
-    if (is_string($userData) && json_decode($userData) != null) {
-        throw new Exception($userData, 500);
+    if (empty($userData)) {
+        echo $user->message->json();
+        die;
     }
 
     $user->setId($userData->id);
@@ -47,8 +48,9 @@ function showUserFullName(): string
     $user->setEmail(session()->user->user_email);
     $userData = $user->findUserByEmail();
 
-    if (is_string($userData) && json_decode($userData) != null) {
-        throw new \Exception($userData);
+    if (empty($userData)) {
+        echo $user->message->json();
+        die;
     }
 
     $userFullNameData = explode(" ", $userData->user_full_name);

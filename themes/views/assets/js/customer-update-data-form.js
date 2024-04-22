@@ -132,9 +132,18 @@ if (window.location.pathname == "/admin/customer/update-data/form") {
             }
 
             if (response.success) {
+                let fullName = response.fullName
+                fullName = fullName.split(" ")
+                fullName = fullName.map((name) => name.charAt(0).toUpperCase() + name.slice(1))
+                
+                fullName = fullName.slice(0, 3).join(" ")
+                const userPanel = document.querySelector(".user-panel")
+                userPanel.firstElementChild.innerHTML = `Bem vindo ${fullName}`
+                
                 btnSubmit.removeAttribute("disabled")
                 btnSubmit.innerHTML = "Atualizar"
                 message = response.success
+                
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.success(message)
             }
