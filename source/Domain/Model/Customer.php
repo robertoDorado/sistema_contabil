@@ -46,21 +46,16 @@ class Customer
         $this->data->$name = $value;
     }
 
-    public function updateCustomerByEmail(array $data): bool
+    public function updateCustomerById(array $data)
     {
-        if (empty($data)) {
-            throw new Exception("array data não pode estar vazio");
-        }
-
         $message = new Message();
-        if (!filter_var($data["customer_email"], FILTER_VALIDATE_EMAIL)) {
-            $message->error("e-mail do cliente inválido");
+        if (empty($data)) {
+            $message->error("array data não pode estar vazio");
             $this->data->message = $message;
             return false;
         }
         
-        $customerData = $this->customer
-        ->find("customer_email=:customer_email", ":customer_email={$data["customer_email"]}")->fetch();
+        $customerData = $this->customer->findById($data["id"]);
         
         if (empty($customerData)) {
             $message->error("cliente não encontrado");
@@ -69,9 +64,9 @@ class Customer
         }
 
         $verifyKeys = [
-            "uuid" => function($value) {
-                if (!Uuid::isValid($value)) {
-                    throw new Exception("uuid inválido");
+            "customer_email" => function($value) {
+                if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                    throw new Exception("e-mail do usuário está inválido");;
                 }
                 return $value;
             }
@@ -81,6 +76,39 @@ class Customer
             if (!empty($verifyKeys[$key])) {
                 $value = $verifyKeys[$key]($value);
             }
+            $customerData->$key = $value;
+        }
+
+        $customerData->setRequiredFields(array_keys($data));
+        return $customerData->save();
+    }
+
+    public function updateCustomerByEmail(array $data): bool
+    {
+        $message = new Message();
+        if (empty($data)) {
+            $message->error("array data não pode estar vazio");
+            $this->data->message = $message;
+            return false;
+        }
+
+        if (!filter_var($data["customer_email"], FILTER_VALIDATE_EMAIL)) {
+            $message->error("e-mail do cliente inválido");
+            $this->data->message = $message;
+            return false;
+        }
+        
+        $customerData = $this->customer
+        ->find("customer_email=:customer_email", ":customer_email={$data["customer_email"]}")
+        ->fetch();
+        
+        if (empty($customerData)) {
+            $message->error("cliente não encontrado");
+            $this->data->message = $message;
+            return false;
+        }
+
+        foreach ($data as $key => &$value) {
             $customerData->$key = $value;
         }
 

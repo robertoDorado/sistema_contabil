@@ -60,6 +60,7 @@ $route->get("/cash-flow/backup/report", "CashFlow::cashFlowBackupReport");
 $route->post("/cash-flow-group/modify/{uuid}", "CashFlowGroup::cashFlowGroupModiFyData");
 $route->post("/cash-flow/modify/{uuid}", "CashFlow::cashFlowModifyData");
 $route->get("/customer/update-data/form", "Customer::updateDataCustomerForm");
+$route->post("/customer/update-data/form", "Customer::updateDataCustomerForm");
 
 /** 
  * Assinatura do cliente

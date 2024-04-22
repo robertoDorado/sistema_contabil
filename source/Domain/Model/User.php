@@ -54,6 +54,52 @@ class User
         return $this->data->$name ?? null;
     }
 
+    public function updateUserByCustomerId(array $data)
+    {
+        $message = new Message();
+        if (empty($data)) {
+            $message->error("array data não pode estar vazio");
+            $this->data->message = $message;
+            return false;
+        }
+
+        $idCustomer = $data['id_customer']->getId();
+        $userData = $this->user
+        ->find("id_customer=:id_customer", ":id_customer={$idCustomer}")
+        ->fetch();
+
+        if (empty($userData)) {
+            $message->error("usuário não encontrado");
+            $this->data->message = $message;
+            return false;
+        }
+
+        $verifyKeys = [
+            "id_customer" => function($value) {
+                if (!$value instanceof Customer) {
+                    throw new Exception("instância do cliente inválida");
+                }
+                return $value->getId();
+            },
+            "user_email" => function($value) {
+                if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                    throw new Exception("e-mail do usuário está inválido");;
+                }
+                return $value;
+            }
+        ];
+
+        foreach ($data as $key => &$value) {
+            if (!empty($verifyKeys[$key])) {
+                $value = $verifyKeys[$key]($value);
+            }
+            $userData->$key = $value;
+        }
+
+        $userData->setRequiredFields(array_keys($data));
+        return $userData->save();
+    }
+
     public function updateUserByEmail(array $data): bool
     {
         $message = new Message();

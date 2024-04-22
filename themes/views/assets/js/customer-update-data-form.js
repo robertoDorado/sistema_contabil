@@ -82,4 +82,62 @@ if (window.location.pathname == "/admin/customer/update-data/form") {
         .replace(/(\d{5})(\d)/, "$1-$2")
         .replace(/(-\d{4})\d+?$/, "$1")
     })
+
+    const customerUpdateForm = document.getElementById("customerUpdateForm")
+    customerUpdateForm.addEventListener("submit", function(event) {
+        event.preventDefault()
+        const btnSubmit = this.querySelector("[type='submit']")
+
+        let message = ""
+        if (/\s/.test(this.userName.value)) {
+            message = "Nome de usuário não pode conter espaços em branco"
+            toastr.warning(message)
+            throw new Error(message)
+        }
+
+        if (this.password.value != this.confirmPassword.value) {
+            message = "As senhas não conferem"
+            toastr.error(message)
+            throw new Error(message)
+        }
+
+        let validateBlankInput = Array.from(this.getElementsByTagName("input"))
+        validateBlankInput = validateBlankInput.filter(function(element) {
+            if (element.name != "phone" && element.name != "cellPhone") {
+                return element
+            }
+        })
+
+        validateBlankInput.forEach(function(element) {
+            if (!element.value) {
+                message = "Campos obrigatórios não foram preenchidos"
+                toastr.warning(message)
+                throw new Error(message)
+            }
+        })
+
+        showSpinner(btnSubmit)
+        const form = new FormData(this)
+
+        fetch(window.location.href, { method: "POST", body: form })
+        .then(response => response.json()).then(function(response) {
+
+            if (response.error) {
+                btnSubmit.removeAttribute("disabled")
+                btnSubmit.innerHTML = "Atualizar"
+                message = response.error
+                message = message.charAt(0).toUpperCase() + message.slice(1)
+                toastr.error(message)
+                throw new Error(message)
+            }
+
+            if (response.success) {
+                btnSubmit.removeAttribute("disabled")
+                btnSubmit.innerHTML = "Atualizar"
+                message = response.success
+                message = message.charAt(0).toUpperCase() + message.slice(1)
+                toastr.success(message)
+            }
+        })
+    })
 }
