@@ -46,6 +46,27 @@ class Customer
         $this->data->$name = $value;
     }
 
+    public function findCustomerById(): ?ModelsCustomer
+    {
+        $id = empty($this->data->customer_id) ? 0 : $this->data->customer_id;
+        $customerData = $this->customer->findById($id);
+
+        $message = new Message();
+        if (empty($customerData)) {
+            $message->error("cliente não encontrado");
+            $this->data->message = $message;
+            return null;    
+        }
+
+        if (!empty($customerData->getDeleted())) {
+            $message->error("este cliente foi deletado");
+            $this->data->message = $message;
+            return null; 
+        }
+
+        return $customerData;
+    }
+
     public function updateCustomerById(array $data)
     {
         $message = new Message();

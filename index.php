@@ -61,6 +61,7 @@ $route->post("/cash-flow-group/modify/{uuid}", "CashFlowGroup::cashFlowGroupModi
 $route->post("/cash-flow/modify/{uuid}", "CashFlow::cashFlowModifyData");
 $route->get("/customer/update-data/form", "Customer::updateDataCustomerForm");
 $route->post("/customer/update-data/form", "Customer::updateDataCustomerForm");
+$route->get("/customer/cancel-subscription", "Customer::cancelSubscription");
 
 /** 
  * Assinatura do cliente
@@ -71,6 +72,7 @@ $route->group($module);
 $route->get("/subscribe", "Customer::customerSubscribeForm");
 $route->post("/subscription/process-payment", "Subscription::processSubscription");
 $route->get("/subscription/thanks-purchase", "Customer::thanksPurchase");
+$route->post("/subscription/cancel-subscription", "Subscription::cancelSubscription");
 
 /**
  * Webhook da stripe

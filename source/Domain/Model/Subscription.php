@@ -67,6 +67,7 @@ class Subscription
                 if (!preg_match("/^sub_/", $value)) {
                     throw new Exception("id da assinatura inválida");
                 }
+                return $value;
             }
         ];
 

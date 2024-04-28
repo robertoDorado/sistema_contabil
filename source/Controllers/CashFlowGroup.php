@@ -5,6 +5,7 @@ use Exception;
 use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Controller;
 use Source\Domain\Model\CashFlowGroup as ModelCashFlowGroup;
+use Source\Domain\Model\Customer;
 use Source\Domain\Model\User;
 
 /**
@@ -31,6 +32,18 @@ class CashFlowGroup extends Controller
 
         if (empty($data["uuid"])) {
             throw new Exception("parametro uuid não pode estar vazio", 500);
+        }
+
+        $customer = new Customer();
+        $customer->email = session()->user->user_email;
+        $customerData = $customer->findCustomerByEmail();
+
+        if (empty($customerData)) {
+            redirect("/admin/login");
+        }
+        
+        if (!empty($customerData->getDeleted())) {
+            redirect("/admin/login");
         }
 
         $requestPost = $this->getRequests()
@@ -67,6 +80,18 @@ class CashFlowGroup extends Controller
             redirect("/admin/login");
         }
 
+        $customer = new Customer();
+        $customer->email = session()->user->user_email;
+        $customerData = $customer->findCustomerByEmail();
+
+        if (empty($customerData)) {
+            redirect("/admin/login");
+        }
+        
+        if (!empty($customerData->getDeleted())) {
+            redirect("/admin/login");
+        }
+
         $user = new User();
         $user->setEmail(session()->user->user_email);
         $userData = $user->findUserByEmail();
@@ -94,6 +119,18 @@ class CashFlowGroup extends Controller
 
         if (empty($data["uuid"])) {
             throw new \Exception("uuid inválido", 500);
+        }
+
+        $customer = new Customer();
+        $customer->email = session()->user->user_email;
+        $customerData = $customer->findCustomerByEmail();
+
+        if (empty($customerData)) {
+            redirect("/admin/login");
+        }
+        
+        if (!empty($customerData->getDeleted())) {
+            redirect("/admin/login");
         }
 
         $uuid = $data["uuid"];
@@ -126,6 +163,18 @@ class CashFlowGroup extends Controller
     public function cashFlowGroupFormUpdate(array $data)
     {
         if (empty(session()->user)) {
+            redirect("/admin/login");
+        }
+
+        $customer = new Customer();
+        $customer->email = session()->user->user_email;
+        $customerData = $customer->findCustomerByEmail();
+
+        if (empty($customerData)) {
+            redirect("/admin/login");
+        }
+        
+        if (!empty($customerData->getDeleted())) {
             redirect("/admin/login");
         }
 
@@ -198,6 +247,18 @@ class CashFlowGroup extends Controller
             redirect("/admin/login");
         }
 
+        $customer = new Customer();
+        $customer->email = session()->user->user_email;
+        $customerData = $customer->findCustomerByEmail();
+
+        if (empty($customerData)) {
+            redirect("/admin/login");
+        }
+        
+        if (!empty($customerData->getDeleted())) {
+            redirect("/admin/login");
+        }
+
         $cashFlowGroup = new ModelCashFlowGroup();
         $user = new User();
         $user->setEmail(session()->user->user_email);
@@ -220,6 +281,18 @@ class CashFlowGroup extends Controller
     public function cashFlowGroupForm()
     {
         if (empty(session()->user)) {
+            redirect("/admin/login");
+        }
+
+        $customer = new Customer();
+        $customer->email = session()->user->user_email;
+        $customerData = $customer->findCustomerByEmail();
+
+        if (empty($customerData)) {
+            redirect("/admin/login");
+        }
+        
+        if (!empty($customerData->getDeleted())) {
             redirect("/admin/login");
         }
 

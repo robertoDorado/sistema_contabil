@@ -27,33 +27,25 @@ class Server extends Controller
     {
         $payload = @file_get_contents("php://input");
         $event = null;
-
+        
         try {
-            $event = Event::constructFrom(json_decode($payload));
+            $event = Event::constructFrom(json_decode($payload, true));
         } catch (UnexpectedValueException $e) {
             throw new Exception($e->getMessage());
         }
 
-        if ($event->type == "invoice.updated") {
-            if (!empty($event->data->object->lines->data)) {
-                
-                foreach ($event->data->object->lines->data as $value) {
-                    $subscription = new Subscription();
+        if ($event->type == "customer.subscription.deleted") {
+            $subscription = new Subscription();
                     
-                    $subscription->subscription_id = $value->id;
-                    $subscriptionData = $subscription->findSubsCriptionBySubscriptionId([]);
-                    if (!empty($subscriptionData)) {
-                        $response = $subscription->updateSubscriptionBySubscriptionId([
-                            "subscription_id" => $value->id,
-                            "period_start" => date("Y-m-d", $value->period->start),
-                            "period_end" => date("Y-m-d", $value->period->end),
-                        ]);
+            $subscription->subscription_id = $event->data->object->id;
+            $subscriptionData = $subscription->findSubsCriptionBySubscriptionId([]);
 
-                        if (empty($response)) {
-                            throw new Exception($subscription->message->json());
-                        }
-                    }
-                }
+            if (!empty($subscriptionData)) {
+                $subscription->updateSubscriptionBySubscriptionId([
+                    "subscription_id" => $event->data->object->id,
+                    "status" => "canceled",
+                    "updated_at" => date("Y-m-d", strtotime($event->data->object->canceled_at))
+                ]);
             }
         }
     }

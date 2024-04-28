@@ -2,6 +2,7 @@
 namespace Source\Controllers;
 
 use Source\Core\Controller;
+use Source\Domain\Model\Customer;
 use Source\Domain\Model\Subscription;
 use Source\Domain\Model\User;
 
@@ -75,9 +76,18 @@ class Login extends Controller
             $status = empty($subscriptionData) 
             ? $subscriptionStatus->status : $subscriptionData->getStatus();
 
+            $customer = new Customer();
+            $customer->customer_id = $userData->id_customer;
+            $customerData = $customer->findCustomerById();
+
+            if (empty($customerData)) {
+                echo $customer->message->json();
+                die;
+            }
+
             session()->set("user", [
                 "subscription" => $status,
-                "id_customer" => $userData->id_customer,
+                "id_customer" => $customerData->id,
                 "user_full_name" => $userData->user_full_name,
                 "user_nick_name" => $userData->user_nick_name,
                 "user_email" => $userData->user_email

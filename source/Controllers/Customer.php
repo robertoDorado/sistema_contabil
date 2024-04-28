@@ -22,6 +22,34 @@ class Customer extends Controller
         parent::__construct();
     }
 
+    public function cancelSubscription()
+    {
+        if (empty(session()->user)) {
+            redirect("/admin/login");
+        }
+
+        if (session()->user->subscription != "active") {
+            redirect("/admin");
+        }
+
+        $customer = new ModelCustomer();
+        $customer->email = session()->user->user_email;
+        $customerData = $customer->findCustomerByEmail();
+
+        if (empty($customerData)) {
+            redirect("/admin/login");
+        }
+        
+        if (!empty($customerData->getDeleted())) {
+            redirect("/admin/login");
+        }
+
+        echo $this->view->render("admin/cancel-subscription", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => ["/admin/customer/cancel-subscription"]
+        ]);
+    }
+
     public function updateDataCustomerForm()
     {
         if (empty(session()->user)) {
@@ -45,7 +73,7 @@ class Customer extends Controller
                 "password",
                 "confirmPassword",
                 "csrfToken"
-            ])->getAllPostData();
+            ])->setHashPassword(true)->getAllPostData();
 
             if (!preg_match("/^[A-Z]{2}$/", $requestPost["state"])) {
                 throw new Exception("estado inválido");
@@ -59,10 +87,6 @@ class Customer extends Controller
             $verifyDocument = preg_replace("/[^\d]+/", "", $requestPost["document"]);
             if (strlen($verifyDocument) > 14) {
                 throw new Exception("documento inválido");
-            }
-            
-            if ($requestPost["password"] != $requestPost["confirmPassword"]) {
-                throw new Exception("as senhas não conferem");
             }
 
             $customer = new ModelCustomer();
@@ -96,7 +120,7 @@ class Customer extends Controller
                 "user_full_name" => $requestPost["fullName"],
                 "user_nick_name" => $requestPost["userName"],
                 "user_email" => $requestPost["email"],
-                "user_password" => password_hash($requestPost["confirmPassword"], PASSWORD_DEFAULT)
+                "user_password" => $requestPost["password"]
             ]);
 
             if (empty($response)) {
@@ -136,9 +160,29 @@ class Customer extends Controller
 
     public function customerSubscribeForm()
     {
+        if (!empty(session()->user->subscription) && session()->user->subscription == "active") {
+            redirect("/admin/login");
+        }
+        
+        $customerData = null;
+        $userData = null;
+
+        $customer = new ModelCustomer();
+        $user = new User();
+
+        if (!empty(session()->user)) {
+            $customer->email = session()->user->user_email;
+            $customerData = $customer->findCustomerByEmail();
+            
+            $user->setEmail(session()->user->user_email);
+            $userData = $user->findUserByEmail(["user_nick_name", "deleted"]);
+        }
+
         $csrfToken = session()->csrf_token;
         echo $this->view->render("site/subscribe-form", [
-            "csrfToken" => $csrfToken
+            "csrfToken" => $csrfToken,
+            "customerData" => $customerData,
+            "userData" => $userData
         ]);
     }
 }

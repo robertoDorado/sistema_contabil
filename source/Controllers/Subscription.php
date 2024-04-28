@@ -26,8 +26,63 @@ class Subscription extends Controller
         parent::__construct();
     }
 
+    public function cancelSubscription()
+    {
+        if (empty(session()->user)) {
+            throw new Exception("usuário não está logado");
+        }
+
+        $cancelData = $this->getRequests()
+        ->setRequiredFields(["cancelData"])->getPost("cancelData");
+
+        if (empty($cancelData)) {
+            throw new Exception("valor de cancelamento inválido");
+        }
+
+        $customer = new Customer();
+        $customer->email = session()->user->user_email;
+        $customerData = $customer->findCustomerByEmail();
+
+        if (empty($customerData)) {
+            throw new Exception($customer->message->json());
+        }
+
+        $subscription = new ModelSubscription();
+        $subscription->customer_id = session()->user->id_customer;
+        $subscriptionData = $subscription->findSubsCriptionByCustomerId(["subscription_id", "status"]);
+
+        if (empty($subscriptionData)) {
+            throw new Exception($subscription->message->json());
+        }
+
+        if ($subscriptionData->getStatus() != "active") {
+            throw new Exception("esta assinatura já foi cancelada");
+        }
+
+        $stripePayment = new StripePayment();
+        $response = $stripePayment->cancelSubscription($subscriptionData->subscription_id);
+
+        if (!empty($response)) {
+            $subscription = new ModelSubscription();
+            $subscription->subscription_id = $response->id;
+            $subscriptionData = $subscription->findSubsCriptionBySubscriptionId(["id"]);
+
+            if (empty($subscriptionData)) {
+                throw new Exception($subscription->message->json());
+            }
+
+            echo json_encode(["success" => "assinatura cancelada com sucesso", "url" => url("/admin/login")]);
+        }else {
+            echo json_encode(["error" => "erro interno ao cancelar assinatura"]);
+        }
+    }
+
     public function processSubscription()
     {
+        if (empty(session()->user)) {
+            throw new Exception("usuário não está logado");
+        }
+
         $requestPost = $this->getRequests()
         ->setRequiredFields([
             "fullName",

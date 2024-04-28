@@ -88,16 +88,20 @@
                                     <p>Formulário do cliente</p>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <p>Comprar assinatura mensal</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <p>Cancelar assinatura</p>
-                                </a>
-                            </li>
+                            <?php if (session()->user->subscription != "active") : ?>
+                                <li class="nav-item">
+                                    <a href="<?= url("/customer/subscribe") ?>" class="nav-link">
+                                        <p>Comprar assinatura mensal</p>
+                                    </a>
+                                </li>
+                            <?php endif ?>
+                            <?php if (!empty(session()->user->subscription) && session()->user->subscription == "active") : ?>
+                                <li class="nav-item">
+                                    <a href="<?= url("/admin/customer/cancel-subscription") ?>" class="nav-link">
+                                        <p>Cancelar assinatura</p>
+                                    </a>
+                                </li>
+                            <?php endif ?>
                         </ul>
                     </li>
                 </ul>

@@ -9,7 +9,7 @@
 
             <form action="#" method="post" id="subscriptionForm">
                 <div class="input-group mb-3">
-                    <input type="text" name="fullName" class="form-control" placeholder="Nome completo ou razão social">
+                    <input type="text" value="<?= empty($customerData->customer_name) ? "" : $customerData->customer_name ?>" name="fullName" class="form-control" placeholder="Nome completo ou razão social">
                     <div class="input-group-append">
                         <div class="input-group-text">
                             <span class="fas fa-user"></span>
@@ -17,7 +17,7 @@
                     </div>
                 </div>
                 <div class="input-group mb-3">
-                    <input type="text" name="document" class="form-control" placeholder="CPF ou CNPJ">
+                    <input type="text" value="<?= empty($customerData->customer_document) ? "" : $customerData->customer_document ?>" name="document" class="form-control" placeholder="CPF ou CNPJ">
                     <div class="input-group-append">
                         <div class="input-group-text">
                             <i class="fa-solid fa-id-card"></i>
@@ -25,7 +25,7 @@
                     </div>
                 </div>
                 <div class="input-group mb-3 date" data-date-format="dd/mm/yyyy">
-                    <input type="text" name="birthDate" id="birthDate" class="form-control" placeholder="Aniversário">
+                    <input type="text" value="<?= empty($customerData->birth_date) ? "" : date("d/m/Y", strtotime($customerData->birth_date)) ?>" name="birthDate" id="birthDate" class="form-control" placeholder="Aniversário">
                     <div class="input-group-append">
                         <div class="input-group-text">
                             <i class="fa-solid fa-cake-candles"></i>
@@ -35,8 +35,8 @@
                 <div class="input-group mb-3">
                     <select name="gender" class="form-control">
                         <option value="" disabled selected>Selecione seu gênero</option>
-                        <option value="1">Masculino</option>
-                        <option value="0">Feminino</option>
+                        <option <?= !empty($customerData->customer_gender) && $customerData->customer_gender == 1 ? "selected" : "" ?> value="1">Masculino</option>
+                        <option <?= empty($customerData->customer_gender) && $customerData->customer_gender == 0 ? "selected" : "" ?> value="0">Feminino</option>
                     </select>
                     <div class="input-group-append">
                         <div class="input-group-text">
@@ -45,7 +45,7 @@
                     </div>
                 </div>
                 <div class="input-group mb-3">
-                    <input type="text" name="email" class="form-control" placeholder="E-mail">
+                    <input type="text" value="<?= empty($customerData->customer_email) ? "" : $customerData->customer_email ?>" name="email" class="form-control" placeholder="E-mail" <?= !empty($customerData->customer_email) ? "readonly" : "" ?>>
                     <div class="input-group-append">
                         <div class="input-group-text">
                             <span class="fas fa-envelope"></span>
@@ -53,7 +53,7 @@
                     </div>
                 </div>
                 <div class="input-group mb-3">
-                    <input type="text" name="zipcode" class="form-control" placeholder="CEP">
+                    <input type="text" value="<?= empty($customerData->customer_zipcode) ? "" : $customerData->customer_zipcode ?>" name="zipcode" class="form-control" placeholder="CEP">
                     <div class="input-group-append">
                         <div class="input-group-text">
                             <i class="fa-solid fa-location-dot"></i>
@@ -61,7 +61,7 @@
                     </div>
                 </div>
                 <div class="input-group mb-3">
-                    <input type="text" name="address" class="form-control" placeholder="Endereço">
+                    <input type="text" value="<?= empty($customerData->customer_address) ? "" : $customerData->customer_address ?>" name="address" class="form-control" placeholder="Endereço">
                     <div class="input-group-append">
                         <div class="input-group-text">
                             <i class="fa-solid fa-location-dot"></i>
@@ -69,7 +69,7 @@
                     </div>
                 </div>
                 <div class="input-group mb-3">
-                    <input type="text" name="number" class="form-control" placeholder="Número">
+                    <input type="text" value="<?= empty($customerData->customer_number) ? "" : $customerData->customer_number ?>" name="number" class="form-control" placeholder="Número">
                     <div class="input-group-append">
                         <div class="input-group-text">
                             <i class="fa-solid fa-location-dot"></i>
@@ -77,7 +77,7 @@
                     </div>
                 </div>
                 <div class="input-group mb-3">
-                    <input type="text" name="neighborhood" class="form-control" placeholder="Bairro">
+                    <input type="text" value="<?= empty($customerData->customer_neighborhood) ? "" : $customerData->customer_neighborhood ?>" name="neighborhood" class="form-control" placeholder="Bairro">
                     <div class="input-group-append">
                         <div class="input-group-text">
                             <i class="fa-solid fa-location-dot"></i>
@@ -85,7 +85,7 @@
                     </div>
                 </div>
                 <div class="input-group mb-3">
-                    <input type="text" name="city" class="form-control" placeholder="Cidade">
+                    <input type="text" value="<?= empty($customerData->customer_city) ? "" : $customerData->customer_city ?>" name="city" class="form-control" placeholder="Cidade">
                     <div class="input-group-append">
                         <div class="input-group-text">
                             <i class="fa-solid fa-location-dot"></i>
@@ -93,7 +93,7 @@
                     </div>
                 </div>
                 <div class="input-group mb-3">
-                    <input type="text" name="state" class="form-control" placeholder="Estado">
+                    <input type="text" value="<?= empty($customerData->customer_state) ? "" : $customerData->customer_state ?>" name="state" class="form-control" placeholder="Estado">
                     <div class="input-group-append">
                         <div class="input-group-text">
                             <i class="fa-solid fa-location-dot"></i>
@@ -101,7 +101,7 @@
                     </div>
                 </div>
                 <div class="input-group mb-3">
-                    <input type="text" name="phone" class="form-control" placeholder="Telefone fixo">
+                    <input type="text" value="<?= empty($customerData->customer_phone) ? "" : $customerData->customer_phone ?>" name="phone" class="form-control" placeholder="Telefone fixo">
                     <div class="input-group-append">
                         <div class="input-group-text">
                             <i class="fa-solid fa-phone"></i>
@@ -109,7 +109,7 @@
                     </div>
                 </div>
                 <div class="input-group mb-3">
-                    <input type="text" name="cellPhone" class="form-control" placeholder="Telefone celular">
+                    <input type="text" value="<?= empty($customerData->cell_phone) ? "" : $customerData->cell_phone ?>" name="cellPhone" class="form-control" placeholder="Telefone celular">
                     <div class="input-group-append">
                         <div class="input-group-text">
                             <i class="fa fa-mobile"></i>
@@ -117,7 +117,7 @@
                     </div>
                 </div>
                 <div class="input-group mb-3">
-                    <input type="text" name="userName" class="form-control" placeholder="Nome de usuário">
+                    <input type="text" value="<?= empty($userData) ? "" : $userData->user_nick_name ?>" name="userName" class="form-control" placeholder="Nome de usuário">
                     <div class="input-group-append">
                         <div class="input-group-text">
                             <span class="fas fa-user"></span>

@@ -151,7 +151,14 @@ class StripePayment
         $message = new Message();
         try {
             validateRequestData(["id", "name", "email", "source"], $requestData);
-            $this->customer = $this->stripeClient->customers->create($requestData);
+            $customer = $this->stripeClient->customers->all([
+                "email" => $requestData["email"],
+                "limit" => 1
+            ]);
+
+            if (empty($customer->data)) {
+                $this->customer = $this->stripeClient->customers->create($requestData);
+            }
             return true;
         } catch (CardException $e) {
             $message->error("Erro ao processar o cartão de crédito: " . $e->getError()->message);
