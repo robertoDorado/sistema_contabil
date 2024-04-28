@@ -83,11 +83,13 @@ class DDL
         }
 
         if (empty($this->className)) {
-            if (preg_match("/\\\/", basename($this->reflectionClass->getName()))) {
-                $transformedString = array_pop(explode("\\", basename($this->reflectionClass->getName())));
+            $reflectionClassName = $this->reflectionClass->getName();
+            if (preg_match("/\\\/", basename($reflectionClassName))) {
+                $reflectionClassNameArray = explode("\\", basename($reflectionClassName));
+                $transformedString = array_pop($reflectionClassNameArray);
                 $transformedString = preg_replace('/([a-z])([A-Z])/', '$1_$2', $transformedString);
             }else {
-                $transformedString = preg_replace('/([a-z])([A-Z])/', '$1_$2', basename($this->reflectionClass->getName()));
+                $transformedString = preg_replace('/([a-z])([A-Z])/', '$1_$2', basename($reflectionClassName));
             }
             $this->className = strtolower($transformedString);
         }

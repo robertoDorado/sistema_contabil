@@ -86,7 +86,7 @@ class CashFlow
                 $date = date("Y-m-d", strtotime(str_replace("/", "-", $date)));
             }
             
-            return $this->cashFlow
+            $cashFlowData = $this->cashFlow
                 ->find("id_user=:id_user AND deleted=0", 
                 ":id_user=" . $user->getId() . "", $columns)
                 ->join("cash_flow_group", "id", "deleted=0 AND id_user=:id_user",
@@ -96,6 +96,14 @@ class CashFlow
                     "date_init" => $dates[0], 
                     "date_end" => $dates[1]
                 ])->fetch(true);
+            
+            if (empty($cashFlowData)) {
+                $message = new Message();
+                $message->error("registro não encontrado");
+                return [];
+            }
+
+            return $cashFlowData;
         }else {
             return [];
         }
