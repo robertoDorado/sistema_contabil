@@ -131,8 +131,7 @@ btnCancelSubscription.removeAttribute("disabled")
 btnCancelSubscription.innerHTML=cancelBtnTitle
 message=response.success
 message=message.charAt(0).toUpperCase()+message.slice(1)
-toastr.success(message)
-setTimeout(()=>{window.location.href=response.url},3000)}})})};if(window.location.pathname=="/admin/cash-flow/backup/report"){const cashFlowDeletedTableReport=document.getElementById("cashFlowDeletedReport")
+toastr.success(message)}})})};if(window.location.pathname=="/admin/cash-flow/backup/report"){const cashFlowDeletedTableReport=document.getElementById("cashFlowDeletedReport")
 const launchModal=document.getElementById("launchModal")
 const modalContainer=document.getElementById("modalContainer")
 const saveChanges=modalContainer.querySelector("#saveChanges")

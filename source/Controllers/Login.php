@@ -66,7 +66,7 @@ class Login extends Controller
 
             $subscription = new Subscription();
             $subscription->customer_id = $userData->id_customer;
-            $subscriptionData = $subscription->findSubsCriptionByCustomerId(["status"]);
+            $subscriptionData = $subscription->findSubsCriptionByCustomerId(["status", "period_end"]);
             
             if (empty($subscriptionData)) {
                 $subscriptionStatus = new \stdClass();
@@ -75,6 +75,7 @@ class Login extends Controller
 
             $status = empty($subscriptionData) 
             ? $subscriptionStatus->status : $subscriptionData->getStatus();
+            $periodEnd = empty($subscriptionData->period_end) ? null : $subscriptionData->period_end;
 
             $customer = new Customer();
             $customer->customer_id = $userData->id_customer;
@@ -90,7 +91,8 @@ class Login extends Controller
                 "id_customer" => $customerData->id,
                 "user_full_name" => $userData->user_full_name,
                 "user_nick_name" => $userData->user_nick_name,
-                "user_email" => $userData->user_email
+                "user_email" => $userData->user_email,
+                "period_end" => $periodEnd
             ]);
             
             echo json_encode(["login_success" => true, "url" => url("/admin")]);

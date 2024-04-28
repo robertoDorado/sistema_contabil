@@ -34,9 +34,9 @@
                 </div>
                 <div class="input-group mb-3">
                     <select name="gender" class="form-control">
-                        <option value="" disabled selected>Selecione seu gênero</option>
+                        <option <?= empty($customerData->customer_gender) ? "selected" : "" ?> value="" disabled selected>Selecione seu gênero</option>
                         <option <?= !empty($customerData->customer_gender) && $customerData->customer_gender == 1 ? "selected" : "" ?> value="1">Masculino</option>
-                        <option <?= empty($customerData->customer_gender) && $customerData->customer_gender == 0 ? "selected" : "" ?> value="0">Feminino</option>
+                        <option <?= !empty($customerData) && $customerData->customer_gender == 0 ? "selected" : "" ?> value="0">Feminino</option>
                     </select>
                     <div class="input-group-append">
                         <div class="input-group-text">

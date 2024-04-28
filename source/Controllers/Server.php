@@ -3,7 +3,9 @@ namespace Source\Controllers;
 
 use Exception;
 use Source\Core\Controller;
+use Source\Domain\Model\Customer;
 use Source\Domain\Model\Subscription;
+use Source\Domain\Model\User;
 use Stripe\Event;
 use UnexpectedValueException;
 
@@ -35,18 +37,50 @@ class Server extends Controller
         }
 
         if ($event->type == "customer.subscription.deleted") {
+            $id = $event->data->object->id;
             $subscription = new Subscription();
-                    
-            $subscription->subscription_id = $event->data->object->id;
+            
+            $subscription->subscription_id = $id;
             $subscriptionData = $subscription->findSubsCriptionBySubscriptionId([]);
-
-            if (!empty($subscriptionData)) {
-                $subscription->updateSubscriptionBySubscriptionId([
-                    "subscription_id" => $event->data->object->id,
-                    "status" => "canceled",
-                    "updated_at" => date("Y-m-d", strtotime($event->data->object->canceled_at))
-                ]);
+            
+            if (empty($subscriptionData)) {
+                throw new Exception($subscription->message->json() . json_encode(["subscription_id" => $id]));
             }
+            
+            $subscription = new Subscription();
+            $response = $subscription->updateSubscriptionBySubscriptionId([
+                "subscription_id" => $id,
+                "status" => "canceled",
+                "updated_at" => date("Y-m-d", strtotime($event->data->object->canceled_at))
+            ]);
+
+            if (empty($response)) {
+                throw new Exception($subscription->message->json() . json_encode(["subscription_id" => $id]));
+            }
+            
+            $customer = new Customer();
+            $customer->setId($subscriptionData->customer_id);
+            $response = $customer->updateCustomerById([
+                "id" => $subscriptionData->customer_id,
+                "deleted" => 1
+            ]);
+
+            if (empty($response)) {
+                throw new Exception($customer->message->json() . json_encode(["subscription_id" => $id]));
+            }
+
+            $user = new User();
+            $response = $user->updateUserByCustomerId([
+                "id_customer" => $customer,
+                "deleted" => 1
+            ]);
+
+            if (empty($response)) {
+                throw new Exception($user->message->json() . json_encode(["subscription_id" => $id]));
+            }
+
+            $path = dirname(dirname(__DIR__)) . "/Logs/subscription-canceled.log";
+            file_put_contents($path, json_encode($subscriptionData->data())  . PHP_EOL, FILE_APPEND);
         }
     }
 }

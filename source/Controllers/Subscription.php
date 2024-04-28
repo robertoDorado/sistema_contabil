@@ -55,10 +55,6 @@ class Subscription extends Controller
             throw new Exception($subscription->message->json());
         }
 
-        if ($subscriptionData->getStatus() != "active") {
-            throw new Exception("esta assinatura já foi cancelada");
-        }
-
         $stripePayment = new StripePayment();
         $response = $stripePayment->cancelSubscription($subscriptionData->subscription_id);
 
@@ -71,7 +67,7 @@ class Subscription extends Controller
                 throw new Exception($subscription->message->json());
             }
 
-            echo json_encode(["success" => "assinatura cancelada com sucesso", "url" => url("/admin/login")]);
+            echo json_encode(["success" => "assinatura cancelada com sucesso"]);
         }else {
             echo json_encode(["error" => "erro interno ao cancelar assinatura"]);
         }
@@ -79,10 +75,6 @@ class Subscription extends Controller
 
     public function processSubscription()
     {
-        if (empty(session()->user)) {
-            throw new Exception("usuário não está logado");
-        }
-
         $requestPost = $this->getRequests()
         ->setRequiredFields([
             "fullName",
@@ -211,7 +203,6 @@ class Subscription extends Controller
 
         $stripePayment = new StripePayment();
         $response = $stripePayment->createCustomer([
-            "id" => $customerUuid,
             "name" => $requestPost["fullName"],
             "email" => $requestPost["email"],
             "source" => $requestPost["cardToken"]

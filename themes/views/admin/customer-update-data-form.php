@@ -49,7 +49,7 @@
                                     <select name="gender" id="gender" class="form-control">
                                         <option value="" disabled>Qual é o seu gênero?</option>
                                         <option value="1" <?= !empty($customerData->customer_gender) && $customerData->customer_gender == 1 ? "selected" : "" ?>>Masculino</option>
-                                        <option value="0" <?= empty($customerData->customer_gender) && $customerData->customer_gender == 0 ? "selected" : "" ?>>Feminino</option>
+                                        <option value="0" <?= !empty($customerData) && $customerData->customer_gender == 0 ? "selected" : "" ?>>Feminino</option>
                                     </select>
                                 </div>
                                 <div class="form-group">

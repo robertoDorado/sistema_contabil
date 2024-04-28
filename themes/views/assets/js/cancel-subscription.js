@@ -51,9 +51,6 @@ if (window.location.pathname == "/admin/customer/cancel-subscription") {
                 message = response.success
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.success(message)
-                setTimeout(() => {
-                    window.location.href = response.url
-                }, 3000)
             }
         })
     })
