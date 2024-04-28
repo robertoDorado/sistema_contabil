@@ -85,7 +85,7 @@ if (window.location.pathname == "/customer/subscribe") {
         .replace(/(-\d{4})\d+?$/, "$1")
     })
 
-    const stripe = Stripe("pk_test_51OEIojC1Uv10wqUudCsaCYGleVine1HcYMo3kLbOJDbFnetTHFMLkCEiCt24J256ahte6UCvHkBfFMrlEIT7qFlE00LQx8SDKD", {
+    const stripe = Stripe("pk_live_51OEIojC1Uv10wqUugUxFvBmy3CWhpFjR9t9lR9trtxfdxgKWdnQxzUERnlysdy1USdCfRTvUq72pBIAKNPH9V3tj00COXqcXEt", {
         locale: "pt-BR"
     })
 
