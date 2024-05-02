@@ -376,7 +376,7 @@ class CashFlow extends Controller
 
             $cashFlowGroup->setId($cashFlowGroupData->id);
             $cashFlow = new ModelCashFlow();
-            $uuid = Uuid::uuid6();
+            $uuid = Uuid::uuid4();
 
             array_push($arrayUuid, $uuid);
             array_push($arrayEdit, "<a class='icons' href=" . url("/admin/cash-flow/update/form/" . $uuid . "") . "><i class='fas fa-edit' aria-hidden='true'></i>");
@@ -796,7 +796,7 @@ class CashFlow extends Controller
             
             $cashFlow = new ModelCashFlow();
             $response = $cashFlow->persistData([
-                "uuid" => Uuid::uuid6(),
+                "uuid" => Uuid::uuid4(),
                 "id_user" => $user,
                 "id_cash_flow_group" => $cashFlowGroup,
                 "entry" => $requestPost["launchValue"],

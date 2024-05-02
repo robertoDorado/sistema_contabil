@@ -312,7 +312,7 @@ class CashFlowGroup extends Controller
             $cashFlowGroup = new ModelCashFlowGroup();
             
             $response = $cashFlowGroup->persistData([
-                "uuid" => Uuid::uuid6(),
+                "uuid" => Uuid::uuid4(),
                 "id_user" => $user,
                 "group_name" => $requestPost["accountGroup"],
                 "created_at" => date("Y-m-d"),

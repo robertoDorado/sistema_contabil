@@ -7,7 +7,7 @@ use Stripe\StripeClient;
 require dirname(dirname(__DIR__)) . "/vendor/autoload.php";
 
 try {
-    $customerUuid = Uuid::uuid6();
+    $customerUuid = Uuid::uuid4();
     $requestPost = [
         "uuid" => $customerUuid,
         "customer_name" => "Heloisa Cecília Marlene da Costa",

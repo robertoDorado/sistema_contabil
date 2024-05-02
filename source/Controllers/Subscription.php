@@ -122,7 +122,7 @@ class Subscription extends Controller
         $userData = $user->findUserByEmail();
 
         $requestUserData = [
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "user_full_name" => $requestPost["fullName"],
             "user_nick_name" => $requestPost["userName"],
             "user_email" => $requestPost["email"],
@@ -130,7 +130,7 @@ class Subscription extends Controller
             "deleted" => 0
         ];
         
-        $customerUuid = Uuid::uuid6();
+        $customerUuid = Uuid::uuid4();
         $requestCustomerData = [
             "uuid" => $customerUuid,
             "customer_name" => $requestPost["fullName"],
@@ -258,7 +258,7 @@ class Subscription extends Controller
 
                 foreach ($response->latest_invoice->lines->data as $value) {
                     $response = $subscription->persistData([
-                        "uuid" => Uuid::uuid6(),
+                        "uuid" => Uuid::uuid4(),
                         "subscription_id" => $response->id,
                         "customer_id" => $customer,
                         "charge_id" => $response->latest_invoice->charge,

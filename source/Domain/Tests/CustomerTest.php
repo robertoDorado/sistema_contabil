@@ -36,7 +36,7 @@ class CustomerTest extends TestCase
         $customers = [];
         for ($i = 0; $i < 2; $i++) {
             $this->customer = new Customer();
-            $customerUuid = Uuid::uuid6();
+            $customerUuid = Uuid::uuid4();
 
             $requestPost = [
                 "uuid" => $customerUuid,
@@ -126,7 +126,7 @@ class CustomerTest extends TestCase
     public function testFindCustomerByUuid()
     {
         $this->customer = new Customer();
-        $customerUuid = Uuid::uuid6();
+        $customerUuid = Uuid::uuid4();
 
         $requestPost = [
             "uuid" => $customerUuid,
@@ -161,7 +161,7 @@ class CustomerTest extends TestCase
     public function testEmptyCustomer()
     {
         $this->customer = new Customer();
-        $this->customer->setUuid(Uuid::uuid6());
+        $this->customer->setUuid(Uuid::uuid4());
         $response = $this->customer->findCustomerByUuid([]);
         if (empty($response)) {
             $this->assertJsonStringEqualsJsonString(
@@ -174,7 +174,7 @@ class CustomerTest extends TestCase
     public function testDropCustomerNotFound()
     {
         $this->customer = new Customer();
-        $this->customer->setUuid(Uuid::uuid6());
+        $this->customer->setUuid(Uuid::uuid4());
         $this->expectException(Exception::class);
         $this->expectExceptionMessage("cliente não encontrado");
         $this->customer->dropCustomerByUuid();

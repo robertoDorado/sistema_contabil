@@ -40,7 +40,7 @@ class UserTest extends TestCase
     public function testPersistData()
     {
         $this->customer = new Customer();
-        $customerUuid = Uuid::uuid6();
+        $customerUuid = Uuid::uuid4();
         $this->customer->setUuid($customerUuid);
 
         $requestPost = [
@@ -67,7 +67,7 @@ class UserTest extends TestCase
         $this->user = new User();
         $userData = [
             "id_customer" => $this->customer,
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "user_full_name" => $requestPost["customer_name"],
             "user_nick_name" => "saraLuiza",
             "user_email" => $requestPost["customer_email"],
@@ -84,7 +84,7 @@ class UserTest extends TestCase
         $this->user = new User();
         $userData = [
             "id_customer" => $this->user,
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "user_full_name" => "Sara Luzia Stefany Gomes",
             "user_nick_name" => "saraLuiza",
             "user_email" => "sara.luzia.gomes@lumavale.com.br",
@@ -102,7 +102,7 @@ class UserTest extends TestCase
         $customers = [];
         for ($i = 0; $i < 2; $i++) {
             $this->customer = new Customer();
-            $customerUuid = Uuid::uuid6();
+            $customerUuid = Uuid::uuid4();
 
             $requestPost = [
                 "uuid" => $customerUuid,
@@ -128,7 +128,7 @@ class UserTest extends TestCase
             $this->user = new User();
             $userData = [
                 "id_customer" => $this->customer,
-                "uuid" => Uuid::uuid6(),
+                "uuid" => Uuid::uuid4(),
                 "user_full_name" => "Sara Luzia Stefany Gomes",
                 "user_nick_name" => "saraLuiza",
                 "user_email" => "sara.luzia.gomes@lumavale.com.br",
@@ -159,7 +159,7 @@ class UserTest extends TestCase
     {
         $this->customer = new Customer();
         $this->customer->setId(1000000000000);
-        $this->customer->setUuid(Uuid::uuid6());
+        $this->customer->setUuid(Uuid::uuid4());
         $this->user = new User();
 
         $userData = [
@@ -189,7 +189,7 @@ class UserTest extends TestCase
     public function testLoginSetEmail()
     {
         $this->customer = new Customer();
-        $customerUuid = Uuid::uuid6();
+        $customerUuid = Uuid::uuid4();
         $this->customer->setUuid($customerUuid);
 
         $requestPost = [
@@ -216,7 +216,7 @@ class UserTest extends TestCase
         $this->user = new User();
         $userData = [
             "id_customer" => $this->customer,
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "user_full_name" => $requestPost["customer_name"],
             "user_nick_name" => "saraLuiza",
             "user_email" => $requestPost["customer_email"],
@@ -235,7 +235,7 @@ class UserTest extends TestCase
     public function testLoginSetNickName()
     {
         $this->customer = new Customer();
-        $customerUuid = Uuid::uuid6();
+        $customerUuid = Uuid::uuid4();
         $this->customer->setUuid($customerUuid);
 
         $requestPost = [
@@ -262,7 +262,7 @@ class UserTest extends TestCase
         $this->user = new User();
         $userData = [
             "id_customer" => $this->customer,
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "user_full_name" => $requestPost["customer_name"],
             "user_nick_name" => "saraLuiza",
             "user_email" => $requestPost["customer_email"],
@@ -294,7 +294,7 @@ class UserTest extends TestCase
     public function testLoginUserDeleted()
     {
         $this->customer = new Customer();
-        $customerUuid = Uuid::uuid6();
+        $customerUuid = Uuid::uuid4();
         $this->customer->setUuid($customerUuid);
 
         $requestPost = [
@@ -321,7 +321,7 @@ class UserTest extends TestCase
         $this->user = new User();
         $userData = [
             "id_customer" => $this->customer,
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "user_full_name" => $requestPost["customer_name"],
             "user_nick_name" => "saraLuiza",
             "user_email" => $requestPost["customer_email"],
@@ -346,7 +346,7 @@ class UserTest extends TestCase
     public function testLoginUserNotAuth()
     {
         $this->customer = new Customer();
-        $customerUuid = Uuid::uuid6();
+        $customerUuid = Uuid::uuid4();
         $this->customer->setUuid($customerUuid);
 
         $requestPost = [
@@ -373,7 +373,7 @@ class UserTest extends TestCase
         $this->user = new User();
         $userData = [
             "id_customer" => $this->customer,
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "user_full_name" => $requestPost["customer_name"],
             "user_nick_name" => "saraLuiza",
             "user_email" => $requestPost["customer_email"],
@@ -436,7 +436,7 @@ class UserTest extends TestCase
     public function testFindUserByEmailAccessDenied()
     {
         $this->customer = new Customer();
-        $customerUuid = Uuid::uuid6();
+        $customerUuid = Uuid::uuid4();
         $this->customer->setUuid($customerUuid);
 
         $requestPost = [
@@ -463,7 +463,7 @@ class UserTest extends TestCase
         $this->user = new User();
         $userData = [
             "id_customer" => $this->customer,
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "user_full_name" => $requestPost["customer_name"],
             "user_nick_name" => "saraLuiza",
             "user_email" => $requestPost["customer_email"],
@@ -487,7 +487,7 @@ class UserTest extends TestCase
     public function testFindUserByEmail()
     {
         $this->customer = new Customer();
-        $customerUuid = Uuid::uuid6();
+        $customerUuid = Uuid::uuid4();
         $this->customer->setUuid($customerUuid);
 
         $requestPost = [
@@ -514,7 +514,7 @@ class UserTest extends TestCase
         $this->user = new User();
         $userData = [
             "id_customer" => $this->customer,
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "user_full_name" => $requestPost["customer_name"],
             "user_nick_name" => "saraLuiza",
             "user_email" => $requestPost["customer_email"],
@@ -532,7 +532,7 @@ class UserTest extends TestCase
     public function testGetUuid()
     {
         $this->user = new User();
-        $this->user->setUuid(Uuid::uuid6());
+        $this->user->setUuid(Uuid::uuid4());
         $uuid = $this->user->getUuid();
         $this->assertIsString($uuid);
     }

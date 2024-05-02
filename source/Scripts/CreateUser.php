@@ -70,7 +70,7 @@ echo "\n";
 
 $customer = new Customer();
 $requestPost = [
-    "uuid" => Uuid::uuid6(),
+    "uuid" => Uuid::uuid4(),
     "customer_name" => $userFullName,
     "customer_document" => $userDocument,
     "birth_date" => $birthDate,
@@ -96,7 +96,7 @@ if (!$customer->persistData($requestPost)) {
 $user = new User();
 $userData = [
     "id_customer" => $customer,
-    "uuid" => Uuid::uuid6(),
+    "uuid" => Uuid::uuid4(),
     "user_full_name" => $userFullName,
     "user_nick_name" => $userNickName,
     "user_email" => $userEmail,

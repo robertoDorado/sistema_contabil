@@ -25,7 +25,7 @@ class SubscriptionTest extends TestCase
     public function testPersistData()
     {
         $this->customer = new Customer();
-        $customerUuid = Uuid::uuid6();
+        $customerUuid = Uuid::uuid4();
         $this->customer->setUuid($customerUuid);
 
         $requestPost = [
@@ -52,7 +52,7 @@ class SubscriptionTest extends TestCase
         $this->subscription = new Subscription();
 
         $requestPost = [
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "subscription_id" => "sub_" . bin2hex(random_bytes(16)),
             "customer_id" => $this->customer,
             "charge_id" => "ch_" . bin2hex(random_bytes(16)),
@@ -108,7 +108,7 @@ class SubscriptionTest extends TestCase
     {
         $this->subscription = new Subscription();
         $requestPost = [
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "subscription_id" => "sub_" . bin2hex(random_bytes(16)),
             "customer_id" => new Subscription(),
             "charge_id" => "ch_" . bin2hex(random_bytes(16)),
@@ -131,7 +131,7 @@ class SubscriptionTest extends TestCase
 
         $this->subscription = new Subscription();
         $requestPost = [
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "subscription_id" => "test_" . bin2hex(random_bytes(16)),
             "customer_id" => $this->customer,
             "charge_id" => "ch_" . bin2hex(random_bytes(16)),
@@ -154,7 +154,7 @@ class SubscriptionTest extends TestCase
 
         $this->subscription = new Subscription();
         $requestPost = [
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "subscription_id" => "sub_" . bin2hex(random_bytes(16)),
             "customer_id" => $this->customer,
             "charge_id" => "test_" . bin2hex(random_bytes(16)),
@@ -199,7 +199,7 @@ class SubscriptionTest extends TestCase
     public function testFindSubsCriptionByCustomerId()
     {
         $this->customer = new Customer();
-        $customerUuid = Uuid::uuid6();
+        $customerUuid = Uuid::uuid4();
 
         $requestPost = [
             "uuid" => $customerUuid,
@@ -225,7 +225,7 @@ class SubscriptionTest extends TestCase
         $this->subscription = new Subscription();
 
         $requestPost = [
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "subscription_id" => "sub_" . bin2hex(random_bytes(16)),
             "customer_id" => $this->customer,
             "charge_id" => "ch_" . bin2hex(random_bytes(16)),

@@ -72,7 +72,7 @@ class CashFlowTest extends TestCase
     public function testPersistData()
     {
         $this->customer = new Customer();
-        $customerUuid = Uuid::uuid6();
+        $customerUuid = Uuid::uuid4();
         $this->customer->setUuid($customerUuid);
 
         $requestPost = [
@@ -100,7 +100,7 @@ class CashFlowTest extends TestCase
 
         $userData = [
             "id_customer" => $this->customer,
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "user_full_name" => "Sara Luzia Stefany Gomes",
             "user_nick_name" => "saraLuiza",
             "user_email" => $requestPost["customer_email"],
@@ -112,7 +112,7 @@ class CashFlowTest extends TestCase
         $this->cashFlowGroup = new CashFlowGroup();
 
         $cashFlowGroupData = [
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "id_user" => $this->user,
             "group_name" => "Receitas",
             "created_at" => date("Y-m-d"),
@@ -124,7 +124,7 @@ class CashFlowTest extends TestCase
         $this->cashFlow = new CashFlow();
 
         $cashFlowData = [
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "id_user" => $this->user,
             "id_cash_flow_group" => $this->cashFlowGroup,
             "entry" => "2.144,22",
@@ -145,7 +145,7 @@ class CashFlowTest extends TestCase
         $this->user = new User();
         $this->user->setId(10000);
         $cashFlowData = [
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "id_user" => $this->user,
             "id_cash_flow_group" => $this->user,
             "entry" => "2.144,22",
@@ -167,7 +167,7 @@ class CashFlowTest extends TestCase
         $this->cashFlowGroup->setId(10000);
 
         $cashFlowData = [
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "id_user" => $this->cashFlowGroup,
             "id_cash_flow_group" => $this->cashFlowGroup,
             "entry" => "2.144,22",
@@ -185,7 +185,7 @@ class CashFlowTest extends TestCase
     public function testCalculateBalance()
     {
         $this->customer = new Customer();
-        $customerUuid = Uuid::uuid6();
+        $customerUuid = Uuid::uuid4();
         $this->customer->setUuid($customerUuid);
 
         $requestPost = [
@@ -213,7 +213,7 @@ class CashFlowTest extends TestCase
 
         $userData = [
             "id_customer" => $this->customer,
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "user_full_name" => "Sara Luzia Stefany Gomes",
             "user_nick_name" => "saraLuiza",
             "user_email" => $requestPost["customer_email"],
@@ -225,7 +225,7 @@ class CashFlowTest extends TestCase
         for ($i = 0; $i < 3; $i++) {
             $this->cashFlowGroup = new CashFlowGroup();
             $cashFlowGroupData = [
-                "uuid" => Uuid::uuid6(),
+                "uuid" => Uuid::uuid4(),
                 "id_user" => $this->user,
                 "group_name" => "Receitas",
                 "created_at" => date("Y-m-d"),
@@ -237,7 +237,7 @@ class CashFlowTest extends TestCase
             $this->cashFlow = new CashFlow();
 
             $cashFlowData = [
-                "uuid" => Uuid::uuid6(),
+                "uuid" => Uuid::uuid4(),
                 "id_user" => $this->user,
                 "id_cash_flow_group" => $this->cashFlowGroup,
                 "entry" => "2.144,22",
@@ -277,7 +277,7 @@ class CashFlowTest extends TestCase
     public function testFindCashFlowByUser()
     {
         $this->customer = new Customer();
-        $customerUuid = Uuid::uuid6();
+        $customerUuid = Uuid::uuid4();
         $this->customer->setUuid($customerUuid);
 
         $requestPost = [
@@ -305,7 +305,7 @@ class CashFlowTest extends TestCase
 
         $userData = [
             "id_customer" => $this->customer,
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "user_full_name" => "Sara Luzia Stefany Gomes",
             "user_nick_name" => "saraLuiza",
             "user_email" => $requestPost["customer_email"],
@@ -317,7 +317,7 @@ class CashFlowTest extends TestCase
         $this->cashFlowGroup = new CashFlowGroup();
 
         $cashFlowGroupData = [
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "id_user" => $this->user,
             "group_name" => "Receitas",
             "created_at" => date("Y-m-d"),
@@ -329,7 +329,7 @@ class CashFlowTest extends TestCase
         $this->cashFlow = new CashFlow();
 
         $cashFlowData = [
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "id_user" => $this->user,
             "id_cash_flow_group" => $this->cashFlowGroup,
             "entry" => "2.144,22",
@@ -369,7 +369,7 @@ class CashFlowTest extends TestCase
     public function testGetUuid()
     {
         $this->cashFlow = new CashFlow();
-        $this->cashFlow->setUuid(Uuid::uuid6());
+        $this->cashFlow->setUuid(Uuid::uuid4());
         $response = $this->cashFlow->getUuid();
         $this->assertIsString($response);
     }
@@ -385,7 +385,7 @@ class CashFlowTest extends TestCase
     public function testFindCashFlowByUuid()
     {
         $this->customer = new Customer();
-        $customerUuid = Uuid::uuid6();
+        $customerUuid = Uuid::uuid4();
         $this->customer->setUuid($customerUuid);
 
         $requestPost = [
@@ -413,7 +413,7 @@ class CashFlowTest extends TestCase
 
         $userData = [
             "id_customer" => $this->customer,
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "user_full_name" => "Sara Luzia Stefany Gomes",
             "user_nick_name" => "saraLuiza",
             "user_email" => $requestPost["customer_email"],
@@ -425,7 +425,7 @@ class CashFlowTest extends TestCase
         $this->cashFlowGroup = new CashFlowGroup();
 
         $cashFlowGroupData = [
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "id_user" => $this->user,
             "group_name" => "Receitas",
             "created_at" => date("Y-m-d"),
@@ -436,7 +436,7 @@ class CashFlowTest extends TestCase
         $this->cashFlowGroup->persistData($cashFlowGroupData);
         $this->cashFlow = new CashFlow();
 
-        $cashFlowUuid = Uuid::uuid6();
+        $cashFlowUuid = Uuid::uuid4();
         $cashFlowData = [
             "uuid" => $cashFlowUuid,
             "id_user" => $this->user,
@@ -462,7 +462,7 @@ class CashFlowTest extends TestCase
     public function testFindCashFlowByUuidIsEmpty()
     {
         $this->cashFlow = new CashFlow();
-        $this->cashFlow->setUuid(Uuid::uuid6());
+        $this->cashFlow->setUuid(Uuid::uuid4());
         $this->cashFlow->findCashFlowByUuid();
         if (empty($reponse)) {
             $this->assertJsonStringEqualsJsonString(
@@ -475,7 +475,7 @@ class CashFlowTest extends TestCase
     public function testDropCashFlowByUuid()
     {
         $this->customer = new Customer();
-        $customerUuid = Uuid::uuid6();
+        $customerUuid = Uuid::uuid4();
         $this->customer->setUuid($customerUuid);
 
         $requestPost = [
@@ -503,7 +503,7 @@ class CashFlowTest extends TestCase
 
         $userData = [
             "id_customer" => $this->customer,
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "user_full_name" => "Sara Luzia Stefany Gomes",
             "user_nick_name" => "saraLuiza",
             "user_email" => $requestPost["customer_email"],
@@ -515,7 +515,7 @@ class CashFlowTest extends TestCase
         $this->cashFlowGroup = new CashFlowGroup();
 
         $cashFlowGroupData = [
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "id_user" => $this->user,
             "group_name" => "Receitas",
             "created_at" => date("Y-m-d"),
@@ -526,7 +526,7 @@ class CashFlowTest extends TestCase
         $this->cashFlowGroup->persistData($cashFlowGroupData);
         $this->cashFlow = new CashFlow();
 
-        $cashFlowUuid = Uuid::uuid6();
+        $cashFlowUuid = Uuid::uuid4();
         $cashFlowData = [
             "uuid" => $cashFlowUuid,
             "id_user" => $this->user,
@@ -552,7 +552,7 @@ class CashFlowTest extends TestCase
     public function testUpdateCashFlowByUuid()
     {
         $this->customer = new Customer();
-        $customerUuid = Uuid::uuid6();
+        $customerUuid = Uuid::uuid4();
         $this->customer->setUuid($customerUuid);
 
         $requestPost = [
@@ -580,7 +580,7 @@ class CashFlowTest extends TestCase
 
         $userData = [
             "id_customer" => $this->customer,
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "user_full_name" => "Sara Luzia Stefany Gomes",
             "user_nick_name" => "saraLuiza",
             "user_email" => $requestPost["customer_email"],
@@ -592,7 +592,7 @@ class CashFlowTest extends TestCase
         $this->cashFlowGroup = new CashFlowGroup();
 
         $cashFlowGroupData = [
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "id_user" => $this->user,
             "group_name" => "Receitas",
             "created_at" => date("Y-m-d"),
@@ -602,7 +602,7 @@ class CashFlowTest extends TestCase
 
         $this->cashFlowGroup->persistData($cashFlowGroupData);
         $this->cashFlow = new CashFlow();
-        $cashFlowUuid = Uuid::uuid6();
+        $cashFlowUuid = Uuid::uuid4();
 
         $cashFlowData = [
             "uuid" => $cashFlowUuid,
@@ -635,7 +635,7 @@ class CashFlowTest extends TestCase
     public function testUpdateCashFlowByUuidEmptyParam()
     {
         $this->cashFlow = new CashFlow();
-        $this->cashFlow->setUuid(Uuid::uuid6());
+        $this->cashFlow->setUuid(Uuid::uuid4());
         $response = $this->cashFlow->updateCashFlowByUuid([]);
         if (empty($response)) {
             $this->assertJsonStringEqualsJsonString(
@@ -648,7 +648,7 @@ class CashFlowTest extends TestCase
     public function testUpdateCashFlowByUuidNotFound()
     {
         $this->cashFlow = new CashFlow();
-        $response = $this->cashFlow->updateCashFlowByUuid(["uuid" => Uuid::uuid6()]);
+        $response = $this->cashFlow->updateCashFlowByUuid(["uuid" => Uuid::uuid4()]);
         if (empty($response)) {
             $this->assertJsonStringEqualsJsonString(
                 json_encode(["error" => "registro de fluxo de caixa não encontrado"]),
@@ -687,7 +687,7 @@ class CashFlowTest extends TestCase
 
         $userData = [
             "id_customer" => $this->customer,
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "user_full_name" => "Sara Luzia Stefany Gomes",
             "user_nick_name" => "saraLuiza",
             "user_email" => $requestPost["customer_email"],
@@ -699,7 +699,7 @@ class CashFlowTest extends TestCase
         $this->cashFlowGroup = new CashFlowGroup();
 
         $cashFlowGroupData = [
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "id_user" => $this->user,
             "group_name" => "Receitas",
             "created_at" => date("Y-m-d"),
@@ -710,7 +710,7 @@ class CashFlowTest extends TestCase
         $this->cashFlowGroup->persistData($cashFlowGroupData);
         $this->cashFlow = new CashFlow();
 
-        $cashFlowUuid = Uuid::uuid6();
+        $cashFlowUuid = Uuid::uuid4();
         $this->cashFlow->setUuid($cashFlowUuid);
 
         $cashFlowData = [
@@ -772,7 +772,7 @@ class CashFlowTest extends TestCase
 
         $userData = [
             "id_customer" => $this->customer,
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "user_full_name" => "Sara Luzia Stefany Gomes",
             "user_nick_name" => "saraLuiza",
             "user_email" => $requestPost["customer_email"],
@@ -784,7 +784,7 @@ class CashFlowTest extends TestCase
         $this->cashFlowGroup = new CashFlowGroup();
 
         $cashFlowGroupData = [
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "id_user" => $this->user,
             "group_name" => "Receitas",
             "created_at" => date("Y-m-d"),
@@ -795,7 +795,7 @@ class CashFlowTest extends TestCase
         $this->cashFlowGroup->persistData($cashFlowGroupData);
         $this->cashFlow = new CashFlow();
 
-        $cashFlowUuid = Uuid::uuid6();
+        $cashFlowUuid = Uuid::uuid4();
         $this->cashFlow->setUuid($cashFlowUuid);
 
         $cashFlowData = [
@@ -829,7 +829,7 @@ class CashFlowTest extends TestCase
     public function testFindCashFlowDataByDate()
     {
         $this->customer = new Customer();
-        $customerUuid = Uuid::uuid6();
+        $customerUuid = Uuid::uuid4();
         $this->customer->setUuid($customerUuid);
 
         $requestPost = [
@@ -857,7 +857,7 @@ class CashFlowTest extends TestCase
 
         $userData = [
             "id_customer" => $this->customer,
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "user_full_name" => "Sara Luzia Stefany Gomes",
             "user_nick_name" => "saraLuiza",
             "user_email" => $requestPost["customer_email"],
@@ -869,7 +869,7 @@ class CashFlowTest extends TestCase
         $this->cashFlowGroup = new CashFlowGroup();
 
         $cashFlowGroupData = [
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "id_user" => $this->user,
             "group_name" => "Receitas",
             "created_at" => date("Y-m-d"),
@@ -880,7 +880,7 @@ class CashFlowTest extends TestCase
         $this->cashFlowGroup->persistData($cashFlowGroupData);
         $this->cashFlow = new CashFlow();
 
-        $cashFlowUuid = Uuid::uuid6();
+        $cashFlowUuid = Uuid::uuid4();
         $this->cashFlow->setUuid($cashFlowUuid);
 
         $cashFlowData = [
@@ -929,7 +929,7 @@ class CashFlowTest extends TestCase
     public function testFindGroupAccountsAgrupped()
     {
         $this->customer = new Customer();
-        $customerUuid = Uuid::uuid6();
+        $customerUuid = Uuid::uuid4();
         $this->customer->setUuid($customerUuid);
 
         $requestPost = [
@@ -957,7 +957,7 @@ class CashFlowTest extends TestCase
 
         $userData = [
             "id_customer" => $this->customer,
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "user_full_name" => "Sara Luzia Stefany Gomes",
             "user_nick_name" => "saraLuiza",
             "user_email" => $requestPost["customer_email"],
@@ -969,7 +969,7 @@ class CashFlowTest extends TestCase
         $this->cashFlowGroup = new CashFlowGroup();
 
         $cashFlowGroupData = [
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "id_user" => $this->user,
             "group_name" => "Receitas",
             "created_at" => date("Y-m-d"),
@@ -980,7 +980,7 @@ class CashFlowTest extends TestCase
         $this->cashFlowGroup->persistData($cashFlowGroupData);
         $this->cashFlow = new CashFlow();
 
-        $cashFlowUuid = Uuid::uuid6();
+        $cashFlowUuid = Uuid::uuid4();
         $this->cashFlow->setUuid($cashFlowUuid);
 
         $cashFlowData = [
@@ -1005,7 +1005,7 @@ class CashFlowTest extends TestCase
     public function testCashFlowDeletedTrue()
     {
         $this->customer = new Customer();
-        $customerUuid = Uuid::uuid6();
+        $customerUuid = Uuid::uuid4();
         $this->customer->setUuid($customerUuid);
 
         $requestPost = [
@@ -1033,7 +1033,7 @@ class CashFlowTest extends TestCase
 
         $userData = [
             "id_customer" => $this->customer,
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "user_full_name" => "Sara Luzia Stefany Gomes",
             "user_nick_name" => "saraLuiza",
             "user_email" => $requestPost["customer_email"],
@@ -1045,7 +1045,7 @@ class CashFlowTest extends TestCase
         $this->cashFlowGroup = new CashFlowGroup();
 
         $cashFlowGroupData = [
-            "uuid" => Uuid::uuid6(),
+            "uuid" => Uuid::uuid4(),
             "id_user" => $this->user,
             "group_name" => "Receitas",
             "created_at" => date("Y-m-d"),
@@ -1056,7 +1056,7 @@ class CashFlowTest extends TestCase
         $this->cashFlowGroup->persistData($cashFlowGroupData);
         $this->cashFlow = new CashFlow();
 
-        $cashFlowUuid = Uuid::uuid6();
+        $cashFlowUuid = Uuid::uuid4();
         $this->cashFlow->setUuid($cashFlowUuid);
 
         $cashFlowData = [
