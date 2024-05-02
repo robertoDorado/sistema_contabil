@@ -425,7 +425,7 @@ this.nextElementSibling.innerHTML=this.files[0].name})
 importExcelForm.addEventListener("submit",function(event){event.preventDefault()
 const extensionName=extensionFileName(this.excelFile.value)
 const btnSubmit=this.querySelector('[type="submit"]')
-const importIcon=btnSubmit.firstElementChild
+const importIcon=document.querySelector(".fa.fa-cloud-upload")
 const excelFile=this.excelFile
 const excelLabel=this.excelFile.nextElementSibling
 if(verifyExtensionFile.indexOf(extensionName)==-1){excelFile.value=""
@@ -433,7 +433,7 @@ excelLabel.innerHTML=standardLabelNameExcelFile
 toastr.warning("Extensão do arquivo não permitida")
 throw new Error("Extensão do arquivo não permitida")}
 showSpinner(btnSubmit)
-const spinner=btnSubmit.querySelector(".fas.fa-spinner.fa-spin")
+const spinner=document.querySelector(".fas.fa-spinner.fa-spin")
 const form=new FormData(this)
 fetch(window.location.origin+"/admin/cash-flow/import-excel",{method:'POST',body:form}).then(response=>response.json()).then(function(response){spinner.remove()
 btnSubmit.append(importIcon," Importar ")
@@ -442,7 +442,8 @@ let message=""
 if(response.error){excelFile.value=""
 excelLabel.innerHTML=standardLabelNameExcelFile
 message=response.error.charAt(0).toUpperCase()+response.error.slice(1)
-toastr.error(message)}
+toastr.error(message)
+throw new Error(message)}
 if(response.success||response.full_success){excelFile.value=""
 excelLabel.innerHTML=standardLabelNameExcelFile
 const excelData=JSON.parse(response.excelData)

@@ -354,9 +354,17 @@ class CashFlow extends Controller
                 continue;
             }
 
-            $excelData["t"][$key] = $excelData["t"][$key] == "Crédito" ? 1 : 0;
-            $excelData["l"][$key] = trim(str_replace(["R$", ",", "-"], "", $excelData["l"][$key]));
-            $excelData["l"][$key] = number_format($excelData["l"][$key], 2, ",", ".");
+            $entryType = $excelData["t"][$key] == "Crédito" ? 1 : 0;
+
+            if ($this->getServer()->getServerByKey("HTTP_HOST") == "localhost") {
+                $launchValue = str_replace([",", "R$", "-"], "", $excelData["l"][$key]);
+                $launchValue = str_replace(".", ",", $launchValue);
+                $launchValue = str_replace(",", ".", $launchValue);
+                $launchValue = number_format(trim($launchValue), 2, ",", ".");
+            }else {
+                $launchValue = $excelData["l"][$key];
+            }
+            
 
             $cashFlowGroup = new CashFlowGroup();
             $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByName($excelData["g"][$key], $user);
@@ -378,9 +386,9 @@ class CashFlow extends Controller
                 "uuid" => $uuid,
                 "id_user" => $user,
                 "id_cash_flow_group" => $cashFlowGroup,
-                "entry" => $excelData["l"][$key],
+                "entry" => $launchValue,
                 "history" => $history,
-                "entry_type" => $excelData["t"][$key],
+                "entry_type" => $entryType,
                 "created_at" => $excelData["d"][$key],
                 "updated_at" => date("Y-m-d"),
                 "deleted" => 0
@@ -403,6 +411,11 @@ class CashFlow extends Controller
             $cashFlow = new ModelCashFlow();
             $cashFlow->setUuid($uuid);
             $cashFlowData = $cashFlow->findCashFlowByUuid();
+
+            if (empty($cashFlowData)) {
+                echo $cashFlow->message->json();
+                die;
+            }
             
             array_push($accountGroup, $cashFlowData->group_name);
             array_push($launchDate, date("d/m/Y", strtotime($cashFlowData->created_at)));

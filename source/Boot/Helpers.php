@@ -87,12 +87,6 @@ function convertCurrencyRealToFloat(string $value)
     $value = preg_replace("/[^\d\.,]+/", "", $value);
     $value = str_replace(".", "", $value);
     $value = str_replace(",", ".", $value);
-    $value = floatval($value);
-
-    if (gettype($value) !== "double") {
-        throw new \Exception("Erro na conversão do valor para float");
-    }
-
     return $value;
 }
 

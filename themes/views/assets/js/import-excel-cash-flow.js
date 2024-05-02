@@ -21,7 +21,7 @@ if (window.location.pathname == '/admin/cash-flow/report') {
         event.preventDefault()
         const extensionName = extensionFileName(this.excelFile.value)
         const btnSubmit = this.querySelector('[type="submit"]')
-        const importIcon = btnSubmit.firstElementChild
+        const importIcon = document.querySelector(".fa.fa-cloud-upload")
         const excelFile = this.excelFile
         const excelLabel = this.excelFile.nextElementSibling
 
@@ -33,7 +33,7 @@ if (window.location.pathname == '/admin/cash-flow/report') {
         }
 
         showSpinner(btnSubmit)
-        const spinner = btnSubmit.querySelector(".fas.fa-spinner.fa-spin")
+        const spinner = document.querySelector(".fas.fa-spinner.fa-spin")
         const form = new FormData(this)
         
         fetch(window.location.origin + "/admin/cash-flow/import-excel", {
@@ -50,6 +50,7 @@ if (window.location.pathname == '/admin/cash-flow/report') {
                 excelLabel.innerHTML = standardLabelNameExcelFile
                 message = response.error.charAt(0).toUpperCase() + response.error.slice(1)
                 toastr.error(message)
+                throw new Error(message)
             }
 
             if (response.success || response.full_success) {

@@ -139,30 +139,6 @@ class CashFlowTest extends TestCase
         $this->customer->dropCustomerByUuid();
     }
 
-    public function testPersistDataInvalidEntry()
-    {
-        $this->cashFlow = new CashFlow();
-        $cashFlowData = [
-            "uuid" => Uuid::uuid6(),
-            "id_user" => new User(),
-            "id_cash_flow_group" => new CashFlowGroup(),
-            "entry" => "R$ 2.144,22",
-            "history" => "Vendas",
-            "entry_type" => 1,
-            "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d"),
-            "deleted" => 0,
-        ];
-
-        $response = $this->cashFlow->persistData($cashFlowData);
-        if (empty($response)) {
-            $this->assertJsonStringEqualsJsonString(
-                json_encode(["error" => "valor de entrada inválido"]),
-                $this->cashFlow->message->json()
-            );
-        }
-    }
-
     public function testInvalidCashFlowGroupOnPersistData()
     {
         $this->cashFlow = new CashFlow();

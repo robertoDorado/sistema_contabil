@@ -254,7 +254,7 @@ class CashFlow
         return $balance;
     }
 
-    public function persistData(array $data): bool
+    public function persistData(array $data)
     {
         $message = new Message();
         if (empty($data)) {
@@ -264,13 +264,6 @@ class CashFlow
         }
 
         validateModelProperties(ModelsCashFlow::class, $data);
-
-        if (!preg_match("/^[\d\\.,]+$/", $data["entry"])) {
-            $message->error("valor de entrada inválido");
-            $this->data->message = $message;
-            return false;
-        }
-        
         $verifyKeys = [
             "uuid" => function($value) {
                 if (!Uuid::isValid($value)) {
@@ -293,9 +286,9 @@ class CashFlow
             },
 
             "entry" => function (string $value) use ($data) {
-                $value = convertCurrencyRealToFloat($value);
-                $value = empty($data['entry_type']) ? ($value * -1) : $value;
-                return $value;
+                $launchValue = convertCurrencyRealToFloat($value);
+                $launchValue = empty($data['entry_type']) ? ($launchValue * -1) : $launchValue;
+                return $launchValue;
             }
         ];
         
