@@ -80,7 +80,10 @@ class Server extends Controller
             }
 
             $path = dirname(dirname(__DIR__)) . "/Logs/subscription-canceled.log";
-            file_put_contents($path, json_encode($subscriptionData->data())  . PHP_EOL, FILE_APPEND);
+            $response = file_put_contents($path, json_encode($subscriptionData->data())  . PHP_EOL, FILE_APPEND);
+            if (!$response) {
+                throw new Exception("Não foi possível criar o arquivo {$path}");
+            }
         }
     }
 }
