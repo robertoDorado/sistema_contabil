@@ -63,6 +63,14 @@ $route->get("/customer/update-data/form", "Customer::updateDataCustomerForm");
 $route->post("/customer/update-data/form", "Customer::updateDataCustomerForm");
 $route->get("/customer/cancel-subscription", "Customer::cancelSubscription");
 
+/**
+ * API para arquivos CNAB
+ */
+$module = "api";
+$route->namespace("Source\Controllers");
+$route->group($module);
+$route->post("/cnab/remessa", "CnabBill::generateCnabFile");
+
 /** 
  * Assinatura do cliente
  */
