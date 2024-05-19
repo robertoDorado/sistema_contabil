@@ -90,38 +90,6 @@ function convertCurrencyRealToFloat(string $value)
     return $value;
 }
 
-function validateModelProperties(string $class, array $data)
-{
-    $reflectionClass = new ReflectionClass($class);
-
-    $properties = $reflectionClass->getProperties();
-    $properties = array_filter($properties, function ($property) use ($reflectionClass) {
-        if ($property->getDeclaringClass()->getName() == $reflectionClass->getName()) {
-            return $property->getName();
-        }
-    });
-
-    $properties = transformCamelCaseToSnakeCase($properties);
-
-    foreach ($properties as &$value) {
-        $value = preg_replace('/^.*\\$([A-Za-z0-9_]+).*/', '$1', trim($value));
-    }
-
-    $properties = array_filter($properties, function ($property) {
-        if (!empty($property)) {
-            return $property;
-        }
-    });
-
-    if (!empty($properties)) {
-        for ($i = 0; $i < count($properties); $i++) {
-            if (!isset($data[$properties[$i]])) {
-                throw new \Exception("esta propriedade " . $properties[$i] . " foi passado de maneira incorreta");
-            }
-        }
-    }
-}
-
 function executeMigrations(string $instance)
 {
     echo "------------ CLASSE: " . $instance . " -----------------\n";

@@ -3,6 +3,7 @@
   <coverage>
     <include>
       <directory suffix=".php">source/Domain/Model/</directory>
+      <directory suffix=".php">source/Domain/Support/</directory>
     </include>
   </coverage>
   <testsuites>

@@ -4,6 +4,7 @@ namespace Source\Domain\Model;
 use Exception;
 use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Connect;
+use Source\Domain\Support\Tools;
 use Source\Models\CashFlowGroup as ModelsCashFlowGroup;
 use Source\Support\Message;
 
@@ -141,45 +142,11 @@ class CashFlowGroup
 
     public function updateCashFlowGroupByUuid(array $data): bool
     {
-        $message = new Message();
-        if (empty($data)) {
-            $message->error("parametro data não pode ser vazio");
-            $this->data->message = $message;
-            return false;
-        }
-
-        $cashFlowGroupData = $this->cashFlowGroup->find("uuid=:uuid", ":uuid={$data['uuid']}")->fetch();
-        if (empty($cashFlowGroupData)) {
-            $message->error("grupo fluxo de caixa não encontrado");
-            $this->data->message = $message;
-            return false;
-        }
-
-        $verifyKeys = [
-            "uuid" => function($value) {
-                if (!Uuid::isValid($value)) {
-                    throw new Exception("uuid inválido");
-                }
-                return $value;
-            },
-            
-            "id_user" => function ($value) {
-                if (!$value instanceof User) {
-                    throw new Exception("Instância inválida ao atualizar o dado");
-                }
-                return $value->getId();
-            },
-        ];
-
-        foreach ($data as $key => &$value) {
-            if (!empty($verifyKeys[$key])) {
-                $value = $verifyKeys[$key]($value);
-            }
-            $cashFlowGroupData->$key = $value;
-        }
-        
-        $cashFlowGroupData->setRequiredFields(array_keys($data));
-        return $cashFlowGroupData->save();
+        $tools = new Tools($this->cashFlowGroup, ModelsCashFlowGroup::class);
+        $response = $tools->updateData("uuid=:uuid", ":uuid={$data['uuid']}",
+        $data, "grupo fluxo de caixa não encontrado");
+        $this->data->message = !empty($tools->message) ? $tools->message : "";
+        return !empty($response) ? true : false;
     }
 
     public function getId(): int
@@ -197,39 +164,11 @@ class CashFlowGroup
 
     public function persistData(array $data): bool
     {
-        $message = new Message();
-        if (empty($data)) {
-            $message->error("dados inválidos");
-            $this->data->message = $message;
-            return false;
-        }
+        $tools = new Tools($this->cashFlowGroup, ModelsCashFlowGroup::class);
+        $response = $tools->persistData($data);
+        $this->data->message = !empty($tools->message) ? $tools->message : "";
 
-        validateModelProperties(ModelsCashFlowGroup::class, $data);
-        
-        $verifyKeys = [
-            "uuid" => function($value) {
-                if (!Uuid::isValid($value)) {
-                    throw new Exception("uuid inválido");
-                }
-                return $value;
-            },
-            "id_user" => function ($value) {
-                if (!$value instanceof User) {
-                    throw new Exception("Instância inválida ao persistir o dado");
-                }
-                return $value->getId();
-            },
-        ];
-
-        foreach ($data as $key => &$value) {
-            if (!empty($verifyKeys[$key])) {
-                $value = $verifyKeys[$key]($value);
-            }
-            $this->cashFlowGroup->$key = $value;
-        }
-
-        $this->cashFlowGroup->save();
-        $this->setId(Connect::getInstance()->lastInsertId());
-        return true;
+        !empty($response) ? $this->setId($tools->lastId) : null;
+        return !empty($response) ? true : false;
     }
 }

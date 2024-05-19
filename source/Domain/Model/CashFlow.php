@@ -4,6 +4,7 @@ namespace Source\Domain\Model;
 use Exception;
 use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Connect;
+use Source\Domain\Support\Tools;
 use Source\Models\CashFlow as ModelsCashFlow;
 use Source\Support\Message;
 
@@ -111,58 +112,11 @@ class CashFlow
 
     public function updateCashFlowByUuid(array $data): bool
     {
-        $message = new Message();
-        if (empty($data)) {
-            $message->error("parametro data não pode ser vazio");
-            $this->data->message = $message;
-            return false;
-        }
-
-        $cashFlowData = $this->cashFlow->find("uuid=:uuid", ":uuid={$data['uuid']}")->fetch();
-        if (empty($cashFlowData)) {
-            $message->error("registro de fluxo de caixa não encontrado");
-            $this->data->message = $message;
-            return false;
-        }
-
-        $verifyKeys = [
-            "uuid" => function($value) {
-                if (!Uuid::isValid($value)) {
-                    throw new Exception("uuid inválido");
-                }
-                return $value;
-            },
-            
-            "id_cash_flow_group" => function ($value) {
-                if (!$value instanceof CashFlowGroup) {
-                    throw new Exception("Instância inválida ao atualizar o dado");
-                }
-                return $value->getId();
-            },
-
-            "id_user" => function ($value) {
-                if (!$value instanceof User) {
-                    throw new Exception("Instância inválida ao atualizar o dado");
-                }
-                return $value->getId();
-            },
-
-            "entry" => function (string $value) use ($data) {
-                $value = convertCurrencyRealToFloat($value);
-                $value = empty($data['entry_type']) ? ($value * -1) : $value;
-                return $value;
-            }
-        ];
-        
-        foreach($data as $key => &$value) {
-            if (!empty($verifyKeys[$key])) {
-                $value = $verifyKeys[$key]($value);
-            }
-            $cashFlowData->$key = $value;
-        }
-        
-        $cashFlowData->setRequiredFields(array_keys($data));
-        return $cashFlowData->save();
+        $tools = new Tools($this->cashFlow, ModelsCashFlow::class);
+        $response = $tools->updateData("uuid=:uuid", ":uuid={$data['uuid']}",
+        $data, "registro de fluxo de caixa não encontrado");
+        $this->data->message = !empty($tools->message) ? $tools->message : "";
+        return !empty($response) ? true : false;
     }
 
     public function dropCashFlowByUuid(): bool
@@ -254,53 +208,13 @@ class CashFlow
         return $balance;
     }
 
-    public function persistData(array $data)
+    public function persistData(array $data): bool
     {
-        $message = new Message();
-        if (empty($data)) {
-            $message->error("dados inválidos");
-            $this->data->message = $message;
-            return false;
-        }
+        $tools = new Tools($this->cashFlow, ModelsCashFlow::class);
+        $response = $tools->persistData($data);
+        $this->data->message = !empty($tools->message) ? $tools->message : "";
 
-        validateModelProperties(ModelsCashFlow::class, $data);
-        $verifyKeys = [
-            "uuid" => function($value) {
-                if (!Uuid::isValid($value)) {
-                    throw new Exception("uuid inválido");
-                }
-                return $value;
-            },
-            "id_cash_flow_group" => function ($value) {
-                if (!$value instanceof CashFlowGroup) {
-                    throw new Exception("Instância inválida ao persistir o dado");
-                }
-                return $value->getId();
-            },
-
-            "id_user" => function ($value) {
-                if (!$value instanceof User) {
-                    throw new Exception("Instância inválida ao persistir o dado");
-                }
-                return $value->getId();
-            },
-
-            "entry" => function (string $value) use ($data) {
-                $launchValue = convertCurrencyRealToFloat($value);
-                $launchValue = empty($data['entry_type']) ? ($launchValue * -1) : $launchValue;
-                return $launchValue;
-            }
-        ];
-        
-        foreach($data as $key => &$value) {
-            if (!empty($verifyKeys[$key])) {
-                $value = $verifyKeys[$key]($value);
-            }
-            $this->cashFlow->$key = $value;
-        }
-
-        $this->cashFlow->save();
-        $this->setId(Connect::getInstance()->lastInsertId());
-        return true;
+        !empty($response) ? $this->setId($tools->lastId) : null;
+        return !empty($response) ? true : false;
     }
 }

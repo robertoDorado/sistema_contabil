@@ -261,4 +261,130 @@ class SubscriptionTest extends TestCase
             );
         }
     }
+
+    public function testFindSubscriptionBySubscriptionId()
+    {
+        $this->customer = new Customer();
+        $customerUuid = Uuid::uuid4();
+        $this->customer->setUuid($customerUuid);
+
+        $requestPost = [
+            "uuid" => $customerUuid,
+            "customer_name" => "Sarah Luzia Stefany Gomes",
+            "customer_document" => "194.626.014-00",
+            "birth_date" => "2005-01-25",
+            "customer_gender" => "0",
+            "customer_email" => "sarah.luzia.gomes@lumavalee.com.br",
+            "customer_zipcode" => "52191-261",
+            "customer_address" => "Rua Juarina",
+            "customer_number" => 624,
+            "customer_neighborhood" => "Nova Descoberta",
+            "customer_city" => "Recife",
+            "customer_state" => "PE",
+            "customer_phone" => "(81) 3799-9446",
+            "cell_phone" => "(81) 99548-0856",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0,
+        ];
+
+        $this->customer->persistData($requestPost);
+        $this->subscription = new Subscription();
+
+        $requestPost = [
+            "uuid" => Uuid::uuid4(),
+            "subscription_id" => "sub_123456",
+            "customer_id" => $this->customer,
+            "charge_id" => "ch_" . bin2hex(random_bytes(16)),
+            "product_description" => "sistema_contabil R$ 69,90 1x",
+            "period_end" => date("Y-m-d", strtotime("+30 days", strtotime(date("Y-m-d")))),
+            "period_start" => date("Y-m-d"),
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "status" => "active"
+        ];
+
+        $response = $this->subscription->persistData($requestPost);
+        $this->subscription = new Subscription();
+        
+        $this->subscription->subscription_id = "sub_123456";
+        $response = $this->subscription->findSubsCriptionBySubscriptionId([]);
+        $this->assertInstanceOf(ModelsSubscription::class, $response);
+        $this->customer->dropCustomerByUuid();
+    }
+
+    public function testUpdateSubscriptionBySubscriptionId()
+    {
+        $this->customer = new Customer();
+        $customerUuid = Uuid::uuid4();
+
+        $requestPost = [
+            "uuid" => $customerUuid,
+            "customer_name" => "Sarah Luzia Stefany Gomes",
+            "customer_document" => "194.626.014-00",
+            "birth_date" => "2005-01-25",
+            "customer_gender" => "0",
+            "customer_email" => "sarah.luzia.gomes@lumavalee.com.br",
+            "customer_zipcode" => "52191-261",
+            "customer_address" => "Rua Juarina",
+            "customer_number" => 624,
+            "customer_neighborhood" => "Nova Descoberta",
+            "customer_city" => "Recife",
+            "customer_state" => "PE",
+            "customer_phone" => "(81) 3799-9446",
+            "cell_phone" => "(81) 99548-0856",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0,
+        ];
+
+        $this->customer->persistData($requestPost);
+        $customer = new Customer();
+        
+        $customer->email = $requestPost["customer_email"];
+        $customerData = $customer->findCustomerByEmail();
+        
+        $this->subscription = new Subscription();
+        $requestPost = [
+            "uuid" => Uuid::uuid4(),
+            "subscription_id" => "sub_" . bin2hex(random_bytes(16)),
+            "customer_id" => $this->customer,
+            "charge_id" => "ch_" . bin2hex(random_bytes(16)),
+            "product_description" => "sistema_contabil R$ 69,90 1x",
+            "period_end" => date("Y-m-d", strtotime("+30 days", strtotime(date("Y-m-d")))),
+            "period_start" => date("Y-m-d"),
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "status" => "active"
+        ];
+
+        $this->subscription->persistData($requestPost);
+        $this->subscription = new Subscription();
+        
+        $requestPost["product_description"] = "teste_123";
+        $response =  $this->subscription->updateSubscriptionBySubscriptionId($requestPost);
+        $this->assertTrue($response);
+
+        $this->subscription = new Subscription();
+        $this->subscription->customer_id = $customerData->id;
+        
+        $response = $this->subscription->findSubsCriptionByCustomerId([]);
+        $this->assertEquals("teste_123", $response->product_description);
+        $this->customer = new Customer();
+        
+        $this->customer->setUuid($customerUuid);
+        $this->customer->dropCustomerByUuid();
+    }
+
+    public function testSubscriptionIdNotFound()
+    {
+        $this->subscription = new Subscription();
+        $this->subscription->subscription_id = "teste";
+        
+        $response = $this->subscription->findSubsCriptionBySubscriptionId([]);
+        $this->assertNull($response);
+        
+        $this->assertJsonStringEqualsJsonString(json_encode(["error" => "assinatura não encontrada"]),
+        $this->subscription->message->json());
+    }
 }

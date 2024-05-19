@@ -4,6 +4,7 @@ namespace Source\Domain\Model;
 use Exception;
 use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Connect;
+use Source\Domain\Support\Tools;
 use Source\Models\Customer as ModelsCustomer;
 use Source\Support\Message;
 
@@ -67,74 +68,21 @@ class Customer
         return $customerData;
     }
 
-    public function updateCustomerById(array $data)
+    public function updateCustomerById(array $data): bool
     {
-        $message = new Message();
-        if (empty($data)) {
-            $message->error("array data não pode estar vazio");
-            $this->data->message = $message;
-            return false;
-        }
-        
-        $customerData = $this->customer->findById($data["id"]);
-        
-        if (empty($customerData)) {
-            $message->error("cliente não encontrado");
-            $this->data->message = $message;
-            return false;
-        }
-
-        $verifyKeys = [
-            "customer_email" => function($value) {
-                if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
-                    throw new Exception("e-mail do usuário está inválido");;
-                }
-                return $value;
-            }
-        ];
-
-        foreach ($data as $key => &$value) {
-            if (!empty($verifyKeys[$key])) {
-                $value = $verifyKeys[$key]($value);
-            }
-            $customerData->$key = $value;
-        }
-
-        $customerData->setRequiredFields(array_keys($data));
-        return $customerData->save();
+        $tools = new Tools($this->customer, ModelsCustomer::class);
+        $response = $tools->updateData("id=:id", ":id={$data['id']}", $data, "cliente não encontrado");
+        $this->data->message = !empty($tools->message) ? $tools->message : "";
+        return !empty($response) ? true : false;
     }
 
     public function updateCustomerByEmail(array $data): bool
     {
-        $message = new Message();
-        if (empty($data)) {
-            $message->error("array data não pode estar vazio");
-            $this->data->message = $message;
-            return false;
-        }
-
-        if (!filter_var($data["customer_email"], FILTER_VALIDATE_EMAIL)) {
-            $message->error("e-mail do cliente inválido");
-            $this->data->message = $message;
-            return false;
-        }
-        
-        $customerData = $this->customer
-        ->find("customer_email=:customer_email", ":customer_email={$data["customer_email"]}")
-        ->fetch();
-        
-        if (empty($customerData)) {
-            $message->error("cliente não encontrado");
-            $this->data->message = $message;
-            return false;
-        }
-
-        foreach ($data as $key => &$value) {
-            $customerData->$key = $value;
-        }
-
-        $customerData->setRequiredFields(array_keys($data));
-        return $customerData->save();
+        $tools = new Tools($this->customer, ModelsCustomer::class);
+        $response = $tools->updateData("customer_email=:customer_email",
+        ":customer_email={$data["customer_email"]}", $data, "cliente não encontrado");
+        $this->data->message = !empty($tools->message) ? $tools->message : "";
+        return !empty($response) ? true : false;
     }
 
     public function findCustomerByEmail(): ?ModelsCustomer
@@ -217,14 +165,6 @@ class Customer
 
     public function persistData(array $data): bool
     {
-        $message = new Message();
-        if (empty($data)) {
-            $message->error("dados inválidos");
-            $this->data->message = $message;
-            return false;
-        }
-
-        validateModelProperties(ModelsCustomer::class, $data);
         if (!empty($data["customer_email"])) {
             $customer = $this->customer
             ->find("customer_email=:customer_email", 
@@ -232,30 +172,18 @@ class Customer
             ->fetch();
             
             if (!empty($customer)) {
+                $message = new Message();
                 $message->error("este cliente já foi cadastrado");
                 $this->data->message = $message;
                 return false;
             }
         }
 
-        $verifyKeys = [
-            "uuid" => function($value) {
-                if (!Uuid::isValid($value)) {
-                    throw new Exception("uuid inválido");
-                }
-                return $value;
-            }
-        ];
+        $tools = new Tools($this->customer, ModelsCustomer::class);
+        $response = $tools->persistData($data);
+        $this->data->message = !empty($tools->message) ? $tools->message : "";
 
-        foreach ($data as $key => &$value) {
-            if (!empty($verifyKeys[$key])) {
-                $value = $verifyKeys[$key]($value);
-            }
-            $this->customer->$key = $value;
-        }
-
-        $this->customer->save();
-        $this->setId(Connect::getInstance()->lastInsertId());
-        return true;
+        !empty($response) ? $this->setId($tools->lastId) : null;
+        return !empty($response) ? true : false;
     }
 }

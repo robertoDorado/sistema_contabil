@@ -4,6 +4,7 @@ namespace Source\Domain\Model;
 use Exception;
 use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Connect;
+use Source\Domain\Support\Tools;
 use Source\Models\Subscription as ModelsSubscription;
 use Source\Support\Message;
 
@@ -45,41 +46,11 @@ class Subscription
 
     public function updateSubscriptionBySubscriptionId(array $data) : bool
     {
-        $message = new Message();
-        if (empty($data)) {
-            $message->error("parametro data não pode ser vazio");
-            $this->data->message = $message;
-            return false;
-        }
-
-        $subscriptionData = $this->subscription
-        ->find("subscription_id=:subscription_id", ":subscription_id={$data['subscription_id']}")
-        ->fetch();
-
-        if (empty($subscriptionData)) {
-            $message->error("assinatura não localizada");
-            $this->data->message = $message;
-            return false;
-        }
-
-        $verifyKeys = [
-            "subscription_id" => function($value) {
-                if (!preg_match("/^sub_/", $value)) {
-                    throw new Exception("id da assinatura inválida");
-                }
-                return $value;
-            }
-        ];
-
-        foreach ($data as $key => &$value) {
-            if (!empty($verifyKeys[$key])) {
-                $value = $verifyKeys[$key]($value);
-            }
-            $subscriptionData->$key = $value;
-        }
-
-        $subscriptionData->setRequiredFields(array_keys($data));
-        return $subscriptionData->save();
+        $tools = new Tools($this->subscription, ModelsSubscription::class);
+        $response = $tools->updateData("subscription_id=:subscription_id",
+        ":subscription_id={$data['subscription_id']}", $data, "assinatura não localizada");
+        $this->data->message = !empty($tools->message) ? $tools->message : "";
+        return !empty($response) ? true : false;
     }
 
     public function findSubsCriptionBySubscriptionId(array $columns): ?ModelsSubscription
@@ -135,50 +106,11 @@ class Subscription
 
     public function persistData(array $data): bool
     {
-        $message = new Message();
-        if (empty($data)) {
-            $message->error("dados inválidos");
-            $this->data->message = $message;
-            return false;
-        }
+        $tools = new Tools($this->subscription, ModelsSubscription::class);
+        $response = $tools->persistData($data);
+        $this->data->message = !empty($tools->message) ? $tools->message : "";
 
-        validateModelProperties(ModelsSubscription::class, $data);
-        $verifyKeys = [
-            "customer_id" => function($value) {
-                if (!$value instanceof Customer) {
-                    throw new Exception("instância do cliente está incorreta");
-                }
-                return $value->getId();
-            },
-            "uuid" => function($value) {
-                if (!Uuid::isValid($value)) {
-                    throw new Exception("uuid inválido");
-                }
-                return $value;
-            },
-            "subscription_id" => function($value) {
-                if (!preg_match("/^sub_/", $value)) {
-                    throw new Exception("subscription_id inválido");
-                }
-                return $value;
-            },
-            "charge_id" => function($value) {
-                if (!preg_match("/^ch_/", $value)) {
-                    throw new Exception("charge_id inválido");
-                }
-                return $value;
-            }
-        ];
-
-        foreach ($data as $key => &$value) {
-            if (!empty($verifyKeys[$key])) {
-                $value = $verifyKeys[$key]($value);
-            }
-            $this->subscription->$key = $value;
-        }
-
-        $this->subscription->save();
-        $this->setId(Connect::getInstance()->lastInsertId());
-        return true;
+        !empty($response) ? $this->setId($tools->lastId) : null;
+        return !empty($response) ? true : false;
     }
 }

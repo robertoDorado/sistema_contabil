@@ -186,4 +186,31 @@ class CustomerTest extends TestCase
         $this->customer->name = "roberto";
         $this->assertEquals("roberto", $this->customer->name);
     }
+
+    public function testFindCustomerByEmailIsEmpty()
+    {
+        $this->customer = new Customer();
+        $this->customer->email = "";
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("e-mail do cliente não pode estar vazio");
+        $this->customer->findCustomerByEmail();
+    }
+
+    public function testFindCustomerByEmailInvalidEmail()
+    {
+        $this->customer = new Customer();
+        $this->customer->email = "teste_123";
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("tipo de e-mail inválido");
+        $this->customer->findCustomerByEmail();
+    }
+
+    public function testFindCustomerByEmailNotExists()
+    {
+        $this->customer = new Customer();
+        $this->customer->email = "meuemail@naoexiste.com";
+        $this->customer->findCustomerByEmail();
+        $this->assertJsonStringEqualsJsonString(json_encode(["error" => "cliente não encontrado"]), 
+        $this->customer->message->json());
+    }
 }

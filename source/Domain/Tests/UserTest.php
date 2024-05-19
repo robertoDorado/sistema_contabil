@@ -529,6 +529,118 @@ class UserTest extends TestCase
         $this->customer->dropCustomerByUuid();
     }
 
+    public function testUpdateUserByEmail()
+    {
+        $this->customer = new Customer();
+        $customerUuid = Uuid::uuid4();
+        $this->customer->setUuid($customerUuid);
+
+        $requestPost = [
+            "uuid" => $customerUuid,
+            "customer_name" => "Sara Luzia Stefany Gomes",
+            "customer_document" => "193.626.014-00",
+            "birth_date" => "2005-01-26",
+            "customer_gender" => "0",
+            "customer_email" => "sara.luzia.gomes@lumavale.com.br",
+            "customer_zipcode" => "52191-261",
+            "customer_address" => "Rua Juarina",
+            "customer_number" => 624,
+            "customer_neighborhood" => "Nova Descoberta",
+            "customer_city" => "Recife",
+            "customer_state" => "PE",
+            "customer_phone" => "(81) 3799-9446",
+            "cell_phone" => "(81) 99548-0856",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0,
+        ];
+
+        $this->customer->persistData($requestPost);
+        $this->user = new User();
+        $userData = [
+            "id_customer" => $this->customer,
+            "uuid" => Uuid::uuid4(),
+            "user_full_name" => $requestPost["customer_name"],
+            "user_nick_name" => "saraLuiza",
+            "user_email" => $requestPost["customer_email"],
+            "user_password" => password_hash("senha123", PASSWORD_DEFAULT),
+            "deleted" => 0
+        ];
+
+        $this->user->persistData($userData);
+        $this->user = new User();
+        
+        $userData["user_nick_name"] .= "_teste123";
+        $this->user->setEmail($userData["user_email"]);
+        
+        $response = $this->user->updateUserByEmail($userData);
+        $this->assertTrue($response);
+
+        $this->user = new User();
+        $this->user->setEmail($userData["user_email"]);
+        $response = $this->user->findUserByEmail();
+        
+        $this->assertInstanceOf(ModelsUser::class, $response);
+        $this->assertEquals("saraLuiza_teste123", $response->user_nick_name);
+        $this->customer->dropCustomerByUuid();
+    }
+
+    public function testUpdateUserByCustomerId()
+    {
+        $this->customer = new Customer();
+        $customerUuid = Uuid::uuid4();
+        $this->customer->setUuid($customerUuid);
+
+        $requestPost = [
+            "uuid" => $customerUuid,
+            "customer_name" => "Sara Luzia Stefany Gomes",
+            "customer_document" => "193.626.014-00",
+            "birth_date" => "2005-01-26",
+            "customer_gender" => "0",
+            "customer_email" => "sara.luzia.gomes@lumavale.com.br",
+            "customer_zipcode" => "52191-261",
+            "customer_address" => "Rua Juarina",
+            "customer_number" => 624,
+            "customer_neighborhood" => "Nova Descoberta",
+            "customer_city" => "Recife",
+            "customer_state" => "PE",
+            "customer_phone" => "(81) 3799-9446",
+            "cell_phone" => "(81) 99548-0856",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0,
+        ];
+
+        $this->customer->persistData($requestPost);
+        $this->user = new User();
+        $userData = [
+            "id_customer" => $this->customer,
+            "uuid" => Uuid::uuid4(),
+            "user_full_name" => $requestPost["customer_name"],
+            "user_nick_name" => "saraLuiza",
+            "user_email" => $requestPost["customer_email"],
+            "user_password" => password_hash("senha123", PASSWORD_DEFAULT),
+            "deleted" => 0
+        ];
+
+        $this->user->persistData($userData);
+        $this->user = new User();
+        
+        $userData["user_nick_name"] .= "_teste123";
+        $this->user->setEmail($userData["user_email"]);
+        
+        $response = $this->user->updateUserByCustomerId($userData);
+        $this->assertTrue($response);
+
+        $this->user = new User();
+        $this->user->setEmail($userData["user_email"]);
+        $response = $this->user->findUserByEmail();
+        
+        $this->assertInstanceOf(ModelsUser::class, $response);
+        $this->assertEquals("saraLuiza_teste123", $response->user_nick_name);
+        $this->customer->dropCustomerByUuid();
+    }
+
     public function testGetUuid()
     {
         $this->user = new User();
