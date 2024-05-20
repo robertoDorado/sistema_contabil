@@ -3,7 +3,6 @@ namespace Source\Domain\Model;
 
 use Exception;
 use Ramsey\Uuid\Nonstandard\Uuid;
-use Source\Core\Connect;
 use Source\Domain\Support\Tools;
 use Source\Models\Customer as ModelsCustomer;
 use Source\Support\Message;

@@ -2,8 +2,6 @@
 namespace Source\Domain\Model;
 
 use Exception;
-use Ramsey\Uuid\Nonstandard\Uuid;
-use Source\Core\Connect;
 use Source\Domain\Support\Tools;
 use Source\Models\Subscription as ModelsSubscription;
 use Source\Support\Message;

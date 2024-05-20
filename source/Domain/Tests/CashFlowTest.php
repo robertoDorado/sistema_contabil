@@ -139,6 +139,25 @@ class CashFlowTest extends TestCase
         $this->customer->dropCustomerByUuid();
     }
 
+    public function testInvaldKeyOnPersistData()
+    {
+        $this->user = new User();
+        $this->user->setId(rand(1000000, 1000000000));
+        $this->cashFlowGroup = new CashFlowGroup();
+        $cashFlowGroupData = [
+            "uuid" => Uuid::uuid4(),
+            "iduser" => $this->user,
+            "group_name" => "Receitas",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ];
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("esta propriedade id_user foi passado de maneira incorreta");
+        $this->cashFlowGroup->persistData($cashFlowGroupData);
+    }
+
     public function testInvalidCashFlowGroupOnPersistData()
     {
         $this->cashFlow = new CashFlow();
@@ -896,8 +915,8 @@ class CashFlowTest extends TestCase
         ];
 
         $this->cashFlow->persistData($cashFlowData);
-        $response = $this->cashFlow
-        ->findCashFlowDataByDate(date("d/m/Y") . "-" . date("d/m/Y"), $this->user);
+        $response = $this->cashFlow->findCashFlowDataByDate(date("d/m/Y") . "-" . date("d/m/Y"), $this->user);
+
         $this->assertIsArray($response);
         if (!empty($response)) {
             foreach ($response as $object) {
@@ -905,6 +924,18 @@ class CashFlowTest extends TestCase
             }
         }
         $this->customer->dropCustomerByUuid();
+    }
+
+    public function testFindCashFlowDataByDateIsDeleted()
+    {
+        $this->user = new User();
+        $this->user->setId(rand(1000000, 1000000));
+        
+        $this->cashFlow = new CashFlow();
+        $this->cashFlow->findCashFlowDataByDate(date("d/m/Y") . "-" . date("d/m/Y"), $this->user);
+        
+        $this->assertJsonStringEqualsJsonString(json_encode(["error" => "registro não encontrado"]),
+        $this->cashFlow->message->json());
     }
 
     public function testFindCashFlowDataByDateIsInvalid()

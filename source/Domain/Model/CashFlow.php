@@ -3,7 +3,6 @@ namespace Source\Domain\Model;
 
 use Exception;
 use Ramsey\Uuid\Nonstandard\Uuid;
-use Source\Core\Connect;
 use Source\Domain\Support\Tools;
 use Source\Models\CashFlow as ModelsCashFlow;
 use Source\Support\Message;
@@ -101,6 +100,7 @@ class CashFlow
             if (empty($cashFlowData)) {
                 $message = new Message();
                 $message->error("registro não encontrado");
+                $this->data->message = $message;
                 return [];
             }
 

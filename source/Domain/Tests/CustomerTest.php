@@ -213,4 +213,138 @@ class CustomerTest extends TestCase
         $this->assertJsonStringEqualsJsonString(json_encode(["error" => "cliente não encontrado"]), 
         $this->customer->message->json());
     }
+
+    public function testUpdateCustomerByEmail()
+    {
+        $this->customer = new Customer();
+        $customerUuid = Uuid::uuid4();
+
+        $requestPost = [
+            "uuid" => $customerUuid,
+            "customer_name" => "Sarah Luzia Stefany Gomes",
+            "customer_document" => "194.626.014-00",
+            "birth_date" => "2005-01-25",
+            "customer_gender" => "0",
+            "customer_email" => "sarah.luzia.gomes@lumavalee.com.br",
+            "customer_zipcode" => "52191-261",
+            "customer_address" => "Rua Juarina",
+            "customer_number" => 624,
+            "customer_neighborhood" => "Nova Descoberta",
+            "customer_city" => "Recife",
+            "customer_state" => "PE",
+            "customer_phone" => "(81) 3799-9446",
+            "cell_phone" => "(81) 99548-0856",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0,
+        ];
+
+        $this->customer->persistData($requestPost);
+        $this->customer = new Customer();
+
+        $requestPost["customer_name"] = "teste_123";
+        $response = $this->customer->updateCustomerByEmail($requestPost);
+
+        $this->assertTrue($response);
+        $this->customer->email = $requestPost["customer_email"];
+        $customerData = $this->customer->findCustomerByEmail();
+
+        $this->assertEquals("teste_123", $customerData->customer_name);
+        $this->customer = new Customer();
+
+        $this->customer->setUuid($customerUuid);
+        $this->customer->dropCustomerByUuid();
+    }
+
+    public function testUpdateCustomerById()
+    {
+        $this->customer = new Customer();
+        $customerUuid = Uuid::uuid4();
+
+        $requestPost = [
+            "uuid" => $customerUuid,
+            "customer_name" => "Sarah Luzia Stefany Gomes",
+            "customer_document" => "194.626.014-00",
+            "birth_date" => "2005-01-25",
+            "customer_gender" => "0",
+            "customer_email" => "sarah.luzia.gomes@lumavalee.com.br",
+            "customer_zipcode" => "52191-261",
+            "customer_address" => "Rua Juarina",
+            "customer_number" => 624,
+            "customer_neighborhood" => "Nova Descoberta",
+            "customer_city" => "Recife",
+            "customer_state" => "PE",
+            "customer_phone" => "(81) 3799-9446",
+            "cell_phone" => "(81) 99548-0856",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0,
+        ];
+
+        $this->customer->persistData($requestPost);
+        $requestPost["id"] = $this->customer->getId();
+
+        $this->customer = new Customer();
+        $requestPost["customer_name"] = "teste_123";
+        $response = $this->customer->updateCustomerById($requestPost);
+
+        $this->assertTrue($response);
+        $this->customer->customer_id = $requestPost["id"];
+        $customerData = $this->customer->findCustomerById();
+
+        $this->assertEquals("teste_123", $customerData->customer_name);
+        $this->customer = new Customer();
+
+        $this->customer->setUuid($customerUuid);
+        $this->customer->dropCustomerByUuid();
+    }
+
+    public function testFindCustomerByIdNotFound()
+    {
+        $this->customer = new Customer();
+        $this->customer->customer_id = rand(1000000, 1000000000000);
+        $this->customer->findCustomerById();
+        $this->assertJsonStringEqualsJsonString(json_encode(["error" => "cliente não encontrado"]),
+        $this->customer->message->json());
+    }
+
+    public function testFindCustomerByIdWasDeleted()
+    {
+        $this->customer = new Customer();
+        $customerUuid = Uuid::uuid4();
+
+        $requestPost = [
+            "uuid" => $customerUuid,
+            "customer_name" => "Sarah Luzia Stefany Gomes",
+            "customer_document" => "194.626.014-00",
+            "birth_date" => "2005-01-25",
+            "customer_gender" => "0",
+            "customer_email" => "sarah.luzia.gomes@lumavalee.com.br",
+            "customer_zipcode" => "52191-261",
+            "customer_address" => "Rua Juarina",
+            "customer_number" => 624,
+            "customer_neighborhood" => "Nova Descoberta",
+            "customer_city" => "Recife",
+            "customer_state" => "PE",
+            "customer_phone" => "(81) 3799-9446",
+            "cell_phone" => "(81) 99548-0856",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 1,
+        ];
+
+        $this->customer->persistData($requestPost);
+        $lastId = $this->customer->getId();
+        
+        $this->customer = new Customer();
+        $this->customer->customer_id = $lastId;
+
+        $this->customer->findCustomerById();
+        $this->assertJsonStringEqualsJsonString(json_encode(["error" => "este cliente foi deletado"]),
+        $this->customer->message->json());
+
+        $this->customer = new Customer();
+        $this->customer->setUuid($customerUuid);
+        $this->customer->dropCustomerByUuid();
+    }
 }
