@@ -18,3 +18,15 @@
     background: rgb(193, 193, 193);
     background: linear-gradient(90deg, rgba(193, 193, 193, 1) 0%, rgba(138, 138, 140, 1) 52%);
 }
+
+.content-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 15% 5%;
+}
+
+.content-message a {
+    font-size: 1.5rem;
+}

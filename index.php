@@ -62,6 +62,9 @@ $route->post("/cash-flow/modify/{uuid}", "CashFlow::cashFlowModifyData");
 $route->get("/customer/update-data/form", "Customer::updateDataCustomerForm");
 $route->post("/customer/update-data/form", "Customer::updateDataCustomerForm");
 $route->get("/customer/cancel-subscription", "Customer::cancelSubscription");
+$route->get("/warning/empty-company", "Company::warningEmptyCompany");
+$route->get("/company/register", "Company::companyRegister");
+$route->post("/company/register", "Company::companyRegister");
 
 /**
  * API para arquivos CNAB

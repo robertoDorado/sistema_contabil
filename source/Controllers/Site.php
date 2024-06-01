@@ -2,6 +2,7 @@
 namespace Source\Controllers;
 
 use Source\Core\Controller;
+use Source\Domain\Model\Company;
 
 /**
  * Site C:\php-projects\sistema-contabil\source\Controllers
@@ -28,6 +29,14 @@ class Site extends Controller
     {
         if (empty(session()->user)) {
             redirect("/admin/login");
+        }
+
+        $company = new Company();
+        $company->id_user = session()->user->id_user;
+        $dataCompany = $company->findCompanyByUserId(["id"]);
+
+        if (empty($dataCompany)) {
+            redirect("/admin/warning/empty-company");
         }
 
         echo $this->view->render("admin/home", [
