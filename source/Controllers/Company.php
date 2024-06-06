@@ -1,7 +1,10 @@
 <?php
 namespace Source\Controllers;
 
+use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Controller;
+use Source\Domain\Model\Company as ModelCompany;
+use Source\Domain\Model\User;
 
 /**
  * Company Controllers
@@ -24,6 +27,67 @@ class Company extends Controller
         if (empty(session()->user)) {
             redirect("/admin/login");
         }
+
+    if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+        $requestPost = $this->getRequests()->setRequiredFields(
+            [
+                "csrfToken", 
+                "companyName",
+                "companyDocument",
+                "openingDate",
+                "companyZipcode",
+                "companyAddress",
+                "companyAddressNumber",
+                "companyNeighborhood",
+                "companyCity",
+                "companyState",
+                "companyCellPhone"
+            ]
+        )->getAllPostData();
+
+        $user = new User();
+        $user->setEmail(session()->user->user_email);
+        $userData = $user->findUserByEmail(); 
+
+        if (empty($userData)) {
+            http_response_code(500);
+            echo $user->message->json();
+            die;
+        }
+
+        $user->setId($userData->id);
+        $company = new ModelCompany();
+        $response = $company->persistData([
+            "uuid" => Uuid::uuid4(),
+            "id_user" => $user,
+            "company_name" => $requestPost["companyName"],
+            "company_document" => $requestPost["companyDocument"],
+            "state_registration" => $requestPost["stateRegistration"],
+            "opening_date" => date("Y-m-d", strtotime(str_replace("/", "-", $requestPost["openingDate"]))),
+            "web_site" => $requestPost["webSite"],
+            "company_email" => $requestPost["companyEmail"],
+            "company_zipcode" => $requestPost["companyZipcode"],
+            "company_address" => $requestPost["companyAddress"],
+            "company_address_number" => $requestPost["companyAddressNumber"],
+            "company_neighborhood" => $requestPost["companyNeighborhood"],
+            "company_city" => $requestPost["companyCity"],
+            "company_state" => $requestPost["companyState"],
+            "company_phone" => $requestPost["companyPhone"],
+            "company_cell_phone" => $requestPost["companyCellPhone"],
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ]);
+
+        if (empty($response)) {
+            http_response_code(500);
+            echo $company->message->json();
+            die;
+        }
+
+        echo json_encode(["success" => true]);
+        die;
+    }
 
         echo $this->view->render("admin/company-form", [
             "userFullName" => showUserFullName(),

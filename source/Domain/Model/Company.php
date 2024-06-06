@@ -55,7 +55,7 @@ class Company
             return null;
         }
 
-        $columns = !empty($columns) ? implode(", ", $columns) : "";
+        $columns = !empty($columns) ? implode(", ", $columns) : "*";
         return $this->company->find("id_user=:id_user", ":id_user=" . $this->data->id_user . "", $columns)
         ->fetch($fetchAll);
     }

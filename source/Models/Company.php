@@ -89,7 +89,6 @@ class Company extends Model
             $this->companyNeighborhood,
             $this->companyCity,
             $this->companyState,
-            $this->companyPhone,
             $this->companyCellPhone,
             $this->createdAt,
             $this->updatedAt,

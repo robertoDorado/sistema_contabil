@@ -45,7 +45,7 @@ class Company
             "VARCHAR(255) NOT NULL",
             "VARCHAR(255) NOT NULL",
             "VARCHAR(255) NOT NULL",
-            "VARCHAR(255) NOT NULL",
+            "VARCHAR(255) NULL",
             "VARCHAR(255) NOT NULL",
             "DATE NOT NULL",
             "DATE NOT NULL",

@@ -3,6 +3,7 @@ namespace Source\Controllers;
 
 use Source\Core\Controller;
 use Source\Domain\Model\Company;
+use Source\Domain\Model\User;
 
 /**
  * Site C:\php-projects\sistema-contabil\source\Controllers
@@ -31,10 +32,18 @@ class Site extends Controller
             redirect("/admin/login");
         }
 
-        $company = new Company();
-        $company->id_user = session()->user->id_user;
-        $dataCompany = $company->findCompanyByUserId(["id"]);
+        $user = new User();
+        $user->setEmail(session()->user->user_email);
+        $userData = $user->findUserByEmail();
 
+        if (empty($userData)) {
+            redirect("/admin/login");
+        }
+
+        $company = new Company();
+        $company->id_user = $userData->id;
+        $dataCompany = $company->findCompanyByUserId();
+        
         if (empty($dataCompany)) {
             redirect("/admin/warning/empty-company");
         }
