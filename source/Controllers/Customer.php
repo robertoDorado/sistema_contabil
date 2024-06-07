@@ -24,24 +24,8 @@ class Customer extends Controller
 
     public function cancelSubscription()
     {
-        if (empty(session()->user)) {
-            redirect("/admin/login");
-        }
-
         if (session()->user->subscription != "active") {
             redirect("/admin");
-        }
-
-        $customer = new ModelCustomer();
-        $customer->email = session()->user->user_email;
-        $customerData = $customer->findCustomerByEmail();
-
-        if (empty($customerData)) {
-            redirect("/admin/login");
-        }
-        
-        if (!empty($customerData->getDeleted())) {
-            redirect("/admin/login");
         }
 
         echo $this->view->render("admin/cancel-subscription", [
@@ -52,10 +36,6 @@ class Customer extends Controller
 
     public function updateDataCustomerForm()
     {
-        if (empty(session()->user)) {
-            redirect("/admin/login");
-        }
-        
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
             $requestPost = $this->getRequests()->setRequiredFields([
                 "fullName",

@@ -20,6 +20,29 @@ error_reporting(E_ALL & (~E_NOTICE | ~E_USER_NOTICE));
 ini_set('error_log', $path);
 ini_set('log_errors', true);
 
+if (empty($_POST["request"]) && !empty($_SERVER["REDIRECT_URL"]) && $_SERVER["REDIRECT_URL"] != "/admin/logout") {
+    if (empty(session()->user)) {
+        redirect("/admin/login");
+    } else if ($_SERVER["REDIRECT_URL"] != "/admin/company/register") {
+
+        if (!userHasCompany()) {
+            redirect("/admin/warning/empty-company");
+        }
+
+        $customer = new \Source\Domain\Model\Customer();
+        $customer->email = session()->user->user_email;
+        $customerData = $customer->findCustomerByEmail();
+
+        if (empty($customerData)) {
+            redirect("/admin/login");
+        }
+
+        if (!empty($customerData->getDeleted())) {
+            redirect("/admin/login");
+        }
+    }
+}
+
 $route = new MyRouter(url(), "::");
 
 /**

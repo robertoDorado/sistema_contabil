@@ -47,6 +47,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link rel="stylesheet" href="<?= theme("assets/style.css") ?>">
     <!-- Stripe JS -->
     <script src="https://js.stripe.com/v3/"></script>
+    <!-- Select2 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 </head>
 
 <body class="hold-transition <?= $defineClass ?>">
@@ -78,6 +80,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <script src="<?= url(CONF_ADMIN_PATH . "/plugins/bootstrap/js/bootstrap.min.js") ?>"></script>
     <script src="<?= url(CONF_ADMIN_PATH . "/plugins/moment/moment.min.js") ?>"></script>
     <script src="<?= url(CONF_ADMIN_PATH . "/plugins/daterangepicker/daterangepicker.js") ?>"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <!-- Laborcode Scripts -->
     <script src="<?= theme("/assets/scripts.js") ?>"></script>
 </body>

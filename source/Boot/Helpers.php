@@ -1,6 +1,31 @@
 <?php
 
-function validateRequestData(array $requiredKeys, array &$requestData) {
+function getCompanysNameByUserId(): array {
+    $user = new \Source\Domain\Model\User();
+    $user->setEmail(session()->user->user_email);
+    $userData = $user->findUserByEmail();
+
+    $company = new \Source\Domain\Model\Company();
+    $company->id_user = $userData->id;
+    $dataCompany = $company->findAllCompanyByUserId(["company_name", "deleted", "id"]);
+    return empty($dataCompany) ? [] : $dataCompany;
+}
+
+function userHasCompany(): bool
+{
+    $user = new \Source\Domain\Model\User();
+    $user->setEmail(session()->user->user_email);
+    $userData = $user->findUserByEmail();
+
+    $company = new \Source\Domain\Model\Company();
+    $company->id_user = $userData->id;
+    $dataCompany = $company->findCompanyByUserId();
+
+    return empty($dataCompany) ? false : true;
+}
+
+function validateRequestData(array $requiredKeys, array &$requestData)
+{
     if (empty($requestData)) {
         throw new \Exception("dados do cliente não pode estar vazio");
     }

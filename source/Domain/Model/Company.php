@@ -46,7 +46,8 @@ class Company
         return $this->data->$name ?? null;
     }
 
-    public function findCompanyByUserId(array $columns = [], bool $fetchAll = false): ?ModelsCompany
+    /** @var ModelsCompany[]  */
+    public function findAllCompanyByUserId(array $columns = []) : array
     {
         if (empty($this->data->id_user)) {
             $message = new Message();
@@ -57,7 +58,21 @@ class Company
 
         $columns = !empty($columns) ? implode(", ", $columns) : "*";
         return $this->company->find("id_user=:id_user", ":id_user=" . $this->data->id_user . "", $columns)
-        ->fetch($fetchAll);
+        ->fetch(true);
+    }
+
+    public function findCompanyByUserId(array $columns = []): ?ModelsCompany
+    {
+        if (empty($this->data->id_user)) {
+            $message = new Message();
+            $message->error("atributo id_user é obrigatório");
+            $this->data->message = $message;
+            return null;
+        }
+
+        $columns = !empty($columns) ? implode(", ", $columns) : "*";
+        return $this->company->find("id_user=:id_user", ":id_user=" . $this->data->id_user . "", $columns)
+        ->fetch();
     }
 
     public function getUuid(): string

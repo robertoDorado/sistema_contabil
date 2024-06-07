@@ -26,24 +26,8 @@ class CashFlowGroup extends Controller
 
     public function cashFlowGroupModiFyData(array $data)
     {
-        if (empty(session()->user)) {
-            redirect("/admin/login");
-        }
-
         if (empty($data["uuid"])) {
             throw new Exception("parametro uuid não pode estar vazio", 500);
-        }
-
-        $customer = new Customer();
-        $customer->email = session()->user->user_email;
-        $customerData = $customer->findCustomerByEmail();
-
-        if (empty($customerData)) {
-            redirect("/admin/login");
-        }
-        
-        if (!empty($customerData->getDeleted())) {
-            redirect("/admin/login");
         }
 
         $requestPost = $this->getRequests()
@@ -76,22 +60,6 @@ class CashFlowGroup extends Controller
 
     public function cashFlowGroupBackupReport()
     {
-        if (empty(session()->user)) {
-            redirect("/admin/login");
-        }
-
-        $customer = new Customer();
-        $customer->email = session()->user->user_email;
-        $customerData = $customer->findCustomerByEmail();
-
-        if (empty($customerData)) {
-            redirect("/admin/login");
-        }
-        
-        if (!empty($customerData->getDeleted())) {
-            redirect("/admin/login");
-        }
-
         $user = new User();
         $user->setEmail(session()->user->user_email);
         $userData = $user->findUserByEmail();
@@ -113,24 +81,8 @@ class CashFlowGroup extends Controller
 
     public function cashFlowGroupRemoveRegister(array $data)
     {
-        if (empty(session()->user)) {
-            redirect("/admin/login");
-        }
-
         if (empty($data["uuid"])) {
             throw new \Exception("uuid inválido", 500);
-        }
-
-        $customer = new Customer();
-        $customer->email = session()->user->user_email;
-        $customerData = $customer->findCustomerByEmail();
-
-        if (empty($customerData)) {
-            redirect("/admin/login");
-        }
-        
-        if (!empty($customerData->getDeleted())) {
-            redirect("/admin/login");
         }
 
         $uuid = $data["uuid"];
@@ -162,22 +114,6 @@ class CashFlowGroup extends Controller
 
     public function cashFlowGroupFormUpdate(array $data)
     {
-        if (empty(session()->user)) {
-            redirect("/admin/login");
-        }
-
-        $customer = new Customer();
-        $customer->email = session()->user->user_email;
-        $customerData = $customer->findCustomerByEmail();
-
-        if (empty($customerData)) {
-            redirect("/admin/login");
-        }
-        
-        if (!empty($customerData->getDeleted())) {
-            redirect("/admin/login");
-        }
-
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
             $requestPost = $this->getRequests()
             ->setRequiredFields(["csrfToken", "accountGroup"])->getAllPostData();
@@ -243,22 +179,6 @@ class CashFlowGroup extends Controller
 
     public function cashFlowGroupReport()
     {
-        if (empty(session()->user)) {
-            redirect("/admin/login");
-        }
-
-        $customer = new Customer();
-        $customer->email = session()->user->user_email;
-        $customerData = $customer->findCustomerByEmail();
-
-        if (empty($customerData)) {
-            redirect("/admin/login");
-        }
-        
-        if (!empty($customerData->getDeleted())) {
-            redirect("/admin/login");
-        }
-
         $cashFlowGroup = new ModelCashFlowGroup();
         $user = new User();
         $user->setEmail(session()->user->user_email);
@@ -280,22 +200,6 @@ class CashFlowGroup extends Controller
 
     public function cashFlowGroupForm()
     {
-        if (empty(session()->user)) {
-            redirect("/admin/login");
-        }
-
-        $customer = new Customer();
-        $customer->email = session()->user->user_email;
-        $customerData = $customer->findCustomerByEmail();
-
-        if (empty($customerData)) {
-            redirect("/admin/login");
-        }
-        
-        if (!empty($customerData->getDeleted())) {
-            redirect("/admin/login");
-        }
-
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
             $requestPost = $this->getRequests()
             ->setRequiredFields(["csrfToken", "accountGroup"])->getAllPostData();

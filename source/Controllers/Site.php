@@ -28,26 +28,6 @@ class Site extends Controller
 
     public function admin()
     {
-        if (empty(session()->user)) {
-            redirect("/admin/login");
-        }
-
-        $user = new User();
-        $user->setEmail(session()->user->user_email);
-        $userData = $user->findUserByEmail();
-
-        if (empty($userData)) {
-            redirect("/admin/login");
-        }
-
-        $company = new Company();
-        $company->id_user = $userData->id;
-        $dataCompany = $company->findCompanyByUserId();
-        
-        if (empty($dataCompany)) {
-            redirect("/admin/warning/empty-company");
-        }
-
         echo $this->view->render("admin/home", [
             "userFullName" => showUserFullName(),
             "endpoints" => []

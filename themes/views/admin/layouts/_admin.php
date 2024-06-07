@@ -18,9 +18,9 @@
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
         <a href="<?= url("/admin") ?>" class="brand-link text-center">
-            <span class="brand-text font-weight-light">Sistema Contabil</span><br/>
+            <span class="brand-text font-weight-light">Sistema Contabil</span><br />
             <span class="right badge badge-danger"><?= (!empty(session()->user->subscription) &&
-            session()->user->subscription == "active" ? "Assinatura ativa" : "Conta grátis") ?></span><br/>
+                                                        session()->user->subscription == "active" ? "Assinatura ativa" : "Conta grátis") ?></span><br />
             <?php if (!empty(session()->user->period_end) && session()->user->subscription == "active") : ?>
                 <span style="font-size:1rem" class="brand-text font-weight-light">Renovação em <?= date("d/m/Y", strtotime(session()->user->period_end)) ?></span>
             <?php endif ?>
@@ -33,9 +33,45 @@
                 <a href="<?= url("/admin") ?>" class="d-block" style="margin:0 auto">Bem vindo <?= $userFullName ?></a>
             </div>
 
+            <?php if (userHasCompany()) : ?>
+                <div class="container-company">
+                    <div class="form-group">
+                        <select class="form-control" name="selectCompanySession" id="selectCompanySession">
+                            <option value="" disabled selected>Selecione uma empresa</option>
+                            <?php foreach (getCompanysNameByUserId() as $company) : ?>
+                                <?php if (empty($company->getDeleted())) : ?>
+                                    <option value="<?= $company->id ?>"><?= $company->company_name ?></option>
+                                <?php endif ?>
+                            <?php endforeach ?>
+                        </select>
+                    </div>
+                </div>
+            <?php endif ?>
+
             <!-- Sidebar Menu -->
             <nav class="mt-2" sidebarMenu>
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-building-user"></i>
+                            <p>
+                                Empresas
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="<?= url("admin/company/register") ?>" class="nav-link">
+                                    <p>Criar nova empresa</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <p>Relatório de empresas</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                     <li class="nav-item">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-dollar-sign"></i>

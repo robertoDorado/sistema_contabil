@@ -30,24 +30,8 @@ class CashFlow extends Controller
 
     public function cashFlowModifyData(array $data)
     {
-        if (empty(session()->user)) {
-            redirect("/admin/login");
-        }
-
         if (empty($data["uuid"])) {
             throw new Exception("parametro uuid não pode estar vazio", 500);
-        }
-
-        $customer = new Customer();
-        $customer->email = session()->user->user_email;
-        $customerData = $customer->findCustomerByEmail();
-
-        if (empty($customerData)) {
-            redirect("/admin/login");
-        }
-        
-        if (!empty($customerData->getDeleted())) {
-            redirect("/admin/login");
         }
 
         $requestPost = $this->getRequests()
@@ -80,22 +64,6 @@ class CashFlow extends Controller
 
     public function cashFlowBackupReport()
     {
-        if (empty(session()->user)) {
-            redirect("/admin/login");
-        }
-
-        $customer = new Customer();
-        $customer->email = session()->user->user_email;
-        $customerData = $customer->findCustomerByEmail();
-
-        if (empty($customerData)) {
-            redirect("/admin/login");
-        }
-        
-        if (!empty($customerData->getDeleted())) {
-            redirect("/admin/login");
-        }
-
         $user = new User();
         $user->setEmail(session()->user->user_email);
         $userData = $user->findUserByEmail();
@@ -125,22 +93,6 @@ class CashFlow extends Controller
 
     public function findCashFlowDataForChartPie()
     {
-        if (empty(session()->user)) {
-            redirect("/admin/login");
-        }
-
-        $customer = new Customer();
-        $customer->email = session()->user->user_email;
-        $customerData = $customer->findCustomerByEmail();
-
-        if (empty($customerData)) {
-            redirect("/admin/login");
-        }
-        
-        if (!empty($customerData->getDeleted())) {
-            redirect("/admin/login");
-        }
-
         $user = basicsValidatesForChartsRender();
         $cashFlow = new ModelCashFlow();
         $cashFlowData = $cashFlow->findGroupAccountsAgrupped($user);
@@ -167,22 +119,6 @@ class CashFlow extends Controller
 
     public function findCashFlowDataForChartLine()
     {
-        if (empty(session()->user)) {
-            redirect("/admin/login");
-        }
-
-        $customer = new Customer();
-        $customer->email = session()->user->user_email;
-        $customerData = $customer->findCustomerByEmail();
-
-        if (empty($customerData)) {
-            redirect("/admin/login");
-        }
-        
-        if (!empty($customerData->getDeleted())) {
-            redirect("/admin/login");
-        }
-
         $user = basicsValidatesForChartsRender();
         $cashFlow = new ModelCashFlow();
         $cashFlowData = $cashFlow->findCashFlowByUser(["entry", "created_at"], $user);
@@ -245,22 +181,6 @@ class CashFlow extends Controller
 
     public function importExcelFile()
     {
-        if (empty(session()->user)) {
-            redirect("/admin/login");
-        }
-
-        $customer = new Customer();
-        $customer->email = session()->user->user_email;
-        $customerData = $customer->findCustomerByEmail();
-
-        if (empty($customerData)) {
-            redirect("/admin/login");
-        }
-        
-        if (!empty($customerData->getDeleted())) {
-            redirect("/admin/login");
-        }
-
         $file = $this->getRequestFiles()->getFile("excelFile");
         $verifyExtensions = ["xls", "xlsx"];
 
@@ -458,23 +378,7 @@ class CashFlow extends Controller
 
     public function cashFlowRemoveRegister(array $data)
     {
-        if (empty(session()->user)) {
-            redirect("/admin/login");
-        }
-
         if (empty($data["uuid"])) {
-            redirect("/admin/login");
-        }
-
-        $customer = new Customer();
-        $customer->email = session()->user->user_email;
-        $customerData = $customer->findCustomerByEmail();
-
-        if (empty($customerData)) {
-            redirect("/admin/login");
-        }
-        
-        if (!empty($customerData->getDeleted())) {
             redirect("/admin/login");
         }
 
@@ -525,22 +429,6 @@ class CashFlow extends Controller
 
     public function cashFlowUpdateForm(array $data)
     {
-        if (empty(session()->user)) {
-            redirect("/admin/login");
-        }
-
-        $customer = new Customer();
-        $customer->email = session()->user->user_email;
-        $customerData = $customer->findCustomerByEmail();
-
-        if (empty($customerData)) {
-            redirect("/admin/login");
-        }
-        
-        if (!empty($customerData->getDeleted())) {
-            redirect("/admin/login");
-        }
-
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
             $requestPost = $this->getRequests()
                 ->setRequiredFields(
@@ -663,22 +551,6 @@ class CashFlow extends Controller
 
     public function cashFlowReport()
     {
-        if (empty(session()->user)) {
-            redirect("/admin/login");
-        }
-
-        $customer = new Customer();
-        $customer->email = session()->user->user_email;
-        $customerData = $customer->findCustomerByEmail();
-
-        if (empty($customerData)) {
-            redirect("/admin/login");
-        }
-        
-        if (!empty($customerData->getDeleted())) {
-            redirect("/admin/login");
-        }
-
         $user = new User();
         $user->setEmail(session()->user->user_email);
         $userData = $user->findUserByEmail();
@@ -731,22 +603,6 @@ class CashFlow extends Controller
 
     public function cashFlowForm()
     {
-        if (empty(session()->user)) {
-            redirect("/admin/login");
-        }
-
-        $customer = new Customer();
-        $customer->email = session()->user->user_email;
-        $customerData = $customer->findCustomerByEmail();
-
-        if (empty($customerData)) {
-            redirect("/admin/login");
-        }
-        
-        if (!empty($customerData->getDeleted())) {
-            redirect("/admin/login");
-        }
-
         if ($this->getServer()->getServerByKey('REQUEST_METHOD') == 'POST') {
             $requestPost = $this->getRequests()
                 ->setRequiredFields(
