@@ -1,5 +1,6 @@
 <?php $v->layout("admin/layouts/_scripts") ?>
 <div class="wrapper">
+    <?php $v->insert("admin/layouts/_modal_loader") ?>
     <!-- Navbar -->
     <nav class="main-header navbar navbar-expand navbar-white navbar-light">
         <!-- Left navbar links -->
@@ -40,7 +41,7 @@
                             <option value="" disabled selected>Selecione uma empresa</option>
                             <?php foreach (getCompanysNameByUserId() as $company) : ?>
                                 <?php if (empty($company->getDeleted())) : ?>
-                                    <option value="<?= $company->id ?>"><?= $company->company_name ?></option>
+                                    <option value="<?= $company->id ?>" <?= !empty(session()->user->company_id) && session()->user->company_id == $company->id ? "selected" : "" ?>><?= $company->company_name ?></option>
                                 <?php endif ?>
                             <?php endforeach ?>
                         </select>

@@ -2,6 +2,7 @@
 
 namespace Source\Controllers;
 
+use Exception;
 use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Controller;
 use Source\Domain\Model\Company as ModelCompany;
@@ -21,6 +22,20 @@ class Company extends Controller
     public function __construct()
     {
         parent::__construct();
+    }
+
+    public function companySession()
+    {
+        $requestPost = $this->getRequests()->setRequiredFields(["companyId"])
+        ->getAllPostData();
+
+        if (!preg_match("/^\d+$/", $requestPost["companyId"])) {
+            http_response_code(500);
+            throw new Exception("id empresa enválido");
+        }
+
+        session()->user->company_id = $requestPost["companyId"];
+        echo json_encode(["success" => true]);
     }
 
     public function companyRegister()

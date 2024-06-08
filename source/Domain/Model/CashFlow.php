@@ -86,11 +86,12 @@ class CashFlow
                 $date = date("Y-m-d", strtotime(str_replace("/", "-", $date)));
             }
             
+            $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
             $cashFlowData = $this->cashFlow
-                ->find("id_user=:id_user AND deleted=0", 
-                ":id_user=" . $user->getId() . "", $columns)
-                ->join("cash_flow_group", "id", "deleted=0 AND id_user=:id_user",
-                ":id_user=" . $user->getId() . "", "group_name", "id_cash_flow_group", "cash_flow")
+                ->find("id_user=:id_user AND deleted=0 AND id_company=:id_company", 
+                ":id_user=" . $user->getId() . "&:id_company=" . $companyId, $columns)
+                ->join("cash_flow_group", "id", "deleted=0 AND id_user=:id_user AND id_company=:id_company",
+                ":id_user=" . $user->getId() . ":id_company=" . $companyId, "group_name", "id_cash_flow_group", "cash_flow")
                 ->between("created_at", "sistema_contabil.cash_flow", 
                 [
                     "date_init" => $dates[0], 
@@ -163,10 +164,11 @@ class CashFlow
     public function findCashFlowByUser(array $columns = [], User $user): array
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
-        $data = $this->cashFlow->find("id_user=:id_user AND deleted=:deleted", 
-        ":id_user=" . $user->getId() . "&:deleted=0", $columns)
-        ->join("cash_flow_group", "id", "deleted=:deleted AND id_user=:id_user",
-        ":deleted=0&:id_user=" . $user->getId() . "", "group_name", "id_cash_flow_group", "cash_flow")
+        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
+        $data = $this->cashFlow->find("id_user=:id_user AND deleted=:deleted AND id_company=:id_company", 
+        ":id_user=" . $user->getId() . "&:deleted=0&:id_company=" . $companyId, $columns)
+        ->join("cash_flow_group", "id", "deleted=:deleted AND id_user=:id_user AND id_company=:id_company",
+        ":deleted=0&:id_user=" . $user->getId() . "&:id_company=". $companyId, "group_name", "id_cash_flow_group", "cash_flow")
         ->fetch(true);
 
         $message = new Message();

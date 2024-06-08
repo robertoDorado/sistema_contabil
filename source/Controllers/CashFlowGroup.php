@@ -214,10 +214,16 @@ class CashFlowGroup extends Controller
 
             $user->setId($userData->id);
             $cashFlowGroup = new ModelCashFlowGroup();
+
+            if (empty(session()->user->company_id)) {
+                http_response_code(500);
+                throw new Exception("id empresa inválido");
+            }
             
             $response = $cashFlowGroup->persistData([
                 "uuid" => Uuid::uuid4(),
                 "id_user" => $user,
+                "id_company" => session()->user->company_id,
                 "group_name" => $requestPost["accountGroup"],
                 "created_at" => date("Y-m-d"),
                 "updated_at" => date("Y-m-d"),

@@ -88,6 +88,7 @@ $route->get("/customer/cancel-subscription", "Customer::cancelSubscription");
 $route->get("/warning/empty-company", "Company::warningEmptyCompany");
 $route->get("/company/register", "Company::companyRegister");
 $route->post("/company/register", "Company::companyRegister");
+$route->post("/company/sesssion", "Company::companySession");
 
 /**
  * API para arquivos CNAB

@@ -1,4 +1,5 @@
 <?php
+
 namespace Source\Domain\Model;
 
 use Exception;
@@ -50,9 +51,11 @@ class CashFlowGroup
     public function findCashFlowGroupDeletedTrue(array $columns, User $user): array
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
+        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
         $cashFlowGroupData = $this->cashFlowGroup
-        ->find("id_user=:id_user AND deleted=1", ":id_user=" . $user->getId() . "", $columns)
-        ->fetch(true);
+            ->find("id_user=:id_user AND deleted=1 AND id_company=:id_company",
+             ":id_user=" . $user->getId() . "&:id_company=" . $companyId . "", $columns)
+            ->fetch(true);
 
         $message = new Message();
         if (empty($cashFlowGroupData)) {
@@ -69,32 +72,36 @@ class CashFlowGroup
         $columns = empty($columns) ? "*" : implode(", ", $columns);
         $data = $this->cashFlowGroup->find("id_user=:id_user AND deleted=:deleted
         AND group_name=:group_name", ":id_user=" . $user->getId() .
-        "&:deleted=0&:group_name=" . $groupName . "", $columns)->fetch();
-        
+            "&:deleted=0&:group_name=" . $groupName . "", $columns)->fetch();
+
         $message = new Message();
         if (empty($data)) {
             $message->error("nenhum registro foi encontrado");
             $this->data->message = $message;
             return null;
         }
-        
+
         return $data;
     }
 
     /** @return ModelsCashFlowGroup[] */
     public function findCashFlowGroupByUser(array $columns = [], User $user): array
     {
+        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
         $columns = empty($columns) ? "*" : implode(", ", $columns);
-        $data = $this->cashFlowGroup->find("id_user=:id_user AND deleted=:deleted", 
-            ":id_user=" . $user->getId() . "&:deleted=0", $columns)->fetch(true);
-        
-        $message = new Message();
+        $data = $this->cashFlowGroup->find(
+            "id_user=:id_user AND deleted=:deleted AND id_company=:id_company",
+            ":id_user=" . $user->getId() . "&:deleted=0&:id_company=" . $companyId . "",
+            $columns
+        )->fetch(true);
+
         if (empty($data)) {
+            $message = new Message();
             $message->error("nenhum registro foi encontrado");
             $this->data->message = $message;
             return [];
         }
-        
+
         return $data;
     }
 
@@ -102,7 +109,7 @@ class CashFlowGroup
     {
         $cashFlowGroupData = $this->cashFlowGroup->find("uuid=:uuid", ":uuid={$this->getUuid()}")->fetch();
         $message = new Message();
-        
+
         if (empty($cashFlowGroupData)) {
             $message->error("registro não encontrado");
             $this->data->message = $message;
@@ -116,13 +123,13 @@ class CashFlowGroup
     {
         $cashFlowGroupData = $this->cashFlowGroup->find("uuid=:uuid", ":uuid={$this->getUuid()}")->fetch();
         $message = new Message();
-        
+
         if (empty($cashFlowGroupData)) {
             $message->error("o registro não existe");
             $this->data->message = $message;
             return false;
         }
-        
+
         return $cashFlowGroupData->destroy();
     }
 
@@ -142,8 +149,12 @@ class CashFlowGroup
     public function updateCashFlowGroupByUuid(array $data): bool
     {
         $tools = new Tools($this->cashFlowGroup, ModelsCashFlowGroup::class);
-        $response = $tools->updateData("uuid=:uuid", ":uuid={$data['uuid']}",
-        $data, "grupo fluxo de caixa não encontrado");
+        $response = $tools->updateData(
+            "uuid=:uuid",
+            ":uuid={$data['uuid']}",
+            $data,
+            "grupo fluxo de caixa não encontrado"
+        );
         $this->data->message = !empty($tools->message) ? $tools->message : "";
         return !empty($response) ? true : false;
     }
