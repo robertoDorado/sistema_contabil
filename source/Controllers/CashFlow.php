@@ -302,8 +302,15 @@ class CashFlow extends Controller
             array_push($arrayEdit, "<a class='icons' href=" . url("/admin/cash-flow/update/form/" . $uuid . "") . "><i class='fas fa-edit' aria-hidden='true'></i>");
             array_push($arrayDelete, "<a class='icons' href='#'><i style='color:#ff0000' class='fa fa-trash' aria-hidden='true'></i></a>");
 
+            if(empty(session()->user->company_id)) {
+                http_response_code(500);
+                echo json_encode(["error" => "selecione uma empresa antes de criar uma conta"]);
+                die;
+            }
+
             $response = $cashFlow->persistData([
                 "uuid" => $uuid,
+                "id_company" => session()->user->company_id,
                 "id_user" => $user,
                 "id_cash_flow_group" => $cashFlowGroup,
                 "entry" => $launchValue,
@@ -652,7 +659,8 @@ class CashFlow extends Controller
 
             if(empty(session()->user->company_id)) {
                 http_response_code(500);
-                throw new Exception("id empresa inválido");
+                echo json_encode(["error" => "selecione uma empresa antes de criar uma conta"]);
+                die;
             }
             
             $cashFlow = new ModelCashFlow();

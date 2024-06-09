@@ -67,7 +67,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="#" class="nav-link">
+                                <a href="<?= url("admin/compnay/report") ?>" class="nav-link">
                                     <p>Relatório de empresas</p>
                                 </a>
                             </li>

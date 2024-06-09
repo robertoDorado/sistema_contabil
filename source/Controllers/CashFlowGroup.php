@@ -217,7 +217,8 @@ class CashFlowGroup extends Controller
 
             if (empty(session()->user->company_id)) {
                 http_response_code(500);
-                throw new Exception("id empresa inválido");
+                echo json_encode(["error" => "selecione uma empresa antes de criar um grupo de contas"]);
+                die;
             }
             
             $response = $cashFlowGroup->persistData([

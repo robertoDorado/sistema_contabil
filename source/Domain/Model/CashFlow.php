@@ -1,4 +1,5 @@
 <?php
+
 namespace Source\Domain\Model;
 
 use Exception;
@@ -50,11 +51,23 @@ class CashFlow
     public function findCashFlowDeletedTrue(array $columns, User $user): array
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
+        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
         $cashFlowData = $this->cashFlow
-        ->find("id_user=:id_user AND deleted=1", ":id_user=" . $user->getId() . "", $columns)
-        ->join("cash_flow_group", "id", "id_user=:id_user AND deleted=0",
-        ":id_user=" . $user->getId() . "", "group_name", "id_cash_flow_group", "cash_flow")
-        ->fetch(true);
+            ->find(
+                "id_user=:id_user AND deleted=1 AND id_company=:id_company",
+                ":id_user=" . $user->getId() . "&:id_company=" . $companyId . "",
+                $columns
+            )
+            ->join(
+                "cash_flow_group",
+                "id",
+                "id_user=:id_user AND deleted=0 AND id_company=:id_company",
+                ":id_user=" . $user->getId() . "&:id_company=" . $companyId . "",
+                "group_name",
+                "id_cash_flow_group",
+                "cash_flow"
+            )
+            ->fetch(true);
 
         $message = new Message();
         if (empty($cashFlowData)) {
@@ -85,19 +98,32 @@ class CashFlow
             foreach ($dates as &$date) {
                 $date = date("Y-m-d", strtotime(str_replace("/", "-", $date)));
             }
-            
+
             $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
             $cashFlowData = $this->cashFlow
-                ->find("id_user=:id_user AND deleted=0 AND id_company=:id_company", 
-                ":id_user=" . $user->getId() . "&:id_company=" . $companyId, $columns)
-                ->join("cash_flow_group", "id", "deleted=0 AND id_user=:id_user AND id_company=:id_company",
-                ":id_user=" . $user->getId() . ":id_company=" . $companyId, "group_name", "id_cash_flow_group", "cash_flow")
-                ->between("created_at", "sistema_contabil.cash_flow", 
-                [
-                    "date_init" => $dates[0], 
-                    "date_end" => $dates[1]
-                ])->fetch(true);
-            
+                ->find(
+                    "id_user=:id_user AND deleted=0 AND id_company=:id_company",
+                    ":id_user=" . $user->getId() . "&:id_company=" . $companyId,
+                    $columns
+                )
+                ->join(
+                    "cash_flow_group",
+                    "id",
+                    "deleted=0 AND id_user=:id_user AND id_company=:id_company",
+                    ":id_user=" . $user->getId() . ":id_company=" . $companyId,
+                    "group_name",
+                    "id_cash_flow_group",
+                    "cash_flow"
+                )
+                ->between(
+                    "created_at",
+                    "sistema_contabil.cash_flow",
+                    [
+                        "date_init" => $dates[0],
+                        "date_end" => $dates[1]
+                    ]
+                )->fetch(true);
+
             if (empty($cashFlowData)) {
                 $message = new Message();
                 $message->error("registro não encontrado");
@@ -106,7 +132,7 @@ class CashFlow
             }
 
             return $cashFlowData;
-        }else {
+        } else {
             return [];
         }
     }
@@ -114,8 +140,12 @@ class CashFlow
     public function updateCashFlowByUuid(array $data): bool
     {
         $tools = new Tools($this->cashFlow, ModelsCashFlow::class);
-        $response = $tools->updateData("uuid=:uuid", ":uuid={$data['uuid']}",
-        $data, "registro de fluxo de caixa não encontrado");
+        $response = $tools->updateData(
+            "uuid=:uuid",
+            ":uuid={$data['uuid']}",
+            $data,
+            "registro de fluxo de caixa não encontrado"
+        );
         $this->data->message = !empty($tools->message) ? $tools->message : "";
         return !empty($response) ? true : false;
     }
@@ -123,20 +153,27 @@ class CashFlow
     public function dropCashFlowByUuid(): bool
     {
         $cashFlowData = $this->cashFlow
-        ->find("uuid=:uuid", ":uuid={$this->getUuid()}")
-        ->fetch();
-        
+            ->find("uuid=:uuid", ":uuid={$this->getUuid()}")
+            ->fetch();
+
         return $cashFlowData->destroy();
     }
 
     public function findCashFlowByUuid(): ?ModelsCashFlow
     {
         $cashFlowData = $this->cashFlow
-        ->find("uuid=:uuid", ":uuid={$this->getUuid()}")
-        ->join("cash_flow_group", "id", 
-        "deleted=:deleted", ":deleted=0", "group_name", "id_cash_flow_group", "cash_flow")
-        ->fetch();
-        
+            ->find("uuid=:uuid", ":uuid={$this->getUuid()}")
+            ->join(
+                "cash_flow_group",
+                "id",
+                "deleted=:deleted",
+                ":deleted=0",
+                "group_name",
+                "id_cash_flow_group",
+                "cash_flow"
+            )
+            ->fetch();
+
         $message = new Message();
         if (empty($cashFlowData)) {
             $message->error("o registro fluxo de caixa não existe");
@@ -165,11 +202,21 @@ class CashFlow
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
         $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
-        $data = $this->cashFlow->find("id_user=:id_user AND deleted=:deleted AND id_company=:id_company", 
-        ":id_user=" . $user->getId() . "&:deleted=0&:id_company=" . $companyId, $columns)
-        ->join("cash_flow_group", "id", "deleted=:deleted AND id_user=:id_user AND id_company=:id_company",
-        ":deleted=0&:id_user=" . $user->getId() . "&:id_company=". $companyId, "group_name", "id_cash_flow_group", "cash_flow")
-        ->fetch(true);
+        $data = $this->cashFlow->find(
+            "id_user=:id_user AND deleted=:deleted AND id_company=:id_company",
+            ":id_user=" . $user->getId() . "&:deleted=0&:id_company=" . $companyId,
+            $columns
+        )
+            ->join(
+                "cash_flow_group",
+                "id",
+                "deleted=:deleted AND id_user=:id_user AND id_company=:id_company",
+                ":deleted=0&:id_user=" . $user->getId() . "&:id_company=" . $companyId,
+                "group_name",
+                "id_cash_flow_group",
+                "cash_flow"
+            )
+            ->fetch(true);
 
         $message = new Message();
         if (empty($data)) {
@@ -177,7 +224,7 @@ class CashFlow
             $this->data->message = $message;
             return [];
         }
-        
+
         return $data;
     }
 
@@ -197,10 +244,12 @@ class CashFlow
     public function calculateBalance(User $user): float
     {
         $data = $this->cashFlow
-            ->find("id_user=:id_user AND deleted=:deleted",
-            ":id_user=" . $user->getId() . "&:deleted=0")->fetch(true);
+            ->find(
+                "id_user=:id_user AND deleted=:deleted",
+                ":id_user=" . $user->getId() . "&:deleted=0"
+            )->fetch(true);
         $balance = 0;
-        
+
         if (!empty($data)) {
             foreach ($data as $value) {
                 $balance += $value->getEntry();

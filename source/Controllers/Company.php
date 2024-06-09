@@ -24,6 +24,14 @@ class Company extends Controller
         parent::__construct();
     }
 
+    public function companyReport()
+    {
+        echo $this->view->render("admin/company-report", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => ["/admin/company/report"]
+        ]);
+    }
+
     public function companySession()
     {
         $requestPost = $this->getRequests()->setRequiredFields(["companyId"])
