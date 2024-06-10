@@ -1,4 +1,14 @@
-if (window.location.pathname == '/admin/company/register') {
+let currentEndpoint = window.location.pathname
+let uuid = ""
+
+if (/\/\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/.test(currentEndpoint)) {
+    currentEndpoint = currentEndpoint.split("/")
+    uuid = currentEndpoint.pop()
+    currentEndpoint = currentEndpoint.join("/")
+}
+
+const endpoints = ["/admin/company/register", "/admin/company/update/form"]
+if (endpoints.indexOf(currentEndpoint) != -1) {
     $(document).ready(function () {
         $("[name='openingDate']").datepicker({
             format: "dd/mm/yyyy",
@@ -90,7 +100,7 @@ if (window.location.pathname == '/admin/company/register') {
     const companyForm = document.getElementById("companyForm")
     companyForm.addEventListener("submit", function (event) {
         event.preventDefault()
-        
+
         const btnSubmit = this.querySelector("[type='submit']")
         const allowFields = ["stateRegistration", "webSite", "companyEmail", "companyPhone"]
 
@@ -104,15 +114,16 @@ if (window.location.pathname == '/admin/company/register') {
         })
 
         const form = new FormData(this)
-        showSpinner(btnSubmit)
+        if (uuid) {
+            form.append("uuid", uuid)
+        }
 
-        fetch(window.location.href, {
+        showSpinner(btnSubmit)
+        fetch(currentEndpoint, {
             method: "POST",
             body: form
         }).then(data => data.json()).then(function (response) {
-            btnSubmit.innerHTML = "Enviar"
-            btnSubmit.removeAttribute("disabled")
-
+            
             if (response.error) {
                 let message = response.error
                 message = message.charAt(0).toUpperCase() + message
@@ -121,12 +132,18 @@ if (window.location.pathname == '/admin/company/register') {
             }
 
             if (response.success) {
-                toastr.success("Empresa criada com sucesso")
-                inputFields.forEach(function(element) {
-                    if (element.name != "csrfToken") {
-                        element.value = ""
-                    }
-                })
+                if (!uuid) {
+                    btnSubmit.innerHTML = "Enviar"
+                    btnSubmit.removeAttribute("disabled")
+                    toastr.success("Empresa criada com sucesso")
+                    inputFields.forEach(function (element) {
+                        if (element.name != "csrfToken") {
+                            element.value = ""
+                        }
+                    })
+                } else {
+                    window.location.href = window.location.origin + "/admin/company/report"
+                }
             }
         })
     })

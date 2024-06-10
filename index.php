@@ -89,7 +89,9 @@ $route->get("/warning/empty-company", "Company::warningEmptyCompany");
 $route->get("/company/register", "Company::companyRegister");
 $route->post("/company/register", "Company::companyRegister");
 $route->post("/company/sesssion", "Company::companySession");
-$route->get("/compnay/report", "Company::companyReport");
+$route->get("/company/report", "Company::companyReport");
+$route->get("/company/update/form/{uuid}", "Company::companyFormUpdate");
+$route->post("/company/update/form", "Company::companyFormUpdate");
 
 /**
  * API para arquivos CNAB

@@ -30,7 +30,7 @@
 
                         <div class="card-body">
                             <div id="widgets" class="dataTables_wrapper dt-bootstrap4">
-                                <table id="cashFlowGroupReport" class="table table-bordered table-striped">
+                                <table id="companyReport" class="table table-bordered table-striped">
                                     <thead>
                                         <tr>
                                             <th>Id</th>
@@ -40,6 +40,12 @@
                                             <th>Data de abertura</th>
                                             <th>Site</th>
                                             <th>E-mail</th>
+                                            <th>CEP</th>
+                                            <th>Endereço</th>
+                                            <th>Número</th>
+                                            <th>Bairro</th>
+                                            <th>Cidade</th>
+                                            <th>Estado</th>
                                             <th>Telefone</th>
                                             <th>Celular</th>
                                             <th>Editar</th>
@@ -47,7 +53,29 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        
+                                        <?php if (!empty($companyData)) : ?>
+                                            <?php foreach ($companyData as $company) : ?>
+                                                <tr>
+                                                    <td><?= $company->getUuid() ?></td>
+                                                    <td><?= $company->company_name ?></td>
+                                                    <td><?= $company->company_document ?></td>
+                                                    <td><?= $company->state_registration ?></td>
+                                                    <td><?= date("d/m/Y", strtotime($company->opening_date)) ?></td>
+                                                    <td><?= $company->web_site ?></td>
+                                                    <td><?= $company->company_email ?></td>
+                                                    <td><?= $company->company_zipcode ?></td>
+                                                    <td><?= $company->company_address ?></td>
+                                                    <td><?= $company->company_address_number ?></td>
+                                                    <td><?= $company->company_neighborhood ?></td>
+                                                    <td><?= $company->company_city ?></td>
+                                                    <td><?= $company->company_state ?></td>
+                                                    <td><?= $company->company_phone ?></td>
+                                                    <td><?= $company->company_cell_phone ?></td>
+                                                    <td><a class="icons" href="<?= url("/admin/company/update/form/" . $company->getUuid() . "") ?>"><i class="fas fa-edit" aria-hidden="true"></i></a></td>
+                                                    <td><a class="icons" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a></td>
+                                                </tr>
+                                            <?php endforeach ?>
+                                        <?php endif ?>
                                     </tbody>
                                 </table>
                             </div>

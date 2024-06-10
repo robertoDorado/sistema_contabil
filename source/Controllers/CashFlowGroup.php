@@ -162,6 +162,14 @@ class CashFlowGroup extends Controller
             die;
         }
 
+        if (empty($data["uuid"])) {
+            redirect("/admin/cash-flow/report");
+        }
+
+        if (!preg_match("/^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/", $data["uuid"])) {
+            redirect("/admin/cash-flow-group/report");
+        }
+
         $cashFlowGroup = new ModelCashFlowGroup();
         $cashFlowGroup->setUuid($data["uuid"]);
         $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid();
@@ -172,7 +180,7 @@ class CashFlowGroup extends Controller
 
         echo $this->view->render("admin/cash-flow-group-form-update", [
             "userFullName" => showUserFullName(),
-            "endpoints" => ["/admin/cash-flow-group/form", "/admin/cash-flow-group/report"],
+            "endpoints" => [],
             "cashFlowGroupData" => $cashFlowGroupData
         ]);
     }

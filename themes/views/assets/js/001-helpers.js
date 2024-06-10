@@ -1,3 +1,4 @@
+const modal = document.getElementById("loadingModal");
 function extensionFileName(value) {
     return value.split(".").pop().toLowerCase()
 }

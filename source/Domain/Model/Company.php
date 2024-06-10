@@ -46,6 +46,39 @@ class Company
         return $this->data->$name ?? null;
     }
 
+    public function updateCompanyByUuid(array $data): bool
+    {
+        $tools = new Tools($this->company, ModelsCompany::class);
+        $response = $tools->updateData(
+            "uuid=:uuid",
+            ":uuid={$data['uuid']}",
+            $data,
+            "registro de fluxo de caixa não encontrado"
+        );
+        $this->data->message = !empty($tools->message) ? $tools->message : "";
+        return !empty($response) ? true : false;
+    }
+
+    public function findCompanyByUuid(array $columns = []): ?ModelsCompany
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        return $this->company->find("uuid=:uuid AND deleted=0", ":uuid=" . $this->getUuid() . "", $columns)->fetch();
+    }
+
+    /** @var ModelsCompany[] */
+    public function findCompanyByUser(array $columns = []) :array
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        $idUser = empty($this->data->id_user) ? 0 : $this->data->id_user;
+        
+        $result = $this->company->find("id_user=:id_user AND deleted=0", ":id_user={$idUser}", $columns)->fetch(true);
+        if (empty($result)) {
+            return [];
+        }
+        
+        return $result;
+    }
+
     /** @var ModelsCompany[]  */
     public function findAllCompanyByUserId(array $columns = []) : array
     {

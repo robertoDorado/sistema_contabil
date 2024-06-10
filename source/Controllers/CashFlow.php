@@ -35,7 +35,7 @@ class CashFlow extends Controller
         }
 
         $requestPost = $this->getRequests()
-        ->setRequiredFields(["destroy", "restore"])->getAllPostData();
+            ->setRequiredFields(["destroy", "restore"])->getAllPostData();
         $requestPost["restore"] = filter_var($requestPost["restore"], FILTER_VALIDATE_BOOLEAN);
         $requestPost["destroy"] = filter_var($requestPost["destroy"], FILTER_VALIDATE_BOOLEAN);
 
@@ -43,7 +43,7 @@ class CashFlow extends Controller
         $response = false;
         if ($requestPost["restore"]) {
             $response = $cashFlow->updateCashFlowByUuid([
-                "uuid"=> $data["uuid"],
+                "uuid" => $data["uuid"],
                 "deleted" => 0
             ]);
         }
@@ -96,7 +96,7 @@ class CashFlow extends Controller
         $user = basicsValidatesForChartsRender();
         $cashFlow = new ModelCashFlow();
         $cashFlowData = $cashFlow->findGroupAccountsAgrupped($user);
-        
+
         if (empty($cashFlowData)) {
             echo json_encode([]);
             die;
@@ -112,9 +112,10 @@ class CashFlow extends Controller
 
         echo json_encode(
             [
-                "total_accounts" => $totalAccounts, 
+                "total_accounts" => $totalAccounts,
                 "accounts_data" => $accountsData
-            ]);
+            ]
+        );
     }
 
     public function findCashFlowDataForChartLine()
@@ -134,10 +135,10 @@ class CashFlow extends Controller
             die;
         }
 
-        $orderByDate = function($a, $b) {
+        $orderByDate = function ($a, $b) {
             $monthA = date("n", strtotime($a));
             $monthB = date("n", strtotime($b));
-            
+
             $dayA = date("j", strtotime($a));
             $dayB = date("j", strtotime($b));
 
@@ -158,7 +159,7 @@ class CashFlow extends Controller
 
             if (array_key_exists($date, $groupByDate)) {
                 $groupByDate[$date] += $entryValue;
-            }else {
+            } else {
                 $groupByDate[$date] = $entryValue;
             }
         }
@@ -174,7 +175,7 @@ class CashFlow extends Controller
 
         $response["entry"] = array_values($groupByDate);
         $response["created_at"] = array_slice($response["created_at"], 0, 31);
-        
+
         $response["entry"] = array_slice($response["entry"], 0, 31);
         echo json_encode($response);
     }
@@ -281,10 +282,10 @@ class CashFlow extends Controller
                 $launchValue = str_replace(".", ",", $launchValue);
                 $launchValue = str_replace(",", ".", $launchValue);
                 $launchValue = number_format(trim($launchValue), 2, ",", ".");
-            }else {
+            } else {
                 $launchValue = $excelData["l"][$key];
             }
-            
+
 
             $cashFlowGroup = new CashFlowGroup();
             $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByName($excelData["g"][$key], $user);
@@ -302,7 +303,7 @@ class CashFlow extends Controller
             array_push($arrayEdit, "<a class='icons' href=" . url("/admin/cash-flow/update/form/" . $uuid . "") . "><i class='fas fa-edit' aria-hidden='true'></i>");
             array_push($arrayDelete, "<a class='icons' href='#'><i style='color:#ff0000' class='fa fa-trash' aria-hidden='true'></i></a>");
 
-            if(empty(session()->user->company_id)) {
+            if (empty(session()->user->company_id)) {
                 http_response_code(500);
                 echo json_encode(["error" => "selecione uma empresa antes de criar uma conta"]);
                 die;
@@ -343,13 +344,13 @@ class CashFlow extends Controller
                 echo $cashFlow->message->json();
                 die;
             }
-            
+
             array_push($accountGroup, $cashFlowData->group_name);
             array_push($launchDate, date("d/m/Y", strtotime($cashFlowData->created_at)));
-            
+
             array_push($history, $cashFlowData->getHistory());
             $entryTypeString = $cashFlowData->entry_type == 0 ? "Débito" : "Crédito";
-            
+
             array_push($entryType, $entryTypeString);
             $entryValue = "R$ " . number_format($cashFlowData->getEntry(), 2, ",", ".");
             array_push($launchValue, $entryValue);
@@ -367,7 +368,7 @@ class CashFlow extends Controller
         $excelData["Lançamento"] = $launchValue;
 
         $response = [
-            "full_success" => "arquivo importado com sucesso", 
+            "full_success" => "arquivo importado com sucesso",
             "excelData" => json_encode($excelData)
         ];
 
@@ -496,7 +497,7 @@ class CashFlow extends Controller
 
             $cashFlowGroup->setId($cashFlowGroupData->id);
             $cashFlow = new ModelCashFlow();
-            
+
             $response = $cashFlow->updateCashFlowByUuid([
                 "uuid" => $uriParameter,
                 "id_user" => $user,
@@ -520,6 +521,10 @@ class CashFlow extends Controller
         }
 
         if (empty($data["uuid"])) {
+            redirect("/admin/cash-flow/report");
+        }
+
+        if (!preg_match("/^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/", $data["uuid"])) {
             redirect("/admin/cash-flow/report");
         }
 
@@ -550,7 +555,7 @@ class CashFlow extends Controller
 
         echo $this->view->render("admin/cash-flow-form-update", [
             "userFullName" => showUserFullName(),
-            "endpoints" => ["/admin/cash-flow/form", "/admin/cash-flow/report"],
+            "endpoints" => [],
             "cashFlowData" => $cashFlowData,
             "cashFlowGroupData" => $cashFlowGroupData
         ]);
@@ -653,16 +658,16 @@ class CashFlow extends Controller
                 echo $cashFlowGroup->message->json();
                 die;
             }
-            
+
             $cashFlowGroup->setId($cashFlowGroupData->id);
             $user->setId($userData->id);
 
-            if(empty(session()->user->company_id)) {
+            if (empty(session()->user->company_id)) {
                 http_response_code(500);
                 echo json_encode(["error" => "selecione uma empresa antes de criar uma conta"]);
                 die;
             }
-            
+
             $cashFlow = new ModelCashFlow();
             $response = $cashFlow->persistData([
                 "uuid" => Uuid::uuid4(),

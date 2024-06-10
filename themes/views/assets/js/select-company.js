@@ -1,5 +1,4 @@
 $(document).ready(function () {
-    const modal = document.getElementById("loadingModal");
     $('[name="selectCompanySession"]').select2();
     $('[name="selectCompanySession"]').on('select2:select', function (event) {
         const form = new FormData()
