@@ -24,6 +24,48 @@ class Company extends Controller
         parent::__construct();
     }
 
+    public function companyDeleteRegister()
+    {
+        $requestPost = $this->getRequests()->setRequiredFields(["uuid", "csrfToken"])->getAllPostData();
+        if (empty($requestPost["uuid"])) {
+            throw new Exception("uuid inválido");
+        }
+
+        if (!preg_match("/^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/", $requestPost["uuid"])) {
+            throw new Exception("uuid inválido");
+        }
+
+        $company = new ModelCompany();
+        $company->setUuid($requestPost["uuid"]);
+        $companyData = $company->findCompanyByUuid(["id", "deleted"]);
+        
+        if (!empty($companyData->getDeleted())) {
+            throw new Exception("este registro já foi deletado");
+        }
+
+        if (!empty(session()->user->company_id)) {
+            if ($companyData->id == session()->user->company_id) {
+                http_response_code(500);
+                echo json_encode(["error" => "não é possível deletar o id da empresa selecionado"]);
+                die;
+            }
+        }
+
+        $company = new ModelCompany();
+        $response = $company->updateCompanyByUuid([
+            "uuid" => $requestPost["uuid"],
+            "deleted" => 1
+        ]);
+
+        if (empty($response)) {
+            http_response_code(500);
+            echo $company->message->json();
+            die;
+        }
+
+        echo json_encode(["success" => true]);
+    }
+
     public function companyFormUpdate(array $data)
     {
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
@@ -142,12 +184,21 @@ class Company extends Controller
 
     public function companySession()
     {
-        $requestPost = $this->getRequests()->setRequiredFields(["companyId"])
-            ->getAllPostData();
+        $requestPost = $this->getRequests()->setRequiredFields(["companyId"])->getAllPostData();
+        
+        $company = new ModelCompany();
+        $company->setId($requestPost["companyId"]);
+        $companyData = $company->findCompanyById(["id", "deleted"]);
+
+        if (!empty($companyData->getDeleted())) {
+            http_response_code(500);
+            echo json_encode(["error" => "esta empresa já foi deletada"]);
+            die;
+        }
 
         if (!preg_match("/^\d+$/", $requestPost["companyId"])) {
             http_response_code(500);
-            throw new Exception("id empresa enválido");
+            throw new Exception("id empresa inválido");
         }
 
         session()->user->company_id = $requestPost["companyId"];

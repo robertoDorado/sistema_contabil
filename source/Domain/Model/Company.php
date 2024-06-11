@@ -46,6 +46,12 @@ class Company
         return $this->data->$name ?? null;
     }
 
+    public function findCompanyById(array $columns = [])
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        return $this->company->findById($this->getId());
+    }
+
     public function updateCompanyByUuid(array $data): bool
     {
         $tools = new Tools($this->company, ModelsCompany::class);

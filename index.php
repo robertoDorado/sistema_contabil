@@ -92,6 +92,7 @@ $route->post("/company/sesssion", "Company::companySession");
 $route->get("/company/report", "Company::companyReport");
 $route->get("/company/update/form/{uuid}", "Company::companyFormUpdate");
 $route->post("/company/update/form", "Company::companyFormUpdate");
+$route->post("/company/delete", "Company::companyDeleteRegister");
 
 /**
  * API para arquivos CNAB

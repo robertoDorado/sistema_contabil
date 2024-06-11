@@ -9,12 +9,17 @@ $(document).ready(function () {
             method: "POST",
             body: form
         }).then(data => data.json()).then(function (response) {
-            if (!response.success) {
-                toastr.error("Erro interno ao selecionar a empresa")
-                throw new Error("Erro interno ao selecionar a empresa")
+            if (response.error) {
+                let message = response.error
+                message = message.charAt(0).toUpperCase() + message.slice(1)
+                toastr.error(message)
+                modal.style.display = "none"
+                throw new Error(message)
             }
 
-            window.location.href = window.location.href
+            if (response.success) {
+                window.location.href = window.location.href
+            }
         })
     })
 

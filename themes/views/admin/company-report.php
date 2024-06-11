@@ -72,7 +72,7 @@
                                                     <td><?= $company->company_phone ?></td>
                                                     <td><?= $company->company_cell_phone ?></td>
                                                     <td><a class="icons" href="<?= url("/admin/company/update/form/" . $company->getUuid() . "") ?>"><i class="fas fa-edit" aria-hidden="true"></i></a></td>
-                                                    <td><a class="icons" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a></td>
+                                                    <td><a data-csrf="<?= session()->csrf_token ?>" data-uuid="<?= $company->getUuid() ?>" class="icons trash-link" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a></td>
                                                 </tr>
                                             <?php endforeach ?>
                                         <?php endif ?>
