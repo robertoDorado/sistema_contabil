@@ -72,7 +72,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="#" class="nav-link">
+                                <a href="<?= url("/admin/company/backup/report") ?>" class="nav-link">
                                     <p>Backup de empresas</p>
                                 </a>
                             </li>
@@ -123,14 +123,14 @@
                         <a href="#" class="nav-link">
                             <i class="nav-icon fa-solid fa-user"></i>
                             <p>
-                                Cliente
+                                Usuário
                                 <i class="right fas fa-angle-left"></i>
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
                                 <a href="<?= url("/admin/customer/update-data/form") ?>" class="nav-link">
-                                    <p>Formulário do cliente</p>
+                                    <p>Formulário do usuário</p>
                                 </a>
                             </li>
                             <?php if (session()->user->subscription != "active") : ?>

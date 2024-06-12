@@ -100,7 +100,7 @@ class Customer extends Controller
                 "user_full_name" => $requestPost["fullName"],
                 "user_nick_name" => $requestPost["userName"],
                 "user_email" => $requestPost["email"],
-                "user_password" => $requestPost["password"]
+                "user_password" => password_hash($requestPost["password"], PASSWORD_DEFAULT)
             ]);
 
             if (empty($response)) {

@@ -17,13 +17,7 @@ if (window.location.pathname == "/admin/cash-flow/backup/report") {
 
         btnRestoreData.addEventListener("click", function(event) {
             event.preventDefault()
-            const uuid = this.parentElement
-            .previousElementSibling
-            .previousElementSibling
-            .previousElementSibling
-            .previousElementSibling
-            .previousElementSibling
-            .previousElementSibling.innerHTML
+            const uuid = this.closest("tr").firstElementChild.innerHTML
             const row = this.parentElement.parentElement
             data.row = row
             data.uuid = uuid
@@ -34,14 +28,7 @@ if (window.location.pathname == "/admin/cash-flow/backup/report") {
 
         btnDestroyData.addEventListener("click", function(event) {
             event.preventDefault()
-            const uuid = this.parentElement
-            .previousElementSibling
-            .previousElementSibling
-            .previousElementSibling
-            .previousElementSibling
-            .previousElementSibling
-            .previousElementSibling
-            .previousElementSibling.innerHTML
+            const uuid = this.closest("tr").firstElementChild.innerHTML
             const row = this.parentElement.parentElement
             data.row = row
             data.uuid = uuid
@@ -86,7 +73,7 @@ if (window.location.pathname == "/admin/cash-flow/backup/report") {
             body: form
         }).then(response => response.json()).then(function(response) {
             let message = ""
-            saveChanges.innerHTML = "Restaurar"
+            saveChanges.innerHTML = data.destroy ? "Excluir" : "Restaurar"
             saveChanges.removeAttribute("disabled")
 
             if (response.error) {

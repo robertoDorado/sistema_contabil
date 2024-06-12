@@ -5,12 +5,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Formulário de atualização de dados do cliente</h1>
+                    <h1 class="m-0">Formulário de atualização de dados do usuário</h1>
                 </div><!-- /.col -->
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="<?= url("/admin") ?>">Página Inicial</a></li>
-                        <li class="breadcrumb-item active">Formulário de atualização de dados do cliente</li>
+                        <li class="breadcrumb-item active">Formulário de atualização de dados do usuário</li>
                     </ol>
                 </div><!-- /.col -->
             </div><!-- /.row -->
@@ -24,12 +24,12 @@
                 <div class="col">
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">Formulário do cliente</h3>
+                            <h3 class="card-title">Formulário do usuário</h3>
                         </div>
                         <form id="customerUpdateForm">
                             <div class="card-body">
                                 <div class="form-group">
-                                    <label for="fullName">Nome do cliente</label>
+                                    <label for="fullName">Nome completo</label>
                                     <input type="text" name="fullName" value="<?= !empty($customerData->customer_name) ? $customerData->customer_name : "" ?>" id="fullName"class="form-control">
                                 </div>
                                 <div class="form-group">

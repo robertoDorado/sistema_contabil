@@ -1,11 +1,11 @@
-if (window.location.pathname == "/admin/cash-flow-group/backup/report") {
-    const cashFlowGroupDeletedTableReport = document.getElementById("cashFlowGroupDeletedReport")
+if (window.location.pathname == "/admin/company/backup/report") {
+    const companyTableDeletedReport = document.getElementById("companyDeletedReport")
     const launchModal = document.getElementById("launchModal")
     const modalContainer = document.getElementById("modalContainer")
     const saveChanges = modalContainer.querySelector("#saveChanges")
     const dismissModal = modalContainer.querySelector("#dismissModal")
     
-    const tBody = Array.from(cashFlowGroupDeletedTableReport.querySelector("tBody").children)
+    const tBody = Array.from(companyTableDeletedReport.querySelector("tBody").children)
     const data = {
         restore: false,
         destroy: false
@@ -23,6 +23,7 @@ if (window.location.pathname == "/admin/cash-flow-group/backup/report") {
             data.uuid = uuid
             data.restore = true
             data.destroy = false
+            data.csrf = this.closest("td").dataset.csrf
             launchModal.click()
         })
 
@@ -34,6 +35,7 @@ if (window.location.pathname == "/admin/cash-flow-group/backup/report") {
             data.uuid = uuid
             data.destroy = true
             data.restore = false
+            data.csrf = this.closest("td").dataset.csrf
             launchModal.click()
         })
     })
@@ -64,10 +66,12 @@ if (window.location.pathname == "/admin/cash-flow-group/backup/report") {
         showSpinner(saveChanges)
         
         const form = new FormData()
+        form.append("uuid", data.uuid)
         form.append("destroy", data.destroy)
         form.append("restore", data.restore)
+        form.append("csrfToken", data.csrf)
 
-        fetch(window.location.origin + `/admin/cash-flow-group/modify/${data.uuid}`,
+        fetch(window.location.origin + "/admin/company/modify",
         {
             method: "POST",
             body: form
@@ -87,7 +91,7 @@ if (window.location.pathname == "/admin/cash-flow-group/backup/report") {
                 message = response.success
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.success(message)
-                cashFlowGroupDeletedReport.row(data.row).remove().draw()
+                companyDeletedReport.row(data.row).remove().draw()
                 dismissModal.click()
             }
         })

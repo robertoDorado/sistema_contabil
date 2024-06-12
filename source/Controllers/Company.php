@@ -24,6 +24,62 @@ class Company extends Controller
         parent::__construct();
     }
 
+    public function companyModifyData()
+    {
+        $requestPost = $this->getRequests()
+        ->setRequiredFields(["csrfToken", "uuid", "destroy", "restore"])->getAllPostData();
+
+        if (!preg_match("/^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/", $requestPost["uuid"])) {
+            throw new Exception("uuid inválido");
+        }
+
+        $requestPost["restore"] = filter_var($requestPost["restore"], FILTER_VALIDATE_BOOLEAN);
+        $requestPost["destroy"] = filter_var($requestPost["destroy"], FILTER_VALIDATE_BOOLEAN);
+        $company = new ModelCompany();
+        $response = false;
+
+        if ($requestPost["restore"]) {
+            $response = $company->updateCompanyByUuid([
+                "uuid" => $requestPost["uuid"],
+                "deleted" => 0
+            ]);
+        }
+
+        if ($requestPost["destroy"]) {
+            $company->setUuid($requestPost["uuid"]);
+            $response = $company->dropCompanyByUuid();
+        }
+
+        if (empty($response)) {
+            http_response_code(500);
+            echo $company->message->json();
+            die;
+        }
+
+        echo json_encode(["success" => "registro modificado com sucesso"]);
+    }
+
+    public function companyBackupReport()
+    {
+        $user = new User();
+        $user->setEmail(session()->user->user_email);
+        $userData = $user->findUserByEmail(["id", "deleted"]);
+        
+        if (empty($userData)) {
+            redirect("/admin/login");
+        }
+
+        $company = new ModelCompany();
+        $company->id_user = $userData->id;
+        $companyData = $company->findAllCompanyByUserDeleted(["uuid", "company_name", "deleted"]);
+
+        echo $this->view->render("admin/company-backup-report", [
+            "endpoints" => ["/admin/company/backup/report"],
+            "userFullName" => showUserFullName(),
+            "companyData" => $companyData
+        ]);
+    }
+
     public function companyDeleteRegister()
     {
         $requestPost = $this->getRequests()->setRequiredFields(["uuid", "csrfToken"])->getAllPostData();

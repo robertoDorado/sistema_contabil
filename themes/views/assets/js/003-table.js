@@ -154,7 +154,7 @@ const companyReport = dataTableConfig($("#companyReport"),
                 "extend": 'excelHtml5',
                 "filename": "Empresas",
                 "title": "Empresas",
-                customizeData: function(xlsxData) {
+                customizeData: function (xlsxData) {
                     xlsxData.header = xlsxData.header.filter((data) => data != 'Editar' && data != 'Excluir')
                 }
             },
@@ -168,7 +168,7 @@ const companyReport = dataTableConfig($("#companyReport"),
                 "filename": "Empresas",
                 "title": 'Empresas',
                 customize: function (doc) {
-                    doc.content[1].table.body.forEach(function(row) {
+                    doc.content[1].table.body.forEach(function (row) {
                         row.splice(0, 1);
                         row.splice(4, 8);
                         row.splice(6);
@@ -197,6 +197,11 @@ const cashFlowGroupDeletedReport = dataTableConfig($("#cashFlowGroupDeletedRepor
         }
     })
 const cashFlowDeletedReport = dataTableConfig($("#cashFlowDeletedReport"), {
+    "language": {
+        "url": urlJson
+    }
+})
+const companyDeletedReport = dataTableConfig($("#companyDeletedReport"), {
     "language": {
         "url": urlJson
     }

@@ -46,10 +46,31 @@ class Company
         return $this->data->$name ?? null;
     }
 
-    public function findCompanyById(array $columns = [])
+    public function dropCompanyByUuid(): bool
+    {
+        $companyData = $this->company->find("uuid=:uuid", ":uuid=" . $this->getUuid() . "")->fetch();
+        return $companyData->destroy();
+    }
+
+    /** @var ModelsCompany[] */
+    public function findAllCompanyByUserDeleted(array $columns) :array
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
-        return $this->company->findById($this->getId());
+        $idUser = empty($this->data->id_user) ? 0 : $this->data->id_user;
+        $companyData = $this->company->find("id_user=:id_user AND deleted=1", ":id_user=" . $idUser . "", $columns)
+        ->fetch(true);
+
+        if (empty($companyData)) {
+            return [];
+        }
+
+        return $companyData;
+    }
+
+    public function findCompanyById(array $columns = []) : ?ModelsCompany
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        return $this->company->find("id=:id AND deleted=0", ":id=" . $this->getId() . "", $columns)->fetch();
     }
 
     public function updateCompanyByUuid(array $data): bool
@@ -77,40 +98,36 @@ class Company
         $columns = empty($columns) ? "*" : implode(", ", $columns);
         $idUser = empty($this->data->id_user) ? 0 : $this->data->id_user;
         
-        $result = $this->company->find("id_user=:id_user AND deleted=0", ":id_user={$idUser}", $columns)->fetch(true);
-        if (empty($result)) {
+        $companyData = $this->company->find("id_user=:id_user AND deleted=0", ":id_user={$idUser}", $columns)
+        ->fetch(true);
+        
+        if (empty($companyData)) {
             return [];
         }
         
-        return $result;
+        return $companyData;
     }
 
     /** @var ModelsCompany[]  */
     public function findAllCompanyByUserId(array $columns = []) : array
     {
-        if (empty($this->data->id_user)) {
-            $message = new Message();
-            $message->error("atributo id_user é obrigatório");
-            $this->data->message = $message;
-            return null;
+        $idUser = empty($this->data->id_user) ? 0 : $this->data->id_user;
+        $columns = !empty($columns) ? implode(", ", $columns) : "*";
+        $companyData = $this->company->find("id_user=:id_user AND deleted=0", ":id_user=" . $idUser . "", $columns)
+        ->fetch(true);
+
+        if (empty($companyData)) {
+            return [];
         }
 
-        $columns = !empty($columns) ? implode(", ", $columns) : "*";
-        return $this->company->find("id_user=:id_user", ":id_user=" . $this->data->id_user . "", $columns)
-        ->fetch(true);
+        return $companyData;
     }
 
     public function findCompanyByUserId(array $columns = []): ?ModelsCompany
     {
-        if (empty($this->data->id_user)) {
-            $message = new Message();
-            $message->error("atributo id_user é obrigatório");
-            $this->data->message = $message;
-            return null;
-        }
-
+        $idUser = empty($this->data->id_user) ? 0 : $this->data->id_user;
         $columns = !empty($columns) ? implode(", ", $columns) : "*";
-        return $this->company->find("id_user=:id_user", ":id_user=" . $this->data->id_user . "", $columns)
+        return $this->company->find("id_user=:id_user AND deleted=0", ":id_user=" . $idUser . "", $columns)
         ->fetch();
     }
 
