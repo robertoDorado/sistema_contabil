@@ -132,6 +132,26 @@ abstract class Model
         return $this->message;
     }
 
+    public function verifyIfColumnIsNullable(string $columnName): bool
+    {
+        if (preg_match("/\w+\.\w+/", $this->entity)) {
+            $arrayEntity = explode(".", $this->entity);
+            $this->entity = array_pop($arrayEntity);
+        }
+
+        $stmt = $this->read(
+            "SELECT is_nullable 
+            FROM information_schema.columns 
+            WHERE table_schema = :db_name
+            AND table_name = :table_name 
+            AND column_name = :column_name",
+            "db_name=" . CONF_DB_NAME . "&table_name=" . $this->entity . "&column_name=" . $columnName
+        );
+
+        $result = $stmt->fetch(\PDO::FETCH_OBJ);
+        return !empty($result) && $result->is_nullable == "YES" ? true : false;
+    }
+
     /**
      * Query between
      *

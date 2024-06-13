@@ -49,12 +49,34 @@ class Tools
     {
         $flag = !empty($isPersistence) ? "persistir" : "atualizar";
         $this->verifyKeys = [
+            "state_registration" => function ($value) {
+                if (!empty($value)) {
+                    if (!preg_match("/^\d{3}\.\d{3}\.\d{3}\.\d{3}$/", $value)) {
+                        http_response_code(500);
+                        echo json_encode(["error" => "inscrição estadual inválido"]);
+                        die;
+                    }
+                }
+
+                return $value;
+            },
+
+            "company_document" => function ($value) {
+                if (!preg_match("/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/", $value)) {
+                    http_response_code(500);
+                    echo json_encode(["error" => "cnpj inválido"]);
+                    die;
+                }
+                return $value;
+            },
+
             "uuid" => function ($value) {
                 if (!Uuid::isValid($value)) {
                     throw new Exception("uuid inválido");
                 }
                 return $value;
             },
+
             "id_cash_flow_group" => function ($value) use ($flag) {
                 if (!$value instanceof CashFlowGroup) {
                     throw new Exception("Instância inválida ao {$flag} o dado");
@@ -155,8 +177,11 @@ class Tools
 
         if (!empty($properties)) {
             for ($i = 0; $i < count($properties); $i++) {
-                if (!isset($data[$properties[$i]])) {
-                    throw new \Exception("esta propriedade " . $properties[$i] . " foi passado de maneira incorreta");
+                $isNullable = $this->model->verifyIfColumnIsNullable($properties[$i]);
+                if (!$isNullable) {
+                    if (!isset($data[$properties[$i]])) {
+                        throw new \Exception("esta propriedade " . $properties[$i] . " foi passado de maneira incorreta");
+                    }
                 }
             }
         }

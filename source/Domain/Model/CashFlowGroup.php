@@ -48,10 +48,9 @@ class CashFlowGroup
     }
 
     /** @return ModelsCashFlowGroup[] */
-    public function findCashFlowGroupDeletedTrue(array $columns, User $user): array
+    public function findCashFlowGroupDeletedTrue(array $columns, User $user, int $companyId): array
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
-        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
         $cashFlowGroupData = $this->cashFlowGroup
             ->find("id_user=:id_user AND deleted=1 AND id_company=:id_company",
              ":id_user=" . $user->getId() . "&:id_company=" . $companyId . "", $columns)
@@ -85,9 +84,8 @@ class CashFlowGroup
     }
 
     /** @return ModelsCashFlowGroup[] */
-    public function findCashFlowGroupByUser(array $columns = [], User $user): array
+    public function findCashFlowGroupByUser(array $columns = [], User $user, int $companyId): array
     {
-        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
         $columns = empty($columns) ? "*" : implode(", ", $columns);
         $data = $this->cashFlowGroup->find(
             "id_user=:id_user AND deleted=:deleted AND id_company=:id_company",

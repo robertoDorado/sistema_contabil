@@ -69,8 +69,9 @@ class CashFlowGroup extends Controller
         }
 
         $user->setId($userData->id);
+        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
         $cashFlowGroup = new ModelCashFlowGroup();
-        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupDeletedTrue([], $user);
+        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupDeletedTrue([], $user, $companyId);
 
         echo $this->view->render("admin/cash-flow-group-backup-report", [
             "cashFlowGroupData" => $cashFlowGroupData,
@@ -197,7 +198,8 @@ class CashFlowGroup extends Controller
         }
 
         $user->setId($userData->id);
-        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUser([], $user);
+        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
+        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUser([], $user, $companyId);
 
         echo $this->view->render("admin/cash-flow-group-report", [
             "userFullName" => showUserFullName(),

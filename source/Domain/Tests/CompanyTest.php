@@ -5,419 +5,55 @@ namespace Source\Domain\Tests;
 use Exception;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Nonstandard\Uuid;
-use Source\Domain\Model\CashFlowGroup;
 use Source\Domain\Model\Company;
 use Source\Domain\Model\Customer;
 use Source\Domain\Model\User;
-use Source\Models\CashFlowGroup as ModelsCashFlowGroup;
 
 /**
- * CashFlowGroupTest Domain\Tests
+ * CompanyTest Domain\Tests
  * @link 
  * @author Roberto Dorado <robertodorado7@gmail.com>
  * @package Source\Domain\Tests
  */
-class CashFlowGroupTest extends TestCase
+class CompanyTest extends TestCase
 {
-    /** @var CashFlowGroup CashFlowGroup */
-    private CashFlowGroup $cashFlowGroup;
-
-    /** @var Customer Customer */
+    /** @var Customer */
     private Customer $customer;
 
-    /** @var User User */
+    /** @var User */
     private User $user;
 
-    /** @var Company Company */
+    /** @var Company */
     private Company $company;
 
-    public function testInvalidPersistData()
+    public function testExceptionGetId()
     {
-        $this->cashFlowGroup = new CashFlowGroup();
-        $response = $this->cashFlowGroup->persistData([]);
-        if (empty($response)) {
-            $this->assertJsonStringEqualsJsonString(
-                json_encode(["error" => "dados inválidos"]),
-                $this->cashFlowGroup->message->json()
-            );
-        }
+        $this->company = new Company();
+        $this->company->setId(0);
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("id não atribuido");
+        $this->company->getId();
     }
 
-    public function testInvalidUuidOnPersistData()
+    public function testSetInvalidUuid()
     {
-        $this->user = new User();
-        $this->user->setId(362589);
-
-        $this->cashFlowGroup = new CashFlowGroup();
-        $cashFlowGroupData = [
-            "uuid" => "-----",
-            "id_user" => $this->user,
-            "id_company" => random_int(1, 1000),
-            "group_name" => "Receitas",
-            "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d"),
-            "deleted" => 0
-        ];
-
+        $this->company = new Company();
         $this->expectException(Exception::class);
         $this->expectExceptionMessage("uuid inválido");
-        $this->cashFlowGroup->persistData($cashFlowGroupData);
-    }
-
-    public function testPersistCashFlowGroup()
-    {
-        $this->customer = new Customer();
-        $customerUuid = Uuid::uuid4();
-        $this->customer->setUuid($customerUuid);
-
-        $requestPost = [
-            "uuid" => $customerUuid,
-            "customer_name" => "Sarah Luzia Stefany Gomes",
-            "customer_document" => "194.626.014-00",
-            "birth_date" => "2005-01-25",
-            "customer_gender" => "0",
-            "customer_email" => "sarah.luzia.gomes@" . bin2hex(random_bytes(6)) . ".com.br",
-            "customer_zipcode" => "52191-261",
-            "customer_address" => "Rua Juarina",
-            "customer_number" => 624,
-            "customer_neighborhood" => "Nova Descoberta",
-            "customer_city" => "Recife",
-            "customer_state" => "PE",
-            "customer_phone" => "(81) 3799-9446",
-            "cell_phone" => "(81) 99548-0856",
-            "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d"),
-            "deleted" => 0,
-        ];
-
-        $this->customer->persistData($requestPost);
-        $this->user = new User();
-
-        $userData = [
-            "id_customer" => $this->customer,
-            "uuid" => Uuid::uuid4(),
-            "user_full_name" => "Sara Luzia Stefany Gomes",
-            "user_nick_name" => "saraLuiza",
-            "user_email" => $requestPost["customer_email"],
-            "user_password" => password_hash("senha123", PASSWORD_DEFAULT),
-            "deleted" => 0
-        ];
-
-        $this->user->persistData($userData);
-        $this->company = new Company();
-
-        $this->company->persistData([
-            "uuid" => Uuid::uuid4(),
-            "id_user" => $this->user,
-            "company_name" => "Cristiane e Kaique Padaria Ltda",
-            "company_document" => "92.530.674/0001-16",
-            "state_registration" => "214.647.670.499",
-            "opening_date" => date("Y-m-d", strtotime(str_replace("/", "-", "04/10/2019"))),
-            "web_site" => "www.cristianeekaiquepadarialtda.com.br",
-            "company_email" => "desenvolvimento@cristianeekaiquepadarialtda.com.br",
-            "company_zipcode" => "17031-350",
-            "company_address" => "Rua Coronel Ivon César Pimentel",
-            "company_address_number" => "294",
-            "company_neighborhood" => "Parque Paulista",
-            "company_city" => "Bauru",
-            "company_state" => "SP",
-            "company_phone" => "(14) 3858-1464",
-            "company_cell_phone" => "(14) 98974-4671",
-            "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d"),
-            "deleted" => 0
-        ]);
-
-        $this->cashFlowGroup = new CashFlowGroup();
-        $cashFlowGroupData = [
-            "uuid" => Uuid::uuid4(),
-            "id_user" => $this->user,
-            "id_company" => $this->company->getId(),
-            "group_name" => "Receitas",
-            "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d"),
-            "deleted" => 0
-        ];
-
-        $response = $this->cashFlowGroup->persistData($cashFlowGroupData);
-        $this->assertTrue($response);
-        $this->customer->dropCustomerByUuid();
-    }
-
-    public function testPersistDataInvalidUserInstance()
-    {
-        $this->cashFlowGroup = new CashFlowGroup();
-        $cashFlowGroupData = [
-            "uuid" => Uuid::uuid4(),
-            "id_user" => new Customer(),
-            "id_company" => random_int(1, 1000),
-            "group_name" => "Receitas",
-            "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d"),
-            "deleted" => 0
-        ];
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage("Instância inválida ao persistir o dado");
-        $this->cashFlowGroup->persistData($cashFlowGroupData);
-    }
-
-    public function testGetId()
-    {
-        $this->cashFlowGroup = new CashFlowGroup();
-        $this->cashFlowGroup->setId(100);
-        $response = $this->cashFlowGroup->getId();
-        $this->assertIsInt($response);
-        $this->assertEquals(100, $response);
-    }
-
-    public function testGetEmptyId()
-    {
-        $this->cashFlowGroup = new CashFlowGroup();
-        $this->cashFlowGroup->setId(0);
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage("Id não atribuido");
-        $this->cashFlowGroup->getId();
-    }
-
-    public function testUpdateCashFlowGroupByUuid()
-    {
-        $this->customer = new Customer();
-        $customerUuid = Uuid::uuid4();
-        $this->customer->setUuid($customerUuid);
-
-        $requestPost = [
-            "uuid" => $customerUuid,
-            "customer_name" => "Sarah Luzia Stefany Gomes",
-            "customer_document" => "194.626.014-00",
-            "birth_date" => "2005-01-25",
-            "customer_gender" => "0",
-            "customer_email" => "sarah.luzia.gomes@" . bin2hex(random_bytes(6)) . ".com.br",
-            "customer_zipcode" => "52191-261",
-            "customer_address" => "Rua Juarina",
-            "customer_number" => 624,
-            "customer_neighborhood" => "Nova Descoberta",
-            "customer_city" => "Recife",
-            "customer_state" => "PE",
-            "customer_phone" => "(81) 3799-9446",
-            "cell_phone" => "(81) 99548-0856",
-            "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d"),
-            "deleted" => 0,
-        ];
-
-        $this->customer->persistData($requestPost);
-        $this->user = new User();
-
-        $userData = [
-            "id_customer" => $this->customer,
-            "uuid" => Uuid::uuid4(),
-            "user_full_name" => "Sara Luzia Stefany Gomes",
-            "user_nick_name" => "saraLuiza",
-            "user_email" => $requestPost["customer_email"],
-            "user_password" => password_hash("senha123", PASSWORD_DEFAULT),
-            "deleted" => 0
-        ];
-
-        $this->user->persistData($userData);
-        $this->company = new Company();
-
-        $this->company->persistData([
-            "uuid" => Uuid::uuid4(),
-            "id_user" => $this->user,
-            "company_name" => "Cristiane e Kaique Padaria Ltda",
-            "company_document" => "92.530.674/0001-16",
-            "state_registration" => "214.647.670.499",
-            "opening_date" => date("Y-m-d", strtotime(str_replace("/", "-", "04/10/2019"))),
-            "web_site" => "www.cristianeekaiquepadarialtda.com.br",
-            "company_email" => "desenvolvimento@cristianeekaiquepadarialtda.com.br",
-            "company_zipcode" => "17031-350",
-            "company_address" => "Rua Coronel Ivon César Pimentel",
-            "company_address_number" => "294",
-            "company_neighborhood" => "Parque Paulista",
-            "company_city" => "Bauru",
-            "company_state" => "SP",
-            "company_phone" => "(14) 3858-1464",
-            "company_cell_phone" => "(14) 98974-4671",
-            "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d"),
-            "deleted" => 0
-        ]);
-
-        $this->cashFlowGroup = new CashFlowGroup();
-        $cashFlowGroupUuid = Uuid::uuid4();
-
-        $cashFlowGroupData = [
-            "uuid" => $cashFlowGroupUuid,
-            "id_company" => $this->company->getId(),
-            "id_user" => $this->user,
-            "group_name" => "Receitas",
-            "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d"),
-            "deleted" => 0
-        ];
-
-        $this->cashFlowGroup->persistData($cashFlowGroupData);
-        $cashFlowGroupData = [
-            "uuid" => $cashFlowGroupUuid,
-            "id_user" => $this->user,
-            "group_name" => "Receitas de vendas"
-        ];
-
-        $this->cashFlowGroup = new CashFlowGroup();
-        $response = $this->cashFlowGroup->updateCashFlowGroupByUuid($cashFlowGroupData);
-        $this->assertTrue($response);
-
-        $this->cashFlowGroup = new CashFlowGroup();
-        $this->cashFlowGroup->setUuid($cashFlowGroupUuid);
-
-        $cashFlowGroupData = $this->cashFlowGroup->findCashFlowGroupByUuid();
-        $this->assertEquals("Receitas de vendas", $cashFlowGroupData->group_name);
-        $this->customer->dropCustomerByUuid();
-    }
-
-    public function testUpdateCashFlowGroupByUuidParamIsEmpty()
-    {
-        $this->cashFlowGroup = new CashFlowGroup();
-        $response = $this->cashFlowGroup->updateCashFlowGroupByUuid([]);
-        if (empty($response)) {
-            $this->assertJsonStringEqualsJsonString(
-                json_encode(["error" => "parametro data não pode ser vazio"]),
-                $this->cashFlowGroup->message->json()
-            );
-        }
-    }
-
-    public function testUpdateCashFlowGroupByUuidNotFound()
-    {
-        $this->cashFlowGroup = new CashFlowGroup();
-        $response = $this->cashFlowGroup->updateCashFlowGroupByUuid([
-            "uuid" => Uuid::uuid4(),
-            "group_name" => "teste"
-        ]);
-        if (empty($response)) {
-            $this->assertJsonStringEqualsJsonString(
-                json_encode(["error" => "grupo fluxo de caixa não encontrado"]),
-                $this->cashFlowGroup->message->json()
-            );
-        }
-    }
-
-    public function testUpdateCashFlowGroupByUuidInvalidInstance()
-    {
-        $this->customer = new Customer();
-        $customerUuid = "1eef5b42-975f-6e18-b69f-0242ac120003";
-        $this->customer->setUuid($customerUuid);
-
-        $requestPost = [
-            "uuid" => $customerUuid,
-            "customer_name" => "Sarah Luzia Stefany Gomes",
-            "customer_document" => "194.626.014-00",
-            "birth_date" => "2005-01-25",
-            "customer_gender" => "0",
-            "customer_email" => "sarah.luzia.gomes@" . bin2hex(random_bytes(6)) . ".com.br",
-            "customer_zipcode" => "52191-261",
-            "customer_address" => "Rua Juarina",
-            "customer_number" => 624,
-            "customer_neighborhood" => "Nova Descoberta",
-            "customer_city" => "Recife",
-            "customer_state" => "PE",
-            "customer_phone" => "(81) 3799-9446",
-            "cell_phone" => "(81) 99548-0856",
-            "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d"),
-            "deleted" => 0,
-        ];
-
-        $this->customer->persistData($requestPost);
-        $this->user = new User();
-
-        $userData = [
-            "id_customer" => $this->customer,
-            "uuid" => Uuid::uuid4(),
-            "user_full_name" => "Sara Luzia Stefany Gomes",
-            "user_nick_name" => "saraLuiza",
-            "user_email" => $requestPost["customer_email"],
-            "user_password" => password_hash("senha123", PASSWORD_DEFAULT),
-            "deleted" => 0
-        ];
-
-        $this->user->persistData($userData);
-        $this->company = new Company();
-
-        $this->company->persistData([
-            "uuid" => Uuid::uuid4(),
-            "id_user" => $this->user,
-            "company_name" => "Cristiane e Kaique Padaria Ltda",
-            "company_document" => "92.530.674/0001-16",
-            "state_registration" => "214.647.670.499",
-            "opening_date" => date("Y-m-d", strtotime(str_replace("/", "-", "04/10/2019"))),
-            "web_site" => "www.cristianeekaiquepadarialtda.com.br",
-            "company_email" => "desenvolvimento@cristianeekaiquepadarialtda.com.br",
-            "company_zipcode" => "17031-350",
-            "company_address" => "Rua Coronel Ivon César Pimentel",
-            "company_address_number" => "294",
-            "company_neighborhood" => "Parque Paulista",
-            "company_city" => "Bauru",
-            "company_state" => "SP",
-            "company_phone" => "(14) 3858-1464",
-            "company_cell_phone" => "(14) 98974-4671",
-            "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d"),
-            "deleted" => 0
-        ]);
-
-        $this->cashFlowGroup = new CashFlowGroup();
-        $cashFlowGroupUuid = Uuid::uuid4();
-
-        $cashFlowGroupData = [
-            "uuid" => $cashFlowGroupUuid,
-            "id_user" => $this->user,
-            "id_company" => $this->company->getId(),
-            "group_name" => "Receitas",
-            "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d"),
-            "deleted" => 0
-        ];
-
-        $this->cashFlowGroup->persistData($cashFlowGroupData);
-        $cashFlowGroupData = [
-            "uuid" => $cashFlowGroupUuid,
-            "id_user" => $this->customer
-        ];
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage("Instância inválida ao atualizar o dado");
-        $this->cashFlowGroup->updateCashFlowGroupByUuid($cashFlowGroupData);
-    }
-
-    public function testCleanDataBase()
-    {
-        $this->customer = new Customer();
-        $this->customer->setUuid("1eef5b42-975f-6e18-b69f-0242ac120003");
-        $response = $this->customer->dropCustomerByUuid();
-        $this->assertTrue($response);
+        $this->company->setUuid("--");
     }
 
     public function testGetUuid()
     {
-        $this->cashFlowGroup = new CashFlowGroup();
-        $this->cashFlowGroup->setUuid("1eef5b42-975f-6e18-b69f-0242ac120003");
-        $response = $this->cashFlowGroup->getUuid();
-        $this->assertEquals("1eef5b42-975f-6e18-b69f-0242ac120003", $response);
-        $this->assertIsString($response);
+        $this->company = new Company();
+        $this->company->setUuid(Uuid::uuid4());
+        $this->assertIsString($this->company->getUuid());
     }
 
-    public function testGetInvalidUuid()
-    {
-        $this->cashFlowGroup = new CashFlowGroup();
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage("uuid inválido");
-        $this->cashFlowGroup->setUuid("----------");
-    }
-
-    public function testDropCashFlowGroupByUuid()
+    public function testFindCompanyByUserId()
     {
         $this->customer = new Customer();
-        $customerUuid = Uuid::uuid4();
+        $customerUuid = "1eed7357-6e74-6096-abf0-0242ac120003";
         $this->customer->setUuid($customerUuid);
 
         $requestPost = [
@@ -455,7 +91,6 @@ class CashFlowGroupTest extends TestCase
 
         $this->user->persistData($userData);
         $this->company = new Company();
-
         $this->company->persistData([
             "uuid" => Uuid::uuid4(),
             "id_user" => $this->user,
@@ -478,373 +113,545 @@ class CashFlowGroupTest extends TestCase
             "deleted" => 0
         ]);
 
-        $this->cashFlowGroup = new CashFlowGroup();
-        $cashFlowGroupUuid = Uuid::uuid4();
+        $this->company = new Company();
+        $this->company->id_user = $this->user->getId();
+        $companyData = $this->company->findCompanyByUserId();
+        $this->assertIsObject($companyData);
+        $this->assertEquals("Cristiane e Kaique Padaria Ltda", $companyData->company_name);
+        $this->customer->dropCustomerByUuid();
+    }
 
-        $cashFlowGroupData = [
-            "uuid" => $cashFlowGroupUuid,
-            "id_company" => $this->company->getId(),
-            "id_user" => $this->user,
-            "group_name" => "Receitas",
+    public function testFindAllCompanyByUserId()
+    {
+        $this->customer = new Customer();
+        $customerUuid = "1eed7357-6e74-6096-abf0-0242ac120003";
+        $this->customer->setUuid($customerUuid);
+
+        $requestPost = [
+            "uuid" => $customerUuid,
+            "customer_name" => "Sarah Luzia Stefany Gomes",
+            "customer_document" => "194.626.014-00",
+            "birth_date" => "2005-01-25",
+            "customer_gender" => "0",
+            "customer_email" => "sarah.luzia.gomes@" . bin2hex(random_bytes(6)) . ".com.br",
+            "customer_zipcode" => "52191-261",
+            "customer_address" => "Rua Juarina",
+            "customer_number" => 624,
+            "customer_neighborhood" => "Nova Descoberta",
+            "customer_city" => "Recife",
+            "customer_state" => "PE",
+            "customer_phone" => "(81) 3799-9446",
+            "cell_phone" => "(81) 99548-0856",
             "created_at" => date("Y-m-d"),
             "updated_at" => date("Y-m-d"),
+            "deleted" => 0,
+        ];
+
+        $this->customer->persistData($requestPost);
+        $this->user = new User();
+
+        $userData = [
+            "id_customer" => $this->customer,
+            "uuid" => Uuid::uuid4(),
+            "user_full_name" => "Sara Luzia Stefany Gomes",
+            "user_nick_name" => "saraLuiza",
+            "user_email" => $requestPost["customer_email"],
+            "user_password" => password_hash("senha123", PASSWORD_DEFAULT),
             "deleted" => 0
         ];
 
-        $this->cashFlowGroup->persistData($cashFlowGroupData);
-        $this->cashFlowGroup = new CashFlowGroup();
+        $this->user->persistData($userData);
+        $this->company = new Company();
+        $this->company->persistData([
+            "uuid" => Uuid::uuid4(),
+            "id_user" => $this->user,
+            "company_name" => "Cristiane e Kaique Padaria Ltda",
+            "company_document" => "92.530.674/0001-16",
+            "state_registration" => "214.647.670.499",
+            "opening_date" => date("Y-m-d", strtotime(str_replace("/", "-", "04/10/2019"))),
+            "web_site" => "www.cristianeekaiquepadarialtda.com.br",
+            "company_email" => "desenvolvimento@cristianeekaiquepadarialtda.com.br",
+            "company_zipcode" => "17031-350",
+            "company_address" => "Rua Coronel Ivon César Pimentel",
+            "company_address_number" => "294",
+            "company_neighborhood" => "Parque Paulista",
+            "company_city" => "Bauru",
+            "company_state" => "SP",
+            "company_phone" => "(14) 3858-1464",
+            "company_cell_phone" => "(14) 98974-4671",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ]);
 
-        $this->cashFlowGroup->setUuid($cashFlowGroupUuid);
-        $response = $this->cashFlowGroup->dropCashFlowGroupByUuid();
+        $this->company = new Company();
+        $this->company->id_user = $this->user->getId();
+        $companyData = $this->company->findAllCompanyByUserId();
+        $this->assertIsArray($companyData);
+        $this->assertEquals("Cristiane e Kaique Padaria Ltda", $companyData[0]->company_name);
+        $this->assertIsInt($this->company->id_user);
+        $this->customer->dropCustomerByUuid();
+    }
+
+    public function testFindAllCompanyByUserIdIsEmpty()
+    {
+        $this->company = new Company();
+        $this->company->id_user = 0;
+        $companyData = $this->company->findAllCompanyByUserId();
+        $this->assertIsArray($companyData);
+    }
+
+    public function testFindCompanyByUser()
+    {
+        $this->customer = new Customer();
+        $customerUuid = "1eed7357-6e74-6096-abf0-0242ac120003";
+        $this->customer->setUuid($customerUuid);
+
+        $requestPost = [
+            "uuid" => $customerUuid,
+            "customer_name" => "Sarah Luzia Stefany Gomes",
+            "customer_document" => "194.626.014-00",
+            "birth_date" => "2005-01-25",
+            "customer_gender" => "0",
+            "customer_email" => "sarah.luzia.gomes@" . bin2hex(random_bytes(6)) . ".com.br",
+            "customer_zipcode" => "52191-261",
+            "customer_address" => "Rua Juarina",
+            "customer_number" => 624,
+            "customer_neighborhood" => "Nova Descoberta",
+            "customer_city" => "Recife",
+            "customer_state" => "PE",
+            "customer_phone" => "(81) 3799-9446",
+            "cell_phone" => "(81) 99548-0856",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0,
+        ];
+
+        $this->customer->persistData($requestPost);
+        $this->user = new User();
+
+        $userData = [
+            "id_customer" => $this->customer,
+            "uuid" => Uuid::uuid4(),
+            "user_full_name" => "Sara Luzia Stefany Gomes",
+            "user_nick_name" => "saraLuiza",
+            "user_email" => $requestPost["customer_email"],
+            "user_password" => password_hash("senha123", PASSWORD_DEFAULT),
+            "deleted" => 0
+        ];
+
+        $this->user->persistData($userData);
+        $this->company = new Company();
+        $this->company->persistData([
+            "uuid" => Uuid::uuid4(),
+            "id_user" => $this->user,
+            "company_name" => "Cristiane e Kaique Padaria Ltda",
+            "company_document" => "92.530.674/0001-16",
+            "state_registration" => "214.647.670.499",
+            "opening_date" => date("Y-m-d", strtotime(str_replace("/", "-", "04/10/2019"))),
+            "web_site" => "www.cristianeekaiquepadarialtda.com.br",
+            "company_email" => "desenvolvimento@cristianeekaiquepadarialtda.com.br",
+            "company_zipcode" => "17031-350",
+            "company_address" => "Rua Coronel Ivon César Pimentel",
+            "company_address_number" => "294",
+            "company_neighborhood" => "Parque Paulista",
+            "company_city" => "Bauru",
+            "company_state" => "SP",
+            "company_phone" => "(14) 3858-1464",
+            "company_cell_phone" => "(14) 98974-4671",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ]);
+
+        $this->company = new Company();
+        $this->company->id_user = $this->user->getId();
+        $companyData = $this->company->findCompanyByUser();
+        $this->assertIsArray($companyData);
+        $this->assertEquals("Cristiane e Kaique Padaria Ltda", $companyData[0]->company_name);
+        $this->assertIsInt($this->company->id_user);
+        $this->customer->dropCustomerByUuid();
+    }
+
+    public function testFindCompanyByUserIsEmpty()
+    {
+        $this->company = new Company();
+        $this->company->id_user = 0;
+        $companyData = $this->company->findCompanyByUser();
+        $this->assertIsArray($companyData);
+    }
+
+    public function testFindCompanyByUuid()
+    {
+        $this->customer = new Customer();
+        $customerUuid = "1eed7357-6e74-6096-abf0-0242ac120003";
+        $this->customer->setUuid($customerUuid);
+
+        $requestPost = [
+            "uuid" => $customerUuid,
+            "customer_name" => "Sarah Luzia Stefany Gomes",
+            "customer_document" => "194.626.014-00",
+            "birth_date" => "2005-01-25",
+            "customer_gender" => "0",
+            "customer_email" => "sarah.luzia.gomes@" . bin2hex(random_bytes(6)) . ".com.br",
+            "customer_zipcode" => "52191-261",
+            "customer_address" => "Rua Juarina",
+            "customer_number" => 624,
+            "customer_neighborhood" => "Nova Descoberta",
+            "customer_city" => "Recife",
+            "customer_state" => "PE",
+            "customer_phone" => "(81) 3799-9446",
+            "cell_phone" => "(81) 99548-0856",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0,
+        ];
+
+        $this->customer->persistData($requestPost);
+        $this->user = new User();
+
+        $userData = [
+            "id_customer" => $this->customer,
+            "uuid" => Uuid::uuid4(),
+            "user_full_name" => "Sara Luzia Stefany Gomes",
+            "user_nick_name" => "saraLuiza",
+            "user_email" => $requestPost["customer_email"],
+            "user_password" => password_hash("senha123", PASSWORD_DEFAULT),
+            "deleted" => 0
+        ];
+
+        $this->user->persistData($userData);
+        $this->company = new Company();
+        $companyUuid = Uuid::uuid4();
+        $this->company->persistData([
+            "uuid" => $companyUuid,
+            "id_user" => $this->user,
+            "company_name" => "Cristiane e Kaique Padaria Ltda",
+            "company_document" => "92.530.674/0001-16",
+            "state_registration" => "214.647.670.499",
+            "opening_date" => date("Y-m-d", strtotime(str_replace("/", "-", "04/10/2019"))),
+            "web_site" => "www.cristianeekaiquepadarialtda.com.br",
+            "company_email" => "desenvolvimento@cristianeekaiquepadarialtda.com.br",
+            "company_zipcode" => "17031-350",
+            "company_address" => "Rua Coronel Ivon César Pimentel",
+            "company_address_number" => "294",
+            "company_neighborhood" => "Parque Paulista",
+            "company_city" => "Bauru",
+            "company_state" => "SP",
+            "company_phone" => "(14) 3858-1464",
+            "company_cell_phone" => "(14) 98974-4671",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ]);
+
+        $this->company = new Company();
+        $this->company->setUuid($companyUuid);
+        $companyData = $this->company->findCompanyByUuid();
+        $this->assertIsObject($companyData);
+        $this->assertEquals("Cristiane e Kaique Padaria Ltda", $companyData->company_name);
+        $this->customer->dropCustomerByUuid();
+    }
+
+    public function testUpdateCompanyByUuid()
+    {
+        $this->customer = new Customer();
+        $customerUuid = "1eed7357-6e74-6096-abf0-0242ac120003";
+        $this->customer->setUuid($customerUuid);
+
+        $requestPost = [
+            "uuid" => $customerUuid,
+            "customer_name" => "Sarah Luzia Stefany Gomes",
+            "customer_document" => "194.626.014-00",
+            "birth_date" => "2005-01-25",
+            "customer_gender" => "0",
+            "customer_email" => "sarah.luzia.gomes@" . bin2hex(random_bytes(6)) . ".com.br",
+            "customer_zipcode" => "52191-261",
+            "customer_address" => "Rua Juarina",
+            "customer_number" => 624,
+            "customer_neighborhood" => "Nova Descoberta",
+            "customer_city" => "Recife",
+            "customer_state" => "PE",
+            "customer_phone" => "(81) 3799-9446",
+            "cell_phone" => "(81) 99548-0856",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0,
+        ];
+
+        $this->customer->persistData($requestPost);
+        $this->user = new User();
+
+        $userData = [
+            "id_customer" => $this->customer,
+            "uuid" => Uuid::uuid4(),
+            "user_full_name" => "Sara Luzia Stefany Gomes",
+            "user_nick_name" => "saraLuiza",
+            "user_email" => $requestPost["customer_email"],
+            "user_password" => password_hash("senha123", PASSWORD_DEFAULT),
+            "deleted" => 0
+        ];
+
+        $this->user->persistData($userData);
+        $this->company = new Company();
+        $companyUuid = Uuid::uuid4();
+        $this->company->persistData([
+            "uuid" => $companyUuid,
+            "id_user" => $this->user,
+            "company_name" => "Cristiane e Kaique Padaria Ltda",
+            "company_document" => "92.530.674/0001-16",
+            "state_registration" => "214.647.670.499",
+            "opening_date" => date("Y-m-d", strtotime(str_replace("/", "-", "04/10/2019"))),
+            "web_site" => "www.cristianeekaiquepadarialtda.com.br",
+            "company_email" => "desenvolvimento@cristianeekaiquepadarialtda.com.br",
+            "company_zipcode" => "17031-350",
+            "company_address" => "Rua Coronel Ivon César Pimentel",
+            "company_address_number" => "294",
+            "company_neighborhood" => "Parque Paulista",
+            "company_city" => "Bauru",
+            "company_state" => "SP",
+            "company_phone" => "(14) 3858-1464",
+            "company_cell_phone" => "(14) 98974-4671",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ]);
+
+        $this->company = new Company();
+        $response = $this->company->updateCompanyByUuid([
+            "uuid" => $companyUuid,
+            "company_state" => "MG"
+        ]);
+
+        $this->assertTrue($response);
+        $this->company = new Company();
+        $this->company->setUuid($companyUuid);
+        $companyData = $this->company->findCompanyByUuid();
+        $this->assertEquals("MG", $companyData->company_state);
+        $this->customer->dropCustomerByUuid();
+    }
+
+    public function testFindCompanyById()
+    {
+        $this->customer = new Customer();
+        $customerUuid = "1eed7357-6e74-6096-abf0-0242ac120003";
+        $this->customer->setUuid($customerUuid);
+
+        $requestPost = [
+            "uuid" => $customerUuid,
+            "customer_name" => "Sarah Luzia Stefany Gomes",
+            "customer_document" => "194.626.014-00",
+            "birth_date" => "2005-01-25",
+            "customer_gender" => "0",
+            "customer_email" => "sarah.luzia.gomes@" . bin2hex(random_bytes(6)) . ".com.br",
+            "customer_zipcode" => "52191-261",
+            "customer_address" => "Rua Juarina",
+            "customer_number" => 624,
+            "customer_neighborhood" => "Nova Descoberta",
+            "customer_city" => "Recife",
+            "customer_state" => "PE",
+            "customer_phone" => "(81) 3799-9446",
+            "cell_phone" => "(81) 99548-0856",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0,
+        ];
+
+        $this->customer->persistData($requestPost);
+        $this->user = new User();
+
+        $userData = [
+            "id_customer" => $this->customer,
+            "uuid" => Uuid::uuid4(),
+            "user_full_name" => "Sara Luzia Stefany Gomes",
+            "user_nick_name" => "saraLuiza",
+            "user_email" => $requestPost["customer_email"],
+            "user_password" => password_hash("senha123", PASSWORD_DEFAULT),
+            "deleted" => 0
+        ];
+
+        $this->user->persistData($userData);
+        $this->company = new Company();
+        $companyUuid = Uuid::uuid4();
+        $this->company->persistData([
+            "uuid" => $companyUuid,
+            "id_user" => $this->user,
+            "company_name" => "Cristiane e Kaique Padaria Ltda",
+            "company_document" => "92.530.674/0001-16",
+            "state_registration" => "214.647.670.499",
+            "opening_date" => date("Y-m-d", strtotime(str_replace("/", "-", "04/10/2019"))),
+            "web_site" => "www.cristianeekaiquepadarialtda.com.br",
+            "company_email" => "desenvolvimento@cristianeekaiquepadarialtda.com.br",
+            "company_zipcode" => "17031-350",
+            "company_address" => "Rua Coronel Ivon César Pimentel",
+            "company_address_number" => "294",
+            "company_neighborhood" => "Parque Paulista",
+            "company_city" => "Bauru",
+            "company_state" => "SP",
+            "company_phone" => "(14) 3858-1464",
+            "company_cell_phone" => "(14) 98974-4671",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ]);
+        $companyId = $this->company->getId();
+
+        $this->company = new Company();
+        $this->company->setId($companyId);
+        $companyData = $this->company->findCompanyById();
+        $this->assertIsObject($companyData);
+        $this->assertEquals("(14) 3858-1464", $companyData->company_phone);
+        $this->customer->dropCustomerByUuid();
+    }
+
+    public function testFindAllCompanyByUserDeleted()
+    {
+        $this->customer = new Customer();
+        $customerUuid = "1eed7357-6e74-6096-abf0-0242ac120003";
+        $this->customer->setUuid($customerUuid);
+
+        $requestPost = [
+            "uuid" => $customerUuid,
+            "customer_name" => "Sarah Luzia Stefany Gomes",
+            "customer_document" => "194.626.014-00",
+            "birth_date" => "2005-01-25",
+            "customer_gender" => "0",
+            "customer_email" => "sarah.luzia.gomes@" . bin2hex(random_bytes(6)) . ".com.br",
+            "customer_zipcode" => "52191-261",
+            "customer_address" => "Rua Juarina",
+            "customer_number" => 624,
+            "customer_neighborhood" => "Nova Descoberta",
+            "customer_city" => "Recife",
+            "customer_state" => "PE",
+            "customer_phone" => "(81) 3799-9446",
+            "cell_phone" => "(81) 99548-0856",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0,
+        ];
+
+        $this->customer->persistData($requestPost);
+        $this->user = new User();
+
+        $userData = [
+            "id_customer" => $this->customer,
+            "uuid" => Uuid::uuid4(),
+            "user_full_name" => "Sara Luzia Stefany Gomes",
+            "user_nick_name" => "saraLuiza",
+            "user_email" => $requestPost["customer_email"],
+            "user_password" => password_hash("senha123", PASSWORD_DEFAULT),
+            "deleted" => 0
+        ];
+
+        $this->user->persistData($userData);
+        $this->company = new Company();
+        $companyUuid = Uuid::uuid4();
+        $this->company->persistData([
+            "uuid" => $companyUuid,
+            "id_user" => $this->user,
+            "company_name" => "Cristiane e Kaique Padaria Ltda",
+            "company_document" => "92.530.674/0001-16",
+            "state_registration" => "214.647.670.499",
+            "opening_date" => date("Y-m-d", strtotime(str_replace("/", "-", "04/10/2019"))),
+            "web_site" => "www.cristianeekaiquepadarialtda.com.br",
+            "company_email" => "desenvolvimento@cristianeekaiquepadarialtda.com.br",
+            "company_zipcode" => "17031-350",
+            "company_address" => "Rua Coronel Ivon César Pimentel",
+            "company_address_number" => "294",
+            "company_neighborhood" => "Parque Paulista",
+            "company_city" => "Bauru",
+            "company_state" => "SP",
+            "company_phone" => "(14) 3858-1464",
+            "company_cell_phone" => "(14) 98974-4671",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 1
+        ]);
+
+        $this->company = new Company();
+        $this->company->id_user = $this->user->getId();
+        $companyData = $this->company->findAllCompanyByUserDeleted([]);
+        $this->assertIsArray($companyData);
+        $this->assertEquals("Bauru", $companyData[0]->company_city);
+        $this->customer->dropCustomerByUuid();
+    }
+
+    public function testDropCompanyByUuid()
+    {
+        $this->customer = new Customer();
+        $customerUuid = "1eed7357-6e74-6096-abf0-0242ac120003";
+        $this->customer->setUuid($customerUuid);
+
+        $requestPost = [
+            "uuid" => $customerUuid,
+            "customer_name" => "Sarah Luzia Stefany Gomes",
+            "customer_document" => "194.626.014-00",
+            "birth_date" => "2005-01-25",
+            "customer_gender" => "0",
+            "customer_email" => "sarah.luzia.gomes@" . bin2hex(random_bytes(6)) . ".com.br",
+            "customer_zipcode" => "52191-261",
+            "customer_address" => "Rua Juarina",
+            "customer_number" => 624,
+            "customer_neighborhood" => "Nova Descoberta",
+            "customer_city" => "Recife",
+            "customer_state" => "PE",
+            "customer_phone" => "(81) 3799-9446",
+            "cell_phone" => "(81) 99548-0856",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0,
+        ];
+
+        $this->customer->persistData($requestPost);
+        $this->user = new User();
+
+        $userData = [
+            "id_customer" => $this->customer,
+            "uuid" => Uuid::uuid4(),
+            "user_full_name" => "Sara Luzia Stefany Gomes",
+            "user_nick_name" => "saraLuiza",
+            "user_email" => $requestPost["customer_email"],
+            "user_password" => password_hash("senha123", PASSWORD_DEFAULT),
+            "deleted" => 0
+        ];
+
+        $this->user->persistData($userData);
+        $this->company = new Company();
+        $companyUuid = Uuid::uuid4();
+        $this->company->persistData([
+            "uuid" => $companyUuid,
+            "id_user" => $this->user,
+            "company_name" => "Cristiane e Kaique Padaria Ltda",
+            "company_document" => "92.530.674/0001-16",
+            "state_registration" => "214.647.670.499",
+            "opening_date" => date("Y-m-d", strtotime(str_replace("/", "-", "04/10/2019"))),
+            "web_site" => "www.cristianeekaiquepadarialtda.com.br",
+            "company_email" => "desenvolvimento@cristianeekaiquepadarialtda.com.br",
+            "company_zipcode" => "17031-350",
+            "company_address" => "Rua Coronel Ivon César Pimentel",
+            "company_address_number" => "294",
+            "company_neighborhood" => "Parque Paulista",
+            "company_city" => "Bauru",
+            "company_state" => "SP",
+            "company_phone" => "(14) 3858-1464",
+            "company_cell_phone" => "(14) 98974-4671",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ]);
+
+        $this->company = new Company();
+        $this->company->setUuid($companyUuid);
+        $response = $this->company->dropCompanyByUuid();
         $this->assertTrue($response);
         $this->customer->dropCustomerByUuid();
     }
 
-    public function testDropCashFlowGroupByUuidIsEmpty()
+    public function testFindAllCompanyByUserDeletedIsEmpty()
     {
-        $this->cashFlowGroup = new CashFlowGroup();
-        $this->cashFlowGroup->setUuid("1eef5b42-975f-6e18-b69f-0242ac120003");
-        $response = $this->cashFlowGroup->dropCashFlowGroupByUuid();
-        if (empty($response)) {
-            $this->assertJsonStringEqualsJsonString(
-                json_encode(["error" => "o registro não existe"]),
-                $this->cashFlowGroup->message->json()
-            );
-        }
-    }
-
-    public function testFindCashFlowGroupNotFound()
-    {
-        $this->cashFlowGroup = new CashFlowGroup();
-        $this->cashFlowGroup->setUuid("1eef5b42-975f-6e18-b69f-0242ac120003");
-        $response = $this->cashFlowGroup->findCashFlowGroupByUuid();
-        if (empty($response)) {
-            $this->assertJsonStringEqualsJsonString(
-                json_encode(["error" => "registro não encontrado"]),
-                $this->cashFlowGroup->message->json()
-            );
-        }
-    }
-
-    public function testFindCashFlowGroupByUser()
-    {
-        $this->customer = new Customer();
-        $customerUuid = Uuid::uuid4();
-        $this->customer->setUuid($customerUuid);
-
-        $requestPost = [
-            "uuid" => $customerUuid,
-            "customer_name" => "Sarah Luzia Stefany Gomes",
-            "customer_document" => "194.626.014-00",
-            "birth_date" => "2005-01-25",
-            "customer_gender" => "0",
-            "customer_email" => "sarah.luzia.gomes@" . bin2hex(random_bytes(6)) . ".com.br",
-            "customer_zipcode" => "52191-261",
-            "customer_address" => "Rua Juarina",
-            "customer_number" => 624,
-            "customer_neighborhood" => "Nova Descoberta",
-            "customer_city" => "Recife",
-            "customer_state" => "PE",
-            "customer_phone" => "(81) 3799-9446",
-            "cell_phone" => "(81) 99548-0856",
-            "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d"),
-            "deleted" => 0,
-        ];
-
-        $this->customer->persistData($requestPost);
-        $this->user = new User();
-
-        $userData = [
-            "id_customer" => $this->customer,
-            "uuid" => Uuid::uuid4(),
-            "user_full_name" => "Sara Luzia Stefany Gomes",
-            "user_nick_name" => "saraLuiza",
-            "user_email" => $requestPost["customer_email"],
-            "user_password" => password_hash("senha123", PASSWORD_DEFAULT),
-            "deleted" => 0
-        ];
-        $this->user->persistData($userData);
-
         $this->company = new Company();
-        $this->company->persistData([
-            "uuid" => Uuid::uuid4(),
-            "id_user" => $this->user,
-            "company_name" => "Cristiane e Kaique Padaria Ltda",
-            "company_document" => "92.530.674/0001-16",
-            "state_registration" => "214.647.670.499",
-            "opening_date" => date("Y-m-d", strtotime(str_replace("/", "-", "04/10/2019"))),
-            "web_site" => "www.cristianeekaiquepadarialtda.com.br",
-            "company_email" => "desenvolvimento@cristianeekaiquepadarialtda.com.br",
-            "company_zipcode" => "17031-350",
-            "company_address" => "Rua Coronel Ivon César Pimentel",
-            "company_address_number" => "294",
-            "company_neighborhood" => "Parque Paulista",
-            "company_city" => "Bauru",
-            "company_state" => "SP",
-            "company_phone" => "(14) 3858-1464",
-            "company_cell_phone" => "(14) 98974-4671",
-            "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d"),
-            "deleted" => 0
-        ]);
-        
-        for ($i = 0; $i < 2; $i++) {
-            $this->cashFlowGroup = new CashFlowGroup();
-            $cashFlowGroupUuid = Uuid::uuid4();
-
-            $cashFlowGroupData = [
-                "uuid" => $cashFlowGroupUuid,
-                "id_user" => $this->user,
-                "id_company" => $this->company->getId(),
-                "group_name" => "Receitas",
-                "created_at" => date("Y-m-d"),
-                "updated_at" => date("Y-m-d"),
-                "deleted" => 0
-            ];
-
-            $this->cashFlowGroup->persistData($cashFlowGroupData);
-        }
-
-        $this->cashFlowGroup = new CashFlowGroup();
-        $response = $this->cashFlowGroup->findCashFlowGroupByUser([], $this->user, $this->company->getId());
-
-        $this->assertIsArray($response);
-        $this->assertEquals(2, count($response));
-
-        if (!empty($response)) {
-            foreach ($response as $object) {
-                $this->assertInstanceOf(ModelsCashFlowGroup::class, $object);
-            }
-        }
-
-        $this->customer->dropCustomerByUuid();
-    }
-
-    public function testFindCashFlowGroupByUserIsEmpty()
-    {
-        $this->user = new User();
-        $this->user->setId(125469325);
-        $this->cashFlowGroup = new CashFlowGroup();
-        $response = $this->cashFlowGroup->findCashFlowGroupByUser([], $this->user, random_int(1, 1000));
-        if (empty($response)) {
-            $this->assertJsonStringEqualsJsonString(
-                json_encode(["error" => "nenhum registro foi encontrado"]),
-                $this->cashFlowGroup->message->json()
-            );
-        }
-    }
-
-    public function testFindCashFlowGroupByName()
-    {
-        $this->customer = new Customer();
-        $customerUuid = Uuid::uuid4();
-        $this->customer->setUuid($customerUuid);
-
-        $requestPost = [
-            "uuid" => $customerUuid,
-            "customer_name" => "Sarah Luzia Stefany Gomes",
-            "customer_document" => "194.626.014-00",
-            "birth_date" => "2005-01-25",
-            "customer_gender" => "0",
-            "customer_email" => "sarah.luzia.gomes@" . bin2hex(random_bytes(6)) . ".com.br",
-            "customer_zipcode" => "52191-261",
-            "customer_address" => "Rua Juarina",
-            "customer_number" => 624,
-            "customer_neighborhood" => "Nova Descoberta",
-            "customer_city" => "Recife",
-            "customer_state" => "PE",
-            "customer_phone" => "(81) 3799-9446",
-            "cell_phone" => "(81) 99548-0856",
-            "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d"),
-            "deleted" => 0,
-        ];
-
-        $this->customer->persistData($requestPost);
-        $this->user = new User();
-
-        $userData = [
-            "id_customer" => $this->customer,
-            "uuid" => Uuid::uuid4(),
-            "user_full_name" => "Sara Luzia Stefany Gomes",
-            "user_nick_name" => "saraLuiza",
-            "user_email" => $requestPost["customer_email"],
-            "user_password" => password_hash("senha123", PASSWORD_DEFAULT),
-            "deleted" => 0
-        ];
-
-        $this->user->persistData($userData);
-
-        $this->company = new Company();
-        $this->company->persistData([
-            "uuid" => Uuid::uuid4(),
-            "id_user" => $this->user,
-            "company_name" => "Cristiane e Kaique Padaria Ltda",
-            "company_document" => "92.530.674/0001-16",
-            "state_registration" => "214.647.670.499",
-            "opening_date" => date("Y-m-d", strtotime(str_replace("/", "-", "04/10/2019"))),
-            "web_site" => "www.cristianeekaiquepadarialtda.com.br",
-            "company_email" => "desenvolvimento@cristianeekaiquepadarialtda.com.br",
-            "company_zipcode" => "17031-350",
-            "company_address" => "Rua Coronel Ivon César Pimentel",
-            "company_address_number" => "294",
-            "company_neighborhood" => "Parque Paulista",
-            "company_city" => "Bauru",
-            "company_state" => "SP",
-            "company_phone" => "(14) 3858-1464",
-            "company_cell_phone" => "(14) 98974-4671",
-            "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d"),
-            "deleted" => 0
-        ]);
-
-        $this->cashFlowGroup = new CashFlowGroup();
-        $cashFlowGroupUuid = Uuid::uuid4();
-
-        $cashFlowGroupData = [
-            "uuid" => $cashFlowGroupUuid,
-            "id_user" => $this->user,
-            "id_company" => $this->company->getId(),
-            "group_name" => "Receitas",
-            "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d"),
-            "deleted" => 0
-        ];
-
-        $this->cashFlowGroup->persistData($cashFlowGroupData);
-        $this->cashFlowGroup = new CashFlowGroup();
-
-        $response = $this->cashFlowGroup->findCashFlowGroupByName("Receitas", $this->user);
-        $this->assertInstanceOf(ModelsCashFlowGroup::class, $response);
-        $this->customer->dropCustomerByUuid();
-    }
-
-    public function testFindCashFlowGroupByNameIsEmpty()
-    {
-        $this->user = new User();
-        $this->user->setId(5263698565485);
-        $this->cashFlowGroup = new CashFlowGroup();
-        $response = $this->cashFlowGroup->findCashFlowGroupByName("Receitas", $this->user);
-        if (empty($response)) {
-            $this->assertJsonStringEqualsJsonString(
-                json_encode(["error" => "nenhum registro foi encontrado"]),
-                $this->cashFlowGroup->message->json()
-            );
-        }
-    }
-
-    public function testFindCashFlowGroupDeletedTrue()
-    {
-        $this->customer = new Customer();
-        $customerUuid = Uuid::uuid4();
-        $this->customer->setUuid($customerUuid);
-
-        $requestPost = [
-            "uuid" => $customerUuid,
-            "customer_name" => "Sarah Luzia Stefany Gomes",
-            "customer_document" => "194.626.014-00",
-            "birth_date" => "2005-01-25",
-            "customer_gender" => "0",
-            "customer_email" => "sarah.luzia.gomes@" . bin2hex(random_bytes(6)) . ".com.br",
-            "customer_zipcode" => "52191-261",
-            "customer_address" => "Rua Juarina",
-            "customer_number" => 624,
-            "customer_neighborhood" => "Nova Descoberta",
-            "customer_city" => "Recife",
-            "customer_state" => "PE",
-            "customer_phone" => "(81) 3799-9446",
-            "cell_phone" => "(81) 99548-0856",
-            "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d"),
-            "deleted" => 0,
-        ];
-
-        $this->customer->persistData($requestPost);
-        $this->user = new User();
-
-        $userData = [
-            "id_customer" => $this->customer,
-            "uuid" => Uuid::uuid4(),
-            "user_full_name" => "Sara Luzia Stefany Gomes",
-            "user_nick_name" => "saraLuiza",
-            "user_email" => $requestPost["customer_email"],
-            "user_password" => password_hash("senha123", PASSWORD_DEFAULT),
-            "deleted" => 0
-        ];
-
-        $this->user->persistData($userData);
-        $this->company = new Company();
-        $this->company->persistData([
-            "uuid" => Uuid::uuid4(),
-            "id_user" => $this->user,
-            "company_name" => "Cristiane e Kaique Padaria Ltda",
-            "company_document" => "92.530.674/0001-16",
-            "state_registration" => "214.647.670.499",
-            "opening_date" => date("Y-m-d", strtotime(str_replace("/", "-", "04/10/2019"))),
-            "web_site" => "www.cristianeekaiquepadarialtda.com.br",
-            "company_email" => "desenvolvimento@cristianeekaiquepadarialtda.com.br",
-            "company_zipcode" => "17031-350",
-            "company_address" => "Rua Coronel Ivon César Pimentel",
-            "company_address_number" => "294",
-            "company_neighborhood" => "Parque Paulista",
-            "company_city" => "Bauru",
-            "company_state" => "SP",
-            "company_phone" => "(14) 3858-1464",
-            "company_cell_phone" => "(14) 98974-4671",
-            "created_at" => date("Y-m-d"),
-            "updated_at" => date("Y-m-d"),
-            "deleted" => 0
-        ]);
-
-        for ($i = 0; $i < 2; $i++) {
-            $this->cashFlowGroup = new CashFlowGroup();
-            $cashFlowGroupUuid = Uuid::uuid4();
-
-            $cashFlowGroupData = [
-                "uuid" => $cashFlowGroupUuid,
-                "id_user" => $this->user,
-                "id_company" => $this->company->getId(),
-                "group_name" => "Receitas",
-                "created_at" => date("Y-m-d"),
-                "updated_at" => date("Y-m-d"),
-                "deleted" => 1
-            ];
-
-            $this->cashFlowGroup->persistData($cashFlowGroupData);
-        }
-
-        $response = $this->cashFlowGroup->findCashFlowGroupDeletedTrue([], $this->user, $this->company->getId());
-        $this->assertIsArray($response);
-        $this->assertEquals(2, count($response));
-
-        if (!empty($respone)) {
-            foreach ($response as $object) {
-                $this->assertInstanceOf(ModelsCashFlowGroup::class, $object);
-            }
-        }
-
-        $this->customer->dropCustomerByUuid();
-    }
-
-    public function testFindCashFlowGroupDeletedTrueIsEmpty()
-    {
-        $this->user = new User();
-        $this->user->setId(52596357);
-        $this->cashFlowGroup = new CashFlowGroup();
-        $response = $this->cashFlowGroup->findCashFlowGroupDeletedTrue([], $this->user, random_int(1, 1000));
-        if (empty($response)) {
-            $this->assertJsonStringEqualsJsonString(
-                json_encode(["error" => "não há registros deletados"]),
-                $this->cashFlowGroup->message->json()
-            );
-        }
-    }
-
-    public function testSetter()
-    {
-        $this->cashFlowGroup = new CashFlowGroup();
-        $this->cashFlowGroup->name = "roberto";
-        $this->assertEquals("roberto", $this->cashFlowGroup->name);
+        $this->company->id_user = 0;
+        $companyData = $this->company->findAllCompanyByUserDeleted([]);
+        $this->assertIsArray($companyData);
     }
 }

@@ -7,6 +7,7 @@ use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Domain\Model\CashFlow;
 use Source\Domain\Model\CashFlowGroup;
+use Source\Domain\Model\Company;
 use Source\Domain\Model\Customer;
 use Source\Domain\Model\User;
 use Source\Models\CashFlow as ModelsCashFlow;
@@ -30,6 +31,9 @@ class CashFlowTest extends TestCase
 
     /** @var Customer */
     private Customer $customer;
+
+    /** @var Company */
+    private Company $company;
 
     public function testInvalidPersistCashFlow()
     {
@@ -55,6 +59,7 @@ class CashFlowTest extends TestCase
         $cashFlowData = [
             "uuid" => "----------",
             "id_user" => $this->user,
+            "id_company" => random_int(1, 1000),
             "id_cash_flow_group" => $this->cashFlowGroup,
             "entry" => "2.144,22",
             "history" => "Vendas",
@@ -109,11 +114,34 @@ class CashFlowTest extends TestCase
         ];
 
         $this->user->persistData($userData);
+        $this->company = new Company();
+        $this->company->persistData([
+            "uuid" => Uuid::uuid4(),
+            "id_user" => $this->user,
+            "company_name" => "Cristiane e Kaique Padaria Ltda",
+            "company_document" => "92.530.674/0001-16",
+            "state_registration" => "214.647.670.499",
+            "opening_date" => date("Y-m-d", strtotime(str_replace("/", "-", "04/10/2019"))),
+            "web_site" => "www.cristianeekaiquepadarialtda.com.br",
+            "company_email" => "desenvolvimento@cristianeekaiquepadarialtda.com.br",
+            "company_zipcode" => "17031-350",
+            "company_address" => "Rua Coronel Ivon César Pimentel",
+            "company_address_number" => "294",
+            "company_neighborhood" => "Parque Paulista",
+            "company_city" => "Bauru",
+            "company_state" => "SP",
+            "company_phone" => "(14) 3858-1464",
+            "company_cell_phone" => "(14) 98974-4671",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ]);
+        
         $this->cashFlowGroup = new CashFlowGroup();
-
         $cashFlowGroupData = [
             "uuid" => Uuid::uuid4(),
             "id_user" => $this->user,
+            "id_company" => $this->company->getId(),
             "group_name" => "Receitas",
             "created_at" => date("Y-m-d"),
             "updated_at" => date("Y-m-d"),
@@ -126,6 +154,7 @@ class CashFlowTest extends TestCase
         $cashFlowData = [
             "uuid" => Uuid::uuid4(),
             "id_user" => $this->user,
+            "id_company" => $this->company->getId(),
             "id_cash_flow_group" => $this->cashFlowGroup,
             "entry" => "2.144,22",
             "history" => "Vendas",
@@ -146,6 +175,7 @@ class CashFlowTest extends TestCase
         $this->cashFlowGroup = new CashFlowGroup();
         $cashFlowGroupData = [
             "uuid" => Uuid::uuid4(),
+            "id_company" => random_int(1, 1000),
             "iduser" => $this->user,
             "group_name" => "Receitas",
             "created_at" => date("Y-m-d"),
@@ -166,6 +196,7 @@ class CashFlowTest extends TestCase
         $cashFlowData = [
             "uuid" => Uuid::uuid4(),
             "id_user" => $this->user,
+            "id_company" => random_int(1, 1000),
             "id_cash_flow_group" => $this->user,
             "entry" => "2.144,22",
             "history" => "Vendas",
@@ -188,6 +219,7 @@ class CashFlowTest extends TestCase
         $cashFlowData = [
             "uuid" => Uuid::uuid4(),
             "id_user" => $this->cashFlowGroup,
+            "id_company" => random_int(1, 1000),
             "id_cash_flow_group" => $this->cashFlowGroup,
             "entry" => "2.144,22",
             "history" => "Vendas",
@@ -241,11 +273,35 @@ class CashFlowTest extends TestCase
         ];
 
         $this->user->persistData($userData);
+        $this->company = new Company();
+        $this->company->persistData([
+            "uuid" => Uuid::uuid4(),
+            "id_user" => $this->user,
+            "company_name" => "Cristiane e Kaique Padaria Ltda",
+            "company_document" => "92.530.674/0001-16",
+            "state_registration" => "214.647.670.499",
+            "opening_date" => date("Y-m-d", strtotime(str_replace("/", "-", "04/10/2019"))),
+            "web_site" => "www.cristianeekaiquepadarialtda.com.br",
+            "company_email" => "desenvolvimento@cristianeekaiquepadarialtda.com.br",
+            "company_zipcode" => "17031-350",
+            "company_address" => "Rua Coronel Ivon César Pimentel",
+            "company_address_number" => "294",
+            "company_neighborhood" => "Parque Paulista",
+            "company_city" => "Bauru",
+            "company_state" => "SP",
+            "company_phone" => "(14) 3858-1464",
+            "company_cell_phone" => "(14) 98974-4671",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ]);
+
         for ($i = 0; $i < 3; $i++) {
             $this->cashFlowGroup = new CashFlowGroup();
             $cashFlowGroupData = [
                 "uuid" => Uuid::uuid4(),
                 "id_user" => $this->user,
+                "id_company" => $this->company->getId(),
                 "group_name" => "Receitas",
                 "created_at" => date("Y-m-d"),
                 "updated_at" => date("Y-m-d"),
@@ -258,6 +314,7 @@ class CashFlowTest extends TestCase
             $cashFlowData = [
                 "uuid" => Uuid::uuid4(),
                 "id_user" => $this->user,
+                "id_company" => $this->company->getId(),
                 "id_cash_flow_group" => $this->cashFlowGroup,
                 "entry" => "2.144,22",
                 "history" => "Vendas",
@@ -333,11 +390,34 @@ class CashFlowTest extends TestCase
         ];
 
         $this->user->persistData($userData);
-        $this->cashFlowGroup = new CashFlowGroup();
+        $this->company = new Company();
+        $this->company->persistData([
+            "uuid" => Uuid::uuid4(),
+            "id_user" => $this->user,
+            "company_name" => "Cristiane e Kaique Padaria Ltda",
+            "company_document" => "92.530.674/0001-16",
+            "state_registration" => "214.647.670.499",
+            "opening_date" => date("Y-m-d", strtotime(str_replace("/", "-", "04/10/2019"))),
+            "web_site" => "www.cristianeekaiquepadarialtda.com.br",
+            "company_email" => "desenvolvimento@cristianeekaiquepadarialtda.com.br",
+            "company_zipcode" => "17031-350",
+            "company_address" => "Rua Coronel Ivon César Pimentel",
+            "company_address_number" => "294",
+            "company_neighborhood" => "Parque Paulista",
+            "company_city" => "Bauru",
+            "company_state" => "SP",
+            "company_phone" => "(14) 3858-1464",
+            "company_cell_phone" => "(14) 98974-4671",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ]);
 
+        $this->cashFlowGroup = new CashFlowGroup();
         $cashFlowGroupData = [
             "uuid" => Uuid::uuid4(),
             "id_user" => $this->user,
+            "id_company" => $this->company->getId(),
             "group_name" => "Receitas",
             "created_at" => date("Y-m-d"),
             "updated_at" => date("Y-m-d"),
@@ -350,6 +430,7 @@ class CashFlowTest extends TestCase
         $cashFlowData = [
             "uuid" => Uuid::uuid4(),
             "id_user" => $this->user,
+            "id_company" => $this->company->getId(),
             "id_cash_flow_group" => $this->cashFlowGroup,
             "entry" => "2.144,22",
             "history" => "Vendas",
@@ -361,7 +442,7 @@ class CashFlowTest extends TestCase
         $this->cashFlow->persistData($cashFlowData);
         $this->cashFlow = new CashFlow();
 
-        $cashFlowData = $this->cashFlow->findCashFlowByUser([], $this->user);
+        $cashFlowData = $this->cashFlow->findCashFlowByUser([], $this->user, $this->company->getId());
         $this->assertIsArray($cashFlowData);
         if (!empty($cashFlowData)) {
             foreach ($cashFlowData as $object) {
@@ -376,7 +457,7 @@ class CashFlowTest extends TestCase
         $this->user = new User();
         $this->user->setId(100000000000000000);
         $this->cashFlow = new CashFlow();
-        $response = $this->cashFlow->findCashFlowByUser([], $this->user);
+        $response = $this->cashFlow->findCashFlowByUser([], $this->user, random_int(1, 1000));
         if (empty($response)) {
             $this->assertJsonStringEqualsJsonString(
                 json_encode(["error" => "nenhum registro foi encontrado"]),
@@ -441,11 +522,34 @@ class CashFlowTest extends TestCase
         ];
 
         $this->user->persistData($userData);
-        $this->cashFlowGroup = new CashFlowGroup();
+        $this->company = new Company();
+        $this->company->persistData([
+            "uuid" => Uuid::uuid4(),
+            "id_user" => $this->user,
+            "company_name" => "Cristiane e Kaique Padaria Ltda",
+            "company_document" => "92.530.674/0001-16",
+            "state_registration" => "214.647.670.499",
+            "opening_date" => date("Y-m-d", strtotime(str_replace("/", "-", "04/10/2019"))),
+            "web_site" => "www.cristianeekaiquepadarialtda.com.br",
+            "company_email" => "desenvolvimento@cristianeekaiquepadarialtda.com.br",
+            "company_zipcode" => "17031-350",
+            "company_address" => "Rua Coronel Ivon César Pimentel",
+            "company_address_number" => "294",
+            "company_neighborhood" => "Parque Paulista",
+            "company_city" => "Bauru",
+            "company_state" => "SP",
+            "company_phone" => "(14) 3858-1464",
+            "company_cell_phone" => "(14) 98974-4671",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ]);
 
+        $this->cashFlowGroup = new CashFlowGroup();
         $cashFlowGroupData = [
             "uuid" => Uuid::uuid4(),
             "id_user" => $this->user,
+            "id_company" => $this->company->getId(),
             "group_name" => "Receitas",
             "created_at" => date("Y-m-d"),
             "updated_at" => date("Y-m-d"),
@@ -459,6 +563,7 @@ class CashFlowTest extends TestCase
         $cashFlowData = [
             "uuid" => $cashFlowUuid,
             "id_user" => $this->user,
+            "id_company" => $this->company->getId(),
             "id_cash_flow_group" => $this->cashFlowGroup,
             "entry" => "2.144,22",
             "history" => "Vendas",
@@ -531,10 +636,33 @@ class CashFlowTest extends TestCase
         ];
 
         $this->user->persistData($userData);
-        $this->cashFlowGroup = new CashFlowGroup();
+        $this->company = new Company();
+        $this->company->persistData([
+            "uuid" => Uuid::uuid4(),
+            "id_user" => $this->user,
+            "company_name" => "Cristiane e Kaique Padaria Ltda",
+            "company_document" => "92.530.674/0001-16",
+            "state_registration" => "214.647.670.499",
+            "opening_date" => date("Y-m-d", strtotime(str_replace("/", "-", "04/10/2019"))),
+            "web_site" => "www.cristianeekaiquepadarialtda.com.br",
+            "company_email" => "desenvolvimento@cristianeekaiquepadarialtda.com.br",
+            "company_zipcode" => "17031-350",
+            "company_address" => "Rua Coronel Ivon César Pimentel",
+            "company_address_number" => "294",
+            "company_neighborhood" => "Parque Paulista",
+            "company_city" => "Bauru",
+            "company_state" => "SP",
+            "company_phone" => "(14) 3858-1464",
+            "company_cell_phone" => "(14) 98974-4671",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ]);
 
+        $this->cashFlowGroup = new CashFlowGroup();
         $cashFlowGroupData = [
             "uuid" => Uuid::uuid4(),
+            "id_company" => $this->company->getId(),
             "id_user" => $this->user,
             "group_name" => "Receitas",
             "created_at" => date("Y-m-d"),
@@ -549,6 +677,7 @@ class CashFlowTest extends TestCase
         $cashFlowData = [
             "uuid" => $cashFlowUuid,
             "id_user" => $this->user,
+            "id_company" => $this->company->getId(),
             "id_cash_flow_group" => $this->cashFlowGroup,
             "entry" => "2.144,22",
             "history" => "Vendas",
@@ -608,11 +737,34 @@ class CashFlowTest extends TestCase
         ];
 
         $this->user->persistData($userData);
-        $this->cashFlowGroup = new CashFlowGroup();
+        $this->company = new Company();
+        $this->company->persistData([
+            "uuid" => Uuid::uuid4(),
+            "id_user" => $this->user,
+            "company_name" => "Cristiane e Kaique Padaria Ltda",
+            "company_document" => "92.530.674/0001-16",
+            "state_registration" => "214.647.670.499",
+            "opening_date" => date("Y-m-d", strtotime(str_replace("/", "-", "04/10/2019"))),
+            "web_site" => "www.cristianeekaiquepadarialtda.com.br",
+            "company_email" => "desenvolvimento@cristianeekaiquepadarialtda.com.br",
+            "company_zipcode" => "17031-350",
+            "company_address" => "Rua Coronel Ivon César Pimentel",
+            "company_address_number" => "294",
+            "company_neighborhood" => "Parque Paulista",
+            "company_city" => "Bauru",
+            "company_state" => "SP",
+            "company_phone" => "(14) 3858-1464",
+            "company_cell_phone" => "(14) 98974-4671",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ]);
 
+        $this->cashFlowGroup = new CashFlowGroup();
         $cashFlowGroupData = [
             "uuid" => Uuid::uuid4(),
             "id_user" => $this->user,
+            "id_company" => $this->company->getId(),
             "group_name" => "Receitas",
             "created_at" => date("Y-m-d"),
             "updated_at" => date("Y-m-d"),
@@ -626,6 +778,7 @@ class CashFlowTest extends TestCase
         $cashFlowData = [
             "uuid" => $cashFlowUuid,
             "id_user" => $this->user,
+            "id_company" => $this->company->getId(),
             "id_cash_flow_group" => $this->cashFlowGroup,
             "entry" => "2.144,22",
             "history" => "Vendas",
@@ -715,11 +868,34 @@ class CashFlowTest extends TestCase
         ];
 
         $this->user->persistData($userData);
-        $this->cashFlowGroup = new CashFlowGroup();
+        $this->company = new Company();
+        $this->company->persistData([
+            "uuid" => Uuid::uuid4(),
+            "id_user" => $this->user,
+            "company_name" => "Cristiane e Kaique Padaria Ltda",
+            "company_document" => "92.530.674/0001-16",
+            "state_registration" => "214.647.670.499",
+            "opening_date" => date("Y-m-d", strtotime(str_replace("/", "-", "04/10/2019"))),
+            "web_site" => "www.cristianeekaiquepadarialtda.com.br",
+            "company_email" => "desenvolvimento@cristianeekaiquepadarialtda.com.br",
+            "company_zipcode" => "17031-350",
+            "company_address" => "Rua Coronel Ivon César Pimentel",
+            "company_address_number" => "294",
+            "company_neighborhood" => "Parque Paulista",
+            "company_city" => "Bauru",
+            "company_state" => "SP",
+            "company_phone" => "(14) 3858-1464",
+            "company_cell_phone" => "(14) 98974-4671",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ]);
 
+        $this->cashFlowGroup = new CashFlowGroup();
         $cashFlowGroupData = [
             "uuid" => Uuid::uuid4(),
             "id_user" => $this->user,
+            "id_company" => $this->company->getId(),
             "group_name" => "Receitas",
             "created_at" => date("Y-m-d"),
             "updated_at" => date("Y-m-d"),
@@ -735,6 +911,7 @@ class CashFlowTest extends TestCase
         $cashFlowData = [
             "uuid" => $cashFlowUuid,
             "id_user" => $this->user,
+            "id_company" => $this->company->getId(),
             "id_cash_flow_group" => $this->cashFlowGroup,
             "entry" => "2.144,22",
             "history" => "Vendas",
@@ -800,10 +977,33 @@ class CashFlowTest extends TestCase
         ];
 
         $this->user->persistData($userData);
-        $this->cashFlowGroup = new CashFlowGroup();
+        $this->company = new Company();
+        $this->company->persistData([
+            "uuid" => Uuid::uuid4(),
+            "id_user" => $this->user,
+            "company_name" => "Cristiane e Kaique Padaria Ltda",
+            "company_document" => "92.530.674/0001-16",
+            "state_registration" => "214.647.670.499",
+            "opening_date" => date("Y-m-d", strtotime(str_replace("/", "-", "04/10/2019"))),
+            "web_site" => "www.cristianeekaiquepadarialtda.com.br",
+            "company_email" => "desenvolvimento@cristianeekaiquepadarialtda.com.br",
+            "company_zipcode" => "17031-350",
+            "company_address" => "Rua Coronel Ivon César Pimentel",
+            "company_address_number" => "294",
+            "company_neighborhood" => "Parque Paulista",
+            "company_city" => "Bauru",
+            "company_state" => "SP",
+            "company_phone" => "(14) 3858-1464",
+            "company_cell_phone" => "(14) 98974-4671",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ]);
 
+        $this->cashFlowGroup = new CashFlowGroup();
         $cashFlowGroupData = [
             "uuid" => Uuid::uuid4(),
+            "id_company" => $this->company->getId(),
             "id_user" => $this->user,
             "group_name" => "Receitas",
             "created_at" => date("Y-m-d"),
@@ -820,6 +1020,7 @@ class CashFlowTest extends TestCase
         $cashFlowData = [
             "uuid" => $cashFlowUuid,
             "id_user" => $this->user,
+            "id_company" => $this->company->getId(),
             "id_cash_flow_group" => $this->cashFlowGroup,
             "entry" => "2.144,22",
             "history" => "Vendas",
@@ -885,11 +1086,34 @@ class CashFlowTest extends TestCase
         ];
 
         $this->user->persistData($userData);
-        $this->cashFlowGroup = new CashFlowGroup();
+        $this->company = new Company();
+        $this->company->persistData([
+            "uuid" => Uuid::uuid4(),
+            "id_user" => $this->user,
+            "company_name" => "Cristiane e Kaique Padaria Ltda",
+            "company_document" => "92.530.674/0001-16",
+            "state_registration" => "214.647.670.499",
+            "opening_date" => date("Y-m-d", strtotime(str_replace("/", "-", "04/10/2019"))),
+            "web_site" => "www.cristianeekaiquepadarialtda.com.br",
+            "company_email" => "desenvolvimento@cristianeekaiquepadarialtda.com.br",
+            "company_zipcode" => "17031-350",
+            "company_address" => "Rua Coronel Ivon César Pimentel",
+            "company_address_number" => "294",
+            "company_neighborhood" => "Parque Paulista",
+            "company_city" => "Bauru",
+            "company_state" => "SP",
+            "company_phone" => "(14) 3858-1464",
+            "company_cell_phone" => "(14) 98974-4671",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ]);
 
+        $this->cashFlowGroup = new CashFlowGroup();
         $cashFlowGroupData = [
             "uuid" => Uuid::uuid4(),
             "id_user" => $this->user,
+            "id_company" => $this->company->getId(),
             "group_name" => "Receitas",
             "created_at" => date("Y-m-d"),
             "updated_at" => date("Y-m-d"),
@@ -905,6 +1129,7 @@ class CashFlowTest extends TestCase
         $cashFlowData = [
             "uuid" => $cashFlowUuid,
             "id_user" => $this->user,
+            "id_company" => $this->company->getId(),
             "id_cash_flow_group" => $this->cashFlowGroup,
             "entry" => "2.144,22",
             "history" => "Vendas",
@@ -915,7 +1140,7 @@ class CashFlowTest extends TestCase
         ];
 
         $this->cashFlow->persistData($cashFlowData);
-        $response = $this->cashFlow->findCashFlowDataByDate(date("d/m/Y") . "-" . date("d/m/Y"), $this->user);
+        $response = $this->cashFlow->findCashFlowDataByDate(date("d/m/Y") . "-" . date("d/m/Y"), $this->user, [], random_int(1, 1000));
 
         $this->assertIsArray($response);
         if (!empty($response)) {
@@ -932,7 +1157,7 @@ class CashFlowTest extends TestCase
         $this->user->setId(rand(1000000, 1000000));
         
         $this->cashFlow = new CashFlow();
-        $this->cashFlow->findCashFlowDataByDate(date("d/m/Y") . "-" . date("d/m/Y"), $this->user);
+        $this->cashFlow->findCashFlowDataByDate(date("d/m/Y") . "-" . date("d/m/Y"), $this->user, [], random_int(1, 1000));
         
         $this->assertJsonStringEqualsJsonString(json_encode(["error" => "registro não encontrado"]),
         $this->cashFlow->message->json());
@@ -944,15 +1169,14 @@ class CashFlowTest extends TestCase
         $this->cashFlow = new CashFlow();
         $this->expectException(Exception::class);
         $this->expectExceptionMessage("parametro dates inválido");
-        $this->cashFlow
-            ->findCashFlowDataByDate("07/04/2024-07/04/2024-07/04/2024", $this->user);
+        $this->cashFlow->findCashFlowDataByDate("07/04/2024-07/04/2024-07/04/2024", $this->user, [], random_int(1, 1000));
     }
 
     public function testFindCashFlowDataByDateIsEmpty()
     {
         $this->user = new User();
         $this->cashFlow = new CashFlow();
-        $response = $this->cashFlow->findCashFlowDataByDate("", $this->user);
+        $response = $this->cashFlow->findCashFlowDataByDate("", $this->user, [], random_int(1, 1000));
         $this->assertIsArray($response);
         $this->assertEmpty($response);
     }
@@ -997,11 +1221,34 @@ class CashFlowTest extends TestCase
         ];
 
         $this->user->persistData($userData);
-        $this->cashFlowGroup = new CashFlowGroup();
+        $this->company = new Company();
+        $this->company->persistData([
+            "uuid" => Uuid::uuid4(),
+            "id_user" => $this->user,
+            "company_name" => "Cristiane e Kaique Padaria Ltda",
+            "company_document" => "92.530.674/0001-16",
+            "state_registration" => "214.647.670.499",
+            "opening_date" => date("Y-m-d", strtotime(str_replace("/", "-", "04/10/2019"))),
+            "web_site" => "www.cristianeekaiquepadarialtda.com.br",
+            "company_email" => "desenvolvimento@cristianeekaiquepadarialtda.com.br",
+            "company_zipcode" => "17031-350",
+            "company_address" => "Rua Coronel Ivon César Pimentel",
+            "company_address_number" => "294",
+            "company_neighborhood" => "Parque Paulista",
+            "company_city" => "Bauru",
+            "company_state" => "SP",
+            "company_phone" => "(14) 3858-1464",
+            "company_cell_phone" => "(14) 98974-4671",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ]);
 
+        $this->cashFlowGroup = new CashFlowGroup();
         $cashFlowGroupData = [
             "uuid" => Uuid::uuid4(),
             "id_user" => $this->user,
+            "id_company" => $this->company->getId(),
             "group_name" => "Receitas",
             "created_at" => date("Y-m-d"),
             "updated_at" => date("Y-m-d"),
@@ -1017,6 +1264,7 @@ class CashFlowTest extends TestCase
         $cashFlowData = [
             "uuid" => $cashFlowUuid,
             "id_user" => $this->user,
+            "id_company" => $this->company->getId(),
             "id_cash_flow_group" => $this->cashFlowGroup,
             "entry" => "2.144,22",
             "history" => "Vendas",
@@ -1027,7 +1275,7 @@ class CashFlowTest extends TestCase
         ];
 
         $this->cashFlow->persistData($cashFlowData);
-        $response = $this->cashFlow->findGroupAccountsAgrupped($this->user);
+        $response = $this->cashFlow->findGroupAccountsAgrupped($this->user, $this->company->getId());
         $this->assertIsArray($response);
         $this->assertNotEmpty($response);
         $this->customer->dropCustomerByUuid();
@@ -1073,10 +1321,33 @@ class CashFlowTest extends TestCase
         ];
 
         $this->user->persistData($userData);
+        $this->company = new Company();
+        $this->company->persistData([
+            "uuid" => Uuid::uuid4(),
+            "id_user" => $this->user,
+            "company_name" => "Cristiane e Kaique Padaria Ltda",
+            "company_document" => "92.530.674/0001-16",
+            "state_registration" => "214.647.670.499",
+            "opening_date" => date("Y-m-d", strtotime(str_replace("/", "-", "04/10/2019"))),
+            "web_site" => "www.cristianeekaiquepadarialtda.com.br",
+            "company_email" => "desenvolvimento@cristianeekaiquepadarialtda.com.br",
+            "company_zipcode" => "17031-350",
+            "company_address" => "Rua Coronel Ivon César Pimentel",
+            "company_address_number" => "294",
+            "company_neighborhood" => "Parque Paulista",
+            "company_city" => "Bauru",
+            "company_state" => "SP",
+            "company_phone" => "(14) 3858-1464",
+            "company_cell_phone" => "(14) 98974-4671",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0
+        ]);
         $this->cashFlowGroup = new CashFlowGroup();
 
         $cashFlowGroupData = [
             "uuid" => Uuid::uuid4(),
+            "id_company" => $this->company->getId(),
             "id_user" => $this->user,
             "group_name" => "Receitas",
             "created_at" => date("Y-m-d"),
@@ -1093,6 +1364,7 @@ class CashFlowTest extends TestCase
         $cashFlowData = [
             "uuid" => $cashFlowUuid,
             "id_user" => $this->user,
+            "id_company" => $this->company->getId(),
             "id_cash_flow_group" => $this->cashFlowGroup,
             "entry" => "2.144,22",
             "history" => "Vendas",
@@ -1103,7 +1375,7 @@ class CashFlowTest extends TestCase
         ];
 
         $this->cashFlow->persistData($cashFlowData);
-        $response = $this->cashFlow->findCashFlowDeletedTrue([], $this->user);
+        $response = $this->cashFlow->findCashFlowDeletedTrue([], $this->user, random_int(1, 1000));
         $this->assertIsArray($response);
         if (!empty($response)) {
             foreach ($response as $object) {
@@ -1118,7 +1390,7 @@ class CashFlowTest extends TestCase
         $this->user = new User();
         $this->cashFlow = new CashFlow();
         $this->user->setId(4525896235);
-        $response = $this->cashFlow->findCashFlowDeletedTrue([], $this->user);
+        $response = $this->cashFlow->findCashFlowDeletedTrue([], $this->user, random_int(1, 1000));
         if (empty($response)) {
             $this->assertJsonStringEqualsJsonString(
                 json_encode(["error" => "não há registros deletados"]),

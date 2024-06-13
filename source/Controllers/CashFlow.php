@@ -73,8 +73,9 @@ class CashFlow extends Controller
         }
 
         $user->setId($userData->id);
+        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
         $cashFlow = new ModelCashFlow();
-        $cashFlowDataByUser = $cashFlow->findCashFlowDeletedTrue([], $user);
+        $cashFlowDataByUser = $cashFlow->findCashFlowDeletedTrue([], $user, $companyId);
 
         if (!empty($cashFlowDataByUser)) {
             foreach ($cashFlowDataByUser as &$value) {
@@ -94,8 +95,9 @@ class CashFlow extends Controller
     public function findCashFlowDataForChartPie()
     {
         $user = basicsValidatesForChartsRender();
+        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
         $cashFlow = new ModelCashFlow();
-        $cashFlowData = $cashFlow->findGroupAccountsAgrupped($user);
+        $cashFlowData = $cashFlow->findGroupAccountsAgrupped($user, $companyId);
 
         if (empty($cashFlowData)) {
             echo json_encode([]);
@@ -122,12 +124,13 @@ class CashFlow extends Controller
     {
         $user = basicsValidatesForChartsRender();
         $cashFlow = new ModelCashFlow();
-        $cashFlowData = $cashFlow->findCashFlowByUser(["entry", "created_at"], $user);
+        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
+        $cashFlowData = $cashFlow->findCashFlowByUser(["entry", "created_at"], $user, $companyId);
 
         $dateRange = $this->getRequests()->get("daterange");
         if (!empty($dateRange)) {
             $cashFlow = new ModelCashFlow();
-            $cashFlowData = $cashFlow->findCashFlowDataByDate($dateRange, $user, ["entry", "created_at"]);
+            $cashFlowData = $cashFlow->findCashFlowDataByDate($dateRange, $user, ["entry", "created_at"], $companyId);
         }
 
         if (empty($cashFlowData)) {
@@ -549,9 +552,10 @@ class CashFlow extends Controller
             throw new Exception($user->message->json(), 500);
         }
 
+        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
         $user->setId($userData->id);
         $cashFlowGroup = new CashFlowGroup();
-        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUser([], $user);
+        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUser([], $user, $companyId);
 
         echo $this->view->render("admin/cash-flow-form-update", [
             "userFullName" => showUserFullName(),
@@ -574,13 +578,14 @@ class CashFlow extends Controller
         }
 
         $user->setId($userData->id);
+        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
         $cashFlow = new ModelCashFlow();
-        $cashFlowDataByUser = $cashFlow->findCashFlowByUser([], $user);
+        $cashFlowDataByUser = $cashFlow->findCashFlowByUser([], $user, $companyId);
 
         $dateRange = $this->getRequests()->get("daterange");
         if (!empty($dateRange)) {
             $cashFlow = new ModelCashFlow();
-            $cashFlowDataByUser = $cashFlow->findCashFlowDataByDate($dateRange, $user);
+            $cashFlowDataByUser = $cashFlow->findCashFlowDataByDate($dateRange, $user, [], $companyId);
         }
 
         if (!empty($cashFlowDataByUser)) {
@@ -697,8 +702,9 @@ class CashFlow extends Controller
         $userData = $user->findUserByEmail();
         $user->setId($userData->id);
 
+        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
         $cashFlowGroup = new CashFlowGroup();
-        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUser([], $user);
+        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUser([], $user, $companyId);
 
         echo $this->view->render("admin/cash-flow-form", [
             "userFullName" => showUserFullName(),

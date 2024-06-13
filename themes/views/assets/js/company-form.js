@@ -123,18 +123,18 @@ if (endpoints.indexOf(currentEndpoint) != -1) {
             method: "POST",
             body: form
         }).then(data => data.json()).then(function (response) {
+            btnSubmit.innerHTML = "Enviar"
+            btnSubmit.removeAttribute("disabled")
             
             if (response.error) {
                 let message = response.error
-                message = message.charAt(0).toUpperCase() + message
+                message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.error(message)
                 throw new Error(message)
             }
 
             if (response.success) {
                 if (!uuid) {
-                    btnSubmit.innerHTML = "Enviar"
-                    btnSubmit.removeAttribute("disabled")
                     toastr.success("Empresa criada com sucesso")
                     inputFields.forEach(function (element) {
                         if (element.name != "csrfToken") {

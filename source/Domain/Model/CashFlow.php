@@ -48,10 +48,9 @@ class CashFlow
     }
 
     /** @return ModelsCashFlow[] */
-    public function findCashFlowDeletedTrue(array $columns, User $user): array
+    public function findCashFlowDeletedTrue(array $columns, User $user, int $companyId): array
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
-        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
         $cashFlowData = $this->cashFlow
             ->find(
                 "id_user=:id_user AND deleted=1 AND id_company=:id_company",
@@ -79,13 +78,13 @@ class CashFlow
         return $cashFlowData;
     }
 
-    public function findGroupAccountsAgrupped(User $user): array
+    public function findGroupAccountsAgrupped(User $user, int $companyId): array
     {
-        return $this->cashFlow->findGroupAccountsAgrupped($user);
+        return $this->cashFlow->findGroupAccountsAgrupped($user, $companyId);
     }
 
     /** @return ModelsCashFlow[] */
-    public function findCashFlowDataByDate(string $dates, User $user, array $columns = []): array
+    public function findCashFlowDataByDate(string $dates, User $user, array $columns = [], int $companyId): array
     {
         $dates = empty($dates) ? "" : explode("-", $dates);
         $columns = empty($columns) ? "*" : implode(", ", $columns);
@@ -99,7 +98,6 @@ class CashFlow
                 $date = date("Y-m-d", strtotime(str_replace("/", "-", $date)));
             }
 
-            $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
             $cashFlowData = $this->cashFlow
                 ->find(
                     "id_user=:id_user AND deleted=0 AND id_company=:id_company",
@@ -198,10 +196,9 @@ class CashFlow
     }
 
     /** @return ModelsCashFlow[] */
-    public function findCashFlowByUser(array $columns = [], User $user): array
+    public function findCashFlowByUser(array $columns = [], User $user, int $companyId): array
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
-        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
         $data = $this->cashFlow->find(
             "id_user=:id_user AND deleted=:deleted AND id_company=:id_company",
             ":id_user=" . $user->getId() . "&:deleted=0&:id_company=" . $companyId,
