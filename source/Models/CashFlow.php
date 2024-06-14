@@ -64,8 +64,8 @@ class CashFlow extends Model
     public function findGroupAccountsAgrupped(User $user, int $companyId): array
     {
         $stmt = $this->read("SELECT cg.group_name, 
-        COUNT(cg.group_name) AS total_accounts FROM sistema_contabil.cash_flow c
-        INNER JOIN sistema_contabil.cash_flow_group cg ON cg.id = c.id_cash_flow_group
+        COUNT(cg.group_name) AS total_accounts FROM " . CONF_DB_NAME . ".cash_flow c
+        INNER JOIN " . CONF_DB_NAME . ".cash_flow_group cg ON cg.id = c.id_cash_flow_group
         WHERE cg.id_user=:id_user_cg AND c.id_user=:id_user_c AND c.deleted=0 AND cg.deleted=0
         AND c.id_company=:c_id_company AND cg.id_company=:cg_id_company
         GROUP BY cg.group_name",
