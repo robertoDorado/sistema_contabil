@@ -11,10 +11,21 @@ if (endpointsElement) {
             
             navItem.forEach(function(element) {
                 const navLink = element.firstElementChild
-                if (navLink.href == window.location.href) {
+                const currentUrl = window.location.href.split("?").shift()
+                
+                if (navLink.href == currentUrl) {
                     navLink.classList.add("active")
-                    element.parentElement.parentElement.classList.add("menu-open")
-                    element.parentElement.parentElement.firstElementChild.classList.add("active")
+                    const menuElement = element.closest("ul").closest("li")
+                    if (menuElement) {
+                        menuElement.classList.add("menu-open")
+                        menuElement.firstElementChild.classList.add("active")
+                    }
+
+                    const submenuElement = menuElement.closest("ul").closest("li")
+                    if (submenuElement) {
+                        submenuElement.classList.add("menu-open")
+                        submenuElement.firstElementChild.classList.add("active")
+                    }
                 }
             })
         })
