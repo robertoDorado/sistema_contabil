@@ -102,11 +102,6 @@
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
                                         <a href="#" class="nav-link">
-                                            <p>Importar extratos bancários</p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="#" class="nav-link">
                                             <p>Conciliação automática</p>
                                         </a>
                                     </li>
@@ -255,6 +250,24 @@
                                 <a href="<?= url("admin/cash-flow/backup/report") ?>" class="nav-link">
                                     <p>Backup de contas</p>
                                 </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <p>Conciliação bancária</p>
+                                    <i class="right fas fa-angle-left"></i>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="<?= url("/admin/bank-reconciliation/cash-flow/automatic") ?>" class="nav-link">
+                                            <p>Conciliação automática</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="#" class="nav-link">
+                                            <p>Conciliação manual</p>
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
                             <li class="nav-item">
                                 <a href="#" class="nav-link">

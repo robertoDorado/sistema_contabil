@@ -9,6 +9,10 @@ if (window.location.pathname == '/admin/cash-flow/form') {
         }
     )
 
+    document.getElementById("launchValue").addEventListener("paste", function(event) {
+        event.preventDefault()
+    })
+    
     const launchBtn = document.getElementById("launchBtn")
     cashFlowForm.addEventListener("submit", function(event) {
         event.preventDefault()

@@ -60,9 +60,17 @@ $module = "admin";
 $route->namespace("Source\Controllers");
 $route->group($module);
 $route->get("/", "Site::admin");
+
+/**
+ * Admin Login
+ */
 $route->get("/login", "Login::login");
 $route->post("/login", "Login::login");
 $route->post("/logout", "Login::logout");
+
+/**
+ * Admin fluxo de caixa
+ */
 $route->get("/cash-flow/report", "CashFlow::cashFlowReport");
 $route->get("/cash-flow/form", "CashFlow::cashFlowForm");
 $route->post("/cash-flow/form", "CashFlow::cashFlowForm");
@@ -70,22 +78,33 @@ $route->get("/cash-flow/update/form/{uuid}", "CashFlow::cashFlowUpdateForm");
 $route->post("/cash-flow/update/form/{uuid}", "CashFlow::cashFlowUpdateForm");
 $route->post("/cash-flow/remove/{uuid}", "CashFlow::cashFlowRemoveRegister");
 $route->post("/cash-flow/import-excel", "CashFlow::importExcelFile");
+$route->get("/cash-flow/chart-line-data", "CashFlow::findCashFlowDataForChartLine");
+$route->get("/cash-flow/chart-pie-data", "CashFlow::findCashFlowDataForChartPie");
+$route->get("/cash-flow/backup/report", "CashFlow::cashFlowBackupReport");
+$route->post("/cash-flow/modify/{uuid}", "CashFlow::cashFlowModifyData");
+
+/**
+ * Admin grupo fluxo de caixa
+ */
 $route->get("/cash-flow-group/form", "CashFlowGroup::cashFlowGroupForm");
 $route->post("/cash-flow-group/form", "CashFlowGroup::cashFlowGroupForm");
 $route->get("/cash-flow-group/report", "CashFlowGroup::cashFlowGroupReport");
 $route->get("/cash-flow-group/update/form/{uuid}", "CashFlowGroup::cashFlowGroupFormUpdate");
 $route->post("/cash-flow-group/update/form/{uuid}", "CashFlowGroup::cashFlowGroupFormUpdate");
 $route->post("/cash-flow-group/remove/{uuid}", "CashFlowGroup::cashFlowGroupRemoveRegister");
-$route->get("/cash-flow/chart-line-data", "CashFlow::findCashFlowDataForChartLine");
-$route->get("/cash-flow/chart-pie-data", "CashFlow::findCashFlowDataForChartPie");
 $route->get("/cash-flow-group/backup/report", "CashFlowGroup::cashFlowGroupBackupReport");
-$route->get("/cash-flow/backup/report", "CashFlow::cashFlowBackupReport");
 $route->post("/cash-flow-group/modify/{uuid}", "CashFlowGroup::cashFlowGroupModiFyData");
-$route->post("/cash-flow/modify/{uuid}", "CashFlow::cashFlowModifyData");
+
+/**
+ * Admin Cliente
+ */
 $route->get("/customer/update-data/form", "Customer::updateDataCustomerForm");
 $route->post("/customer/update-data/form", "Customer::updateDataCustomerForm");
 $route->get("/customer/cancel-subscription", "Customer::cancelSubscription");
-$route->get("/warning/empty-company", "Company::warningEmptyCompany");
+
+/**
+ * Admin empresa
+ */
 $route->get("/company/register", "Company::companyRegister");
 $route->post("/company/register", "Company::companyRegister");
 $route->post("/company/sesssion", "Company::companySession");
@@ -95,6 +114,13 @@ $route->post("/company/update/form", "Company::companyFormUpdate");
 $route->post("/company/delete", "Company::companyDeleteRegister");
 $route->get("/company/backup/report", "Company::companyBackupReport");
 $route->post("/company/modify", "Company::companyModifyData");
+$route->get("/warning/empty-company", "Company::warningEmptyCompany");
+
+/**
+ * Conciliação bancária
+ */
+$route->get("/bank-reconciliation/cash-flow/automatic", "BankReconciliation::automaticReconciliationCashFlow");
+$route->post("/bank-reconciliation/cash-flow/automatic", "BankReconciliation::automaticReconciliationCashFlow");
 
 /**
  * API para arquivos CNAB

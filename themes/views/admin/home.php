@@ -44,7 +44,7 @@
                                         </h4>
                                     </div>
                                     <div id="collapseOne" class="collapse show" data-parent="#accordion">
-                                        <div class="card-body">
+                                        <div class="card-body documentation">
                                             Uma das características distintivas do nosso Sistema de Gestão Contábil 
                                             é a robusta funcionalidade de Fluxo de Caixa. Essencial para uma gestão 
                                             financeira eficiente, nossa plataforma oferece um painel intuitivo que 
@@ -71,6 +71,17 @@
                                                     O acesso fácil e rápido ao fluxo de caixa permite uma tomada de decisões 
                                                     estratégicas fundamentada, auxiliando na alocação eficiente de recursos 
                                                     e na identificação de oportunidades de investimento.
+                                                </li>
+                                                <li>
+                                                    <strong>Análise gráfica:</strong>
+                                                    A plataforma inclui indicadores de gráfico de linha que agrupam os movimentos diários, 
+                                                    fornecendo uma visão clara e contínua das atividades financeiras diárias. 
+                                                    Esses gráficos permitem que os gestores identifiquem rapidamente 
+                                                    tendências e variações no fluxo de caixa, facilitando a tomada de decisões informadas.
+                                                    O gráfico de pizza mostra o total de contas que existe no grupo de contas. 
+                                                    Esse tipo de visualização torna mais fácil compreender a distribuição dos recursos 
+                                                    e identificar quais contas representam uma maior parte do total, 
+                                                    ajudando a direcionar esforços para a gestão dessas contas de maneira mais eficaz.
                                                 </li>
                                             </ul>
                                             O Fluxo de Caixa Dinâmico do nosso sistema não apenas simplifica a gestão diária das finanças, 
