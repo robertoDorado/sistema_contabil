@@ -32,9 +32,41 @@ class BankReconciliation extends Controller
             }
 
             $requestFiles = $this->getRequestFiles()->getAllFiles();
+            if (!file_exists($requestFiles["ofxFile"]["tmp_name"]) && !is_readable($requestFiles["ofxFile"]["tmp_name"])) {
+                http_response_code(500);
+                echo json_encode(["error" => "o arquivo não existe ou não pode ser lido corretamente"]);
+                die;
+            }
+
+            $fileContent = file_get_contents($requestFiles["ofxFile"]["tmp_name"]);
+            if (empty($fileContent)) {
+                http_response_code(500);
+                echo json_encode(["error" => "o arquivo não pode estar vazio"]);
+                die;
+            }
+
             $parser = new Parser();
             $ofx = $parser->loadFromFile($requestFiles["ofxFile"]["tmp_name"]);
 
+            $bankAccount = $ofx->bankAccounts[0];
+            $transactions = $bankAccount->statement->transactions;
+
+            if (empty($transactions)) {
+                http_response_code(500);
+                echo json_encode(["error" => "o arquivo de transações está vazio"]);
+                die;
+            }
+
+            $datesTransaction = array_map(function ($item) {
+                $item->timestamp = strtotime($item->date->format("Y-m-d"));
+                return array_intersect_key((array) $item, ["timestamp" => true]);
+            }, $transactions);
+
+            $minDate = min($datesTransaction);
+            $maxDate = max($datesTransaction);
+            $dateRange = date("d/m/Y", $minDate["timestamp"]) . " - " . date("d/m/Y", $maxDate["timestamp"]);
+
+            $allowKeys = ["amount", "memo", "date"];
             $user = new User();
             $user->setEmail(session()->user->user_email);
             $userData = $user->findUserByEmail([]);
@@ -43,25 +75,21 @@ class BankReconciliation extends Controller
             $cashFlow = new CashFlow();
             $cashFlow->id_user = $userData->id;
             $companyId = session()->user->company_id;
-            $cashFlowData = $cashFlow->findCashFlowByUser([], $user, $companyId);
+            $cashFlowData = $cashFlow->findCashFlowDataByDate($dateRange, $user, [], $companyId);
 
-            $bankAccount = $ofx->bankAccounts[0];
-            $transactions = $bankAccount->statement->transactions;
-            $allowKeys = ["amount", "memo", "date"];
-            
-            $transactions = array_map(function($item) use ($allowKeys) {
+            $transactions = array_map(function ($item) use ($allowKeys) {
                 $item->date = $item->date->format("Y-m-d");
                 return array_intersect_key((array) $item, array_flip($allowKeys));
             }, $transactions);
 
-            $cashFlowData = array_map(function($item) use ($allowKeys) {
+            $cashFlowData = array_map(function ($item) use ($allowKeys) {
                 $item->amount = $item->getEntry();
                 $item->memo = $item->getHistory();
                 $item->date = $item->created_at;
                 return array_intersect_key((array) $item->data(), array_flip($allowKeys));
             }, $cashFlowData);
 
-            $differentData = array_udiff($transactions, $cashFlowData, function($a, $b) {
+            $differentData = array_udiff($transactions, $cashFlowData, function ($a, $b) {
                 if ($a['amount'] == $b['amount']) {
                     return 0;
                 }
@@ -70,7 +98,7 @@ class BankReconciliation extends Controller
 
             $total = 0;
             if (!empty($differentData)) {
-                $differentData = array_map(function($data) {
+                $differentData = array_map(function ($data) {
                     $data["date"] = date("d/m/Y", strtotime($data["date"]));
                     $data["amount_formated"] = "R$ " . number_format($data["amount"], 2, ",", ".");
                     return $data;
@@ -81,10 +109,10 @@ class BankReconciliation extends Controller
                     $total += $value["amount"];
                 }
             }
-            
-            echo empty($differentData) ? 
-            json_encode(["success" => "todas as contas estão conciliadas"]) : 
-            json_encode(["data" => $differentData, "total" => "R$ " . number_format($total, 2, ",", ".")]);
+
+            echo empty($differentData) ?
+                json_encode(["success" => "todas as contas estão conciliadas"]) :
+                json_encode(["data" => $differentData, "total" => "R$ " . number_format($total, 2, ",", ".")]);
             die;
         }
 

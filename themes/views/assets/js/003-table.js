@@ -53,8 +53,9 @@ const cashFlowTable = dataTableConfig($("#cashFlowReport"),
                     let arrayXlsxData = Array.from(xlsxData.body)
 
                     arrayXlsxData = arrayXlsxData.map(function (row) {
-                        row[5] = parseFloat(row[5].replace("R$", "")
-                            .replace(".", "").replace(",", ".").trim())
+                        row[5] = parseFloat(row[5].replace("R$", "").replace(".", "").replace(",", ".").trim())
+                        row[2] = formatDate(row[2])
+
                         row = row.filter((data) => data)
                         balance += row[5]
                         return row
@@ -130,15 +131,15 @@ const cashFlowTable = dataTableConfig($("#cashFlowReport"),
 
                     pdfData.content[1].table.body = arrayPdfData
                     var objLayout = {};
-                    objLayout['hLineWidth'] = function(i) { return 0.5; };
-                    objLayout['vLineWidth'] = function(i) { return 0.5; };
-                    objLayout['hLineColor'] = function(i) { return '#aaa'; };
-                    objLayout['vLineColor'] = function(i) { return '#aaa'; };
-                    objLayout['paddingLeft'] = function(i) { return 4; };
-                    objLayout['paddingRight'] = function(i) { return 4; };
-                    objLayout['paddingTop'] = function(i) { return 4; };
-                    objLayout['paddingBottom'] = function(i) { return 4; };
-                    objLayout['fillColor'] = function(i) { return null; };
+                    objLayout['hLineWidth'] = function (i) { return 0.5; };
+                    objLayout['vLineWidth'] = function (i) { return 0.5; };
+                    objLayout['hLineColor'] = function (i) { return '#aaa'; };
+                    objLayout['vLineColor'] = function (i) { return '#aaa'; };
+                    objLayout['paddingLeft'] = function (i) { return 4; };
+                    objLayout['paddingRight'] = function (i) { return 4; };
+                    objLayout['paddingTop'] = function (i) { return 4; };
+                    objLayout['paddingBottom'] = function (i) { return 4; };
+                    objLayout['fillColor'] = function (i) { return null; };
                     pdfData.content[1].layout = objLayout;
                 }
             },
@@ -190,15 +191,15 @@ const companyReport = dataTableConfig($("#companyReport"),
                     });
 
                     var objLayout = {};
-                    objLayout['hLineWidth'] = function(i) { return 0.5; };
-                    objLayout['vLineWidth'] = function(i) { return 0.5; };
-                    objLayout['hLineColor'] = function(i) { return '#aaa'; };
-                    objLayout['vLineColor'] = function(i) { return '#aaa'; };
-                    objLayout['paddingLeft'] = function(i) { return 4; };
-                    objLayout['paddingRight'] = function(i) { return 4; };
-                    objLayout['paddingTop'] = function(i) { return 4; };
-                    objLayout['paddingBottom'] = function(i) { return 4; };
-                    objLayout['fillColor'] = function(i) { return null; };
+                    objLayout['hLineWidth'] = function (i) { return 0.5; };
+                    objLayout['vLineWidth'] = function (i) { return 0.5; };
+                    objLayout['hLineColor'] = function (i) { return '#aaa'; };
+                    objLayout['vLineColor'] = function (i) { return '#aaa'; };
+                    objLayout['paddingLeft'] = function (i) { return 4; };
+                    objLayout['paddingRight'] = function (i) { return 4; };
+                    objLayout['paddingTop'] = function (i) { return 4; };
+                    objLayout['paddingBottom'] = function (i) { return 4; };
+                    objLayout['fillColor'] = function (i) { return null; };
                     doc.content[1].layout = objLayout;
                 }
             },
@@ -231,6 +232,11 @@ const automaticReconciliationReport = dataTableConfig($("#automaticReconciliatio
                 "title": "Conciliação bancária automática",
                 customizeData: function (xlsxData) {
                     xlsxData.header = xlsxData.header.filter((data) => data != 'Editar' && data != 'Excluir')
+                    xlsxData.body = xlsxData.body.map(function(row) {
+                        row[2] = parseFloat(row[2].replace("R$", "").replace(".", "").replace(",", ".").trim())
+                        row[0] = formatDate(row[0])
+                        return row
+                    })
                 }
             },
             {
@@ -248,15 +254,15 @@ const automaticReconciliationReport = dataTableConfig($("#automaticReconciliatio
                     ];
 
                     var objLayout = {};
-                    objLayout['hLineWidth'] = function(i) { return 0.5; };
-                    objLayout['vLineWidth'] = function(i) { return 0.5; };
-                    objLayout['hLineColor'] = function(i) { return '#aaa'; };
-                    objLayout['vLineColor'] = function(i) { return '#aaa'; };
-                    objLayout['paddingLeft'] = function(i) { return 4; };
-                    objLayout['paddingRight'] = function(i) { return 4; };
-                    objLayout['paddingTop'] = function(i) { return 4; };
-                    objLayout['paddingBottom'] = function(i) { return 4; };
-                    objLayout['fillColor'] = function(i) { return null; };
+                    objLayout['hLineWidth'] = function (i) { return 0.5; };
+                    objLayout['vLineWidth'] = function (i) { return 0.5; };
+                    objLayout['hLineColor'] = function (i) { return '#aaa'; };
+                    objLayout['vLineColor'] = function (i) { return '#aaa'; };
+                    objLayout['paddingLeft'] = function (i) { return 4; };
+                    objLayout['paddingRight'] = function (i) { return 4; };
+                    objLayout['paddingTop'] = function (i) { return 4; };
+                    objLayout['paddingBottom'] = function (i) { return 4; };
+                    objLayout['fillColor'] = function (i) { return null; };
                     doc.content[1].layout = objLayout;
                 }
             },
