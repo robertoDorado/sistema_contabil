@@ -46,6 +46,10 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
+                                    <label for="launchDate">Data de lançamento</label>
+                                    <input type="text" name="launchDate" class="form-control" id="launchDate" placeholder="Exemplo: 29/10/2000">
+                                </div>
+                                <div class="form-group">
                                     <label for="accountGroup">Grupo de conta</label>
                                     <select name="accountGroup" id="accountGroup" class="form-control">
                                         <option value="" disabled selected>Selecione um grupo de contas</option>

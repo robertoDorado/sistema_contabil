@@ -124,7 +124,22 @@ const cashFlowTable = dataTableConfig($("#cashFlowReport"),
                         ]
                     )
 
+                    pdfData.content[1].table.widths = [
+                        '16.66%', '16.66%', '16.66%', '16.66%', '16.66%', '16.66%'
+                    ];
+
                     pdfData.content[1].table.body = arrayPdfData
+                    var objLayout = {};
+                    objLayout['hLineWidth'] = function(i) { return 0.5; };
+                    objLayout['vLineWidth'] = function(i) { return 0.5; };
+                    objLayout['hLineColor'] = function(i) { return '#aaa'; };
+                    objLayout['vLineColor'] = function(i) { return '#aaa'; };
+                    objLayout['paddingLeft'] = function(i) { return 4; };
+                    objLayout['paddingRight'] = function(i) { return 4; };
+                    objLayout['paddingTop'] = function(i) { return 4; };
+                    objLayout['paddingBottom'] = function(i) { return 4; };
+                    objLayout['fillColor'] = function(i) { return null; };
+                    pdfData.content[1].layout = objLayout;
                 }
             },
             "colvis"
@@ -173,6 +188,76 @@ const companyReport = dataTableConfig($("#companyReport"),
                         row.splice(4, 8);
                         row.splice(6);
                     });
+
+                    var objLayout = {};
+                    objLayout['hLineWidth'] = function(i) { return 0.5; };
+                    objLayout['vLineWidth'] = function(i) { return 0.5; };
+                    objLayout['hLineColor'] = function(i) { return '#aaa'; };
+                    objLayout['vLineColor'] = function(i) { return '#aaa'; };
+                    objLayout['paddingLeft'] = function(i) { return 4; };
+                    objLayout['paddingRight'] = function(i) { return 4; };
+                    objLayout['paddingTop'] = function(i) { return 4; };
+                    objLayout['paddingBottom'] = function(i) { return 4; };
+                    objLayout['fillColor'] = function(i) { return null; };
+                    doc.content[1].layout = objLayout;
+                }
+            },
+            "colvis"
+        ],
+        "initComplete": function () {
+            this.api()
+                .buttons()
+                .container()
+                .appendTo("#widgets .col-md-6:eq(0)");
+        }
+    })
+const automaticReconciliationReport = dataTableConfig($("#automaticReconciliationReport"),
+    {
+        "order": [[0, "desc"]],
+        "language": {
+            "url": urlJson
+        },
+        "responsive": true,
+        "lengthChange": false,
+        "autoWidth": false,
+        "buttons": [
+            {
+                "extend": 'copyHtml5',
+                "title": 'Conciliação bancária automática'
+            },
+            {
+                "extend": 'excelHtml5',
+                "filename": "Conciliação bancária automática",
+                "title": "Conciliação bancária automática",
+                customizeData: function (xlsxData) {
+                    xlsxData.header = xlsxData.header.filter((data) => data != 'Editar' && data != 'Excluir')
+                }
+            },
+            {
+                "extend": 'csvHtml5',
+                "filename": "Conciliação bancária automática",
+                "title": "Conciliação bancária automática"
+            },
+            {
+                "extend": 'pdfHtml5',
+                "filename": "Conciliação bancária automática",
+                "title": 'Conciliação bancária automática',
+                customize: function (doc) {
+                    doc.content[1].table.widths = [
+                        '33.33%', '33.33%', '33.33%'
+                    ];
+
+                    var objLayout = {};
+                    objLayout['hLineWidth'] = function(i) { return 0.5; };
+                    objLayout['vLineWidth'] = function(i) { return 0.5; };
+                    objLayout['hLineColor'] = function(i) { return '#aaa'; };
+                    objLayout['vLineColor'] = function(i) { return '#aaa'; };
+                    objLayout['paddingLeft'] = function(i) { return 4; };
+                    objLayout['paddingRight'] = function(i) { return 4; };
+                    objLayout['paddingTop'] = function(i) { return 4; };
+                    objLayout['paddingBottom'] = function(i) { return 4; };
+                    objLayout['fillColor'] = function(i) { return null; };
+                    doc.content[1].layout = objLayout;
                 }
             },
             "colvis"

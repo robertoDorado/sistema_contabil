@@ -627,6 +627,7 @@ class CashFlow extends Controller
                         "launchValue",
                         "releaseHistory",
                         "entryType",
+                        "launchDate",
                         "csrfToken",
                         "accountGroup"
                     ]
@@ -636,6 +637,13 @@ class CashFlow extends Controller
                 0 => 'success',
                 1 => 'success',
             ];
+
+            $launchDate = date("Y-m-d", strtotime(str_replace("/", "-", $requestPost["launchDate"])));
+            if (strtotime(date("Y-m-d")) < strtotime($launchDate)) {
+                http_response_code(500);
+                echo json_encode(["error" => "a data de lançamento não pode ser uma data futura"]);
+                die;
+            }
 
             if (empty($entryTypeFields[$requestPost["entryType"]])) {
                 http_response_code(500);
@@ -682,7 +690,7 @@ class CashFlow extends Controller
                 "entry" => $requestPost["launchValue"],
                 "history" => $requestPost["releaseHistory"],
                 "entry_type" => $requestPost["entryType"],
-                "created_at" => date("Y-m-d"),
+                "created_at" => $launchDate,
                 "updated_at" => date("Y-m-d"),
                 "deleted" => 0
             ]);

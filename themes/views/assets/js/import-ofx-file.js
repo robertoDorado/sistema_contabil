@@ -2,8 +2,24 @@ if (window.location.pathname == "/admin/bank-reconciliation/cash-flow/automatic"
     const importOfxFileForm = document.getElementById("importOfxFile")
     const ofxFileInput = document.querySelector("[name='ofxFile']")
     const standardLabelNameExcelFile = ofxFileInput.nextElementSibling.innerHTML
+    const totalElement = document.querySelector("tfoot tr").lastElementChild
 
-    importOfxFileForm.addEventListener("submit", function(event) {
+    automaticReconciliationReport.on('search.dt', function() {
+        const dataFilter = automaticReconciliationReport.rows({ search: 'applied' }).data();
+        let balance = 0
+
+        dataFilter.each(function (row) {
+            let entryValue = parseFloat(row[2].replace("R$", "")
+                .replace(".", "").replace(",", ".").trim())
+
+            balance += entryValue
+        })
+
+        totalElement.innerHTML = balance
+        .toLocaleString("pt-br", { "currency": "BRL", "style": "currency" })
+    })
+
+    importOfxFileForm.addEventListener("submit", function (event) {
         event.preventDefault()
         const extensionName = extensionFileName(this.ofxFile.value)
         const btnSubmit = this.querySelector('[type="submit"]')
@@ -25,7 +41,7 @@ if (window.location.pathname == "/admin/bank-reconciliation/cash-flow/automatic"
         fetch(window.location.href, {
             method: "POST",
             body: form
-        }).then(response => response.json()).then(function(response) {
+        }).then(response => response.json()).then(function (response) {
             spinner.remove()
             btnSubmit.append(importIcon, " Importar ")
             btnSubmit.removeAttribute("disabled")
@@ -39,11 +55,27 @@ if (window.location.pathname == "/admin/bank-reconciliation/cash-flow/automatic"
                 throw new Error(message)
             }
 
-            console.log(response)
+            if (response.success) {
+                let message = response.success
+                message = message.charAt(0).toUpperCase() + message.slice(1)
+                toastr.success(message)
+                throw { message: message, name: 'StopExecution' }
+            }
+
+            if (response.data) {
+                for (let i = 0; i < response.data.length; i++) {
+                    automaticReconciliationReport.row.add([
+                        response.data[i].date,
+                        response.data[i].memo,
+                        response.data[i].amount_formated
+                    ]).draw(false)
+                }
+                totalElement.innerHTML = response.total
+            }
         })
     })
 
-    ofxFileInput.addEventListener("change", function() {
+    ofxFileInput.addEventListener("change", function () {
         const extensionName = extensionFileName(this.value)
 
         if (extensionName != "ofx") {

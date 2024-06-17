@@ -35,5 +35,35 @@
                 </div>
             </form>
         </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Relatório de fluxo de caixa</h3>
+                </div>
+
+                <div class="card-body">
+                    <div id="widgets" class="dataTables_wrapper dt-bootstrap4">
+                        <table id="automaticReconciliationReport" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Histórico</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th rowspan="1" colspan="1">Total</th>
+                                    <th rowspan="1" colspan="1"></th>
+                                    <th rowspan="1" colspan="1">0,00</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

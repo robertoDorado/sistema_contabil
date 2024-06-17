@@ -62,14 +62,29 @@ class BankReconciliation extends Controller
             }, $cashFlowData);
 
             $differentData = array_udiff($transactions, $cashFlowData, function($a, $b) {
-                if ($a['date'] == $b['date']) {
+                if ($a['amount'] == $b['amount']) {
                     return 0;
                 }
-                return ($a['date'] < $b['date']) ? -1 : 1;
+                return ($a['amount'] < $b['amount']) ? -1 : 1;
             });
 
-            echo "<pre>";
-            print_r($differentData);
+            $total = 0;
+            if (!empty($differentData)) {
+                $differentData = array_map(function($data) {
+                    $data["date"] = date("d/m/Y", strtotime($data["date"]));
+                    $data["amount_formated"] = "R$ " . number_format($data["amount"], 2, ",", ".");
+                    return $data;
+                }, $differentData);
+
+                $differentData = array_values($differentData);
+                foreach ($differentData as $value) {
+                    $total += $value["amount"];
+                }
+            }
+            
+            echo empty($differentData) ? 
+            json_encode(["success" => "todas as contas estão conciliadas"]) : 
+            json_encode(["data" => $differentData, "total" => "R$ " . number_format($total, 2, ",", ".")]);
             die;
         }
 

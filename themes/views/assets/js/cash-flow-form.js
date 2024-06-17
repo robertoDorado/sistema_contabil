@@ -9,6 +9,21 @@ if (window.location.pathname == '/admin/cash-flow/form') {
         }
     )
 
+    $(document).ready(function () {
+        $("[name='launchDate']").datepicker({
+            format: "dd/mm/yyyy",
+            language: "pt-BR",
+            autoclose: true
+        });
+    });
+
+    document.querySelector("[name='launchDate']").addEventListener("input", function(event) {
+        event.target.value = event.target.value.replace(/\D/g, "")
+        .replace(/(\d{2})(\d)/, "$1/$2")
+        .replace(/(\d{2})(\d)/, "$1/$2")
+        .replace(/(\/\d{4})\d+?$/, "$1")
+    })
+
     document.getElementById("launchValue").addEventListener("paste", function(event) {
         event.preventDefault()
     })
@@ -37,6 +52,11 @@ if (window.location.pathname == '/admin/cash-flow/form') {
             throw new Error("Campo tipo de entrada inválido")
         }
 
+        if (!this.launchDate.value) {
+            toastr.warning("Campo data da entrada inválido")
+            throw new Error('Campo data da entrada é obrigatório')
+        }
+
         if (!this.accountGroup.value) {
             toastr.warning("Campo grupo de contas inválido")
             throw new Error("Campo grupo de contas inválido")
@@ -46,6 +66,7 @@ if (window.location.pathname == '/admin/cash-flow/form') {
             this.launchValue,
             this.releaseHistory,
             this.entryType,
+            this.launchDate,
             this.accountGroup
         ]
         showSpinner(launchBtn)
