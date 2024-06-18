@@ -1,5 +1,4 @@
 <?php $v->layout("admin/layouts/_admin") ?>
-<?php $v->insert("admin/layouts/_modal") ?>
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <div class="content-header">
@@ -38,12 +37,12 @@
         <div class="col">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Relatório de fluxo de caixa</h3>
+                    <h3 class="card-title">Relatório do extrato bancário</h3>
                 </div>
 
                 <div class="card-body">
                     <div id="widgets" class="dataTables_wrapper dt-bootstrap4">
-                        <table id="automaticReconciliationReport" class="table table-bordered table-striped">
+                        <table id="automaticReconciliationReportCashFlow" class="table table-bordered table-striped">
                             <thead>
                                 <tr>
                                     <th>Data</th>

@@ -263,7 +263,7 @@
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="#" class="nav-link">
+                                        <a href="<?= url("/admin/bank-reconciliation/cash-flow/manual") ?>" class="nav-link">
                                             <p>Conciliação manual</p>
                                         </a>
                                     </li>

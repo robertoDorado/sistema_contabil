@@ -614,7 +614,8 @@ class CashFlow extends Controller
             "endpoints" => ["/admin/cash-flow/form", "/admin/cash-flow/report"],
             "cashFlowDataByUser" => $cashFlowDataByUser,
             "balance" => $balance,
-            "balanceValue" => $balanceValue
+            "balanceValue" => $balanceValue,
+            "hasControls" => true
         ]);
     }
 

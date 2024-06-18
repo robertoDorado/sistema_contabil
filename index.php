@@ -120,7 +120,8 @@ $route->get("/warning/empty-company", "Company::warningEmptyCompany");
  * Conciliação bancária
  */
 $route->get("/bank-reconciliation/cash-flow/automatic", "BankReconciliation::automaticReconciliationCashFlow");
-$route->post("/bank-reconciliation/cash-flow/automatic", "BankReconciliation::automaticReconciliationCashFlow");
+$route->get("/bank-reconciliation/cash-flow/manual", "BankReconciliation::manualReconciliationCashFlow");
+$route->post("/bank-reconciliation/cash-flow/import-ofx-file", "BankReconciliation::importOfxFile");
 
 /**
  * API para arquivos CNAB

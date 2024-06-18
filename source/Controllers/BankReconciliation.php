@@ -23,60 +23,63 @@ class BankReconciliation extends Controller
         parent::__construct();
     }
 
-    public function automaticReconciliationCashFlow()
+    public function importOfxFile()
     {
-        if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
-            if (empty(session()->user->company_id)) {
-                echo json_encode(["error" => "selecione uma empresa antes de importar o arquivo"]);
-                die;
-            }
+        if (empty(session()->user->company_id)) {
+            echo json_encode(["error" => "selecione uma empresa antes de importar o arquivo"]);
+            die;
+        }
 
-            $requestFiles = $this->getRequestFiles()->getAllFiles();
-            if (!file_exists($requestFiles["ofxFile"]["tmp_name"]) && !is_readable($requestFiles["ofxFile"]["tmp_name"])) {
-                http_response_code(500);
-                echo json_encode(["error" => "o arquivo não existe ou não pode ser lido corretamente"]);
-                die;
-            }
+        $requestFiles = $this->getRequestFiles()->getAllFiles();
+        $httpReferer = $this->getServer()->getServerByKey("HTTP_REFERER");
+        $urlComponents = parse_url($httpReferer);
 
-            $fileContent = file_get_contents($requestFiles["ofxFile"]["tmp_name"]);
-            if (empty($fileContent)) {
-                http_response_code(500);
-                echo json_encode(["error" => "o arquivo não pode estar vazio"]);
-                die;
-            }
+        if (!file_exists($requestFiles["ofxFile"]["tmp_name"]) && !is_readable($requestFiles["ofxFile"]["tmp_name"])) {
+            http_response_code(500);
+            echo json_encode(["error" => "o arquivo não existe ou não pode ser lido corretamente"]);
+            die;
+        }
 
-            $parser = new Parser();
-            $ofx = $parser->loadFromFile($requestFiles["ofxFile"]["tmp_name"]);
+        $fileContent = file_get_contents($requestFiles["ofxFile"]["tmp_name"]);
+        if (empty($fileContent)) {
+            http_response_code(500);
+            echo json_encode(["error" => "o arquivo não pode estar vazio"]);
+            die;
+        }
 
-            $bankAccount = $ofx->bankAccounts[0];
-            $transactions = $bankAccount->statement->transactions;
+        $parser = new Parser();
+        $ofx = $parser->loadFromFile($requestFiles["ofxFile"]["tmp_name"]);
 
-            if (empty($transactions)) {
-                http_response_code(500);
-                echo json_encode(["error" => "o arquivo de transações está vazio"]);
-                die;
-            }
+        $bankAccount = $ofx->bankAccounts[0];
+        $transactions = $bankAccount->statement->transactions;
 
-            $datesTransaction = array_map(function ($item) {
-                $item->timestamp = strtotime($item->date->format("Y-m-d"));
-                return array_intersect_key((array) $item, ["timestamp" => true]);
-            }, $transactions);
+        if (empty($transactions)) {
+            http_response_code(500);
+            echo json_encode(["error" => "o arquivo de transações está vazio"]);
+            die;
+        }
 
-            $minDate = min($datesTransaction);
-            $maxDate = max($datesTransaction);
-            $dateRange = date("d/m/Y", $minDate["timestamp"]) . " - " . date("d/m/Y", $maxDate["timestamp"]);
+        $datesTransaction = array_map(function ($item) {
+            $item->timestamp = strtotime($item->date->format("Y-m-d"));
+            return array_intersect_key((array) $item, ["timestamp" => true]);
+        }, $transactions);
 
-            $allowKeys = ["amount", "memo", "date"];
-            $user = new User();
-            $user->setEmail(session()->user->user_email);
-            $userData = $user->findUserByEmail([]);
-            $user->setId($userData->id);
+        $minDate = min($datesTransaction);
+        $maxDate = max($datesTransaction);
+        $dateRange = date("d/m/Y", $minDate["timestamp"]) . " - " . date("d/m/Y", $maxDate["timestamp"]);
 
-            $cashFlow = new CashFlow();
-            $cashFlow->id_user = $userData->id;
-            $companyId = session()->user->company_id;
-            $cashFlowData = $cashFlow->findCashFlowDataByDate($dateRange, $user, [], $companyId);
+        $allowKeys = ["amount", "memo", "date"];
+        $user = new User();
+        $user->setEmail(session()->user->user_email);
+        $userData = $user->findUserByEmail([]);
+        $user->setId($userData->id);
 
+        $cashFlow = new CashFlow();
+        $cashFlow->id_user = $userData->id;
+        $companyId = session()->user->company_id;
+        $cashFlowData = $cashFlow->findCashFlowDataByDate($dateRange, $user, [], $companyId);
+
+        if ($urlComponents['path'] == "/admin/bank-reconciliation/cash-flow/automatic") {
             $transactions = array_map(function ($item) use ($allowKeys) {
                 $item->date = $item->date->format("Y-m-d");
                 return array_intersect_key((array) $item, array_flip($allowKeys));
@@ -88,22 +91,34 @@ class BankReconciliation extends Controller
                 $item->date = $item->created_at;
                 return array_intersect_key((array) $item->data(), array_flip($allowKeys));
             }, $cashFlowData);
+        }else {
+            $cashFlowData = array_map(function($item) {
+                return $item->data();
+            }, $cashFlowData);
 
+            $transactions = array_map(function ($item) {
+                $item->amount_formated = "R$ " . number_format($item->amount, 2, ",", ".");
+                $item->date = $item->date->format("d/m/Y");
+                return $item;
+            }, $transactions);
+        }
+
+        $total = 0;
+        if ($urlComponents['path'] == "/admin/bank-reconciliation/cash-flow/automatic") {
             $differentData = array_udiff($transactions, $cashFlowData, function ($a, $b) {
                 if ($a['amount'] == $b['amount']) {
                     return 0;
                 }
                 return ($a['amount'] < $b['amount']) ? -1 : 1;
             });
-
-            $total = 0;
+            
             if (!empty($differentData)) {
                 $differentData = array_map(function ($data) {
                     $data["date"] = date("d/m/Y", strtotime($data["date"]));
                     $data["amount_formated"] = "R$ " . number_format($data["amount"], 2, ",", ".");
                     return $data;
                 }, $differentData);
-
+    
                 $differentData = array_values($differentData);
                 foreach ($differentData as $value) {
                     $total += $value["amount"];
@@ -113,10 +128,53 @@ class BankReconciliation extends Controller
             echo empty($differentData) ?
                 json_encode(["success" => "todas as contas estão conciliadas"]) :
                 json_encode(["data" => $differentData, "total" => "R$ " . number_format($total, 2, ",", ".")]);
-            die;
+        }else {
+            if (!empty($transactions)) {
+                foreach ($transactions as $value) {
+                    $total += $value->amount;
+                }
+            }
+            
+            echo json_encode(
+                [
+                    "data" => $transactions, 
+                    "cashFlowData" => $cashFlowData, 
+                    "total" => "R$ " . number_format($total, 2, ",", "."),
+                ]
+            );
+        }
+    }
+
+    public function manualReconciliationCashFlow()
+    {
+        $user = new User();
+        $user->setEmail(session()->user->user_email);
+        $userData = $user->findUserByEmail();
+        $user->setId($userData->id);
+        
+        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
+        $cashFlow = new CashFlow();
+        $cashFlowDataByUser = $cashFlow->findCashFlowByUser([], $user, $companyId);
+
+        if (!empty($cashFlowDataByUser)) {
+            $cashFlowDataByUser = array_map(function($cashFlowData) {
+                $cashFlowData->setEntry("R$ " . number_format($cashFlowData->getEntry(), 2, ",", "."));
+                $cashFlowData->created_at = date("d/m/Y", strtotime($cashFlowData->created_at));
+                $cashFlowData->entry_type_value = !empty($cashFlowData->entry_type) ? "Crédito" : "Débito";
+                return $cashFlowData;
+            }, $cashFlowDataByUser);
         }
 
-        echo $this->view->render("admin/automatic-bank-reconciliation", [
+        echo $this->view->render("admin/manual-bank-reconciliation-cashflow", [
+            "endpoints" => ["/admin/bank-reconciliation/cash-flow/manual"],
+            "userFullName" => showUserFullName(),
+            "cashFlowDataByUser" => $cashFlowDataByUser
+        ]);
+    }
+
+    public function automaticReconciliationCashFlow()
+    {
+        echo $this->view->render("admin/automatic-bank-reconciliation-cashflow", [
             "endpoints" => ["/admin/bank-reconciliation/cash-flow/automatic"],
             "userFullName" => showUserFullName()
         ]);
