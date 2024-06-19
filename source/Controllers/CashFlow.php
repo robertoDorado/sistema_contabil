@@ -92,97 +92,6 @@ class CashFlow extends Controller
         ]);
     }
 
-    public function findCashFlowDataForChartPie()
-    {
-        $user = basicsValidatesForChartsRender();
-        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
-        $cashFlow = new ModelCashFlow();
-        $cashFlowData = $cashFlow->findGroupAccountsAgrupped($user, $companyId);
-
-        if (empty($cashFlowData)) {
-            echo json_encode([]);
-            die;
-        }
-
-        $accountsData = [];
-        $totalAccounts = [];
-
-        foreach ($cashFlowData as $arrayData) {
-            array_push($accountsData, $arrayData->group_name);
-            array_push($totalAccounts, $arrayData->total_accounts);
-        }
-
-        echo json_encode(
-            [
-                "total_accounts" => $totalAccounts,
-                "accounts_data" => $accountsData
-            ]
-        );
-    }
-
-    public function findCashFlowDataForChartLine()
-    {
-        $user = basicsValidatesForChartsRender();
-        $cashFlow = new ModelCashFlow();
-        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
-        $cashFlowData = $cashFlow->findCashFlowByUser(["entry", "created_at"], $user, $companyId);
-
-        $dateRange = $this->getRequests()->get("daterange");
-        if (!empty($dateRange)) {
-            $cashFlow = new ModelCashFlow();
-            $cashFlowData = $cashFlow->findCashFlowDataByDate($dateRange, $user, ["entry", "created_at"], $companyId);
-        }
-
-        if (empty($cashFlowData)) {
-            echo json_encode([]);
-            die;
-        }
-
-        $orderByDate = function ($a, $b) {
-            $monthA = date("n", strtotime($a));
-            $monthB = date("n", strtotime($b));
-
-            $dayA = date("j", strtotime($a));
-            $dayB = date("j", strtotime($b));
-
-            if ($monthA == $monthB) {
-                if ($dayA == $dayB) {
-                    return 0;
-                }
-
-                return $dayA < $dayB ? -1 : 1;
-            }
-            return $monthA < $monthB ? -1 : 1;
-        };
-
-        $groupByDate = [];
-        foreach ($cashFlowData as $value) {
-            $date = $value->created_at;
-            $entryValue = $value->getEntry();
-
-            if (array_key_exists($date, $groupByDate)) {
-                $groupByDate[$date] += $entryValue;
-            } else {
-                $groupByDate[$date] = $entryValue;
-            }
-        }
-
-        uksort($groupByDate, $orderByDate);
-        $formatDate = function ($date) {
-            return date("d/m", strtotime($date));
-        };
-
-        $response = [];
-        $response["created_at"] = array_keys($groupByDate);
-        $response["created_at"] = array_map($formatDate, $response["created_at"]);
-
-        $response["entry"] = array_values($groupByDate);
-        $response["created_at"] = array_slice($response["created_at"], 0, 31);
-
-        $response["entry"] = array_slice($response["entry"], 0, 31);
-        echo json_encode($response);
-    }
-
     public function importExcelFile()
     {
         $file = $this->getRequestFiles()->getFile("excelFile");
@@ -615,7 +524,8 @@ class CashFlow extends Controller
             "cashFlowDataByUser" => $cashFlowDataByUser,
             "balance" => $balance,
             "balanceValue" => $balanceValue,
-            "hasControls" => true
+            "hasControls" => true,
+            "urlDateRangeInput" => url("/admin/cash-flow/report")
         ]);
     }
 

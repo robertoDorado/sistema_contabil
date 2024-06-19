@@ -78,8 +78,6 @@ $route->get("/cash-flow/update/form/{uuid}", "CashFlow::cashFlowUpdateForm");
 $route->post("/cash-flow/update/form/{uuid}", "CashFlow::cashFlowUpdateForm");
 $route->post("/cash-flow/remove/{uuid}", "CashFlow::cashFlowRemoveRegister");
 $route->post("/cash-flow/import-excel", "CashFlow::importExcelFile");
-$route->get("/cash-flow/chart-line-data", "CashFlow::findCashFlowDataForChartLine");
-$route->get("/cash-flow/chart-pie-data", "CashFlow::findCashFlowDataForChartPie");
 $route->get("/cash-flow/backup/report", "CashFlow::cashFlowBackupReport");
 $route->post("/cash-flow/modify/{uuid}", "CashFlow::cashFlowModifyData");
 
@@ -122,6 +120,15 @@ $route->get("/warning/empty-company", "Company::warningEmptyCompany");
 $route->get("/bank-reconciliation/cash-flow/automatic", "BankReconciliation::automaticReconciliationCashFlow");
 $route->get("/bank-reconciliation/cash-flow/manual", "BankReconciliation::manualReconciliationCashFlow");
 $route->post("/bank-reconciliation/cash-flow/import-ofx-file", "BankReconciliation::importOfxFile");
+
+/**
+ * Análises e indicadores
+ */
+$route->get("/analyzes-and-indicators/cash-flow/charts-and-visualizations", "AnalyzesAndIndicators::charts");
+$route->get("/analyzes-and-indicators/cash-flow/chart-line-data/pooled-cash-flow", "AnalyzesAndIndicators::findCashFlowDataForChartLinePooledChasFlow");
+$route->get("/analyzes-and-indicators/cash-flow/chart-pie-data/account-grouping-count", "AnalyzesAndIndicators::findCashFlowDataForChartPieAccountGroupingCount");
+$route->get("/analyzes-and-indicators/cash-flow/chart-bar-data/monthly-cash-flow-comparison", "AnalyzesAndIndicators::findChasFlowDataForBarChartMonthlyCashFlowComparasion");
+$route->get("/analyzes-and-indicators/cash-flow/chart-bar-data/expenses-by-account-group", "AnalyzesAndIndicators::findChasFlowDataForBarChartExpensesByAccountGroup");
 
 /**
  * API para arquivos CNAB

@@ -19,7 +19,8 @@ if (modal) {
                 }
     
                 if (response.success) {
-                    window.location.href = window.location.href
+                    const redirectUrl = window.location.origin + window.location.pathname
+                    window.location.href = redirectUrl
                 }
             })
         })

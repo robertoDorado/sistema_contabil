@@ -1,5 +1,24 @@
-if (window.location.pathname == "/admin/cash-flow/report") {
-    fetch(window.location.origin + "/admin/cash-flow/chart-line-data" + window.location.search)
+if (window.location.pathname == "/admin/analyzes-and-indicators/cash-flow/charts-and-visualizations") {
+    $(document).ready(function () {
+        $('#date-range').daterangepicker({
+            opens: 'left',
+            locale: {
+                format: 'DD/MM/YYYY',
+                separator: ' - ',
+                applyLabel: 'Aplicar',
+                cancelLabel: 'Cancelar',
+            }
+        });
+    });
+
+    document.querySelector(".content").style.padding = "2.1rem .5rem"
+    document.getElementById("searchCashFlowById").addEventListener("submit", function(event) {
+        event.preventDefault()
+        showSpinner(event.target.querySelector("[type='submit']"))
+        this.submit()
+    })
+
+    fetch(window.location.origin + "/admin/analyzes-and-indicators/cash-flow/chart-line-data/pooled-cash-flow" + window.location.search)
     .then(response => response.json()).then(function(response) {
         const containerChartLine = document.getElementById("containerChartLine")
 
@@ -45,6 +64,8 @@ if (window.location.pathname == "/admin/cash-flow/report") {
                 options: chartOptions
             });
 
+        }else {
+            toastr.error("Esta empresa não possui movimento de caixa")
         }
     })
 

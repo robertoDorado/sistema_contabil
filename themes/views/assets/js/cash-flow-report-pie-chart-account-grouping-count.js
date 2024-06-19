@@ -1,6 +1,6 @@
-if (window.location.pathname == "/admin/cash-flow/report") {
+if (window.location.pathname == "/admin/analyzes-and-indicators/cash-flow/charts-and-visualizations") {
      
-    fetch(window.location.origin + "/admin/cash-flow/chart-pie-data")
+    fetch(window.location.origin + "/admin/analyzes-and-indicators/cash-flow/chart-pie-data/account-grouping-count" + window.location.search)
     .then(response => response.json()).then(function(response) {
         const containerPieChart = document.getElementById("containerPieChart")
         if (response.total_accounts && response.accounts_data) {

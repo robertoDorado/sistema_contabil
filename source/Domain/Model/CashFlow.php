@@ -78,9 +78,9 @@ class CashFlow
         return $cashFlowData;
     }
 
-    public function findGroupAccountsAgrupped(User $user, int $companyId): array
+    public function findGroupAccountsAgrupped(User $user, int $companyId, string $dateRange): array
     {
-        return $this->cashFlow->findGroupAccountsAgrupped($user, $companyId);
+        return $this->cashFlow->findGroupAccountsAgrupped($user, $companyId, $dateRange);
     }
 
     /** @return ModelsCashFlow[] */
