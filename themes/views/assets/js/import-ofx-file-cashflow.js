@@ -11,7 +11,8 @@ if (allowPathNamesImportOfxFile.indexOf(window.location.pathname) != -1) {
     const importOfxFileForm = document.getElementById("importOfxFile")
     const ofxFileInput = document.querySelector("[name='ofxFile']")
     const standardLabelNameExcelFile = ofxFileInput.nextElementSibling.innerHTML
-    const totalElement = document.querySelector("tfoot tr").lastElementChild
+    const totalElement = document.querySelector(".reconciliation-report-cash-flow")
+    .querySelector("tfoot tr").lastElementChild
 
     if (window.location.pathname == allowPathNamesImportOfxFile[0]) {
         automaticReconciliationReportCashFlow.on('search.dt', function() {

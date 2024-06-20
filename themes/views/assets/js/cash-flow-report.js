@@ -1,4 +1,5 @@
-if (window.location.pathname == "/admin/cash-flow/report") {
+const allowEndponts = ["/admin/bank-reconciliation/cash-flow/manual", "/admin/cash-flow/report"]
+if (allowEndponts.indexOf(window.location.pathname) != -1) {
     $(document).ready(function () {
         $('#date-range').daterangepicker({
             opens: 'left',

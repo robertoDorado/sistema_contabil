@@ -43,7 +43,7 @@
 
                 <div class="card-body">
                     <div id="widgets" class="dataTables_wrapper dt-bootstrap4">
-                        <table id="manualReconciliationReportCashFlow" class="table table-bordered table-striped">
+                        <table id="manualReconciliationReportCashFlow" class="table table-bordered table-striped reconciliation-report-cash-flow">
                             <thead>
                                 <tr>
                                     <th>Data</th>

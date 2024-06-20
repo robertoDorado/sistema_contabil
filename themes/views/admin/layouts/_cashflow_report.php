@@ -55,7 +55,7 @@
                         <?php endif ?>
                     </tbody>
                     <tfoot>
-                        <?php if (!empty($balanceValue)) : ?>
+                        <?php if (!empty($hasBalance)) : ?>
                             <?php if ($balanceValue > 0) : ?>
                                 <tr style="color:#008000">
                                     <th rowspan="1" colspan="1">Total</th>
@@ -64,8 +64,10 @@
                                     <th rowspan="1" colspan="1"></th>
                                     <th rowspan="1" colspan="1"></th>
                                     <th rowspan="1" colspan="1"><?= $balance ?></th>
-                                    <th rowspan="1" colspan="1"></th>
-                                    <th rowspan="1" colspan="1"></th>
+                                    <?php if (!empty($hasControls)) : ?>
+                                        <th rowspan="1" colspan="1"></th>
+                                        <th rowspan="1" colspan="1"></th>
+                                    <?php endif ?>
                                 </tr>
                             <?php elseif (empty($balanceValue)) : ?>
                                 <tr>
@@ -75,8 +77,10 @@
                                     <th rowspan="1" colspan="1"></th>
                                     <th rowspan="1" colspan="1"></th>
                                     <th rowspan="1" colspan="1">0,00</th>
-                                    <th rowspan="1" colspan="1"></th>
-                                    <th rowspan="1" colspan="1"></th>
+                                    <?php if (!empty($hasControls)) : ?>
+                                        <th rowspan="1" colspan="1"></th>
+                                        <th rowspan="1" colspan="1"></th>
+                                    <?php endif ?>
                                 </tr>
                             <?php else : ?>
                                 <tr style="color:#ff0000">
@@ -86,8 +90,10 @@
                                     <th rowspan="1" colspan="1"></th>
                                     <th rowspan="1" colspan="1"></th>
                                     <th rowspan="1" colspan="1"><?= $balance ?></th>
-                                    <th rowspan="1" colspan="1"></th>
-                                    <th rowspan="1" colspan="1"></th>
+                                    <?php if (!empty($hasControls)) : ?>
+                                        <th rowspan="1" colspan="1"></th>
+                                        <th rowspan="1" colspan="1"></th>
+                                    <?php endif ?>
                                 </tr>
                             <?php endif ?>
                         <?php endif ?>

@@ -327,7 +327,7 @@ class CashFlowTest extends TestCase
         }
 
         $this->cashFlow = new CashFlow();
-        $balance = $this->cashFlow->calculateBalance($this->user);
+        $balance = $this->cashFlow->calculateBalance($this->user, $this->company->getId());
         $this->assertIsFloat($balance);
 
         $this->assertEquals(6432.66, $balance);

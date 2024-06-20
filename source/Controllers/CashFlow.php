@@ -333,7 +333,8 @@ class CashFlow extends Controller
         $user->setId($userData->id);
         $cashFlow = new ModelCashFlow();
 
-        $balance = $cashFlow->calculateBalance($user);
+        $companyId = !empty(session()->user->company_id) ? session()->user->company_id : 0;
+        $balance = $cashFlow->calculateBalance($user, $companyId);
         $color = ($balance < 0 ? "#ff0000" : ($balance > 0 ? "#008000" : ""));
         $balance = ($balance < 0 ? $balance * -1 : $balance);
 
@@ -510,10 +511,10 @@ class CashFlow extends Controller
         $user = new User();
 
         $user->setId($userData->id);
-        $balanceValue = $cashFlow->calculateBalance($user);
+        $companyId = !empty(session()->user->company_id) ? session()->user->company_id : 0;
+        $balanceValue = $cashFlow->calculateBalance($user, $companyId);
 
         $balance = !empty($balanceValue) ? 'R$ ' . number_format($balanceValue, 2, ',', '.') : 0;
-
         if (!empty($cashFlowDataByUser) && is_array($cashFlowDataByUser)) {
             $cashFlowDataByUser = array_reverse($cashFlowDataByUser);
         }
@@ -524,8 +525,9 @@ class CashFlow extends Controller
             "cashFlowDataByUser" => $cashFlowDataByUser,
             "balance" => $balance,
             "balanceValue" => $balanceValue,
+            "hasBalance" => true,
             "hasControls" => true,
-            "urlDateRangeInput" => url("/admin/cash-flow/report")
+            "urlDateRangeInput" => url("/admin/cash-flow/report"),
         ]);
     }
 

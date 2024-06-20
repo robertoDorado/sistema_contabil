@@ -165,10 +165,22 @@ class BankReconciliation extends Controller
             }, $cashFlowDataByUser);
         }
 
+        $cashFlow = new CashFlow();
+        $companyId = !empty(session()->user->company_id) ? session()->user->company_id : 0;
+        $balanceValue = $cashFlow->calculateBalance($user, $companyId);
+        $balance = !empty($balanceValue) ? 'R$ ' . number_format($balanceValue, 2, ',', '.') : 0;
+
+        if (!empty($cashFlowDataByUser) && is_array($cashFlowDataByUser)) {
+            $cashFlowDataByUser = array_reverse($cashFlowDataByUser);
+        }
+
         echo $this->view->render("admin/manual-bank-reconciliation-cashflow", [
             "endpoints" => ["/admin/bank-reconciliation/cash-flow/manual"],
             "userFullName" => showUserFullName(),
-            "cashFlowDataByUser" => $cashFlowDataByUser
+            "cashFlowDataByUser" => $cashFlowDataByUser,
+            "balance" => $balance,
+            "balanceValue" => $balanceValue,
+            "hasBalance" => true
         ]);
     }
 

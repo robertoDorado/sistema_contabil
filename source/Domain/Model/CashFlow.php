@@ -238,12 +238,12 @@ class CashFlow
         $this->id = $id;
     }
 
-    public function calculateBalance(User $user): float
+    public function calculateBalance(User $user, int $companyId): float
     {
         $data = $this->cashFlow
             ->find(
-                "id_user=:id_user AND deleted=:deleted",
-                ":id_user=" . $user->getId() . "&:deleted=0"
+                "id_user=:id_user AND deleted=:deleted AND id_company=:id_company",
+                ":id_user=" . $user->getId() . "&:deleted=0&:id_company=" . $companyId . ""
             )->fetch(true);
         $balance = 0;
 
