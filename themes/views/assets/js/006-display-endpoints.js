@@ -11,7 +11,7 @@ if (endpointsElement) {
             
             navItem.forEach(function(element) {
                 const navLink = element.firstElementChild
-                const currentUrl = window.location.href.split("?").shift()
+                const currentUrl = window.location.href.split("?").shift().replace("#", "")
                 
                 if (navLink.href == currentUrl) {
                     navLink.classList.add("active")

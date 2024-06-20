@@ -26,20 +26,28 @@
                     <?= $v->insert("admin/layouts/_daterange_input") ?>
                 </div>
             </div>
-            <div class="row">
-                <div id="containerChartLine" class="col-md-6 mt-5" style="display:none">
-                    <canvas id="lineChartCashFlowReport" width="800" height="400"></canvas>
-                </div>
-                <div id="containerPieChart" class="col-md-6 mt-5 mb-5" style="display:none">
-                    <canvas style="margin:0 auto" id="pieChartCashFlowReport" width="350" height="350"></canvas>
+            <div class="row mt-5 mb-5">
+                <div class="col-12">
+                    <div id="containerChartLine" style="display:none">
+                        <canvas id="lineChartCashFlowReport" width="550" height="200"></canvas>
+                    </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <canvas id="monthlyComparasion"></canvas>
+            <div class="row mt-5 mb-5">
+                <div class="col-md-12">
+                    <div id="containerPieChart" style="display:none">
+                        <canvas style="margin:0 auto" id="pieChartCashFlowReport" width="550" height="200"></canvas>
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <canvas id="expenseCategories"></canvas>
+            </div>
+            <div class="row  mt-5 mb-5">
+                <div class="col-md-12">
+                    <canvas id="monthlyComparasion" width="550" height="200"></canvas>
+                </div>
+            </div>
+            <div class="row  mt-5 mb-5">
+                <div class="col-md-12">
+                    <canvas id="expenseCategories" width="550" height="200"></canvas>
                 </div>
             </div>
         </div>

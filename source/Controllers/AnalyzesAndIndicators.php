@@ -5,6 +5,7 @@ namespace Source\Controllers;
 use DateTime;
 use Source\Core\Controller;
 use Source\Domain\Model\CashFlow;
+use Source\Domain\Model\User;
 
 /**
  * AnalyzesAndIndicators Controllers
@@ -22,12 +23,88 @@ class AnalyzesAndIndicators extends Controller
         parent::__construct();
     }
 
+    public function financialIndicators()
+    {
+        $user = new User();
+        $user->setEmail(session()->user->user_email);
+        $userData = $user->findUserByEmail(["id", "deleted"]);
+        $user->setId($userData->id);
+
+        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
+        $cashFlow = new CashFlow();
+        $cashFlowData = $cashFlow->findCashFlowByUser(["entry", "deleted"], $user, $companyId);
+
+        $financialIndicators = [
+            "recebimentos de clientes" => 0,
+            "pagamentos a fornecedores e empregados" => 0,
+            "despesas de capital" => 0,
+            "emissão de dívidas ou ações" => 0,
+            "pagamento de dívidas ou dividendos" => 0,
+            "compra de ativos fixos" => 0,
+            "venda de investimentos" => 0,
+            "pagamentos de juros" => 0,
+            "pagamentos de dívidas" => 0,
+            "lucro líquido" => 0,
+            "receita líquida" => 0,
+            "período médio de cobrança" => 0,
+            "período médio de estoque" => 0,
+            "período médio de pagamento" => 0,
+            "fco" => 0
+        ];
+
+        if (!empty($cashFlowData)) {
+            $cashFlowData = array_map(function ($item) {
+                $item->entry = $item->getEntry() >= 0 ? $item->getEntry() : ($item->getEntry() * -1);
+                $item->group_name = strtolower($item->group_name);
+                $item = $item->data();
+                return $item;
+            }, $cashFlowData);
+
+            $allowGroupNameKeys = [
+                "recebimentos de clientes",
+                "pagamentos a fornecedores e empregados",
+                "despesas de capital",
+                "emissão de dívidas ou ações",
+                "pagamento de dívidas ou dividendos",
+                "compra de ativos fixos",
+                "venda de investimentos",
+                "pagamentos de juros",
+                "pagamentos de dívidas",
+                "lucro líquido",
+                "receita líquida",
+                "período médio de cobrança",
+                "período médio de estoque",
+                "período médio de pagamento"
+            ];
+
+            $cashFlowData = array_filter($cashFlowData, function ($item) use ($allowGroupNameKeys) {
+                return in_array($item->group_name, $allowGroupNameKeys);
+            });
+
+            foreach ($cashFlowData as $value) {
+                if ($financialIndicators[$value->group_name] >= 0) {
+                    $financialIndicators[$value->group_name] += $value->entry;
+                }
+
+                if (!empty($financialIndicators["recebimentos de clientes"]) && !empty($financialIndicators["pagamentos a fornecedores e empregados"])) {
+                    $financialIndicators["fco"] = $financialIndicators["recebimentos de clientes"] - $financialIndicators["pagamentos a fornecedores e empregados"];
+                }
+            }
+        }
+
+        echo $this->view->render("admin/financial-indicators", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => ["/admin/analyzes-and-indicators/cash-flow/financial-indicators"],
+            "financialIndicators" => $financialIndicators
+        ]);
+    }
+
     public function findChasFlowDataForBarChartExpensesByAccountGroup()
     {
         $user = basicsValidatesForChartsRender();
         $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
         $cashFlow = new CashFlow();
-        
+
         $columns = ["entry", "deleted", "id_cash_flow_group"];
         $cashFlowData = $cashFlow->findCashFlowByUser($columns, $user, $companyId);
         $dateRange = $this->getRequests()->get("daterange");
@@ -42,7 +119,7 @@ class AnalyzesAndIndicators extends Controller
             die;
         }
 
-        $cashFlowData = array_map(function($item) {
+        $cashFlowData = array_map(function ($item) {
             $item->entry = $item->getEntry();
             $item = $item->data();
             return (array) $item;
@@ -60,7 +137,7 @@ class AnalyzesAndIndicators extends Controller
         }
 
         $grouppedCashFlowData = array_values($grouppedCashFlowData);
-        $grouppedCashFlowData = array_map(function($item) {
+        $grouppedCashFlowData = array_map(function ($item) {
             return array_intersect_key($item, array_flip(["group_name", "total_value"]));
         }, $grouppedCashFlowData);
 
@@ -72,7 +149,7 @@ class AnalyzesAndIndicators extends Controller
         $user = basicsValidatesForChartsRender();
         $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
         $cashFlow = new CashFlow();
-        
+
         $columns = ["created_at", "entry", "deleted"];
         $cashFlowData = $cashFlow->findCashFlowByUser($columns, $user, $companyId);
         $dateRange = $this->getRequests()->get("daterange");
@@ -88,24 +165,24 @@ class AnalyzesAndIndicators extends Controller
         }
 
         $months = [
-            1 => 'Janeiro', 
-            2 => 'Fevereiro', 
+            1 => 'Janeiro',
+            2 => 'Fevereiro',
             3 => 'Março',
-            4 => 'Abril', 
-            5 => 'Maio', 
+            4 => 'Abril',
+            5 => 'Maio',
             6 => 'Junho',
-            7 => 'Julho', 
-            8 => 'Agosto', 
+            7 => 'Julho',
+            8 => 'Agosto',
             9 => 'Setembro',
-            10 => 'Outubro', 
-            11 => 'Novembro', 
+            10 => 'Outubro',
+            11 => 'Novembro',
             12 => 'Dezembro'
         ];
 
         $cashFlowData = array_map(function ($item) use ($months) {
             $item->month = date("Y-m", strtotime($item->created_at));
             $dateTime = new DateTime($item->created_at);
-            $item->month_name = $months[$dateTime->format("n")] . "/" . date("Y" ,strtotime($item->created_at));
+            $item->month_name = $months[$dateTime->format("n")] . "/" . date("Y", strtotime($item->created_at));
             $item->entry_value = $item->getEntry();
             $item = $item->data();
             return (array) $item;
@@ -132,7 +209,7 @@ class AnalyzesAndIndicators extends Controller
         $grouppedCashFlowData = array_values($grouppedCashFlowData);
         $filterKeys = ["positive_value", "negative_value", "month_name"];
 
-        $grouppedCashFlowData = array_map(function($item) use ($filterKeys) {
+        $grouppedCashFlowData = array_map(function ($item) use ($filterKeys) {
             return array_intersect_key($item, array_flip($filterKeys));
         }, $grouppedCashFlowData);
 

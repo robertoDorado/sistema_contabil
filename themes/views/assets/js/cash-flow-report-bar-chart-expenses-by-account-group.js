@@ -10,7 +10,7 @@ if (window.location.pathname == "/admin/analyzes-and-indicators/cash-flow/charts
                 accountGroup.push(response.data[i].group_name)
                 totalValues.push(response.data[i].total_value)
             }
-            console.log(totalValues)
+            
             // Dados de Categorias de Despesas
             const dataCategory = {
                 labels: accountGroup,

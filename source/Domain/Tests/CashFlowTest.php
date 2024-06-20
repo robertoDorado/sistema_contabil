@@ -1275,7 +1275,7 @@ class CashFlowTest extends TestCase
         ];
 
         $this->cashFlow->persistData($cashFlowData);
-        $response = $this->cashFlow->findGroupAccountsAgrupped($this->user, $this->company->getId());
+        $response = $this->cashFlow->findGroupAccountsAgrupped($this->user, $this->company->getId(), date("d/m/Y") . "-" . date("d/m/Y"));
         $this->assertIsArray($response);
         $this->assertNotEmpty($response);
         $this->customer->dropCustomerByUuid();

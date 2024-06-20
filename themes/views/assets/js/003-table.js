@@ -140,6 +140,12 @@ if (pathnameAllowedButtons.indexOf(window.location.pathname) != -1) {
         "colvis"
     ]
 }
+const initComplete = buttonsData.length > 0 ? function () {
+    this.api()
+        .buttons()
+        .container()
+        .appendTo("#widgets .col-md-6:eq(0)");
+} : null
 const cashFlowTable = dataTableConfig($("#cashFlowReport"),
     {
         "order": [[0, "desc"]],
@@ -147,15 +153,9 @@ const cashFlowTable = dataTableConfig($("#cashFlowReport"),
             "url": urlJson
         },
         "responsive": true,
-        "lengthChange": false,
         "autoWidth": false,
         "buttons": buttonsData,
-        "initComplete": function () {
-            this.api()
-                .buttons()
-                .container()
-                .appendTo("#widgets .col-md-6:eq(0)");
-        }
+        "initComplete": initComplete
     })
 const companyReport = dataTableConfig($("#companyReport"),
     {
@@ -164,7 +164,6 @@ const companyReport = dataTableConfig($("#companyReport"),
             "url": urlJson
         },
         "responsive": true,
-        "lengthChange": false,
         "autoWidth": false,
         "buttons": [
             {
@@ -224,7 +223,6 @@ const automaticReconciliationReportCashFlow = dataTableConfig($("#automaticRecon
             "url": urlJson
         },
         "responsive": true,
-        "lengthChange": false,
         "autoWidth": false,
         "buttons": [
             {
@@ -303,6 +301,87 @@ const companyDeletedReport = dataTableConfig($("#companyDeletedReport"), {
     }
 })
 const manualReconciliationReportCashFlow = dataTableConfig($("#manualReconciliationReportCashFlow"), {
+    "language": {
+        "url": urlJson
+    }
+})
+const financialIndicatorsFco = dataTableConfig($("#financialIndicatorsFco"), {
+    "lengthChange": false,
+    "paging": false,
+    "searching": false,
+    "info": false,
+    "language": {
+        "url": urlJson
+    }
+})
+const financialIndicatorsFcl = dataTableConfig($("#financialIndicatorsFcl"), {
+    "lengthChange": false,
+    "paging": false,
+    "searching": false,
+    "info": false,
+    "language": {
+        "url": urlJson
+    }
+})
+const financialIndicatorsFcf = dataTableConfig($("#financialIndicatorsFcf"), {
+    "lengthChange": false,
+    "paging": false,
+    "searching": false,
+    "info": false,
+    "language": {
+        "url": urlJson
+    }
+})
+const financialIndicatorsFci = dataTableConfig($("#financialIndicatorsFci"), {
+    "lengthChange": false,
+    "paging": false,
+    "searching": false,
+    "info": false,
+    "language": {
+        "url": urlJson
+    }
+})
+const financialIndicatorsIcjfc = dataTableConfig($("#financialIndicatorsIcjfc"), {
+    "lengthChange": false,
+    "paging": false,
+    "searching": false,
+    "info": false,
+    "language": {
+        "url": urlJson
+    }
+})
+const financialIndicatorsIcsd = dataTableConfig($("#financialIndicatorsIcsd"), {
+    "lengthChange": false,
+    "paging": false,
+    "searching": false,
+    "info": false,
+    "language": {
+        "url": urlJson
+    }
+})
+const financialIndicatorsIrfc = dataTableConfig($("#financialIndicatorsIrfc"), {
+    "lengthChange": false,
+    "paging": false,
+    "searching": false,
+    "info": false,
+    "language": {
+        "url": urlJson
+    }
+})
+const financialIndicatorsMfc = dataTableConfig($("#financialIndicatorsMfc"), {
+    "lengthChange": false,
+    "paging": false,
+    "searching": false,
+    "info": false,
+    "language": {
+        "url": urlJson
+    }
+})
+const financialIndicatorsCc = dataTableConfig($("#financialIndicatorsCc"), {
+    "lengthChange": false,
+    "paging": false,
+    "searching": false,
+    "info": false,
     "language": {
         "url": urlJson
     }

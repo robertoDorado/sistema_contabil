@@ -281,7 +281,7 @@
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="#" class="nav-link">
+                                        <a href="<?= url("/admin/analyzes-and-indicators/cash-flow/financial-indicators") ?>" class="nav-link">
                                             <p>Indicadores financeiros</p>
                                         </a>
                                     </li>

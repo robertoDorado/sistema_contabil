@@ -1,5 +1,6 @@
 if (window.location.pathname == '/admin/cash-flow/form') {
     const cashFlowForm = document.getElementById("cashFlowForm")
+    $("#accountGroup").select2()
     $("#launchValue").maskMoney(
         {
             allowNegative: false, 

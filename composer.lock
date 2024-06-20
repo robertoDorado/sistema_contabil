@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fd6e51200756afca268cf6392d84af5d",
+    "content-hash": "050049c742a8077cb9b7e96a3aa953bf",
     "packages": [
         {
             "name": "almasaeed2010/adminlte",
@@ -727,67 +727,6 @@
                 }
             ],
             "time": "2022-08-04T09:53:51+00:00"
-        },
-        {
-            "name": "openboleto/opencnabphp",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/openboleto/OpenCnabPHP.git",
-                "reference": "b38ee88e7054ffefadbaeb6cd6e45f121ca98c42"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/openboleto/OpenCnabPHP/zipball/b38ee88e7054ffefadbaeb6cd6e45f121ca98c42",
-                "reference": "b38ee88e7054ffefadbaeb6cd6e45f121ca98c42",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.6"
-            },
-            "require-dev": {
-                "codeclimate/php-test-reporter": "dev-master",
-                "phpunit/phpunit": "^6.5"
-            },
-            "default-branch": true,
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "CnabPHP\\": [
-                        "src"
-                    ]
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Rogerio Muniz de Castro",
-                    "email": "rogeriomunizcastro@gmail.com"
-                }
-            ],
-            "description": "Biblioteca multibanco para geração e leitura de arquivos Cnab de remessa e retorno",
-            "keywords": [
-                "boleto",
-                "bradesco",
-                "caixa",
-                "cnab240",
-                "cnab400",
-                "cnabphp",
-                "itaú",
-                "remessa",
-                "retorno",
-                "santander",
-                "sicoob",
-                "uniprime"
-            ],
-            "support": {
-                "issues": "https://github.com/openboleto/OpenCnabPHP/issues",
-                "source": "https://github.com/openboleto/OpenCnabPHP/tree/master"
-            },
-            "time": "2024-03-08T20:21:40+00:00"
         },
         {
             "name": "phpoffice/phpspreadsheet",
@@ -3413,8 +3352,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "league/plates": 15,
-        "openboleto/opencnabphp": 20
+        "league/plates": 15
     },
     "prefer-stable": false,
     "prefer-lowest": false,

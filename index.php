@@ -129,14 +129,8 @@ $route->get("/analyzes-and-indicators/cash-flow/chart-line-data/pooled-cash-flow
 $route->get("/analyzes-and-indicators/cash-flow/chart-pie-data/account-grouping-count", "AnalyzesAndIndicators::findCashFlowDataForChartPieAccountGroupingCount");
 $route->get("/analyzes-and-indicators/cash-flow/chart-bar-data/monthly-cash-flow-comparison", "AnalyzesAndIndicators::findChasFlowDataForBarChartMonthlyCashFlowComparasion");
 $route->get("/analyzes-and-indicators/cash-flow/chart-bar-data/expenses-by-account-group", "AnalyzesAndIndicators::findChasFlowDataForBarChartExpensesByAccountGroup");
+$route->get("/analyzes-and-indicators/cash-flow/financial-indicators", "AnalyzesAndIndicators::financialIndicators");
 
-/**
- * API para arquivos CNAB
- */
-$module = "api";
-$route->namespace("Source\Controllers");
-$route->group($module);
-$route->post("/cnab/remessa", "CnabBill::generateCnabFile");
 
 /** 
  * Assinatura do cliente

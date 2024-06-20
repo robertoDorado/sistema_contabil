@@ -27,7 +27,7 @@ if (window.location.pathname == "/admin/analyzes-and-indicators/cash-flow/charts
             const financeData = {
                 labels: response.created_at,
                 datasets: [{
-                    label: "Projeção financeira",
+                    label: "Fluxo de caixa agrupado",
                     data: response.entry,
                     borderColor: 'rgb(75, 192, 192)',
                     borderWidth: 1,
