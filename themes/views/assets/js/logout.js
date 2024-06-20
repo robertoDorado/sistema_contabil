@@ -22,7 +22,8 @@ if (!verifyPath.includes(window.location.pathname)) {
             }
 
             if (response.logout_success) {
-                window.location.href = window.location.href
+                const url = window.location.origin + window.location.pathname
+                window.location.href = url
             }
         })
     })
