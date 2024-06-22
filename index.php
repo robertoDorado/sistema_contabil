@@ -130,6 +130,7 @@ $route->get("/analyzes-and-indicators/cash-flow/chart-pie-data/account-grouping-
 $route->get("/analyzes-and-indicators/cash-flow/chart-bar-data/monthly-cash-flow-comparison", "AnalyzesAndIndicators::findChasFlowDataForBarChartMonthlyCashFlowComparasion");
 $route->get("/analyzes-and-indicators/cash-flow/chart-bar-data/expenses-by-account-group", "AnalyzesAndIndicators::findChasFlowDataForBarChartExpensesByAccountGroup");
 $route->get("/analyzes-and-indicators/cash-flow/financial-indicators", "AnalyzesAndIndicators::financialIndicators");
+$route->get("/analyzes-and-indicators/cash-flow/cash-flow-projections", "AnalyzesAndIndicators::cashFlowProjections");
 
 
 /** 

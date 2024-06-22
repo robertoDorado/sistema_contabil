@@ -276,7 +276,7 @@
                                 </a>
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
-                                        <a href="#" class="nav-link">
+                                        <a href="<?= url("/admin/analyzes-and-indicators/cash-flow/cash-flow-projections") ?>" class="nav-link">
                                             <p>Projeções de fluxo de caixa</p>
                                         </a>
                                     </li>

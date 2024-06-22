@@ -23,6 +23,129 @@ class AnalyzesAndIndicators extends Controller
         parent::__construct();
     }
 
+    public function cashFlowProjections()
+    {
+        $user = new User();
+        $user->setEmail(session()->user->user_email);
+        $userData = $user->findUserByEmail(["id", "deleted"]);
+        $user->setId($userData->id);
+
+        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
+        $cashFlow = new CashFlow();
+        $cashFlowData = $cashFlow->findCashFlowByUser(["entry", "deleted", "created_at"], $user, $companyId);
+        $dateRange = $this->getRequests()->get("daterange");
+
+        if ($this->getRequests()->has("daterange")) {
+            $cashFlow = new CashFlow();
+            $cashFlowData = $cashFlow->findCashFlowDataByDate($dateRange, $user, ["entry", "deleted", "created_at"], $companyId);
+        }
+
+        $grouppedCashFlowData = [];
+        $incomeData = [];
+        $expensesData = [];
+        $projectedCashFlow = [];
+
+        if (!empty($cashFlowData)) {
+
+            $months = [
+                1 => 'Janeiro',
+                2 => 'Fevereiro',
+                3 => 'Março',
+                4 => 'Abril',
+                5 => 'Maio',
+                6 => 'Junho',
+                7 => 'Julho',
+                8 => 'Agosto',
+                9 => 'Setembro',
+                10 => 'Outubro',
+                11 => 'Novembro',
+                12 => 'Dezembro'
+            ];
+
+            $cashFlowData = array_map(function ($cashFlow) use ($months) {
+                $cashFlow->entry = $cashFlow->getEntry();
+                $cashFlow->date = date("Y-m", strtotime($cashFlow->created_at));
+                $cashFlow->month = $months[date("n", strtotime($cashFlow->created_at))] . "/" . date("Y", strtotime($cashFlow->created_at));
+                return (array)$cashFlow->data();
+            }, $cashFlowData);
+
+            foreach ($cashFlowData as $value) {
+                $entryValue = $value["entry"];
+                if (empty($grouppedCashFlowData[$value["date"]][$value["group_name"]])) {
+                    $grouppedCashFlowData[$value["date"]][$value["group_name"]] = $value;
+                    $grouppedCashFlowData[$value["date"]][$value["group_name"]]["total_entry"] = 0;
+                }
+
+                $grouppedCashFlowData[$value["date"]][$value["group_name"]]["total_entry"] += $entryValue;
+            }
+
+            foreach ($grouppedCashFlowData as $dateKey => $groupsData) {
+                foreach ($groupsData as $groupKey => &$group) {
+                    $grouppedCashFlowData[$dateKey][$groupKey] = array_intersect_key($group, array_flip(["total_entry", "month", "date", "group_name"]));
+                    $grouppedCashFlowData[$dateKey][$groupKey]["total_entry_value"] = $group["total_entry"];
+                    $grouppedCashFlowData[$dateKey][$groupKey]["total_entry"] = $group["total_entry"] > 0 ? $group["total_entry"] : $group["total_entry"] * -1;
+                    $grouppedCashFlowData[$dateKey][$groupKey]["total_entry"] = "R$ " . number_format($grouppedCashFlowData[$dateKey][$groupKey]["total_entry"], 2, ",", ".");
+                }
+            }
+
+            foreach ($grouppedCashFlowData as $dateKey => $groupsData) {
+                foreach ($groupsData as $groupKey => &$group) {
+                    if (isset($group["total_entry_value"])) {
+                        if ($group["total_entry_value"] >= 0) {
+                            $incomeData[] = $group;
+                        }else {
+                            $expensesData[] = $group;
+                        }
+                    }
+                }
+            }
+
+            foreach ($incomeData as $key => $data) {
+                if (empty($projectedCashFlow[$data["date"]])) {
+                    $projectedCashFlow[$data["date"]]["date"] = $data["date"];
+                    $projectedCashFlow[$data["date"]]["total_income_value"] = 0;
+                    $projectedCashFlow[$data["date"]]["month"] = $data["month"];
+                    $projectedCashFlow[$data["date"]]["total_expenses_value"] = 0;
+                    $projectedCashFlow[$data["date"]]["accumulated_balance"] = 0;
+                }
+                $projectedCashFlow[$data["date"]]["total_income_value"] += $data["total_entry_value"];
+            }
+
+            foreach ($expensesData as $key => $data) {
+                if (empty($projectedCashFlow[$data["date"]])) {
+                    $projectedCashFlow[$data["date"]]["date"] = $data["date"];
+                    $projectedCashFlow[$data["date"]]["total_income_value"] = 0;
+                    $projectedCashFlow[$data["date"]]["month"] = $data["month"];
+                    $projectedCashFlow[$data["date"]]["total_expenses_value"] = 0;
+                    $projectedCashFlow[$data["date"]]["accumulated_balance"] = 0;
+                }
+                $projectedCashFlow[$data["date"]]["total_expenses_value"] += $data["total_entry_value"];
+                $projectedCashFlow[$data["date"]]["total_expenses_value"] = $projectedCashFlow[$data["date"]]["total_expenses_value"] * -1;
+                $projectedCashFlow[$data["date"]]["month_balance"] = $projectedCashFlow[$data["date"]]["total_income_value"] - $projectedCashFlow[$data["date"]]["total_expenses_value"]; 
+            }
+
+            usort($projectedCashFlow, function($a, $b) {
+                return strtotime($a["date"]) - strtotime($b["date"]);
+            });
+
+            $projectedCashFlow = array_values($projectedCashFlow);
+            $accumulated = 0;
+            foreach ($projectedCashFlow as &$data) {
+                $accumulated += $data["month_balance"];
+                $data["accumulated_balance"] += $accumulated;
+            }
+
+        }
+
+        echo $this->view->render("admin/cash-flow-projections", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => ["/admin/analyzes-and-indicators/cash-flow/cash-flow-projections"],
+            "incomeData" => $incomeData,
+            "expensesData" => $expensesData,
+            "projectedCashFlow" => $projectedCashFlow
+        ]);
+    }
+
     public function financialIndicators()
     {
         $user = new User();

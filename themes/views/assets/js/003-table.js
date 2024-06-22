@@ -235,7 +235,7 @@ const automaticReconciliationReportCashFlow = dataTableConfig($("#automaticRecon
                 "title": "Conciliação bancária automática do fluxo de caixa",
                 customizeData: function (xlsxData) {
                     xlsxData.header = xlsxData.header.filter((data) => data != 'Editar' && data != 'Excluir')
-                    xlsxData.body = xlsxData.body.map(function(row) {
+                    xlsxData.body = xlsxData.body.map(function (row) {
                         row[2] = parseFloat(row[2].replace("R$", "").replace(".", "").replace(",", ".").trim())
                         row[0] = formatDate(row[0])
                         return row
@@ -386,3 +386,129 @@ const financialIndicatorsCc = dataTableConfig($("#financialIndicatorsCc"), {
         "url": urlJson
     }
 })
+const cashFlowProjectionsIncome = dataTableConfig($("#cashFlowProjectionsIncome"),
+    {
+        "columnDefs": [
+            {
+                "targets": [0],
+                "visible": false
+            }
+        ],
+        "language": {
+            "url": urlJson
+        },
+        "responsive": true,
+        "autoWidth": false,
+        "buttons": [
+            {
+                "extend": 'copyHtml5',
+                "title": 'Entradas de caixa'
+            },
+            {
+                "extend": 'excelHtml5',
+                "filename": "Entradas de caixa",
+                "title": "Entradas de caixa"
+            },
+            {
+                "extend": 'csvHtml5',
+                "filename": "Entradas de caixa",
+                "title": "Entradas de caixa"
+            },
+            {
+                "extend": 'pdfHtml5',
+                "filename": "Entradas de caixa",
+                "title": 'Entradas de caixa'
+            },
+            "colvis"
+        ],
+        "initComplete": function () {
+            this.api()
+                .buttons()
+                .container()
+                .appendTo(".cash-flow-projections-income .col-md-6:eq(0)");
+        }
+    })
+const cashFlowProjectionsExpenses = dataTableConfig($("#cashFlowProjectionsExpenses"),
+    {
+        "columnDefs": [
+            {
+                "targets": [0],
+                "visible": false
+            }
+        ],
+        "language": {
+            "url": urlJson
+        },
+        "responsive": true,
+        "autoWidth": false,
+        "buttons": [
+            {
+                "extend": 'copyHtml5',
+                "title": 'Saídas de caixa'
+            },
+            {
+                "extend": 'excelHtml5',
+                "filename": "Saídas de caixa",
+                "title": "Saídas de caixa"
+            },
+            {
+                "extend": 'csvHtml5',
+                "filename": "Saídas de caixa",
+                "title": "Saídas de caixa"
+            },
+            {
+                "extend": 'pdfHtml5',
+                "filename": "Saídas de caixa",
+                "title": 'Saídas de caixa'
+            },
+            "colvis"
+        ],
+        "initComplete": function () {
+            this.api()
+                .buttons()
+                .container()
+                .appendTo(".cash-flow-projections-expenses .col-md-6:eq(0)");
+        }
+    })
+const cashFlowProjections = dataTableConfig($("#cashFlowProjections"),
+    {
+        "columnDefs": [
+            {
+                "targets": [0],
+                "visible": false
+            }
+        ],
+        "language": {
+            "url": urlJson
+        },
+        "responsive": true,
+        "autoWidth": false,
+        "buttons": [
+            {
+                "extend": 'copyHtml5',
+                "title": 'Projeção de fluxo de caixa'
+            },
+            {
+                "extend": 'excelHtml5',
+                "filename": "Projeção de fluxo de caixa",
+                "title": "Projeção de fluxo de caixa"
+            },
+            {
+                "extend": 'csvHtml5',
+                "filename": "Projeção de fluxo de caixa",
+                "title": "Projeção de fluxo de caixa"
+            },
+            {
+                "extend": 'pdfHtml5',
+                "filename": "Projeção de fluxo de caixa",
+                "title": 'Projeção de fluxo de caixa'
+            },
+            "colvis"
+        ],
+        "initComplete": function () {
+            this.api()
+                .buttons()
+                .container()
+                .appendTo(".cash-flow-projections .col-md-6:eq(0)");
+        }
+    })
