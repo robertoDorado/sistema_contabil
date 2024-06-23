@@ -115,7 +115,7 @@ class CashFlow
                 )
                 ->between(
                     "created_at",
-                    "sistema_contabil.cash_flow",
+                    "" . CONF_DB_NAME . ".cash_flow",
                     [
                         "date_init" => $dates[0],
                         "date_end" => $dates[1]
