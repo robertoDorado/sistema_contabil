@@ -1,16 +1,5 @@
 const allowEndponts = ["/admin/bank-reconciliation/cash-flow/manual", "/admin/cash-flow/report"]
 if (allowEndponts.indexOf(window.location.pathname) != -1) {
-    $(document).ready(function () {
-        $('#date-range').daterangepicker({
-            opens: 'left',
-            locale: {
-                format: 'DD/MM/YYYY',
-                separator: ' - ',
-                applyLabel: 'Aplicar',
-                cancelLabel: 'Cancelar',
-            }
-        });
-    });
     const tFoot = document.querySelector("tfoot").firstElementChild
     cashFlowTable.on('search.dt', function () {
         const dataFilter = cashFlowTable.rows({ search: 'applied' }).data();
