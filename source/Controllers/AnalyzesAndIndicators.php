@@ -47,21 +47,7 @@ class AnalyzesAndIndicators extends Controller
 
         if (!empty($cashFlowData)) {
 
-            $months = [
-                1 => 'Janeiro',
-                2 => 'Fevereiro',
-                3 => 'Março',
-                4 => 'Abril',
-                5 => 'Maio',
-                6 => 'Junho',
-                7 => 'Julho',
-                8 => 'Agosto',
-                9 => 'Setembro',
-                10 => 'Outubro',
-                11 => 'Novembro',
-                12 => 'Dezembro'
-            ];
-
+            $months = monthsInPortuguese();
             $cashFlowData = array_map(function ($cashFlow) use ($months) {
                 $cashFlow->entry = $cashFlow->getEntry();
                 $cashFlow->date = date("Y-m", strtotime($cashFlow->created_at));
@@ -287,21 +273,7 @@ class AnalyzesAndIndicators extends Controller
             die;
         }
 
-        $months = [
-            1 => 'Janeiro',
-            2 => 'Fevereiro',
-            3 => 'Março',
-            4 => 'Abril',
-            5 => 'Maio',
-            6 => 'Junho',
-            7 => 'Julho',
-            8 => 'Agosto',
-            9 => 'Setembro',
-            10 => 'Outubro',
-            11 => 'Novembro',
-            12 => 'Dezembro'
-        ];
-
+        $months = monthsInPortuguese();
         $cashFlowData = array_map(function ($item) use ($months) {
             $item->month = date("Y-m", strtotime($item->created_at));
             $dateTime = new DateTime($item->created_at);

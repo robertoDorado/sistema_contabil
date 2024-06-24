@@ -132,6 +132,10 @@ $route->get("/analyzes-and-indicators/cash-flow/chart-bar-data/expenses-by-accou
 $route->get("/analyzes-and-indicators/cash-flow/financial-indicators", "AnalyzesAndIndicators::financialIndicators");
 $route->get("/analyzes-and-indicators/cash-flow/cash-flow-projections", "AnalyzesAndIndicators::cashFlowProjections");
 
+/**
+ * Planejamento de caixa
+ */
+$route->get("/cash-planning/cash-flow/cash-budget", "CashPlanning::cashBudget");
 
 /** 
  * Assinatura do cliente

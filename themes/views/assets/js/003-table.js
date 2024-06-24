@@ -512,3 +512,40 @@ const cashFlowProjections = dataTableConfig($("#cashFlowProjections"),
                 .appendTo(".cash-flow-projections .col-md-6:eq(0)");
         }
     })
+const cashFlowBudget = dataTableConfig($("#cashFlowBudget"),
+    {
+        "searching": false,
+        "language": {
+            "url": urlJson
+        },
+        "responsive": true,
+        "autoWidth": false,
+        "buttons": [
+            {
+                "extend": 'copyHtml5',
+                "title": 'Orçamento de caixa'
+            },
+            {
+                "extend": 'excelHtml5',
+                "filename": "Orçamento de caixa",
+                "title": "Orçamento de caixa"
+            },
+            {
+                "extend": 'csvHtml5',
+                "filename": "Orçamento de caixa",
+                "title": "Orçamento de caixa"
+            },
+            {
+                "extend": 'pdfHtml5',
+                "filename": "Orçamento de caixa",
+                "title": 'Orçamento de caixa'
+            },
+            "colvis"
+        ],
+        "initComplete": function () {
+            this.api()
+                .buttons()
+                .container()
+                .appendTo(".cash-flow-projections .col-md-6:eq(0)");
+        }
+    })
