@@ -20,12 +20,12 @@
 
     <div class="content">
         <div class="container-fluid">
-            <?php if (!empty($cashBudget)) : ?>
-                <div class="row">
-                    <div class="col-md-6 mb-5">
-                        <?= $v->insert("admin/layouts/_daterange_input") ?>
-                    </div>
+            <div class="row">
+                <div class="col-md-6 mb-5">
+                    <?= $v->insert("admin/layouts/_daterange_input") ?>
                 </div>
+            </div>
+            <?php if (!empty($cashBudget['month'])) : ?>
                 <div class="row">
                     <div class="col">
                         <div class="card">

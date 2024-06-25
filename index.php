@@ -133,6 +133,13 @@ $route->get("/analyzes-and-indicators/cash-flow/financial-indicators", "Analyzes
 $route->get("/analyzes-and-indicators/cash-flow/cash-flow-projections", "AnalyzesAndIndicators::cashFlowProjections");
 
 /**
+ * Config. variação de fluxo de caixa
+ */
+$route->get("/cash-variation-setting/operating-cash-flow", "CashVariationSetting::operatingCashFlowReport");
+$route->get("/cash-variation-setting/operating-cash-flow/form", "CashVariationSetting::operatingCashFlowForm");
+$route->post("/cash-variation-setting/operating-cash-flow/form", "CashVariationSetting::operatingCashFlowForm");
+
+/**
  * Planejamento de caixa
  */
 $route->get("/cash-planning/cash-flow/cash-budget", "CashPlanning::cashBudget");

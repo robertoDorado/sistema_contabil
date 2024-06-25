@@ -294,6 +294,59 @@
                             </li>
                             <li class="nav-item">
                                 <a href="#" class="nav-link">
+                                    <p>Config. variação de caixa</p>
+                                    <i class="right fas fa-angle-left"></i>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="<?= url("/admin/cash-variation-setting/operating-cash-flow/form") ?>" class="nav-link">
+                                            <p>Lançar fluxo de caixa operacional</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="#" class="nav-link">
+                                            <p>Lançar fluxo de caixa de investimento</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="#" class="nav-link">
+                                            <p>Lançar fluxo de caixa de financiamento</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="#" class="nav-link">
+                                            <p>Relatório de fluxo de caixa operacional</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="#" class="nav-link">
+                                            <p>Relatório de fluxo de caixa de investimento</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="#" class="nav-link">
+                                            <p>Relatório de fluxo de caixa de financiamento</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="#" class="nav-link">
+                                            <p>Backup de fluxo de caixa operacional</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="#" class="nav-link">
+                                            <p>Backup de fluxo de caixa de investimento</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="#" class="nav-link">
+                                            <p>Backup de fluxo de caixa de financiamento</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
                                     <p>Planejamento de caixa</p>
                                     <i class="right fas fa-angle-left"></i>
                                 </a>
@@ -305,17 +358,7 @@
                                     </li>
                                     <li class="nav-item">
                                         <a href="#" class="nav-link">
-                                            <p>Previsões de fluxo de caixa</p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="#" class="nav-link">
-                                            <p>Monitoramento de fluxo de caixa</p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="#" class="nav-link">
-                                            <p>Análise de variação</p>
+                                            <p>Análise de variação caixa</p>
                                         </a>
                                     </li>
                                 </ul>

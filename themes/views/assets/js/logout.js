@@ -2,6 +2,7 @@ if (!verifyPath.includes(window.location.pathname)) {
     const logoutBtn = document.getElementById("logout")
     logoutBtn.addEventListener("click", function (event) {
         event.preventDefault()
+        modal.style.display = "flex"
     
         const form = new FormData()
         form.append('request', JSON.stringify({ logout: true }))

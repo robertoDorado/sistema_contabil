@@ -3,27 +3,27 @@
 namespace Source\Migrations;
 
 use Source\Migrations\Core\DDL;
-use Source\Models\Subscription as ModelsSubscription;
+use Source\Models\OperatingCashFlow as ModelsOperatingCashFlow;
 
 require dirname(dirname(__DIR__)) . "/vendor/autoload.php";
 
 /**
- * 005-Subscription Migrations
+ * 007-OperatingCashFlow Migrations
  * @link 
  * @author Roberto Dorado <robertodorado7@gmail.com>
  * @package Source\Migrations
  */
-class Subscription
+class OperatingCashFlow
 {
     /** @var DDL Data definition language */
     private DDL $ddl;
 
     /**
-     * 005-Subscription constructor
+     * 007-OperatingCashFlow constructor
      */
     public function __construct()
     {
-        $this->ddl = new DDL(ModelsSubscription::class);
+        $this->ddl = new DDL(ModelsOperatingCashFlow::class);
     }
 
     public function defineTable()
@@ -32,13 +32,14 @@ class Subscription
         $this->ddl->setProperty('');
         $this->ddl->setKeysToProperties([
             "BIGINT AUTO_INCREMENT PRIMARY KEY",
-            "VARCHAR(36) UNIQUE NOT NULL", "VARCHAR(255) NOT NULL", "BIGINT NOT NULL",
-            "VARCHAR(255) NOT NULL", "VARCHAR(255) NOT NULL", "DATE NOT NULL", "DATE NOT NULL",
-            "DATE NOT NULL", "DATE NOT NULL", "VARCHAR(255) NOT NULL",
-            "CONSTRAINT fk_customer_subscription FOREIGN KEY (customer_id) REFERENCES customer(id) ON DELETE CASCADE ON UPDATE CASCADE"
+            "VARCHAR(36) UNIQUE NOT NULL",
+            "BIGINT NOT NULL UNIQUE",
+            "VARCHAR(36) NOT NULL",
+            "TINYINT(1) NOT NULL",
+            "CONSTRAINT fk_operating_cash_flow_group FOREIGN KEY (cash_flow_group_id) REFERENCES cash_flow_group(id) ON DELETE CASCADE ON UPDATE CASCADE"
         ]);
         $this->ddl->dropTableIfExists()->createTableQuery();
         return $this->ddl->executeQuery();
     }
 }
-executeMigrations(Subscription::class);
+executeMigrations(OperatingCashFlow::class);

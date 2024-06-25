@@ -1,4 +1,5 @@
 <?php
+
 namespace Source\Migrations;
 
 use Source\Migrations\Core\DDL;
@@ -40,11 +41,18 @@ class User
     {
         $this->ddl->setClassProperties();
         $this->ddl->setProperty('');
-        $this->ddl->setKeysToProperties(["BIGINT AUTO_INCREMENT PRIMARY KEY",
-        "VARCHAR(36) UNIQUE NOT NULL", "BIGINT UNIQUE NOT NULL", "VARCHAR(355) NOT NULL",
-        "VARCHAR(355) NOT NULL", "VARCHAR(355) NOT NULL", "VARCHAR(355) NOT NULL", 
-        "TINYINT(1) NOT NULL", "CONSTRAINT fk_customer_user FOREIGN KEY (id_customer) 
-        REFERENCES customer(id) ON UPDATE CASCADE ON DELETE CASCADE"]);
+        $this->ddl->setKeysToProperties([
+            "BIGINT AUTO_INCREMENT PRIMARY KEY",
+            "VARCHAR(36) UNIQUE NOT NULL",
+            "BIGINT UNIQUE NOT NULL",
+            "VARCHAR(355) NOT NULL",
+            "VARCHAR(355) NOT NULL",
+            "VARCHAR(355) NOT NULL",
+            "VARCHAR(355) NOT NULL",
+            "TINYINT(1) NOT NULL",
+            "CONSTRAINT fk_customer_user FOREIGN KEY (id_customer) 
+            REFERENCES customer(id) ON UPDATE CASCADE ON DELETE CASCADE"
+        ]);
         $this->ddl->setForeignKeyChecks(0)->dropTableIfExists()->createTableQuery()->setForeignKeyChecks(1);
         $this->ddl->executeQuery();
     }

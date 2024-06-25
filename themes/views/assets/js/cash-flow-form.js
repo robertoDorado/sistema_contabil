@@ -1,6 +1,7 @@
 if (window.location.pathname == '/admin/cash-flow/form') {
     const cashFlowForm = document.getElementById("cashFlowForm")
-    $("#accountGroup").select2()
+    const accountGroup = $("#accountGroup").select2()
+
     $("#launchValue").maskMoney(
         {
             allowNegative: false, 
@@ -67,8 +68,7 @@ if (window.location.pathname == '/admin/cash-flow/form') {
             this.launchValue,
             this.releaseHistory,
             this.entryType,
-            this.launchDate,
-            this.accountGroup
+            this.launchDate
         ]
         showSpinner(launchBtn)
         const form = new FormData(this)
@@ -110,6 +110,7 @@ if (window.location.pathname == '/admin/cash-flow/form') {
                 throw new Error(message)
             }
             
+            accountGroup.val(null).trigger("change")
             cashFlowFormFields.forEach(function(elem) {
                 elem.value = ''
             })
