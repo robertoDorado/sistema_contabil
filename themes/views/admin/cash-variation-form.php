@@ -29,6 +29,15 @@
                         <form id="operatingCashFlowForm">
                             <div class="card-body">
                                 <div class="form-group">
+                                    <label for="accountGroupVariation">Grupo de variação</label>
+                                    <select name="accountGroupVariation" id="accountGroupVariation" class="form-control">
+                                        <option value="" disabled selected>Selecione um grupo de variação</option>
+                                        <option value="1">Fluxo de caixa operacional</option>
+                                        <option value="2">Fluxo de caixa de investimento</option>
+                                        <option value="3">Fluxo de caixa de financiamento</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
                                     <label for="accountGroup">Grupo de conta</label>
                                     <select name="accountGroup" id="accountGroup" class="form-control">
                                         <option value="" disabled selected>Selecione um grupo de contas</option>

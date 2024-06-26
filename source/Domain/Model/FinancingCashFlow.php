@@ -5,18 +5,18 @@ namespace Source\Domain\Model;
 use Exception;
 use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Domain\Support\Tools;
-use Source\Models\OperatingCashFlow as ModelsOperatingCashFlow;
+use Source\Models\FinancingCashFlow as ModelsFinancingCashFlow;
 
 /**
- * OperatingCashFlow Domain\Model
+ * FinancingCashFlow Domain\Model
  * @link 
  * @author Roberto Dorado <robertodorado7@gmail.com>
  * @package Source\Domain\Model
  */
-class OperatingCashFlow
+class FinancingCashFlow
 {
-    /** @var ModelsOperatingCashFlow */
-    private ModelsOperatingCashFlow $operatingCashFlow;
+    /** @var ModelsFinancingCashFlow */
+    private ModelsFinancingCashFlow $financingCashFlow;
 
     /** @var object */
     private object $data;
@@ -28,11 +28,11 @@ class OperatingCashFlow
     private int $id;
 
     /**
-     * OperatingCashFlow constructor
+     * FinancingCashFlow constructor
      */
     public function __construct()
     {
-        $this->operatingCashFlow = new ModelsOperatingCashFlow();
+        $this->financingCashFlow = new ModelsFinancingCashFlow();
         $this->data = new \stdClass();
     }
 
@@ -46,13 +46,13 @@ class OperatingCashFlow
         return $this->data->$name ?? null;
     }
 
-    /** @var ModelsOperatingCashFlow[] */
-    public function findOperatingCashFlowJoinCashFlowGroup(array $columnsOp, array $columnsCg, User $user, int $companyId): array
+    /** @var ModelsFinancingCashFlow[] */
+    public function findFinancingCashFlowJoinCashFlowGroup(array $columnsOp, array $columnsCg, User $user, int $companyId): array
     {
         $columnsOp = empty($columnsOp) ? "*" : implode(", ", $columnsOp);
         $columnsCg = empty($columnsCg) ? "*" : implode(", ", $columnsCg);
         
-        $response = $this->operatingCashFlow->find("", "", $columnsOp)
+        $response = $this->financingCashFlow->find("", "", $columnsOp)
             ->join(
                 CONF_DB_NAME .".cash_flow_group",
                 "id",
@@ -60,7 +60,7 @@ class OperatingCashFlow
                 ":id_user=" . $user->getId() . "&:id_company=" . $companyId . "",
                 $columnsCg,
                 "cash_flow_group_id",
-                CONF_DB_NAME .".operating_cash_flow"
+                CONF_DB_NAME .".financing_cash_flow"
             )->fetch(true);
         
         if (empty($response)){
@@ -70,21 +70,21 @@ class OperatingCashFlow
         return $response;
     }
 
-    public function findOperatingCashFlowByUuid(array $columnsOp, array $columnsCg): ?ModelsOperatingCashFlow
+    function findFinancingCashFlowByUuid(array $columnsFin, array $columnsCg): ?ModelsFinancingCashFlow
     {
-        $columnsOp = empty($columnsOp) ? "*" : implode(", ", $columnsOp);
+        $columnsFin = empty($columnsFin) ? "*" : implode(", ", $columnsFin);
         $columnsCg = empty($columnsCg) ? "*" : implode(", ", $columnsCg);
 
-        return $this->operatingCashFlow->find("", "", $columnsOp)
-        ->join(
-            CONF_DB_NAME . ".cash_flow_group",
-            "id",
-            "uuid=:uuid",
-            ":uuid=" . $this->getUuid() . "",
-            $columnsCg,
-            "cash_flow_group_id",
-            CONF_DB_NAME . ".operating_cash_flow"
-        )->fetch();
+        return $this->financingCashFlow->find("", "", $columnsFin)
+            ->join(
+                CONF_DB_NAME . ".cash_flow_group",
+                "id",
+                "uuid=:uuid",
+                ":uuid=" . $this->getUuid() . "",
+                $columnsCg,
+                "cash_flow_group_id",
+                CONF_DB_NAME . ".financing_cash_flow"
+            )->fetch();
     }
 
     public function getId(): int
@@ -115,7 +115,7 @@ class OperatingCashFlow
 
     public function persistData(array $data): bool
     {
-        $tools = new Tools($this->operatingCashFlow, ModelsOperatingCashFlow::class);
+        $tools = new Tools($this->financingCashFlow, ModelsFinancingCashFlow::class);
         $response = $tools->persistData($data);
         $this->data->message = !empty($tools->message) ? $tools->message : "";
 

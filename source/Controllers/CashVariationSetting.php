@@ -1,10 +1,15 @@
 <?php
+
 namespace Source\Controllers;
 
 use Source\Core\Controller;
 use Source\Domain\Model\CashFlowGroup;
+use Source\Domain\Model\FinancingCashFlow;
+use Source\Domain\Model\InvestmentCashFlow;
 use Source\Domain\Model\OperatingCashFlow;
 use Source\Domain\Model\User;
+use Source\Models\CashFlowGroup as ModelsCashFlowGroup;
+use Source\Support\Message;
 
 /**
  * CashVariationSetting Controllers
@@ -22,15 +27,84 @@ class CashVariationSetting extends Controller
         parent::__construct();
     }
 
-    public function operatingCashFlowForm()
+    public function cashVariationReport()
+    {
+        $user = new User();
+        $user->setEmail(session()->user->user_email);
+        $userData = $user->findUserByEmail(["id", "deleted"]);
+        $user->setId($userData->id);
+
+        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
+        if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            $requestPost = $this->getRequests()->setRequiredFields(["csrfToken", "accountGroupVariation"])->getAllPostData();
+            
+            $verifyAccountGroupVariation = [
+                1 => function() use ($user, $companyId) {
+                    $operatingCashFlow = new OperatingCashFlow();
+                    return $operatingCashFlow->findOperatingCashFlowJoinCashFlowGroup(
+                        ["id"],
+                        ["uuid", "group_name"],
+                        $user,
+                        $companyId
+                    );
+                },
+
+                2 => function() use ($user, $companyId) {
+                    $investmentCashFlow = new InvestmentCashFlow();
+                    return $investmentCashFlow->findInvestmentCashFlowJoinCashFlowGroup(
+                        ["id"],
+                        ["uuid", "group_name"],
+                        $user,
+                        $companyId
+                    );
+                },
+
+                3 => function() use ($user, $companyId) {
+                    $financingCashFlow = new FinancingCashFlow();
+                    return $financingCashFlow->findFinancingCashFlowJoinCashFlowGroup(
+                        ["id"],
+                        ["uuid", "group_name"],
+                        $user,
+                        $companyId
+                    );
+                }
+            ];
+
+            $response = null;
+            if (!empty($verifyAccountGroupVariation[$requestPost["accountGroupVariation"]])) {
+                $response = $verifyAccountGroupVariation[$requestPost["accountGroupVariation"]]();
+            }
+
+            session()->user->account_group_variation = $response;
+            session()->user->account_group_variation_id = $requestPost["accountGroupVariation"];
+            echo json_encode(["success" => true]);
+            die;
+        }
+
+        $responseData = empty(session()->user->account_group_variation) ? 
+        (new OperatingCashFlow())->findOperatingCashFlowJoinCashFlowGroup(
+            ["id"],
+            ["uuid", "group_name"],
+            $user,
+            $companyId
+        ) : session()->user->account_group_variation;
+
+        echo $this->view->render("admin/cash-variation-report", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => ["/admin/cash-variation-setting/report"],
+            "responseData" => $responseData
+        ]);
+    }
+
+    public function cashVariationForm()
     {
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
-            $requestPost = $this->getRequests()->setRequiredFields(["csrfToken", "accountGroup"])->getAllPostData();
-            
+            $requestPost = $this->getRequests()->setRequiredFields(["csrfToken", "accountGroup", "accountGroupVariation"])->getAllPostData();
+
             $cashFlowGroup = new CashFlowGroup();
             $cashFlowGroup->setUuid($requestPost["accountGroup"]);
             $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid();
-            
+
             if (empty($cashFlowGroupData)) {
                 echo $cashFlowGroup->message->json();
                 die;
@@ -38,23 +112,72 @@ class CashVariationSetting extends Controller
 
             $operatingCashFlow = new OperatingCashFlow();
             $operatingCashFlow->setUuid($requestPost["accountGroup"]);
-            $operatingCashFlowData = $operatingCashFlow->findOperatingCashFlowByUuid(["uuid", "deleted"]);
-            
+            $columnsData = [["id"], ["uuid", "deleted"]];
+
+            $operatingCashFlowData = $operatingCashFlow->findOperatingCashFlowByUuid(...$columnsData);
             if (!empty($operatingCashFlowData)) {
-                echo json_encode(["error" => "este grupo de contas já existe"]);
+                echo json_encode(["error" => "este grupo de contas já existe no fluxo de caixa operacional"]);
                 die;
             }
 
-            $operatingCashFlow = new OperatingCashFlow();
-            $response = $operatingCashFlow->persistData([
-                "uuid" => $requestPost["accountGroup"],
-                "cash_flow_group_id" => $cashFlowGroupData->id,
-                "group_name" => $cashFlowGroupData->group_name,
-                "deleted" => 0
-            ]);
+            $investmentCashFlow = new InvestmentCashFlow();
+            $investmentCashFlow->setUuid($requestPost["accountGroup"]);
+            $investmentCashFlowData = $investmentCashFlow->findInvestmentCashFlowByUuid(...$columnsData);
 
-            if (empty($response)) {
-                echo $operatingCashFlow->message->json();
+            if (!empty($investmentCashFlowData)) {
+                echo json_encode(["error" => "este grupo de contas já existe no fluxo de caixa de investimentos"]);
+                die;
+            }
+
+            $financingCashFlow = new FinancingCashFlow();
+            $financingCashFlow->setUuid($requestPost["accountGroup"]);
+            $financingCashFlowData = $financingCashFlow->findFinancingCashFlowByUuid(...$columnsData);
+
+            if (!empty($financingCashFlowData)) {
+                echo json_encode(["error" => "este grupo de contas já existe no fluxo de caixa de financiamento"]);
+                die;
+            }
+
+            $verifyAccountGroupVariation = [
+                1 => function (ModelsCashFlowGroup $cashFlowGroupData): array {
+                    $operatingCashFlow = new OperatingCashFlow();
+                    $response = $operatingCashFlow->persistData([
+                        "cash_flow_group_id" => $cashFlowGroupData->id,
+                        "deleted" => 0
+                    ]);
+                    return [$response, $operatingCashFlow];
+                },
+
+                2 => function (ModelsCashFlowGroup $cashFlowGroupData): array {
+                    $investmentCashFlow = new InvestmentCashFlow();
+                    $response = $investmentCashFlow->persistData([
+                        "cash_flow_group_id" => $cashFlowGroupData->id,
+                        "deleted" => 0
+                    ]);
+                    return [$response, $investmentCashFlow];
+                },
+
+                3 => function (ModelsCashFlowGroup $cashFlowGroupData): array {
+                    $financingCashFlow = new FinancingCashFlow();
+                    $response = $financingCashFlow->persistData([
+                        "cash_flow_group_id" => $cashFlowGroupData->id,
+                        "deleted" => 0
+                    ]);
+                    return [$response, $financingCashFlow];
+                },
+            ];
+
+            $dataMessage = new \stdClass();
+            $dataMessage->message = new Message();
+            $dataMessage->message->error("nenhum registro foi inserido");
+            $response = [false, $dataMessage];
+
+            if (!empty($verifyAccountGroupVariation[$requestPost["accountGroupVariation"]])) {
+                $response = $verifyAccountGroupVariation[$requestPost["accountGroupVariation"]]($cashFlowGroupData);
+            }
+
+            if (empty($response[0])) {
+                echo $response[1]->message->json();
                 die;
             }
 
@@ -65,16 +188,16 @@ class CashVariationSetting extends Controller
         $user = new User();
         $user->setEmail(session()->user->user_email);
         $userData = $user->findUserByEmail(["id", "deleted"]);
-        
+
         $user->setId($userData->id);
         $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
 
         $cashFlowGroup = new CashFlowGroup();
         $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUser(["deleted", "uuid", "group_name"], $user, $companyId);
 
-        echo $this->view->render("admin/operating-cash-flow-form", [
+        echo $this->view->render("admin/cash-variation-form", [
             "userFullName" => showUserFullName(),
-            "endpoints" => ["/admin/cash-variation-setting/operating-cash-flow/form"],
+            "endpoints" => ["/admin/cash-variation-setting/form"],
             "cashFlowGroupData" => $cashFlowGroupData
         ]);
     }

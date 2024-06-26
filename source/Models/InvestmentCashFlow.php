@@ -1,15 +1,16 @@
 <?php
+
 namespace Source\Models;
 
 use Source\Core\Model;
 
 /**
- * OperatingCashFlow Models
+ * InvestmentCashFlow Models
  * @link 
  * @author Roberto Dorado <robertodorado7@gmail.com>
  * @package Source\Models
  */
-class OperatingCashFlow extends Model
+class InvestmentCashFlow extends Model
 {
     /** @var string Id do grupo de contas */
     protected string $cashFlowGroupId = "cash_flow_group_id";
@@ -18,11 +19,11 @@ class OperatingCashFlow extends Model
     protected string $deleted = "deleted";
 
     /**
-     * OperatingCashFlow constructor
+     * InvestmentCashFlow constructor
      */
     public function __construct()
     {
-        parent::__construct(CONF_DB_NAME . ".operating_cash_flow", ["id"], [
+        parent::__construct(CONF_DB_NAME . ".investment_cash_flow", ["id"], [
             $this->cashFlowGroupId,
             $this->deleted
         ]);

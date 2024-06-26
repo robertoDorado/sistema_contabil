@@ -32,9 +32,7 @@ class OperatingCashFlow
         $this->ddl->setProperty('');
         $this->ddl->setKeysToProperties([
             "BIGINT AUTO_INCREMENT PRIMARY KEY",
-            "VARCHAR(36) UNIQUE NOT NULL",
             "BIGINT NOT NULL UNIQUE",
-            "VARCHAR(36) NOT NULL",
             "TINYINT(1) NOT NULL",
             "CONSTRAINT fk_operating_cash_flow_group FOREIGN KEY (cash_flow_group_id) REFERENCES cash_flow_group(id) ON DELETE CASCADE ON UPDATE CASCADE"
         ]);

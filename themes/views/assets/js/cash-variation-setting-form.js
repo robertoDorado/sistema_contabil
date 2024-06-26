@@ -1,10 +1,16 @@
-if (window.location.pathname == "/admin/cash-variation-setting/operating-cash-flow/form") {
+if (window.location.pathname == "/admin/cash-variation-setting/form") {
     const accountGroup = $("#accountGroup").select2()
     document.getElementById("operatingCashFlowForm").addEventListener("submit", function(event) {
         event.preventDefault()
         const btnSubmit = this.querySelector("[type='submit']")
 
         let message = ""
+        if (!this.accountGroupVariation.value) {
+            message = "O campo grupo de variação está vazio ou inválido"
+            toastr.warning(message)
+            throw new Error(message)
+        }
+        
         if (!this.accountGroup.value) {
             message = "O campo grupo de contas está vazio ou inválido"
             toastr.warning(message)
@@ -17,6 +23,7 @@ if (window.location.pathname == "/admin/cash-variation-setting/operating-cash-fl
             throw new Error(message)
         }
 
+        const accountGroupVariation = this.accountGroupVariation
         const form = new FormData(this)
         showSpinner(btnSubmit)
 
@@ -26,7 +33,9 @@ if (window.location.pathname == "/admin/cash-variation-setting/operating-cash-fl
         }).then(response => response.json()).then(function(response) {
             btnSubmit.removeAttribute("disabled")
             btnSubmit.innerHTML = "Enviar"
+
             accountGroup.val(null).trigger("change")
+            accountGroupVariation.value = ""
             
             if (response.error) {
                 message = response.error

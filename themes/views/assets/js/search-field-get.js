@@ -2,8 +2,10 @@ const endpointsSearchCashFlowGet = [
     `/admin/cash-flow/report${window.location.search}`,
     `/admin/analyzes-and-indicators/cash-flow/charts-and-visualizations${window.location.search}`,
     `/admin/analyzes-and-indicators/cash-flow/cash-flow-projections${window.location.search}`,
-    `/admin/cash-planning/cash-flow/cash-budget${window.location.search}`
+    `/admin/cash-planning/cash-flow/cash-budget${window.location.search}`,
+    `/admin/cash-variation-setting/report${window.location.search}`
 ]
+
 const currentUrlSearchCashFlowGet = window.location.pathname + window.location.search
 if (endpointsSearchCashFlowGet.indexOf(currentUrlSearchCashFlowGet) != -1) {
     $(document).ready(function () {

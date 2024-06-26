@@ -135,9 +135,10 @@ $route->get("/analyzes-and-indicators/cash-flow/cash-flow-projections", "Analyze
 /**
  * Config. variação de fluxo de caixa
  */
-$route->get("/cash-variation-setting/operating-cash-flow", "CashVariationSetting::operatingCashFlowReport");
-$route->get("/cash-variation-setting/operating-cash-flow/form", "CashVariationSetting::operatingCashFlowForm");
-$route->post("/cash-variation-setting/operating-cash-flow/form", "CashVariationSetting::operatingCashFlowForm");
+$route->get("/cash-variation-setting/form", "CashVariationSetting::cashVariationForm");
+$route->post("/cash-variation-setting/form", "CashVariationSetting::cashVariationForm");
+$route->get("/cash-variation-setting/report", "CashVariationSetting::cashVariationReport");
+$route->post("/cash-variation-setting/report", "CashVariationSetting::cashVariationReport");
 
 /**
  * Planejamento de caixa
