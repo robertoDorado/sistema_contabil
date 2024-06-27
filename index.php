@@ -139,6 +139,8 @@ $route->get("/cash-variation-setting/form", "CashVariationSetting::cashVariation
 $route->post("/cash-variation-setting/form", "CashVariationSetting::cashVariationForm");
 $route->get("/cash-variation-setting/report", "CashVariationSetting::cashVariationReport");
 $route->post("/cash-variation-setting/report", "CashVariationSetting::cashVariationReport");
+$route->get("/cash-variation-setting/form-update/{uuid}", "CashVariationSetting::cashVariationFormUpdate");
+$route->post("/cash-variation-setting/form-update", "CashVariationSetting::cashVariationFormUpdate");
 
 /**
  * Planejamento de caixa

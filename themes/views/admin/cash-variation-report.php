@@ -22,9 +22,6 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-6 mb-5">
-                    <?= $v->insert("admin/layouts/_daterange_input") ?>
-                </div>
-                <div class="col-md-6 mb-5">
                     <form action="#" id="searchCashFlowVariation">
                         <div class="form-group">
                             <label for="accountGroupVariation">Grupo de variação</label>
@@ -61,7 +58,7 @@
                                                 <tr>
                                                     <td><?= $response->uuid ?></td>
                                                     <td><?= $response->group_name ?></td>
-                                                    <td><a class="icons" href="#"><i class="fas fa-edit" aria-hidden="true"></i></a></td>
+                                                    <td><a class="icons" href="<?= url("/admin/cash-variation-setting/form-update/" . $response->uuid) ?>"><i class="fas fa-edit" aria-hidden="true"></i></a></td>
                                                     <td><a class="icons" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a></td>
                                                 </tr>
                                             <?php endforeach ?>

@@ -1,6 +1,15 @@
-if (window.location.pathname == "/admin/cash-variation-setting/form") {
+const cashVariationEndpointFormUrl = window.location.pathname.replace(/(\/\w{8}-\w{4}-\w{4}-\w{4}-\w{12})/, "")
+let cashVariationUuid = window.location.pathname.match(/(\w{8}-\w{4}-\w{4}-\w{4}-\w{12})/)
+cashVariationUuid = cashVariationUuid && cashVariationUuid.length > 0 ? cashVariationUuid[0] : ""
+
+const cashVariationAllowEndpoints = [
+    "/admin/cash-variation-setting/form",
+    "/admin/cash-variation-setting/form-update"
+]
+
+if (cashVariationAllowEndpoints.indexOf(cashVariationEndpointFormUrl) != -1) {
     const accountGroup = $("#accountGroup").select2()
-    document.getElementById("operatingCashFlowForm").addEventListener("submit", function(event) {
+    document.getElementById("cashVariationForm").addEventListener("submit", function(event) {
         event.preventDefault()
         const btnSubmit = this.querySelector("[type='submit']")
 
@@ -25,9 +34,12 @@ if (window.location.pathname == "/admin/cash-variation-setting/form") {
 
         const accountGroupVariation = this.accountGroupVariation
         const form = new FormData(this)
+        if (cashVariationUuid) {
+            form.append("currentUuid", cashVariationUuid)
+        }
+        
         showSpinner(btnSubmit)
-
-        fetch(window.location.href, {
+        fetch(cashVariationEndpointFormUrl, {
             method: "POST",
             body: form
         }).then(response => response.json()).then(function(response) {

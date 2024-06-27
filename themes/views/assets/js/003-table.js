@@ -565,7 +565,10 @@ const cashFlowVariation = dataTableConfig($("#cashFlowVariation"),
             {
                 "extend": 'excelHtml5',
                 "filename": "Variação de caixa",
-                "title": "Variação de caixa"
+                "title": "Variação de caixa",
+                customizeData: function(xlsxData) {
+                    xlsxData.header = xlsxData.header.filter((data) => data != 'Editar' && data != 'Excluir')
+                }
             },
             {
                 "extend": 'csvHtml5',

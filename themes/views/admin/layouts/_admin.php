@@ -300,17 +300,17 @@
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
                                         <a href="<?= url("/admin/cash-variation-setting/form") ?>" class="nav-link">
-                                            <p>Lançar grupo de variação de caixa</p>
+                                            <p>Lançar variação de caixa</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="<?= url("/admin/cash-variation-setting/report") ?>" class="nav-link">
-                                            <p>Relatório grupo de variação de caixa</p>
+                                            <p>Relatório variação de caixa</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="#" class="nav-link">
-                                            <p>Backup grupo de variação de caixa</p>
+                                            <p>Backup variação de caixa</p>
                                         </a>
                                     </li>
                                 </ul>

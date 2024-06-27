@@ -2,6 +2,7 @@
 
 namespace Source\Controllers;
 
+use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Controller;
 use Source\Domain\Model\CashFlowGroup;
 use Source\Domain\Model\FinancingCashFlow;
@@ -25,6 +26,83 @@ class CashVariationSetting extends Controller
     public function __construct()
     {
         parent::__construct();
+    }
+
+    public function cashVariationFormUpdate(array $data)
+    {
+        if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            $requestPost = $this->getRequests()
+            ->setRequiredFields(["csrfToken", "accountGroup", "accountGroupVariation", "currentUuid"])->getAllPostData();
+            echo "<pre>";
+            print_r($requestPost);
+            die;
+        }
+
+        if (!Uuid::isValid($data["uuid"])){
+            redirect("/admin/cash-variation-setting/report");
+        }
+        
+        $user = new User();
+        $user->setEmail(session()->user->user_email);
+        $userData = $user->findUserByEmail(["id", "deleted"]);
+        
+        $user->setId($userData->id);
+        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
+        
+        $allClass = [
+            OperatingCashFlow::class,
+            FinancingCashFlow::class,
+            InvestmentCashFlow::class
+        ];
+
+        $columns = [["id"], ["deleted", "group_name", "uuid"]];
+        $checkInstance = [
+            OperatingCashFlow::class => function(string $uuid, array $columns) {
+                $operatingCashFlow = new OperatingCashFlow();
+                $operatingCashFlow->setUuid($uuid);
+                $response = $operatingCashFlow->findOperatingCashFlowByUuid(...$columns);
+                empty($response) ? null : $response->operating = true;
+                return $response;
+            },
+            FinancingCashFlow::class => function(string $uuid, array $columns) {
+                $financingCashFlow = new FinancingCashFlow();
+                $financingCashFlow->setUuid($uuid);
+                $response = $financingCashFlow->findFinancingCashFlowByUuid(...$columns);
+                empty($response) ? null : $response->financing = true;
+                return $response;
+            },
+            InvestmentCashFlow::class => function(string $uuid, array $columns) {
+                $investmentCashFlow = new InvestmentCashFlow();
+                $investmentCashFlow->setUuid($uuid);
+                $response = $investmentCashFlow->findInvestmentCashFlowByUuid(...$columns);
+                empty($response) ? null : $response->investment = true;
+                return $response;
+            }
+        ];
+
+        $cashVariationData = array_map(function($class) use ($checkInstance, $data, $columns) {
+            return $checkInstance[$class]($data["uuid"], $columns);
+        }, $allClass);
+
+        $cashVariationData = array_filter($cashVariationData, function($object) {
+            if (!empty($object)) {
+                return $object;
+            }
+        });
+
+        $cashVariationData = array_values($cashVariationData);
+        $cashVariationData = $cashVariationData[0] ?? null;
+
+        $cashFlowGroup = new CashFlowGroup();
+        $cashFlowGroup->setUuid($data["uuid"]);
+        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUser(["uuid", "group_name", "deleted"], $user, $companyId);
+
+        echo $this->view->render("admin/cash-variation-form-update", [
+            "userFullName" => showUserFullName(),
+            "cashVariationData" => $cashVariationData,
+            "cashFlowGroupData" => $cashFlowGroupData,
+            "endpoints" => []
+        ]);
     }
 
     public function cashVariationReport()
