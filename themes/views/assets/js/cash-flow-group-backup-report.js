@@ -18,11 +18,12 @@ if (window.location.pathname == "/admin/cash-flow-group/backup/report") {
         btnRestoreData.addEventListener("click", function(event) {
             event.preventDefault()
             const uuid = this.closest("tr").firstElementChild.innerHTML
-            const row = this.parentElement.parentElement
+            const row = this.closest("tr")
             data.row = row
             data.uuid = uuid
             data.restore = true
             data.destroy = false
+            data.nameReference = Array.from(this.closest("tr").children)[1].innerHTML
             launchModal.click()
         })
 
@@ -34,6 +35,7 @@ if (window.location.pathname == "/admin/cash-flow-group/backup/report") {
             data.uuid = uuid
             data.destroy = true
             data.restore = false
+            data.nameReference = Array.from(this.closest("tr").children)[1].innerHTML
             launchModal.click()
         })
     })
@@ -45,7 +47,7 @@ if (window.location.pathname == "/admin/cash-flow-group/backup/report") {
             saveChanges.classList.add("btn-primary")
             dismissModal.innerHTML = "Voltar";
             modalContainer.querySelector("#modalContainerLabel").innerHTML = "Restaurar registro"
-            modalContainer.querySelector(".modal-body").innerHTML = `Deseja mesmo restaurar o registro ${data.uuid}?`
+            modalContainer.querySelector(".modal-body").innerHTML = `Deseja mesmo restaurar o registro "${data.nameReference}"?`
         }
 
         if (data.destroy) {
@@ -55,7 +57,7 @@ if (window.location.pathname == "/admin/cash-flow-group/backup/report") {
             dismissModal.innerHTML = "Voltar";
             modalContainer.querySelector("#modalContainerLabel").innerHTML = "Excluir registro"
             modalContainer.querySelector(".modal-body")
-            .innerHTML = `Deseja mesmo excluir permanentemente o registro ${data.uuid}?`
+            .innerHTML = `Deseja mesmo excluir permanentemente o registro "${data.nameReference}"?`
         }
     })
 

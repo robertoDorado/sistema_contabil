@@ -41,7 +41,7 @@
                                     <select name="accountGroup" id="accountGroup" class="form-control">
                                         <?php if (!empty($cashFlowGroupData)) : ?>
                                             <?php foreach ($cashFlowGroupData as $value) : ?>
-                                                <option <?= $cashVariationData->uuid == $value->getUuid() ? "selected" : "" ?> value="<?= $value->getUuid() ?>"><?= $value->group_name ?></option>
+                                                <option <?= !empty($cashVariationData->uuid) && $cashVariationData->uuid == $value->getUuid() ? "selected" : "disabled" ?> value="<?= $value->getUuid() ?>"><?= $value->group_name ?></option>
                                             <?php endforeach ?>
                                         <?php endif ?>
                                     </select>

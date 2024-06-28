@@ -24,6 +24,7 @@ if (window.location.pathname == "/admin/company/backup/report") {
             data.restore = true
             data.destroy = false
             data.csrf = this.closest("td").dataset.csrf
+            data.nameReference = Array.from(this.closest("tr").children)[1].innerHTML
             launchModal.click()
         })
 
@@ -36,6 +37,7 @@ if (window.location.pathname == "/admin/company/backup/report") {
             data.destroy = true
             data.restore = false
             data.csrf = this.closest("td").dataset.csrf
+            data.nameReference = Array.from(this.closest("tr").children)[1].innerHTML
             launchModal.click()
         })
     })
@@ -47,7 +49,7 @@ if (window.location.pathname == "/admin/company/backup/report") {
             saveChanges.classList.add("btn-primary")
             dismissModal.innerHTML = "Voltar";
             modalContainer.querySelector("#modalContainerLabel").innerHTML = "Restaurar registro"
-            modalContainer.querySelector(".modal-body").innerHTML = `Deseja mesmo restaurar o registro ${data.uuid}?`
+            modalContainer.querySelector(".modal-body").innerHTML = `Deseja mesmo restaurar o registro "${data.nameReference}"?`
         }
 
         if (data.destroy) {
@@ -57,7 +59,7 @@ if (window.location.pathname == "/admin/company/backup/report") {
             dismissModal.innerHTML = "Voltar";
             modalContainer.querySelector("#modalContainerLabel").innerHTML = "Excluir registro"
             modalContainer.querySelector(".modal-body")
-            .innerHTML = `Deseja mesmo excluir permanentemente o registro ${data.uuid}?`
+            .innerHTML = `Deseja mesmo excluir permanentemente o registro "${data.nameReference}"?`
         }
     })
 

@@ -1,4 +1,5 @@
 <?php $v->layout("admin/layouts/_admin") ?>
+<?php $v->insert("admin/layouts/_modal") ?>
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <div class="content-header">
@@ -26,9 +27,9 @@
                         <div class="form-group">
                             <label for="accountGroupVariation">Grupo de variação</label>
                             <select name="accountGroupVariation" id="accountGroupVariation" class="form-control">
-                                <option value="1" <?= empty(session()->user->account_group_variation_id) ? "selected" : (!empty(session()->user->account_group_variation_id) && session()->user->account_group_variation_id == 1 ? "selected" : "") ?> >Fluxo de caixa operacional</option>
-                                <option value="2" <?= !empty(session()->user->account_group_variation_id) && session()->user->account_group_variation_id == 2 ? "selected" : "" ?>>Fluxo de caixa de investimento</option>
-                                <option value="3" <?= !empty(session()->user->account_group_variation_id) && session()->user->account_group_variation_id == 3 ? "selected" : "" ?>>Fluxo de caixa de financiamento</option>
+                                <option value="1" <?= empty(session()->account_group_variation_id) ? "selected" : (!empty(session()->account_group_variation_id) && session()->account_group_variation_id == 1 ? "selected" : "") ?> >Fluxo de caixa operacional</option>
+                                <option value="2" <?= !empty(session()->account_group_variation_id) && session()->account_group_variation_id == 2 ? "selected" : "" ?>>Fluxo de caixa de investimento</option>
+                                <option value="3" <?= !empty(session()->account_group_variation_id) && session()->account_group_variation_id == 3 ? "selected" : "" ?>>Fluxo de caixa de financiamento</option>
                             </select>
                         </div>
                     </form>
@@ -59,7 +60,7 @@
                                                     <td><?= $response->uuid ?></td>
                                                     <td><?= $response->group_name ?></td>
                                                     <td><a class="icons" href="<?= url("/admin/cash-variation-setting/form-update/" . $response->uuid) ?>"><i class="fas fa-edit" aria-hidden="true"></i></a></td>
-                                                    <td><a class="icons" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a></td>
+                                                    <td><a class="icons trash-icon" data-accountname="<?= $response->group_name ?>" data-csrf="<?= session()->csrf_token ?>" data-uuid="<?= $response->uuid ?>" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a></td>
                                                 </tr>
                                             <?php endforeach ?>
                                         <?php endif ?>

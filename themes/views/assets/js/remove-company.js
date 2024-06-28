@@ -7,7 +7,7 @@ if (window.location.pathname == '/admin/company/report') {
             $("#modalContainerLabel").html("Atenção!")
             $("#dismissModal").html("Voltar")
             $("#saveChanges").removeClass("btn-primary").addClass("btn-danger").html("Excluir")
-            $(".modal-body").html(`Você quer mesmo deletar o registro ${$(this).data("uuid")}?`)
+            $(".modal-body").html(`Você quer mesmo deletar o registro "${$(this).data("company")}"?`)
             deleteData.uuid  = $(this).data("uuid")
             deleteData.trElement = $(this).closest("tr").prev()
             deleteData.csrfToken = $(this).data("csrf")

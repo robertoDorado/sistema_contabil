@@ -100,6 +100,7 @@ if (window.location.pathname == `/admin/cash-flow/update/form/${cashFlowParamete
             }
 
             if (response.success) {
+                modal.style.display = "flex"
                 window.location.href = response.url
             }
         })

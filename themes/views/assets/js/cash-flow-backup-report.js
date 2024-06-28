@@ -23,6 +23,7 @@ if (window.location.pathname == "/admin/cash-flow/backup/report") {
             data.uuid = uuid
             data.restore = true
             data.destroy = false
+            data.accountReference = Array.from(this.closest("tr").children)[3].innerHTML
             launchModal.click()
         })
 
@@ -34,6 +35,7 @@ if (window.location.pathname == "/admin/cash-flow/backup/report") {
             data.uuid = uuid
             data.destroy = true
             data.restore = false
+            data.accountReference = Array.from(this.closest("tr").children)[3].innerHTML
             launchModal.click()
         })
     })
@@ -45,7 +47,7 @@ if (window.location.pathname == "/admin/cash-flow/backup/report") {
             saveChanges.classList.add("btn-primary")
             dismissModal.innerHTML = "Voltar";
             modalContainer.querySelector("#modalContainerLabel").innerHTML = "Restaurar registro"
-            modalContainer.querySelector(".modal-body").innerHTML = `Deseja mesmo restaurar o registro ${data.uuid}?`
+            modalContainer.querySelector(".modal-body").innerHTML = `Deseja mesmo restaurar o registro "${data.accountReference}"?`
         }
 
         if (data.destroy) {
@@ -55,7 +57,7 @@ if (window.location.pathname == "/admin/cash-flow/backup/report") {
             dismissModal.innerHTML = "Voltar";
             modalContainer.querySelector("#modalContainerLabel").innerHTML = "Excluir registro"
             modalContainer.querySelector(".modal-body")
-            .innerHTML = `Deseja mesmo excluir permanentemente o registro ${data.uuid}?`
+            .innerHTML = `Deseja mesmo excluir permanentemente o registro "${data.accountReference}"?`
         }
     })
 

@@ -18,9 +18,8 @@ if (window.location.pathname == '/admin/cash-flow/report') {
             const linkDelete = element.parentElement
             linkDelete.addEventListener("click", function (event) {
                 event.preventDefault()
-
-                const row = this.parentElement.parentElement
-                let uuidParameter = this.parentElement.previousElementSibling.firstElementChild
+                const row = this.closest("tr")
+                let uuidParameter = this.closest("td").previousElementSibling.firstElementChild
                 
                 uuidParameter = uuidParameter.href.split("/")
                 uuidParameter = uuidParameter.pop()
@@ -29,13 +28,14 @@ if (window.location.pathname == '/admin/cash-flow/report') {
                 dataDelete.uuidParameter = uuidParameter
                 dataDelete.url = url
                 dataDelete.row = row
+                dataDelete.accountReference = Array.from(row.children)[3].innerHTML
                 launchModal.click()
             })
         })
 
         launchModal.addEventListener("click", function() {
             modalContainerLabel.innerHTML = "Atenção!"
-            modalBody.innerHTML = `Você quer mesmo deletar o registro ${dataDelete.uuidParameter}?`
+            modalBody.innerHTML = `Você quer mesmo deletar o registro "${dataDelete.accountReference}"?`
         })
 
         saveChanges.addEventListener("click", function() {

@@ -9,7 +9,6 @@ use Ramsey\Uuid\Uuid;
 use Source\Core\Controller;
 use Source\Domain\Model\CashFlow as ModelCashFlow;
 use Source\Domain\Model\CashFlowGroup;
-use Source\Domain\Model\Customer;
 use Source\Domain\Model\User;
 
 /**

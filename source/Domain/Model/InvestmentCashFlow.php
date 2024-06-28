@@ -46,24 +46,34 @@ class InvestmentCashFlow
         $this->data->$name = $value;
     }
 
+    public function findInvestmentCashFlowByCashFlowGroupId(array $columns, int $cashFlowGroupId)
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        return $this->investmentCashFlow
+            ->find(
+                "cash_flow_group_id=:cash_flow_group_id AND deleted=:deleted",
+                ":cash_flow_group_id=" . $cashFlowGroupId . "&:deleted=0"
+            )->fetch();
+    }
+
     /** @var ModelsInvestmentCashFlow[] */
     public function findInvestmentCashFlowJoinCashFlowGroup(array $columnsOp, array $columnsCg, User $user, int $companyId): array
     {
         $columnsOp = empty($columnsOp) ? "*" : implode(", ", $columnsOp);
         $columnsCg = empty($columnsCg) ? "*" : implode(", ", $columnsCg);
-        
-        $response = $this->investmentCashFlow->find("", "", $columnsOp)
+
+        $response = $this->investmentCashFlow->find("deleted=:deleted", ":deleted=0", $columnsOp)
             ->join(
-                CONF_DB_NAME .".cash_flow_group",
+                CONF_DB_NAME . ".cash_flow_group",
                 "id",
-                "id_user=:id_user AND id_company=:id_company",
-                ":id_user=" . $user->getId() . "&:id_company=" . $companyId . "",
+                "id_user=:id_user AND id_company=:id_company AND deleted=:deleted",
+                ":id_user=" . $user->getId() . "&:id_company=" . $companyId . "&:deleted=0",
                 $columnsCg,
                 "cash_flow_group_id",
-                CONF_DB_NAME .".investment_cash_flow"
+                CONF_DB_NAME . ".investment_cash_flow"
             )->fetch(true);
-        
-        if (empty($response)){
+
+        if (empty($response)) {
             return [];
         }
 
@@ -75,12 +85,12 @@ class InvestmentCashFlow
         $columnsInv = empty($columnsInv) ? "*" : implode(", ", $columnsInv);
         $columnsCg = empty($columnsCg) ? "*" : implode(", ", $columnsCg);
 
-        return $this->investmentCashFlow->find("", "", $columnsInv)
+        return $this->investmentCashFlow->find("deleted=:deleted", ":deleted=0", $columnsInv)
             ->join(
                 CONF_DB_NAME . ".cash_flow_group",
                 "id",
-                "uuid=:uuid",
-                ":uuid=" . $this->getUuid() . "",
+                "uuid=:uuid AND deleted=:deleted",
+                ":uuid=" . $this->getUuid() . "&:deleted=0",
                 $columnsCg,
                 "cash_flow_group_id",
                 CONF_DB_NAME . ".investment_cash_flow"

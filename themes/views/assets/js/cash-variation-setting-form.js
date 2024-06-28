@@ -9,7 +9,7 @@ const cashVariationAllowEndpoints = [
 
 if (cashVariationAllowEndpoints.indexOf(cashVariationEndpointFormUrl) != -1) {
     const accountGroup = $("#accountGroup").select2()
-    document.getElementById("cashVariationForm").addEventListener("submit", function(event) {
+    document.getElementById("cashVariationForm").addEventListener("submit", function (event) {
         event.preventDefault()
         const btnSubmit = this.querySelector("[type='submit']")
 
@@ -19,7 +19,7 @@ if (cashVariationAllowEndpoints.indexOf(cashVariationEndpointFormUrl) != -1) {
             toastr.warning(message)
             throw new Error(message)
         }
-        
+
         if (!this.accountGroup.value) {
             message = "O campo grupo de contas está vazio ou inválido"
             toastr.warning(message)
@@ -37,18 +37,19 @@ if (cashVariationAllowEndpoints.indexOf(cashVariationEndpointFormUrl) != -1) {
         if (cashVariationUuid) {
             form.append("currentUuid", cashVariationUuid)
         }
-        
+
         showSpinner(btnSubmit)
         fetch(cashVariationEndpointFormUrl, {
             method: "POST",
             body: form
-        }).then(response => response.json()).then(function(response) {
+        }).then(response => response.json()).then(function (response) {
+
             btnSubmit.removeAttribute("disabled")
             btnSubmit.innerHTML = "Enviar"
 
             accountGroup.val(null).trigger("change")
             accountGroupVariation.value = ""
-            
+
             if (response.error) {
                 message = response.error
                 message = message.charAt(0).toUpperCase() + message.slice(1)
@@ -56,10 +57,18 @@ if (cashVariationAllowEndpoints.indexOf(cashVariationEndpointFormUrl) != -1) {
                 throw new Error(message)
             }
 
+            if (cashVariationUuid) {
+                modal.style.display = "flex"
+            }
+
             if (response.success) {
                 message = response.success
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.success(message)
+            }
+
+            if (response.redirect) {
+                window.location.href = response.redirect
             }
         })
     })

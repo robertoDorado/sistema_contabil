@@ -40,6 +40,13 @@ if (empty($_POST["request"]) && !empty($_SERVER["REDIRECT_URL"]) && $_SERVER["RE
         if (!empty($customerData->getDeleted())) {
             redirect("/admin/login");
         }
+
+        if ($_SERVER["REDIRECT_URL"] != "/admin/cash-variation-setting/report") {
+            if (!empty(session()->account_group_variation) && !empty(session()->account_group_variation_id)) {
+                session()->unset("account_group_variation");
+                session()->unset("account_group_variation_id");
+            }
+        }
     }
 }
 
@@ -141,6 +148,7 @@ $route->get("/cash-variation-setting/report", "CashVariationSetting::cashVariati
 $route->post("/cash-variation-setting/report", "CashVariationSetting::cashVariationReport");
 $route->get("/cash-variation-setting/form-update/{uuid}", "CashVariationSetting::cashVariationFormUpdate");
 $route->post("/cash-variation-setting/form-update", "CashVariationSetting::cashVariationFormUpdate");
+$route->post("/cash-variation-setting/remove", "CashVariationSetting::cashVariationRemoveData");
 
 /**
  * Planejamento de caixa
