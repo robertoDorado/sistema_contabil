@@ -5,6 +5,7 @@ namespace Source\Controllers;
 use Exception;
 use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Controller;
+use Source\Core\Model;
 use Source\Domain\Model\CashFlowGroup;
 use Source\Domain\Model\FinancingCashFlow;
 use Source\Domain\Model\InvestmentCashFlow;
@@ -27,6 +28,98 @@ class CashVariationSetting extends Controller
     public function __construct()
     {
         parent::__construct();
+    }
+
+    public function cashVariationBackupReport()
+    {
+        if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            $requestPost = $this->getRequests()->setRequiredFields(
+                [
+                    "csrfToken",
+                    "uuid",
+                    "changeType"
+                ]
+            )->getAllPostData();
+
+            $cashFlowGroup = new CashFlowGroup();
+            $cashFlowGroup->setUuid($requestPost["uuid"]);
+            $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid();
+
+            if (empty($cashFlowGroupData)) {
+                throw new Exception($cashFlowGroup->message->json());
+                die;
+            }
+
+            $params = [[], $cashFlowGroupData->id];
+            $operatingCashFlow = new OperatingCashFlow();
+            $operatingCashFlowData = $operatingCashFlow->findOperatingCashFlowByCashFlowGroupId(...$params);
+
+            $verifyChangeType = [
+                "restore" => function (Model $model): void {
+                    $model->deleted = 0;
+                    $model->save();
+                },
+                "delete" => function (Model $model): void {
+                    $model->destroy();
+                }
+            ];
+
+            if (!empty($operatingCashFlowData)) {
+                if (!empty($verifyChangeType[$requestPost["changeType"]])) {
+                    $verifyChangeType[$requestPost["changeType"]]($operatingCashFlowData);
+                }
+            }
+
+            $financingCashFlow = new FinancingCashFlow();
+            $financingCashFlowData = $financingCashFlow->findFinancingCashFlowByCashFlowGroupId(...$params);
+
+            if (!empty($financingCashFlowData)) {
+                if (!empty($verifyChangeType[$requestPost["changeType"]])) {
+                    $verifyChangeType[$requestPost["changeType"]]($financingCashFlowData);
+                }
+            }
+
+            $investmentCashFlow = new InvestmentCashFlow();
+            $investmentCashFlowData = $investmentCashFlow->findInvestmentCashFlowByCashFlowGroupId(...$params);
+
+            if (!empty($investmentCashFlowData)) {
+                if (!empty($verifyChangeType[$requestPost["changeType"]])) {
+                    $verifyChangeType[$requestPost["changeType"]]($investmentCashFlowData);
+                }
+            }
+
+            echo json_encode(["success" => true]);
+            die;
+        }
+
+        $user = new User();
+        $user->setEmail(session()->user->user_email);
+        $userData = $user->findUserByEmail(["id", "deleted"]);
+        $user->setId($userData->id);
+        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
+
+        $accountGroupVariationSession = is_object(session()->account_group_variation) ?
+            (array) session()->account_group_variation : session()->account_group_variation;
+
+        $responseData = empty(session()->account_group_variation) ?
+            (new OperatingCashFlow())->findOperatingCashFlowJoinCashFlowGroup(
+                ["deleted AS variation_deleted"],
+                ["uuid", "group_name"],
+                $user,
+                $companyId
+            ) : $accountGroupVariationSession;
+        
+        $responseData = array_filter($responseData, function ($item) {
+            if (!empty($item->variation_deleted)) {
+                return $item;
+            }
+        });
+
+        echo $this->view->render("admin/cash-variation-backup", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => ["/admin/cash-variation-setting/backup"],
+            "responseData" => $responseData
+        ]);
     }
 
     public function cashVariationRemoveData()
@@ -187,7 +280,7 @@ class CashVariationSetting extends Controller
             InvestmentCashFlow::class
         ];
 
-        $columns = [["id"], ["deleted", "group_name", "uuid"]];
+        $columns = [["id"], ["group_name", "uuid"]];
         $checkInstance = [
             OperatingCashFlow::class => function (string $uuid, array $columns) {
                 $operatingCashFlow = new OperatingCashFlow();
@@ -227,7 +320,7 @@ class CashVariationSetting extends Controller
 
         $cashFlowGroup = new CashFlowGroup();
         $cashFlowGroup->setUuid($data["uuid"]);
-        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUser(["uuid", "group_name", "deleted"], $user, $companyId);
+        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUser(["uuid", "group_name"], $user, $companyId);
 
         echo $this->view->render("admin/cash-variation-form-update", [
             "userFullName" => showUserFullName(),
@@ -252,7 +345,7 @@ class CashVariationSetting extends Controller
                 1 => function () use ($user, $companyId) {
                     $operatingCashFlow = new OperatingCashFlow();
                     return $operatingCashFlow->findOperatingCashFlowJoinCashFlowGroup(
-                        ["id"],
+                        ["deleted AS variation_deleted"],
                         ["uuid", "group_name"],
                         $user,
                         $companyId
@@ -262,7 +355,7 @@ class CashVariationSetting extends Controller
                 2 => function () use ($user, $companyId) {
                     $investmentCashFlow = new InvestmentCashFlow();
                     return $investmentCashFlow->findInvestmentCashFlowJoinCashFlowGroup(
-                        ["id"],
+                        ["deleted AS variation_deleted"],
                         ["uuid", "group_name"],
                         $user,
                         $companyId
@@ -272,7 +365,7 @@ class CashVariationSetting extends Controller
                 3 => function () use ($user, $companyId) {
                     $financingCashFlow = new FinancingCashFlow();
                     return $financingCashFlow->findFinancingCashFlowJoinCashFlowGroup(
-                        ["id"],
+                        ["deleted AS variation_deleted"],
                         ["uuid", "group_name"],
                         $user,
                         $companyId
@@ -280,7 +373,7 @@ class CashVariationSetting extends Controller
                 }
             ];
 
-            $response = null;
+            $response = [];
             if (!empty($verifyAccountGroupVariation[$requestPost["accountGroupVariation"]])) {
                 $response = $verifyAccountGroupVariation[$requestPost["accountGroupVariation"]]();
             }
@@ -291,13 +384,22 @@ class CashVariationSetting extends Controller
             die;
         }
 
+        $accountGroupVariationSession = is_object(session()->account_group_variation) ?
+            (array) session()->account_group_variation : session()->account_group_variation;
+
         $responseData = empty(session()->account_group_variation) ?
             (new OperatingCashFlow())->findOperatingCashFlowJoinCashFlowGroup(
-                ["id"],
+                ["deleted AS variation_deleted"],
                 ["uuid", "group_name"],
                 $user,
                 $companyId
-            ) : session()->account_group_variation;
+            ) : $accountGroupVariationSession;
+
+        $responseData = array_filter($responseData, function ($item) {
+            if (empty($item->variation_deleted)) {
+                return $item;
+            }
+        });
 
         echo $this->view->render("admin/cash-variation-report", [
             "userFullName" => showUserFullName(),

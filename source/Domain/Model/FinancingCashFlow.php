@@ -51,8 +51,8 @@ class FinancingCashFlow
         $columns = empty($columns) ? "*" : implode(", ", $columns);
         return $this->financingCashFlow
             ->find(
-                "cash_flow_group_id=:cash_flow_group_id AND deleted=:deleted",
-                ":cash_flow_group_id=" . $cashFlowGroupId . "&:deleted=0"
+                "cash_flow_group_id=:cash_flow_group_id",
+                ":cash_flow_group_id=" . $cashFlowGroupId . ""
             )->fetch();
     }
 
@@ -62,12 +62,12 @@ class FinancingCashFlow
         $columnsOp = empty($columnsOp) ? "*" : implode(", ", $columnsOp);
         $columnsCg = empty($columnsCg) ? "*" : implode(", ", $columnsCg);
 
-        $response = $this->financingCashFlow->find("deleted=:deleted", ":deleted=0", $columnsOp)
+        $response = $this->financingCashFlow->find("", "", $columnsOp)
             ->join(
                 CONF_DB_NAME . ".cash_flow_group",
                 "id",
-                "id_user=:id_user AND id_company=:id_company AND deleted=:deleted",
-                ":id_user=" . $user->getId() . "&:id_company=" . $companyId . "&:deleted=0",
+                "id_user=:id_user AND id_company=:id_company",
+                ":id_user=" . $user->getId() . "&:id_company=" . $companyId . "",
                 $columnsCg,
                 "cash_flow_group_id",
                 CONF_DB_NAME . ".financing_cash_flow"
@@ -85,12 +85,12 @@ class FinancingCashFlow
         $columnsFin = empty($columnsFin) ? "*" : implode(", ", $columnsFin);
         $columnsCg = empty($columnsCg) ? "*" : implode(", ", $columnsCg);
 
-        return $this->financingCashFlow->find("deleted=:deleted", ":deleted=0", $columnsFin)
+        return $this->financingCashFlow->find("", "", $columnsFin)
             ->join(
                 CONF_DB_NAME . ".cash_flow_group",
                 "id",
-                "uuid=:uuid AND deleted=:deleted",
-                ":uuid=" . $this->getUuid() . "&:deleted=0",
+                "uuid=:uuid",
+                ":uuid=" . $this->getUuid() . "",
                 $columnsCg,
                 "cash_flow_group_id",
                 CONF_DB_NAME . ".financing_cash_flow"

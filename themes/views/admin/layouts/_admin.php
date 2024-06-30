@@ -309,7 +309,7 @@
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="#" class="nav-link">
+                                        <a href="<?= url("/admin/cash-variation-setting/backup") ?>" class="nav-link">
                                             <p>Backup variação de caixa</p>
                                         </a>
                                     </li>
