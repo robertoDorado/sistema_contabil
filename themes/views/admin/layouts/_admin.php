@@ -153,29 +153,6 @@
                                     </li>
                                 </ul>
                             </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <p>Integração com outros módulos</p>
-                                    <i class="right fas fa-angle-left"></i>
-                                </a>
-                                <ul class="nav nav-treeview">
-                                    <li class="nav-item">
-                                        <a href="#" class="nav-link">
-                                            <p>Int. DRE</p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="#" class="nav-link">
-                                            <p>Int. fluxo de caixa</p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="#" class="nav-link">
-                                            <p>Int. módulos e ativos fixos</p>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
                         </ul>
                     </li>
                     <li class="nav-item">
@@ -365,24 +342,6 @@
                                     <li class="nav-item">
                                         <a href="#" class="nav-link">
                                             <p>Relatórios de auditoria</p>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <p>Integração com outros módulos</p>
-                                    <i class="right fas fa-angle-left"></i>
-                                </a>
-                                <ul class="nav nav-treeview">
-                                    <li class="nav-item">
-                                        <a href="#" class="nav-link">
-                                            <p>Int. contas a pagar e receber</p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="#" class="nav-link">
-                                            <p>Int. balanço patrimonial</p>
                                         </a>
                                     </li>
                                 </ul>
