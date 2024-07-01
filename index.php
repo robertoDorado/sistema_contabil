@@ -157,6 +157,7 @@ $route->get("/cash-variation-setting/backup", "CashVariationSetting::cashVariati
  * Planejamento de caixa
  */
 $route->get("/cash-planning/cash-flow/cash-budget", "CashPlanning::cashBudget");
+$route->get("/cash-planning/cash-flow/cash-variation-analysis", "CashPlanning::cashVariationAnalysis");
 
 /** 
  * Assinatura do cliente

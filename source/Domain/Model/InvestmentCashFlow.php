@@ -46,6 +46,41 @@ class InvestmentCashFlow
         $this->data->$name = $value;
     }
 
+    /** @var ModelsInvestmentCashFlow[] */
+    public function findInvestmentCashFlowJoinCashFlowGroupAndJoinCashFlowData(array $columnsInv, array $columnsCg, array $columnsCd, array $betweenData, User $user, int $companyId): array
+    {
+        $columnsInv = empty($columnsInv) ? "*" : implode(", ", $columnsInv);
+        $columnsCg = empty($columnsCg) ? "*" : implode(", ", $columnsCg);
+        $columnsCd = empty($columnsCd) ? "*" : implode(", ", $columnsCd);
+
+        $terms = "id_user=:id_user AND id_company=:id_company AND deleted=0";
+        $params = ":id_user=" . $user->getId() . "&:id_company=" . $companyId . "";
+
+        $response = $this->investmentCashFlow->find("", "", $columnsInv)
+            ->join(
+                CONF_DB_NAME . ".cash_flow_group",
+                "id",
+                $terms,
+                $params,
+                $columnsCg,
+                "cash_flow_group_id",
+                CONF_DB_NAME . ".investment_cash_flow",
+            )->join(
+                CONF_DB_NAME . ".cash_flow",
+                "id_cash_flow_group",
+                $terms,
+                $params,
+                $columnsCd,
+                "id",
+                CONF_DB_NAME . ".cash_flow_group"
+            )->between("created_at", CONF_DB_NAME . ".cash_flow", $betweenData)->fetch(true);
+        
+        if (empty($response)) {
+            return [];
+        }
+        return $response;
+    }
+
     public function findInvestmentCashFlowByCashFlowGroupId(array $columns, int $cashFlowGroupId)
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
@@ -57,12 +92,12 @@ class InvestmentCashFlow
     }
 
     /** @var ModelsInvestmentCashFlow[] */
-    public function findInvestmentCashFlowJoinCashFlowGroup(array $columnsOp, array $columnsCg, User $user, int $companyId): array
+    public function findInvestmentCashFlowJoinCashFlowGroup(array $columnsInv, array $columnsCg, User $user, int $companyId): array
     {
-        $columnsOp = empty($columnsOp) ? "*" : implode(", ", $columnsOp);
+        $columnsInv = empty($columnsInv) ? "*" : implode(", ", $columnsInv);
         $columnsCg = empty($columnsCg) ? "*" : implode(", ", $columnsCg);
 
-        $response = $this->investmentCashFlow->find("", "", $columnsOp)
+        $response = $this->investmentCashFlow->find("", "", $columnsInv)
             ->join(
                 CONF_DB_NAME . ".cash_flow_group",
                 "id",

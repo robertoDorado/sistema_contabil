@@ -327,7 +327,7 @@
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="#" class="nav-link">
+                                        <a href="<?= url("/admin/cash-planning/cash-flow/cash-variation-analysis") ?>" class="nav-link">
                                             <p>Análise de variação caixa</p>
                                         </a>
                                     </li>

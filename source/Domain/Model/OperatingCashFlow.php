@@ -46,6 +46,41 @@ class OperatingCashFlow
         return $this->data->$name ?? null;
     }
 
+    /** @var ModelsOperatingCashFlow[] */
+    public function findOperatingCashFlowJoinCashFlowGroupAndJoinCashFlowData(array $columnsOp, array $columnsCg, array $columnsCd, array $betweenData, User $user, int $companyId): array
+    {
+        $columnsOp = empty($columnsOp) ? "*" : implode(", ", $columnsOp);
+        $columnsCg = empty($columnsCg) ? "*" : implode(", ", $columnsCg);
+        $columnsCd = empty($columnsCd) ? "*" : implode(", ", $columnsCd);
+
+        $terms = "id_user=:id_user AND id_company=:id_company AND deleted=0";
+        $params = ":id_user=" . $user->getId() . "&:id_company=" . $companyId . "";
+
+        $response = $this->operatingCashFlow->find("", "", $columnsOp)
+            ->join(
+                CONF_DB_NAME . ".cash_flow_group",
+                "id",
+                $terms,
+                $params,
+                $columnsCg,
+                "cash_flow_group_id",
+                CONF_DB_NAME . ".operating_cash_flow",
+            )->join(
+                CONF_DB_NAME . ".cash_flow",
+                "id_cash_flow_group",
+                $terms,
+                $params,
+                $columnsCd,
+                "id",
+                CONF_DB_NAME . ".cash_flow_group"
+            )->between("created_at", CONF_DB_NAME . ".cash_flow", $betweenData)->fetch(true);
+
+        if (empty($response)) {
+            return [];
+        }
+        return $response;
+    }
+
     public function findOperatingCashFlowByCashFlowGroupId(array $columns, int $cashFlowGroupId)
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
