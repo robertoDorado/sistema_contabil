@@ -31,8 +31,20 @@
     font-size: 1.5rem;
 }
 
-.select2-selection__rendered {
+#selectCompanySession + .select2.select2-container.select2-container--default > .selection > .select2-selection.select2-selection--single .select2-selection__rendered {
     margin-top: -0.5rem !important;
+}
+#accountGroup + .select2.select2-container.select2-container--default > .selection > .select2-selection.select2-selection--single .select2-selection__rendered {
+    margin-top: -0.5rem !important;
+}
+#cashFlowSelectMultiple + .select2.select2-container.select2-container--default > .selection > .select2-selection.select2-selection--multiple > .select2-selection__rendered > .select2-selection__choice {
+    color: #000;
+}
+#toast-container > .toast.toast-warning > .toast-close-button {
+    color: #000;
+}
+#toast-container > .toast.toast-warning {
+    color: #000;
 }
 
 .modal {

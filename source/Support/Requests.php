@@ -2,6 +2,7 @@
 
 namespace Source\Support;
 
+use Exception;
 use Source\Core\Session;
 
 /**
@@ -62,9 +63,9 @@ class Requests
         return $this;
     }
 
-    private function verifyData(string $field, string $key, string $value) {
+    private function verifyData(string $field, string $key, $value) {
         if ($field == $key) {
-            if ($value == '') {
+            if (empty($value)) {
                 throw new \Exception("Campo " . $key . " é obrigatório.");
             }
         }
@@ -83,6 +84,12 @@ class Requests
 
     public function setRequiredFields(array $requiredFields)
     {
+        foreach ($requiredFields as $value) {
+            if (!in_array($value, array_keys($this->post))) {
+                throw new Exception("O campo " . $value . " é obrigatório");
+            }
+        }
+
         $verifyRequiredFields = function (&$value, $key) use ($requiredFields) {
             if (!empty($requiredFields)) {
                 foreach ($requiredFields as $field) {

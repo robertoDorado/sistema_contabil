@@ -159,6 +159,12 @@ $route->get("/cash-variation-setting/backup", "CashVariationSetting::cashVariati
 $route->get("/cash-planning/cash-flow/cash-budget", "CashPlanning::cashBudget");
 $route->get("/cash-planning/cash-flow/cash-variation-analysis", "CashPlanning::cashVariationAnalysis");
 
+/**
+ * Notas explicativas do fluxo de caixa
+ */
+$route->get("/cash-flow-explanatory-notes/form", "CashFlowExplanatoryNotes::cashFlowExplanatoryNotesForm");
+$route->post("/cash-flow-explanatory-notes/form", "CashFlowExplanatoryNotes::cashFlowExplanatoryNotesForm");
+
 /** 
  * Assinatura do cliente
  */

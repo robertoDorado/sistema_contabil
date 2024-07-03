@@ -317,8 +317,8 @@
                                 </a>
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
-                                        <a href="#" class="nav-link">
-                                            <p>Adicionar notas</p>
+                                        <a href="<?= url("/admin/cash-flow-explanatory-notes/form") ?>" class="nav-link">
+                                            <p>Adicionar nova nota</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
