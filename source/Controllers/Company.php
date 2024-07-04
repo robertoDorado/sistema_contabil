@@ -62,16 +62,9 @@ class Company extends Controller
 
     public function companyBackupReport()
     {
-        $user = new User();
-        $user->setEmail(session()->user->user_email);
-        $userData = $user->findUserByEmail(["id", "deleted"]);
-        
-        if (empty($userData)) {
-            redirect("/admin/login");
-        }
-
+        $response = initializeUserAndCompanyId();
         $company = new ModelCompany();
-        $company->id_user = $userData->id;
+        $company->id_user = $response["user_data"]->id;
         $companyData = $company->findAllCompanyByUserDeleted(["uuid", "company_name", "deleted"]);
 
         echo $this->view->render("admin/company-backup-report", [
@@ -153,21 +146,11 @@ class Company extends Controller
                 throw new Exception("uuid inválido");
             }
 
-            $user = new User();
-            $user->setEmail(session()->user->user_email);
-            $userData = $user->findUserByEmail();
-
-            if (empty($userData)) {
-                http_response_code(500);
-                echo $user->message->json();
-                die;
-            }
-
-            $user->setId($userData->id);
+            $response = initializeUserAndCompanyId();
             $company = new ModelCompany();
             $response = $company->updateCompanyByUuid([
                 "uuid" => $requestPost["uuid"],
-                "id_user" => $user,
+                "id_user" => $response["user"],
                 "company_name" => $requestPost["companyName"],
                 "company_document" => $requestPost["companyDocument"],
                 "state_registration" => empty($requestPost["stateRegistration"]) ? null : $requestPost["stateRegistration"],
@@ -221,16 +204,9 @@ class Company extends Controller
 
     public function companyReport()
     {
-        $user = new User();
-        $user->setEmail(session()->user->user_email);
-        $userData = $user->findUserByEmail(["id", "deleted"]);
-
-        if (empty($userData)) {
-            redirect("/admin/login");
-        }
-
+        $response = initializeUserAndCompanyId();
         $company = new ModelCompany();
-        $company->id_user = $userData->id;
+        $company->id_user = $response["user_data"]->id;
         $companyData = $company->findCompanyByUser();
 
         echo $this->view->render("admin/company-report", [
@@ -284,21 +260,11 @@ class Company extends Controller
                 ]
             )->getAllPostData();
 
-            $user = new User();
-            $user->setEmail(session()->user->user_email);
-            $userData = $user->findUserByEmail();
-
-            if (empty($userData)) {
-                http_response_code(500);
-                echo $user->message->json();
-                die;
-            }
-
-            $user->setId($userData->id);
+            $response = initializeUserAndCompanyId();
             $company = new ModelCompany();
             $response = $company->persistData([
                 "uuid" => Uuid::uuid4(),
-                "id_user" => $user,
+                "id_user" => $response["user"],
                 "company_name" => $requestPost["companyName"],
                 "company_document" => $requestPost["companyDocument"],
                 "state_registration" => empty($requestPost["stateRegistration"]) ? null : $requestPost["stateRegistration"],

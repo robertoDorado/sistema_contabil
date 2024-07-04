@@ -1,4 +1,5 @@
 <?php
+
 namespace Source\Domain\Model;
 
 use Exception;
@@ -43,6 +44,35 @@ class CashFlowExplanatoryNotes
     public function __get($name)
     {
         return $this->data->$name ?? null;
+    }
+
+    /** @var ModelsCashFlowExplanatoryNotes[] */
+    public function findCashFlowExplanatoryNotesJoinCashFlow(array $columnsExp, array $columnsCash, User $user, int $companyId, bool $deleted): array
+    {
+        $deleted = !$deleted ? 0 : 1;
+        $columnsExp = empty($columnsExp) ? "*" : implode(", ", $columnsExp);
+        $columnsCash = empty($columnsCash) ? "*" : implode(", ", $columnsCash);
+
+        $response = $this->cashFlowExplanatoryNotes->find(
+            "deleted=:deleted",
+            ":deleted=" . $deleted . "",
+            $columnsExp
+        )
+            ->join(
+                CONF_DB_NAME . ".cash_flow",
+                "id",
+                "id_user=:id_user&id_company=:id_company&deleted=:deleted",
+                ":id_user=" . $user->getId() . "&:id_company=" . $companyId . "&:deleted=" . $deleted . "",
+                $columnsCash,
+                "id_cash_flow",
+                CONF_DB_NAME . ".cash_flow_explanatory_notes"
+            )->fetch(true);
+
+        if (empty($response)) {
+            return [];
+        }
+
+        return $response;
     }
 
     public function getId(): int

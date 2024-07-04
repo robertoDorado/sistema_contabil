@@ -70,15 +70,11 @@ class BankReconciliation extends Controller
         $dateRange = date("d/m/Y", $minDate["timestamp"]) . " - " . date("d/m/Y", $maxDate["timestamp"]);
 
         $allowKeys = ["amount", "memo", "date"];
-        $user = new User();
-        $user->setEmail(session()->user->user_email);
-        $userData = $user->findUserByEmail([]);
-        $user->setId($userData->id);
+        $response = initializeUserAndCompanyId();
 
         $cashFlow = new CashFlow();
-        $cashFlow->id_user = $userData->id;
-        $companyId = session()->user->company_id;
-        $cashFlowData = $cashFlow->findCashFlowDataByDate($dateRange, $user, [], $companyId);
+        $cashFlow->id_user = $response["user_data"]->id;
+        $cashFlowData = $cashFlow->findCashFlowDataByDate($dateRange, $response["user"], [], $response["company_id"]);
 
         if ($urlComponents['path'] == "/admin/bank-reconciliation/cash-flow/automatic") {
             $transactions = array_map(function ($item) use ($allowKeys) {
@@ -148,14 +144,9 @@ class BankReconciliation extends Controller
 
     public function manualReconciliationCashFlow()
     {
-        $user = new User();
-        $user->setEmail(session()->user->user_email);
-        $userData = $user->findUserByEmail();
-        $user->setId($userData->id);
-        
-        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
+        $response = initializeUserAndCompanyId();
         $cashFlow = new CashFlow();
-        $cashFlowDataByUser = $cashFlow->findCashFlowByUser([], $user, $companyId);
+        $cashFlowDataByUser = $cashFlow->findCashFlowByUser([], $response["user"], $response["company_id"]);
 
         if (!empty($cashFlowDataByUser)) {
             $cashFlowDataByUser = array_map(function($cashFlowData) {
@@ -167,8 +158,7 @@ class BankReconciliation extends Controller
         }
 
         $cashFlow = new CashFlow();
-        $companyId = !empty(session()->user->company_id) ? session()->user->company_id : 0;
-        $balanceValue = $cashFlow->calculateBalance($user, $companyId);
+        $balanceValue = $cashFlow->calculateBalance($response["user"], $response["company_id"]);
         $balance = !empty($balanceValue) ? 'R$ ' . number_format($balanceValue, 2, ',', '.') : 0;
 
         if (!empty($cashFlowDataByUser) && is_array($cashFlowDataByUser)) {

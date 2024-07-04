@@ -40,6 +40,7 @@ class CashFlowExplanatoryNotes
             "VARCHAR(36) UNIQUE NOT NULL",
             "BIGINT NOT NULL",
             "VARCHAR(255) NOT NULL",
+            "TINYINT(1) NOT NULL",
             "CONSTRAINT fk_cash_flow_explanatory_notes FOREIGN KEY (id_cash_flow) REFERENCES cash_flow(id) ON DELETE CASCADE ON UPDATE CASCADE"
         ]);
         $this->ddl->setForeignKeyChecks(0)->dropTableIfExists()->createTableQuery()->setForeignKeyChecks(1);

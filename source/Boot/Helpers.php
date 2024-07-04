@@ -1,4 +1,19 @@
 <?php
+function initializeUserAndCompanyId(): array {
+    $user = new \Source\Domain\Model\User();
+    $user->setEmail(session()->user->user_email);
+    $userData = $user->findUserByEmail();
+    
+    $user->setId($userData->id);
+    $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
+
+    return [
+        "user" => $user, 
+        "company_id" => $companyId,
+        "user_data" => $userData
+    ];
+}
+
 function verifyRequestHttpOrigin(?string $serverOrigin) {
     $allowedOrigin = [
         CONF_URL_BASE,
@@ -7,6 +22,7 @@ function verifyRequestHttpOrigin(?string $serverOrigin) {
 
     $origin = !empty($serverOrigin) ? $serverOrigin : '';
     if (!in_array($origin, $allowedOrigin)) {
+        header("Content-Type: application/json");
         http_response_code(403);
         echo json_encode([
             'error' => 'acesso negado',
@@ -79,25 +95,6 @@ function validateRequestData(array $requiredKeys, array &$requestData)
             throw new \Exception("chave da requisição {$key} não pode estar vazio");
         }
     }
-}
-
-function basicsValidatesForChartsRender(): \Source\Domain\Model\User
-{
-    if (empty(session()->user)) {
-        throw new \Exception("usuário inválido", 500);
-    }
-
-    $user = new \Source\Domain\Model\User();
-    $user->setEmail(session()->user->user_email);
-    $userData = $user->findUserByEmail();
-
-    if (empty($userData)) {
-        echo $user->message->json();
-        die;
-    }
-
-    $user->setId($userData->id);
-    return $user;
 }
 
 function showUserFullName(): string

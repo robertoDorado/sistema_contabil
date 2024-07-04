@@ -20,6 +20,9 @@ class CashFlowExplanatoryNotes extends Model
     /** @var string Nota */
     protected string $note = "note";
 
+    /** @var string Deleted */
+    protected string $deleted = "deleted";
+
     /**
      * CashFlowExplanatoryNotes constructor
      */
@@ -28,8 +31,19 @@ class CashFlowExplanatoryNotes extends Model
         parent::__construct(CONF_DB_NAME . ".cash_flow_explanatory_notes", ["id"], [
             $this->uuid,
             $this->idCashFlow,
-            $this->note
+            $this->note,
+            $this->deleted
         ]);
+    }
+
+    public function setDeleted(string $deleted)
+    {
+        $this->deleted = $deleted;
+    }
+
+    public function getDeleted()
+    {
+        return $this->deleted;
     }
 
     public function setUuid(string $uuid)

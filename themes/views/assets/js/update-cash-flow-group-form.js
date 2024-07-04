@@ -36,7 +36,10 @@ if (window.location.pathname == `/admin/cash-flow-group/update/form/${cashFlowGr
             }
 
             if (response.success) {
-                window.location.href = response.url
+                modal.style.display = "flex"
+                setTimeout(() => {
+                    window.location.href = response.url
+                }, 1000)
             }
         })
     })

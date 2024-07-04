@@ -61,18 +61,9 @@ class CashFlowGroup extends Controller
 
     public function cashFlowGroupBackupReport()
     {
-        $user = new User();
-        $user->setEmail(session()->user->user_email);
-        $userData = $user->findUserByEmail();
-
-        if (empty($userData)) {
-            throw new Exception($user->message->json(), 500);
-        }
-
-        $user->setId($userData->id);
-        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
+        $response = initializeUserAndCompanyId();
         $cashFlowGroup = new ModelCashFlowGroup();
-        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupDeletedTrue([], $user, $companyId);
+        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupDeletedTrue([], $response["user"], $response["company_id"]);
 
         echo $this->view->render("admin/cash-flow-group-backup-report", [
             "cashFlowGroupData" => $cashFlowGroupData,
@@ -130,15 +121,6 @@ class CashFlowGroup extends Controller
                 throw new \Exception("parametro vazio ou inválido para atualização do fluxo de caixa", 500);
             }
 
-            $user = new User();
-            $user->setEmail(session()->user->user_email);
-            $userData = $user->findUserByEmail();
-
-            if (empty($userData)) {
-                throw new Exception($user->message->json(), 500);
-            }
-
-            $user->setId($userData->id);
             $cashFlowGroup = new ModelCashFlowGroup();
             $cashFlowGroup->setUuid($uriParameter);
             $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid();
@@ -192,17 +174,8 @@ class CashFlowGroup extends Controller
     public function cashFlowGroupReport()
     {
         $cashFlowGroup = new ModelCashFlowGroup();
-        $user = new User();
-        $user->setEmail(session()->user->user_email);
-        $userData = $user->findUserByEmail();
-
-        if (empty($userData)) {
-            throw new Exception($user->message->json(), 500);
-        }
-
-        $user->setId($userData->id);
-        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
-        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUser([], $user, $companyId);
+        $response = initializeUserAndCompanyId();
+        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUser([], $response["user"], $response["company_id"]);
 
         echo $this->view->render("admin/cash-flow-group-report", [
             "userFullName" => showUserFullName(),
@@ -218,27 +191,19 @@ class CashFlowGroup extends Controller
             $requestPost = $this->getRequests()
             ->setRequiredFields(["csrfToken", "accountGroup"])->getAllPostData();
 
-            $user = new User();
-            $user->setEmail(session()->user->user_email);
-            $userData = $user->findUserByEmail();
-
-            if (empty($userData)) {
-                throw new Exception($user->message->json(), 500);
-            }
-
-            $user->setId($userData->id);
+            $response = initializeUserAndCompanyId();
             $cashFlowGroup = new ModelCashFlowGroup();
 
-            if (empty(session()->user->company_id)) {
+            if (empty($response["company_id"])) {
                 http_response_code(500);
-                echo json_encode(["error" => "selecione uma empresa antes de criar um grupo de contas"]);
+                echo json_encode(["error" => "selecione uma empresa antes de criar un grupo de contas"]);
                 die;
             }
             
             $response = $cashFlowGroup->persistData([
                 "uuid" => Uuid::uuid4(),
-                "id_user" => $user,
-                "id_company" => session()->user->company_id,
+                "id_user" => $response["user"],
+                "id_company" => $response["company_id"],
                 "group_name" => $requestPost["accountGroup"],
                 "created_at" => date("Y-m-d"),
                 "updated_at" => date("Y-m-d"),

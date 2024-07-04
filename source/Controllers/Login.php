@@ -25,6 +25,7 @@ class Login extends Controller
 
     public function logout(array $data)
     {
+        verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
         if (empty($data['request'])) {
             die;
         }

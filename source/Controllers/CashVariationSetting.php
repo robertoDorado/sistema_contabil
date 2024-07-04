@@ -93,12 +93,7 @@ class CashVariationSetting extends Controller
             die;
         }
 
-        $user = new User();
-        $user->setEmail(session()->user->user_email);
-        $userData = $user->findUserByEmail(["id", "deleted"]);
-        $user->setId($userData->id);
-        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
-
+        $response = initializeUserAndCompanyId();
         $accountGroupVariationSession = is_object(session()->account_group_variation) ?
             (array) session()->account_group_variation : session()->account_group_variation;
 
@@ -106,8 +101,8 @@ class CashVariationSetting extends Controller
             (new OperatingCashFlow())->findOperatingCashFlowJoinCashFlowGroup(
                 ["deleted AS variation_deleted"],
                 ["uuid", "group_name"],
-                $user,
-                $companyId
+                $response["user"],
+                $response["company_id"]
             ) : $accountGroupVariationSession;
         
         $responseData = array_filter($responseData, function ($item) {
@@ -270,13 +265,7 @@ class CashVariationSetting extends Controller
             redirect("/admin/cash-variation-setting/report");
         }
 
-        $user = new User();
-        $user->setEmail(session()->user->user_email);
-        $userData = $user->findUserByEmail(["id", "deleted"]);
-
-        $user->setId($userData->id);
-        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
-
+        $responseCompanyAndUser = initializeUserAndCompanyId();
         $allClass = [
             OperatingCashFlow::class,
             FinancingCashFlow::class,
@@ -323,7 +312,7 @@ class CashVariationSetting extends Controller
 
         $cashFlowGroup = new CashFlowGroup();
         $cashFlowGroup->setUuid($data["uuid"]);
-        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUser(["uuid", "group_name"], $user, $companyId);
+        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUser(["uuid", "group_name"], $responseCompanyAndUser["user"], $responseCompanyAndUser["company_id"]);
 
         echo $this->view->render("admin/cash-variation-form-update", [
             "userFullName" => showUserFullName(),
@@ -335,44 +324,39 @@ class CashVariationSetting extends Controller
 
     public function cashVariationReport()
     {
-        $user = new User();
-        $user->setEmail(session()->user->user_email);
-        $userData = $user->findUserByEmail(["id", "deleted"]);
-        $user->setId($userData->id);
-
-        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
+        $responseUserAndCompany = initializeUserAndCompanyId();
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
             verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
-            $requestPost = $this->getRequests()->setRequiredFields(["csrfToken", "accountGroupVariation"])->getAllPostData();
+            $requestPost = $this->getRequests()->setRequiredFields(["accountGroupVariation"])->getAllPostData();
 
             $verifyAccountGroupVariation = [
-                1 => function () use ($user, $companyId) {
+                1 => function () use ($responseUserAndCompany) {
                     $operatingCashFlow = new OperatingCashFlow();
                     return $operatingCashFlow->findOperatingCashFlowJoinCashFlowGroup(
                         ["deleted AS variation_deleted"],
                         ["uuid", "group_name"],
-                        $user,
-                        $companyId
+                        $responseUserAndCompany["user"],
+                        $responseUserAndCompany["company_id"]
                     );
                 },
 
-                2 => function () use ($user, $companyId) {
+                2 => function () use ($responseUserAndCompany) {
                     $investmentCashFlow = new InvestmentCashFlow();
                     return $investmentCashFlow->findInvestmentCashFlowJoinCashFlowGroup(
                         ["deleted AS variation_deleted"],
                         ["uuid", "group_name"],
-                        $user,
-                        $companyId
+                        $responseUserAndCompany["user"],
+                        $responseUserAndCompany["company_id"]
                     );
                 },
 
-                3 => function () use ($user, $companyId) {
+                3 => function () use ($responseUserAndCompany) {
                     $financingCashFlow = new FinancingCashFlow();
                     return $financingCashFlow->findFinancingCashFlowJoinCashFlowGroup(
                         ["deleted AS variation_deleted"],
                         ["uuid", "group_name"],
-                        $user,
-                        $companyId
+                        $responseUserAndCompany["user"],
+                        $responseUserAndCompany["company_id"]
                     );
                 }
             ];
@@ -395,8 +379,8 @@ class CashVariationSetting extends Controller
             (new OperatingCashFlow())->findOperatingCashFlowJoinCashFlowGroup(
                 ["deleted AS variation_deleted"],
                 ["uuid", "group_name"],
-                $user,
-                $companyId
+                $responseUserAndCompany["user"],
+                $responseUserAndCompany["company_id"]
             ) : $accountGroupVariationSession;
 
         $responseData = array_filter($responseData, function ($item) {
@@ -508,15 +492,9 @@ class CashVariationSetting extends Controller
             die;
         }
 
-        $user = new User();
-        $user->setEmail(session()->user->user_email);
-        $userData = $user->findUserByEmail(["id", "deleted"]);
-
-        $user->setId($userData->id);
-        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
-
+        $response = initializeUserAndCompanyId();
         $cashFlowGroup = new CashFlowGroup();
-        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUser(["deleted", "uuid", "group_name"], $user, $companyId);
+        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUser(["deleted", "uuid", "group_name"], $response["user"], $response["company_id"]);
 
         echo $this->view->render("admin/cash-variation-form", [
             "userFullName" => showUserFullName(),

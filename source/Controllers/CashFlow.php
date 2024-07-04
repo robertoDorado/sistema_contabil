@@ -64,18 +64,9 @@ class CashFlow extends Controller
 
     public function cashFlowBackupReport()
     {
-        $user = new User();
-        $user->setEmail(session()->user->user_email);
-        $userData = $user->findUserByEmail();
-
-        if (empty($userData)) {
-            throw new Exception($user->message->json(), 500);
-        }
-
-        $user->setId($userData->id);
-        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
+        $response = initializeUserAndCompanyId();
         $cashFlow = new ModelCashFlow();
-        $cashFlowDataByUser = $cashFlow->findCashFlowDeletedTrue([], $user, $companyId);
+        $cashFlowDataByUser = $cashFlow->findCashFlowDeletedTrue([], $response["user"], $response["company_id"]);
 
         if (!empty($cashFlowDataByUser)) {
             foreach ($cashFlowDataByUser as &$value) {
@@ -165,11 +156,7 @@ class CashFlow extends Controller
             }
         }
 
-        $user = new User();
-        $user->setEmail(session()->user->user_email);
-        $userData = $user->findUserByEmail();
-        $user->setId($userData->id);
-
+        $response = initializeUserAndCompanyId();
         $verifyEntryType = ["Crédito", "Débito"];
         $arrayUuid = [];
         $arrayEdit = [];
@@ -201,7 +188,7 @@ class CashFlow extends Controller
 
 
             $cashFlowGroup = new CashFlowGroup();
-            $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByName($excelData["g"][$key], $user);
+            $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByName($excelData["g"][$key], $response["user"]);
 
             if (empty($cashFlowGroupData)) {
                 $errorMessage = "grupo de contas inexistente";
@@ -225,7 +212,7 @@ class CashFlow extends Controller
             $response = $cashFlow->persistData([
                 "uuid" => $uuid,
                 "id_company" => session()->user->company_id,
-                "id_user" => $user,
+                "id_user" => $response["user"],
                 "id_cash_flow_group" => $cashFlowGroup,
                 "entry" => $launchValue,
                 "history" => $history,
@@ -324,19 +311,10 @@ class CashFlow extends Controller
             throw new \Exception($cashFlow->message->json(), 500);
         }
 
-        $user = new User();
-        $user->setEmail(session()->user->user_email);
-        $userData = $user->findUserByEmail();
-
-        if (empty($userData)) {
-            throw new \Exception($user->message->json(), 500);
-        }
-
-        $user->setId($userData->id);
+        $response = initializeUserAndCompanyId();
         $cashFlow = new ModelCashFlow();
 
-        $companyId = !empty(session()->user->company_id) ? session()->user->company_id : 0;
-        $balance = $cashFlow->calculateBalance($user, $companyId);
+        $balance = $cashFlow->calculateBalance($response["user"], $response["company_id"]);
         $color = ($balance < 0 ? "#ff0000" : ($balance > 0 ? "#008000" : ""));
         $balance = ($balance < 0 ? $balance * -1 : $balance);
 
@@ -374,17 +352,7 @@ class CashFlow extends Controller
                 throw new \Exception("parametro vazio ou inválido para atualização do fluxo de caixa");
             }
 
-            $user = new User();
-            $user->setEmail(session()->user->user_email);
-            $userData = $user->findUserByEmail();
-
-            if (empty($userData)) {
-                http_response_code(500);
-                echo $user->message->json();
-                die;
-            }
-
-            $user->setId($userData->id);
+            $response = initializeUserAndCompanyId();
             $cashFlow = new ModelCashFlow();
             $cashFlow->setUuid($uriParameter);
             $cashFlowData = $cashFlow->findCashFlowByUuid();
@@ -416,7 +384,7 @@ class CashFlow extends Controller
 
             $response = $cashFlow->updateCashFlowByUuid([
                 "uuid" => $uriParameter,
-                "id_user" => $user,
+                "id_user" => $response["user"],
                 "id_cash_flow_group" => $cashFlowGroup,
                 "entry" => $requestPost["launchValue"],
                 "history" => $requestPost["releaseHistory"],
@@ -457,18 +425,9 @@ class CashFlow extends Controller
             $cashFlowData->setEntry($cashFlowData->getEntry() * -1);
         }
 
-        $user = new User();
-        $user->setEmail(session()->user->user_email);
-        $userData = $user->findUserByEmail();
-
-        if (empty($userData)) {
-            throw new Exception($user->message->json(), 500);
-        }
-
-        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
-        $user->setId($userData->id);
+        $response = initializeUserAndCompanyId();
         $cashFlowGroup = new CashFlowGroup();
-        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUser([], $user, $companyId);
+        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUser([], $response["user"], $response["company_id"]);
 
         echo $this->view->render("admin/cash-flow-form-update", [
             "userFullName" => showUserFullName(),
@@ -480,25 +439,14 @@ class CashFlow extends Controller
 
     public function cashFlowReport()
     {
-        $user = new User();
-        $user->setEmail(session()->user->user_email);
-        $userData = $user->findUserByEmail();
-
-        if (empty($userData)) {
-            http_response_code(500);
-            echo $user->message->json();
-            die;
-        }
-
-        $user->setId($userData->id);
-        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
+        $response = initializeUserAndCompanyId();
         $cashFlow = new ModelCashFlow();
-        $cashFlowDataByUser = $cashFlow->findCashFlowByUser([], $user, $companyId);
+        $cashFlowDataByUser = $cashFlow->findCashFlowByUser([], $response["user"], $response["company_id"]);
 
         $dateRange = $this->getRequests()->get("daterange");
         if (!empty($dateRange)) {
             $cashFlow = new ModelCashFlow();
-            $cashFlowDataByUser = $cashFlow->findCashFlowDataByDate($dateRange, $user, [], $companyId);
+            $cashFlowDataByUser = $cashFlow->findCashFlowDataByDate($dateRange, $response["user"], [], $response["company_id"]);
         }
 
         if (!empty($cashFlowDataByUser)) {
@@ -511,11 +459,7 @@ class CashFlow extends Controller
         }
 
         $cashFlow = new ModelCashFlow();
-        $user = new User();
-
-        $user->setId($userData->id);
-        $companyId = !empty(session()->user->company_id) ? session()->user->company_id : 0;
-        $balanceValue = $cashFlow->calculateBalance($user, $companyId);
+        $balanceValue = $cashFlow->calculateBalance($response["user"], $response["company_id"]);
 
         $balance = !empty($balanceValue) ? 'R$ ' . number_format($balanceValue, 2, ',', '.') : 0;
         if (!empty($cashFlowDataByUser) && is_array($cashFlowDataByUser)) {
@@ -567,17 +511,7 @@ class CashFlow extends Controller
                 die;
             }
 
-            $user = new User();
-            $user->setEmail(session()->user->user_email);
-            $userData = $user->findUserByEmail();
-
-            if (empty($userData)) {
-                http_response_code(500);
-                echo $user->message->json();
-                die;
-            }
-
-            $user->setId($userData->id);
+            $response = initializeUserAndCompanyId();
             $cashFlowGroup = new CashFlowGroup();
             $cashFlowGroup->setUuid($requestPost["accountGroup"]);
             $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid();
@@ -589,19 +523,12 @@ class CashFlow extends Controller
             }
 
             $cashFlowGroup->setId($cashFlowGroupData->id);
-            $user->setId($userData->id);
-
-            if (empty(session()->user->company_id)) {
-                http_response_code(500);
-                echo json_encode(["error" => "selecione uma empresa antes de criar uma conta"]);
-                die;
-            }
-
             $cashFlow = new ModelCashFlow();
+            
             $response = $cashFlow->persistData([
                 "uuid" => Uuid::uuid4(),
-                "id_user" => $user,
-                "id_company" => session()->user->company_id,
+                "id_user" => $response["user"],
+                "id_company" => $response["company_id"],
                 "id_cash_flow_group" => $cashFlowGroup,
                 "entry" => $requestPost["launchValue"],
                 "history" => $requestPost["releaseHistory"],
@@ -621,14 +548,9 @@ class CashFlow extends Controller
             die;
         }
 
-        $user = new User();
-        $user->setEmail(session()->user->user_email);
-        $userData = $user->findUserByEmail();
-        $user->setId($userData->id);
-
-        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
+        $response = initializeUserAndCompanyId();
         $cashFlowGroup = new CashFlowGroup();
-        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUser([], $user, $companyId);
+        $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUser([], $response["user"], $response["company_id"]);
 
         echo $this->view->render("admin/cash-flow-form", [
             "userFullName" => showUserFullName(),

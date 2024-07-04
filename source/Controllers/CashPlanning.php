@@ -28,12 +28,7 @@ class CashPlanning extends Controller
 
     public function cashVariationAnalysis()
     {
-        $user = new User();
-        $user->setEmail(session()->user->user_email);
-        $userData = $user->findUserByEmail(["id", "deleted"]);
-        $user->setId($userData->id);
-        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
-
+        $response = initializeUserAndCompanyId();
         $dateRange = $this->getRequests()->has("daterange") ? explode("-", $this->getRequests()->get("daterange")) : [];
         if (!empty($dateRange)) {
             $dateRange["date_ini"] = preg_replace("/(\d{2})\/(\d{2})\/(\d{4})/", "$3-$2-$1", $dateRange[0]);
@@ -59,8 +54,8 @@ class CashPlanning extends Controller
             ["group_name"],
             ["history", "entry"],
             $dateRangeParam,
-            $user,
-            $companyId
+            $response["user"],
+            $response["company_id"]
         ];
 
         $operatingCashFlow = new OperatingCashFlow();
@@ -188,16 +183,11 @@ class CashPlanning extends Controller
 
     public function cashBudget()
     {
-        $user = new User();
-        $user->setEmail(session()->user->user_email);
-        $userData = $user->findUserByEmail(["id", "deleted"]);
-        $user->setId($userData->id);
-
-        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
+        $response = initializeUserAndCompanyId();
         $cashFlowColumns = ["created_at", "entry"];
 
         $cashFlow = new CashFlow();
-        $cashFlowData = $cashFlow->findCashFlowByUser($cashFlowColumns, $user, $companyId);
+        $cashFlowData = $cashFlow->findCashFlowByUser($cashFlowColumns, $response["user"], $response["company_id"]);
 
         $dateRange = $this->getRequests()->get("daterange");
         $dateTimeFormat = $this->getRequests()->has("daterange") ? explode("-", $dateRange)[0] : "";

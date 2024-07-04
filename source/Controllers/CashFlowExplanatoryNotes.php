@@ -26,9 +26,20 @@ class CashFlowExplanatoryNotes extends Controller
 
     public function cashFlowExplanatoryNotesReport()
     {
+        $response = initializeUserAndCompanyId();
+        $cashFlowExplanatoryNotes = new ModelCashFlowExplanatoryNotes();
+        $cashFlowExplanatoryNotesData = $cashFlowExplanatoryNotes->findCashFlowExplanatoryNotesJoinCashFlow(
+            ["note", "uuid"],
+            ["entry", "history"],
+            $response["user"],
+            $response["company_id"],
+            false
+        );
+
         echo $this->view->render("admin/cash-flow-explanatory-notes-report", [
             "userFullName" => showUserFullName(),
-            "endpoints" => ["/admin/cash-flow-explanatory-notes/report"]
+            "endpoints" => ["/admin/cash-flow-explanatory-notes/report"],
+            "cashFlowExplanatoryNotesData" => $cashFlowExplanatoryNotesData
         ]);
     }
 
@@ -39,12 +50,12 @@ class CashFlowExplanatoryNotes extends Controller
             $requestPost = $this->getRequests()->setRequiredFields(
                 [
                     "csrfToken",
-                    "explanatoryNoteText", 
+                    "explanatoryNoteText",
                     "cashFlowSelectMultiple"
                 ]
             )->getAllPostData();
 
-            $requestPost["cashFlowSelectMultiple"] = array_map(function($uuid) {
+            $requestPost["cashFlowSelectMultiple"] = array_map(function ($uuid) {
                 $cashFlow = new CashFlow();
                 $cashFlow->setUuid($uuid);
                 $cashFlowData = $cashFlow->findCashFlowByUuid();
@@ -74,10 +85,10 @@ class CashFlowExplanatoryNotes extends Controller
         $user = new User();
         $user->setEmail(session()->user->user_email);
         $userData = $user->findUserByEmail(["id", "deleted"]);
-        
+
         $user->setId($userData->id);
         $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
-        
+
         $cashFlow = new CashFlow();
         $cashFlowData = $cashFlow->findCashFlowByUser(["history", "uuid"], $user, $companyId);
 

@@ -25,19 +25,14 @@ class AnalyzesAndIndicators extends Controller
 
     public function cashFlowProjections()
     {
-        $user = new User();
-        $user->setEmail(session()->user->user_email);
-        $userData = $user->findUserByEmail(["id", "deleted"]);
-        $user->setId($userData->id);
-
-        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
+        $response = initializeUserAndCompanyId();
         $cashFlow = new CashFlow();
-        $cashFlowData = $cashFlow->findCashFlowByUser(["entry", "deleted", "created_at"], $user, $companyId);
+        $cashFlowData = $cashFlow->findCashFlowByUser(["entry", "deleted", "created_at"], $response["user"], $response["company_id"]);
         $dateRange = $this->getRequests()->get("daterange");
 
         if ($this->getRequests()->has("daterange")) {
             $cashFlow = new CashFlow();
-            $cashFlowData = $cashFlow->findCashFlowDataByDate($dateRange, $user, ["entry", "deleted", "created_at"], $companyId);
+            $cashFlowData = $cashFlow->findCashFlowDataByDate($dateRange, $response["user"], ["entry", "deleted", "created_at"], $response["company_id"]);
         }
 
         $grouppedCashFlowData = [];
@@ -134,14 +129,9 @@ class AnalyzesAndIndicators extends Controller
 
     public function financialIndicators()
     {
-        $user = new User();
-        $user->setEmail(session()->user->user_email);
-        $userData = $user->findUserByEmail(["id", "deleted"]);
-        $user->setId($userData->id);
-
-        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
+        $response = initializeUserAndCompanyId();
         $cashFlow = new CashFlow();
-        $cashFlowData = $cashFlow->findCashFlowByUser(["entry", "deleted"], $user, $companyId);
+        $cashFlowData = $cashFlow->findCashFlowByUser(["entry", "deleted"], $response["user"], $response["company_id"]);
 
         $financialIndicators = [
             "recebimentos de clientes" => 0,
@@ -210,17 +200,16 @@ class AnalyzesAndIndicators extends Controller
 
     public function findChasFlowDataForBarChartExpensesByAccountGroup()
     {
-        $user = basicsValidatesForChartsRender();
-        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
+        $response = initializeUserAndCompanyId();
         $cashFlow = new CashFlow();
 
         $columns = ["entry", "deleted", "id_cash_flow_group"];
-        $cashFlowData = $cashFlow->findCashFlowByUser($columns, $user, $companyId);
+        $cashFlowData = $cashFlow->findCashFlowByUser($columns, $response["user"], $response["company_id"]);
         $dateRange = $this->getRequests()->get("daterange");
 
         if (!empty($this->getRequests()->get("daterange"))) {
             $cashFlow = new CashFlow();
-            $cashFlowData = $cashFlow->findCashFlowDataByDate($dateRange, $user, $columns, $companyId);
+            $cashFlowData = $cashFlow->findCashFlowDataByDate($dateRange, $response["user"], $columns, $response["company_id"]);
         }
 
         if (empty($cashFlowData)) {
@@ -255,17 +244,16 @@ class AnalyzesAndIndicators extends Controller
 
     public function findChasFlowDataForBarChartMonthlyCashFlowComparasion()
     {
-        $user = basicsValidatesForChartsRender();
-        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
+        $response = initializeUserAndCompanyId();
         $cashFlow = new CashFlow();
 
         $columns = ["created_at", "entry", "deleted"];
-        $cashFlowData = $cashFlow->findCashFlowByUser($columns, $user, $companyId);
+        $cashFlowData = $cashFlow->findCashFlowByUser($columns, $response["user"], $response["company_id"]);
         $dateRange = $this->getRequests()->get("daterange");
 
         if (!empty($this->getRequests()->has("daterange"))) {
             $cashFlow = new CashFlow();
-            $cashFlowData = $cashFlow->findCashFlowDataByDate($dateRange, $user, $columns, $companyId);
+            $cashFlowData = $cashFlow->findCashFlowDataByDate($dateRange, $response["user"], $columns, $response["company_id"]);
         }
 
         if (empty($cashFlowData)) {
@@ -313,11 +301,10 @@ class AnalyzesAndIndicators extends Controller
 
     public function findCashFlowDataForChartPieAccountGroupingCount()
     {
-        $user = basicsValidatesForChartsRender();
-        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
+        $response = initializeUserAndCompanyId();
         $dateRange = !empty($this->getRequests()->get("daterange")) ? $this->getRequests()->get("daterange") : "";
         $cashFlow = new CashFlow();
-        $cashFlowData = $cashFlow->findGroupAccountsAgrupped($user, $companyId, $dateRange);
+        $cashFlowData = $cashFlow->findGroupAccountsAgrupped($response["user"], $response["company_id"], $dateRange);
 
         if (empty($cashFlowData)) {
             echo json_encode([]);
@@ -342,15 +329,14 @@ class AnalyzesAndIndicators extends Controller
 
     public function findCashFlowDataForChartLinePooledChasFlow()
     {
-        $user = basicsValidatesForChartsRender();
+        $response = initializeUserAndCompanyId();
         $cashFlow = new CashFlow();
-        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
-        $cashFlowData = $cashFlow->findCashFlowByUser(["entry", "created_at"], $user, $companyId);
+        $cashFlowData = $cashFlow->findCashFlowByUser(["entry", "created_at"], $response["user"], $response["company_id"]);
 
         $dateRange = $this->getRequests()->get("daterange");
         if (!empty($dateRange)) {
             $cashFlow = new CashFlow();
-            $cashFlowData = $cashFlow->findCashFlowDataByDate($dateRange, $user, ["entry", "created_at"], $companyId);
+            $cashFlowData = $cashFlow->findCashFlowDataByDate($dateRange, $response["user"], ["entry", "created_at"], $response["company_id"]);
         }
 
         if (empty($cashFlowData)) {
