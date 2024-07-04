@@ -11,8 +11,9 @@ if (window.location.pathname == "/admin/cash-flow-explanatory-notes/form") {
         event.preventDefault();
         let message = ""
         const btnSubmit = this.querySelector("[type='submit']")
+        const explanatoryNoteText = this.explanatoryNoteText
 
-        if (!this.explanatoryNoteText.value) {
+        if (!explanatoryNoteText.value) {
             message = "O campo nota não pode estar vazio"
             toastr.warning(message);
             throw new Error(message)
@@ -37,6 +38,7 @@ if (window.location.pathname == "/admin/cash-flow-explanatory-notes/form") {
             btnSubmit.removeAttribute("disabled")
             btnSubmit.innerHTML = "Enviar"
             cashFlowSelectMultiple.val(null).trigger("change")
+            explanatoryNoteText.value = ''
             
             if (response.error) {
                 message = response.error

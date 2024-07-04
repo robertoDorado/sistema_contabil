@@ -45,8 +45,8 @@
                                                 <tr>
                                                     <td><?= $value->getUuid() ?></td>
                                                     <td><?= $value->company_name ?></td>
-                                                    <td data-csrf="<?= session()->csrf_token ?>"><a class="icons" href="#"><i class="fas fa-database"></i></a></td>
-                                                    <td data-csrf="<?= session()->csrf_token ?>"><a class="icons" href="#"><i class="fas fa-trash" style="color:#ff0000"></i></a></td>
+                                                    <td data-csrf="<?= session()->csrf_token ?>"><a data-uuid="<?= $value->getUuid() ?>" class="icons" href="#"><i class="fas fa-database"></i></a></td>
+                                                    <td data-csrf="<?= session()->csrf_token ?>"><a data-uuid="<?= $value->getUuid() ?>" class="icons" href="#"><i class="fas fa-trash" style="color:#ff0000"></i></a></td>
                                                 </tr>
                                             <?php endforeach ?>
                                         <?php endif ?>

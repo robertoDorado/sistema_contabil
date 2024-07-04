@@ -45,8 +45,8 @@
                                                 <tr>
                                                     <td><?= $value->getUuid() ?></td>
                                                     <td><?= $value->group_name ?></td>
-                                                    <td><a class="icons" href="#"><i class="fas fa-database"></i></a></td>
-                                                    <td><a class="icons" href="#"><i class="fas fa-trash" style="color:#ff0000"></i></a></td>
+                                                    <td><a data-uuid="<?= $value->getUuid() ?>" class="icons" href="#"><i class="fas fa-database"></i></a></td>
+                                                    <td><a data-uuid="<?= $value->getUuid() ?>" class="icons" href="#"><i class="fas fa-trash" style="color:#ff0000"></i></a></td>
                                                 </tr>
                                             <?php endforeach ?>
                                         <?php endif ?>

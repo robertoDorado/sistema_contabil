@@ -36,6 +36,13 @@ class CashFlowExplanatoryNotes extends Controller
             false
         );
 
+        if (!empty($cashFlowExplanatoryNotesData)) {
+            $cashFlowExplanatoryNotesData = array_map(function($item) {
+                $item->entry_type = $item->entry > 0 ? "Crédito" : "Débito";
+                return $item;
+            }, $cashFlowExplanatoryNotesData);
+        }
+
         echo $this->view->render("admin/cash-flow-explanatory-notes-report", [
             "userFullName" => showUserFullName(),
             "endpoints" => ["/admin/cash-flow-explanatory-notes/report"],
@@ -67,7 +74,8 @@ class CashFlowExplanatoryNotes extends Controller
                 $response = $cashFlowExplanatoryNotes->persistData([
                     "uuid" => Uuid::uuid4(),
                     "id_cash_flow" => $cashFlowId,
-                    "note" => $requestPost["explanatoryNoteText"]
+                    "note" => $requestPost["explanatoryNoteText"],
+                    "deleted" => 0
                 ]);
 
                 if (empty($response)) {
@@ -82,15 +90,9 @@ class CashFlowExplanatoryNotes extends Controller
             die;
         }
 
-        $user = new User();
-        $user->setEmail(session()->user->user_email);
-        $userData = $user->findUserByEmail(["id", "deleted"]);
-
-        $user->setId($userData->id);
-        $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
-
+        $response = initializeUserAndCompanyId();
         $cashFlow = new CashFlow();
-        $cashFlowData = $cashFlow->findCashFlowByUser(["history", "uuid"], $user, $companyId);
+        $cashFlowData = $cashFlow->findCashFlowByUser(["history", "uuid"], $response["user"], $response["company_id"]);
 
         echo $this->view->render("admin/cash-flow-explanatory-notes-form", [
             "userFullName" => showUserFullName(),

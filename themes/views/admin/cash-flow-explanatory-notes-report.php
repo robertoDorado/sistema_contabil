@@ -33,20 +33,24 @@
                                 <table id="cashFlowExplanatoryNotesReport" class="table table-bordered table-striped">
                                     <thead>
                                         <tr>
-                                            <th>Id</th>
                                             <th>Histórico</th>
+                                            <th>Tipo de entrada</th>
                                             <th>Valor</th>
                                             <th>Nota explicativa</th>
+                                            <th>Editar</th>
+                                            <th>Excluir</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <?php if (!empty($cashFlowExplanatoryNotesData)) : ?>
-                                            <?php foreach($cashFlowExplanatoryNotesData as $value): ?>
+                                            <?php foreach ($cashFlowExplanatoryNotesData as $value) : ?>
                                                 <tr>
-                                                    <td><?= $value->getUuid() ?></td>
                                                     <td><?= $value->history ?></td>
+                                                    <td><?= $value->entry_type ?></td>
                                                     <td><?= "R$ " . number_format($value->entry, 2, ",", ".") ?></td>
-                                                    <td><?= $value->note ?></td>
+                                                    <td><?= $value->getNote() ?></td>
+                                                    <td><a class="icons" href="#"><i class="fas fa-edit" aria-hidden="true"></i></a></td>
+                                                    <td><a class="icons" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a></td>
                                                 </tr>
                                             <?php endforeach ?>
                                         <?php endif ?>

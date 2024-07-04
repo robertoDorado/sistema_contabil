@@ -148,6 +148,12 @@ const initComplete = buttonsData.length > 0 ? function () {
 } : null
 const cashFlowTable = dataTableConfig($("#cashFlowReport"),
     {
+        "columnDefs": [
+            {
+                "targets": [0],
+                "visible": false
+            }
+        ],
         "order": [[0, "desc"]],
         "language": {
             "url": urlJson
@@ -159,6 +165,12 @@ const cashFlowTable = dataTableConfig($("#cashFlowReport"),
     })
 const companyReport = dataTableConfig($("#companyReport"),
     {
+        "columnDefs": [
+            {
+                "targets": [0],
+                "visible": false
+            }
+        ],
         "order": [[0, "desc"]],
         "language": {
             "url": urlJson
@@ -280,22 +292,46 @@ const automaticReconciliationReportCashFlow = dataTableConfig($("#automaticRecon
     })
 const cashFlowGroupTable = dataTableConfig($("#cashFlowGroupReport"),
     {
+        "columnDefs": [
+            {
+                "targets": [0],
+                "visible": false
+            }
+        ],
         "language": {
             "url": urlJson
         }
     })
 const cashFlowGroupDeletedReport = dataTableConfig($("#cashFlowGroupDeletedReport"),
     {
+        "columnDefs": [
+            {
+                "targets": [0],
+                "visible": false
+            }
+        ],
         "language": {
             "url": urlJson
         }
     })
 const cashFlowDeletedReport = dataTableConfig($("#cashFlowDeletedReport"), {
+    "columnDefs": [
+        {
+            "targets": [0],
+            "visible": false
+        }
+    ],
     "language": {
         "url": urlJson
     }
 })
 const companyDeletedReport = dataTableConfig($("#companyDeletedReport"), {
+    "columnDefs": [
+        {
+            "targets": [0],
+            "visible": false
+        }
+    ],
     "language": {
         "url": urlJson
     }
@@ -552,6 +588,12 @@ const cashFlowBudget = dataTableConfig($("#cashFlowBudget"),
     })
 const cashFlowVariation = dataTableConfig($("#cashFlowVariation"),
     {
+        "columnDefs": [
+            {
+                "targets": [0],
+                "visible": false
+            }
+        ],
         "searching": false,
         "language": {
             "url": urlJson
@@ -561,7 +603,7 @@ const cashFlowVariation = dataTableConfig($("#cashFlowVariation"),
         "buttons": [
             {
                 "extend": 'copyHtml5',
-                "title": 'Variação de caixa'
+                "title": 'Notas explicativas'
             },
             {
                 "extend": 'excelHtml5',
@@ -613,6 +655,12 @@ const cashFlowVariation = dataTableConfig($("#cashFlowVariation"),
     })
 const cashFlowVariationBackup = dataTableConfig($("#cashFlowVariationBackup"),
     {
+        "columnDefs": [
+            {
+                "targets": [0],
+                "visible": false
+            }
+        ],
         "searching": false,
         "language": {
             "url": urlJson
@@ -703,6 +751,66 @@ const cashVariationAnalysis = dataTableConfig($("#cashVariationAnalysis"),
                 "extend": 'pdfHtml5',
                 "filename": "Variação de caixa",
                 "title": 'Variação de caixa',
+                customize: function (doc) {
+                    doc.content[1].table.body.forEach(function (row) {
+                        row.splice(2, 3);
+                    });
+
+                    doc.content[1].table.widths = [
+                        '50%', '50%'
+                    ];
+
+                    var objLayout = {};
+                    objLayout['hLineWidth'] = function (i) { return 0.5; };
+                    objLayout['vLineWidth'] = function (i) { return 0.5; };
+                    objLayout['hLineColor'] = function (i) { return '#aaa'; };
+                    objLayout['vLineColor'] = function (i) { return '#aaa'; };
+                    objLayout['paddingLeft'] = function (i) { return 4; };
+                    objLayout['paddingRight'] = function (i) { return 4; };
+                    objLayout['paddingTop'] = function (i) { return 4; };
+                    objLayout['paddingBottom'] = function (i) { return 4; };
+                    objLayout['fillColor'] = function (i) { return null; };
+                    doc.content[1].layout = objLayout;
+                }
+            },
+            "colvis"
+        ],
+        "initComplete": function () {
+            this.api()
+                .buttons()
+                .container()
+                .appendTo("#widgets .col-md-6:eq(0)");
+        }
+    })
+const cashFlowExplanatoryNotesReport = dataTableConfig($("#cashFlowExplanatoryNotesReport"),
+    {
+        "language": {
+            "url": urlJson
+        },
+        "responsive": true,
+        "autoWidth": false,
+        "buttons": [
+            {
+                "extend": 'copyHtml5',
+                "title": 'Notas explicativas'
+            },
+            {
+                "extend": 'excelHtml5',
+                "filename": "Notas explicativas",
+                "title": "Notas explicativas",
+                customizeData: function (xlsxData) {
+                    xlsxData.header = xlsxData.header.filter((data) => data != 'Editar' && data != 'Excluir')
+                }
+            },
+            {
+                "extend": 'csvHtml5',
+                "filename": "Notas explicativas",
+                "title": "Notas explicativas"
+            },
+            {
+                "extend": 'pdfHtml5',
+                "filename": "Notas explicativas",
+                "title": 'Notas explicativas',
                 customize: function (doc) {
                     doc.content[1].table.body.forEach(function (row) {
                         row.splice(2, 3);

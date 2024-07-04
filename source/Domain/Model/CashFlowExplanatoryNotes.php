@@ -61,7 +61,7 @@ class CashFlowExplanatoryNotes
             ->join(
                 CONF_DB_NAME . ".cash_flow",
                 "id",
-                "id_user=:id_user&id_company=:id_company&deleted=:deleted",
+                "id_user=:id_user AND id_company=:id_company AND deleted=:deleted",
                 ":id_user=" . $user->getId() . "&:id_company=" . $companyId . "&:deleted=" . $deleted . "",
                 $columnsCash,
                 "id_cash_flow",

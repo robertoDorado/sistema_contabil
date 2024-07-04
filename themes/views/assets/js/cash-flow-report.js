@@ -14,7 +14,7 @@ if (allowEndponts.indexOf(window.location.pathname) != -1) {
         balance < 0 ? tFoot.style.color = "#ff0000" : balance == 0 ?
             tFoot.removeAttribute("style") : tFoot.style.color = "#008000"
 
-        tFoot.children[5].innerHTML = balance
+        tFoot.children[4].innerHTML = balance
             .toLocaleString("pt-br", { "currency": "BRL", "style": "currency" })
     })
 }

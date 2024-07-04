@@ -28,7 +28,7 @@ if (window.location.pathname == '/admin/cash-flow/report') {
                 dataDelete.uuidParameter = uuidParameter
                 dataDelete.url = url
                 dataDelete.row = row
-                dataDelete.accountReference = Array.from(row.children)[3].innerHTML
+                dataDelete.accountReference = Array.from(row.children)[2].innerHTML
                 launchModal.click()
             })
         })

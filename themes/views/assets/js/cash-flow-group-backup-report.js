@@ -17,25 +17,25 @@ if (window.location.pathname == "/admin/cash-flow-group/backup/report") {
 
         btnRestoreData.addEventListener("click", function(event) {
             event.preventDefault()
-            const uuid = this.closest("tr").firstElementChild.innerHTML
+            const uuid = this.dataset.uuid
             const row = this.closest("tr")
             data.row = row
             data.uuid = uuid
             data.restore = true
             data.destroy = false
-            data.nameReference = Array.from(this.closest("tr").children)[1].innerHTML
+            data.nameReference = Array.from(this.closest("tr").children)[0].innerHTML
             launchModal.click()
         })
 
         btnDestroyData.addEventListener("click", function(event) {
             event.preventDefault()
-            const uuid = this.closest("tr").firstElementChild.innerHTML
+            const uuid = this.dataset.uuid
             const row = this.parentElement.parentElement
             data.row = row
             data.uuid = uuid
             data.destroy = true
             data.restore = false
-            data.nameReference = Array.from(this.closest("tr").children)[1].innerHTML
+            data.nameReference = Array.from(this.closest("tr").children)[0].innerHTML
             launchModal.click()
         })
     })

@@ -29,7 +29,7 @@ if (window.location.pathname == '/admin/cash-flow-group/report') {
                 dataDelete.uuidParameter = uuidParameter
                 dataDelete.url = url
                 dataDelete.row = row
-                dataDelete.nameReference = Array.from(this.closest("tr").children)[1].innerHTML
+                dataDelete.nameReference = Array.from(this.closest("tr").children)[0].innerHTML
                 launchModal.click()
             })
         })
