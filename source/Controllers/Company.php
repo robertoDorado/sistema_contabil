@@ -26,6 +26,7 @@ class Company extends Controller
 
     public function companyModifyData()
     {
+        verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
         $requestPost = $this->getRequests()
         ->setRequiredFields(["csrfToken", "uuid", "destroy", "restore"])->getAllPostData();
 
@@ -82,6 +83,7 @@ class Company extends Controller
 
     public function companyDeleteRegister()
     {
+        verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
         $requestPost = $this->getRequests()->setRequiredFields(["uuid", "csrfToken"])->getAllPostData();
         if (empty($requestPost["uuid"])) {
             throw new Exception("uuid inválido");
@@ -125,6 +127,7 @@ class Company extends Controller
     public function companyFormUpdate(array $data)
     {
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $requestPost = $this->getRequests()->setRequiredFields(
                 [
                     "uuid",
@@ -239,6 +242,7 @@ class Company extends Controller
 
     public function companySession()
     {
+        verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
         $requestPost = $this->getRequests()->setRequiredFields(["companyId"])->getAllPostData();
         
         $company = new ModelCompany();
@@ -263,6 +267,7 @@ class Company extends Controller
     public function companyRegister()
     {
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $requestPost = $this->getRequests()->setRequiredFields(
                 [
                     "csrfToken",

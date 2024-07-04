@@ -25,6 +25,7 @@ class BankReconciliation extends Controller
 
     public function importOfxFile()
     {
+        verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
         if (empty(session()->user->company_id)) {
             echo json_encode(["error" => "selecione uma empresa antes de importar o arquivo"]);
             die;

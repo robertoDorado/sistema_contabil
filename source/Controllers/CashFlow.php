@@ -29,6 +29,7 @@ class CashFlow extends Controller
 
     public function cashFlowModifyData(array $data)
     {
+        verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
         if (empty($data["uuid"])) {
             throw new Exception("parametro uuid não pode estar vazio", 500);
         }
@@ -93,6 +94,7 @@ class CashFlow extends Controller
 
     public function importExcelFile()
     {
+        verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
         $file = $this->getRequestFiles()->getFile("excelFile");
         $verifyExtensions = ["xls", "xlsx"];
 
@@ -297,6 +299,7 @@ class CashFlow extends Controller
 
     public function cashFlowRemoveRegister(array $data)
     {
+        verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
         if (empty($data["uuid"])) {
             redirect("/admin/login");
         }
@@ -350,6 +353,7 @@ class CashFlow extends Controller
     public function cashFlowUpdateForm(array $data)
     {
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $requestPost = $this->getRequests()
                 ->setRequiredFields(
                     [

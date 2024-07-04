@@ -1,4 +1,21 @@
 <?php
+function verifyRequestHttpOrigin(?string $serverOrigin) {
+    $allowedOrigin = [
+        CONF_URL_BASE,
+        CONF_URL_TEST
+    ];
+
+    $origin = !empty($serverOrigin) ? $serverOrigin : '';
+    if (!in_array($origin, $allowedOrigin)) {
+        http_response_code(403);
+        echo json_encode([
+            'error' => 'acesso negado',
+            'code' => 403
+        ]);
+        die;
+    }
+}
+
 function monthsInPortuguese(): array {
     return [
         1 => 'Janeiro',

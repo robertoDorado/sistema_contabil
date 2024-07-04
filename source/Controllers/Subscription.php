@@ -28,6 +28,7 @@ class Subscription extends Controller
 
     public function cancelSubscription()
     {
+        verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
         if (empty(session()->user)) {
             throw new Exception("usuário não está logado");
         }
@@ -75,6 +76,7 @@ class Subscription extends Controller
 
     public function processSubscription()
     {
+        verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
         $requestPost = $this->getRequests()
         ->setRequiredFields([
             "fullName",

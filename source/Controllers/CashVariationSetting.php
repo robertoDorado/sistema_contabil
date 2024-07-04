@@ -33,6 +33,7 @@ class CashVariationSetting extends Controller
     public function cashVariationBackupReport()
     {
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $requestPost = $this->getRequests()->setRequiredFields(
                 [
                     "csrfToken",
@@ -124,6 +125,7 @@ class CashVariationSetting extends Controller
 
     public function cashVariationRemoveData()
     {
+        verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
         $requestPost = $this->getRequests()->setRequiredFields(["csrfToken", "uuid"])->getAllPostData();
         $cashFlowGroup = new CashFlowGroup();
         $cashFlowGroup->setUuid($requestPost["uuid"]);
@@ -165,6 +167,7 @@ class CashVariationSetting extends Controller
     public function cashVariationFormUpdate(array $data)
     {
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $requestPost = $this->getRequests()->setRequiredFields(
                 [
                     "csrfToken",
@@ -339,6 +342,7 @@ class CashVariationSetting extends Controller
 
         $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $requestPost = $this->getRequests()->setRequiredFields(["csrfToken", "accountGroupVariation"])->getAllPostData();
 
             $verifyAccountGroupVariation = [
@@ -411,6 +415,7 @@ class CashVariationSetting extends Controller
     public function cashVariationForm()
     {
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $requestPost = $this->getRequests()->setRequiredFields(
                 [
                     "csrfToken",

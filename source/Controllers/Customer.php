@@ -37,6 +37,7 @@ class Customer extends Controller
     public function updateDataCustomerForm()
     {
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $requestPost = $this->getRequests()->setRequiredFields([
                 "fullName",
                 "document",

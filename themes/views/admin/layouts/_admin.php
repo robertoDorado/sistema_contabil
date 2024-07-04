@@ -323,7 +323,12 @@
                                     </li>
                                     <li class="nav-item">
                                         <a href="#" class="nav-link">
-                                            <p>Visualizar notas</p>
+                                            <p>Relatório de notas</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="#" class="nav-link">
+                                            <p>Backup de notas</p>
                                         </a>
                                     </li>
                                 </ul>

@@ -1,6 +1,7 @@
 if (window.location.pathname == "/admin/cash-flow-explanatory-notes/form") {
+    const cashFlowSelectMultiple = $('#cashFlowSelectMultiple')
     $(document).ready(function () {
-        $('#cashFlowSelectMultiple').select2({
+        cashFlowSelectMultiple.select2({
             placeholder: "Selecione as contas do caixa",
             allowClear: true
         });
@@ -17,8 +18,8 @@ if (window.location.pathname == "/admin/cash-flow-explanatory-notes/form") {
             throw new Error(message)
         }
 
-        if (Array.isArray($("#cashFlowSelectMultiple").val())) {
-            if ($("#cashFlowSelectMultiple").val().length == 0) {
+        if (Array.isArray(cashFlowSelectMultiple.val())) {
+            if (cashFlowSelectMultiple.val().length == 0) {
                 message = "O campo contas não pode estar vazio"
                 toastr.warning(message);
                 throw new Error(message)
@@ -35,7 +36,20 @@ if (window.location.pathname == "/admin/cash-flow-explanatory-notes/form") {
         }).then(response => response.json()).then(function (response) {
             btnSubmit.removeAttribute("disabled")
             btnSubmit.innerHTML = "Enviar"
-            console.log(response)
+            cashFlowSelectMultiple.val(null).trigger("change")
+            
+            if (response.error) {
+                message = response.error
+                message = message.charAt(0).toUpperCase() + message.slice(1)
+                toastr.error(message);
+                throw new Error(message)
+            }
+
+            if (response.success) {
+                message = response.success
+                message = message.charAt(0).toUpperCase() + message.slice(1)
+                toastr.success(message)
+            }
         })
     })
 }

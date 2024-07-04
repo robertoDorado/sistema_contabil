@@ -164,6 +164,7 @@ $route->get("/cash-planning/cash-flow/cash-variation-analysis", "CashPlanning::c
  */
 $route->get("/cash-flow-explanatory-notes/form", "CashFlowExplanatoryNotes::cashFlowExplanatoryNotesForm");
 $route->post("/cash-flow-explanatory-notes/form", "CashFlowExplanatoryNotes::cashFlowExplanatoryNotesForm");
+$route->get("/cash-flow-explanatory-notes/report", "CashFlowExplanatoryNotes::cashFlowExplanatoryNotesReport");
 
 /** 
  * Assinatura do cliente

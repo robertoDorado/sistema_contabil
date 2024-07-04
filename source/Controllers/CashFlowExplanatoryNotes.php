@@ -2,6 +2,7 @@
 
 namespace Source\Controllers;
 
+use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Controller;
 use Source\Domain\Model\CashFlow;
 use Source\Domain\Model\CashFlowExplanatoryNotes as ModelCashFlowExplanatoryNotes;
@@ -23,9 +24,18 @@ class CashFlowExplanatoryNotes extends Controller
         parent::__construct();
     }
 
+    public function cashFlowExplanatoryNotesReport()
+    {
+        echo $this->view->render("admin/cash-flow-explanatory-notes-report", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => ["/admin/cash-flow-explanatory-notes/report"]
+        ]);
+    }
+
     public function cashFlowExplanatoryNotesForm()
     {
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $requestPost = $this->getRequests()->setRequiredFields(
                 [
                     "csrfToken",
@@ -33,17 +43,41 @@ class CashFlowExplanatoryNotes extends Controller
                     "cashFlowSelectMultiple"
                 ]
             )->getAllPostData();
-            echo json_encode($requestPost);
+
+            $requestPost["cashFlowSelectMultiple"] = array_map(function($uuid) {
+                $cashFlow = new CashFlow();
+                $cashFlow->setUuid($uuid);
+                $cashFlowData = $cashFlow->findCashFlowByUuid();
+                return $cashFlowData->id;
+            }, $requestPost["cashFlowSelectMultiple"]);
+
+            foreach ($requestPost["cashFlowSelectMultiple"] as $cashFlowId) {
+                $cashFlowExplanatoryNotes = new ModelCashFlowExplanatoryNotes();
+                $response = $cashFlowExplanatoryNotes->persistData([
+                    "uuid" => Uuid::uuid4(),
+                    "id_cash_flow" => $cashFlowId,
+                    "note" => $requestPost["explanatoryNoteText"]
+                ]);
+
+                if (empty($response)) {
+                    http_response_code(500);
+                    echo $cashFlowExplanatoryNotes->message->json();
+                    die;
+                }
+            }
+
+
+            echo json_encode(["success" => "nota criada com sucesso"]);
             die;
         }
 
         $user = new User();
         $user->setEmail(session()->user->user_email);
         $userData = $user->findUserByEmail(["id", "deleted"]);
-
+        
         $user->setId($userData->id);
         $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
-
+        
         $cashFlow = new CashFlow();
         $cashFlowData = $cashFlow->findCashFlowByUser(["history", "uuid"], $user, $companyId);
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace Source\Controllers;
 
 use Source\Core\Controller;
@@ -36,19 +37,19 @@ class Login extends Controller
                 echo json_encode(["logout_success" => true]);
             }
         }
-
     }
 
     public function login()
     {
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $requestPost = $this->getRequests()
-            ->setRequiredFields(["csrfToken", "userData", "userPassword"])->getAllPostData();
-            
+                ->setRequiredFields(["csrfToken", "userData", "userPassword"])->getAllPostData();
+
             $user = new User();
             if (filter_var($requestPost["userData"], FILTER_VALIDATE_EMAIL)) {
                 $user->setEmail($requestPost["userData"]);
-            }else {
+            } else {
                 $user->setNickName($requestPost["userData"]);
             }
 
@@ -67,14 +68,14 @@ class Login extends Controller
             $subscription = new Subscription();
             $subscription->customer_id = $userData->id_customer;
             $subscriptionData = $subscription->findSubsCriptionByCustomerId(["status", "period_end"]);
-            
+
             if (empty($subscriptionData)) {
                 $subscriptionStatus = new \stdClass();
                 $subscriptionStatus->status = "free";
             }
 
-            $status = empty($subscriptionData) 
-            ? $subscriptionStatus->status : $subscriptionData->getStatus();
+            $status = empty($subscriptionData)
+                ? $subscriptionStatus->status : $subscriptionData->getStatus();
             $periodEnd = empty($subscriptionData->period_end) ? null : $subscriptionData->period_end;
 
             $customer = new Customer();
@@ -94,7 +95,7 @@ class Login extends Controller
                 "user_email" => $userData->user_email,
                 "period_end" => $periodEnd
             ]);
-            
+
             echo json_encode(["login_success" => true, "url" => url("/admin")]);
             die;
         }

@@ -26,6 +26,7 @@ class CashFlowGroup extends Controller
 
     public function cashFlowGroupModiFyData(array $data)
     {
+        verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
         if (empty($data["uuid"])) {
             throw new Exception("parametro uuid não pode estar vazio", 500);
         }
@@ -82,6 +83,7 @@ class CashFlowGroup extends Controller
 
     public function cashFlowGroupRemoveRegister(array $data)
     {
+        verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
         if (empty($data["uuid"])) {
             throw new \Exception("uuid inválido", 500);
         }
@@ -116,6 +118,7 @@ class CashFlowGroup extends Controller
     public function cashFlowGroupFormUpdate(array $data)
     {
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $requestPost = $this->getRequests()
             ->setRequiredFields(["csrfToken", "accountGroup"])->getAllPostData();
 
@@ -211,6 +214,7 @@ class CashFlowGroup extends Controller
     public function cashFlowGroupForm()
     {
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $requestPost = $this->getRequests()
             ->setRequiredFields(["csrfToken", "accountGroup"])->getAllPostData();
 
