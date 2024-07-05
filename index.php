@@ -165,6 +165,11 @@ $route->get("/cash-planning/cash-flow/cash-variation-analysis", "CashPlanning::c
 $route->get("/cash-flow-explanatory-notes/form", "CashFlowExplanatoryNotes::cashFlowExplanatoryNotesForm");
 $route->post("/cash-flow-explanatory-notes/form", "CashFlowExplanatoryNotes::cashFlowExplanatoryNotesForm");
 $route->get("/cash-flow-explanatory-notes/report", "CashFlowExplanatoryNotes::cashFlowExplanatoryNotesReport");
+$route->get("/cash-flow-explanatory-notes/form/update/{uuid}", "CashFlowExplanatoryNotes::cashFlowExplanatoryNotesUpdate");
+$route->post("/cash-flow-explanatory-notes/form/update", "CashFlowExplanatoryNotes::cashFlowExplanatoryNotesUpdate");
+$route->post("/cash-flow-explanatory-notes/remove", "CashFlowExplanatoryNotes::cashFlowExplanatoryNotesRemove");
+$route->get("/cash-flow-explanatory-notes/backup", "CashFlowExplanatoryNotes::cashFlowExplanatoryNotesBackup");
+$route->post("/cash-flow-explanatory-notes/backup", "CashFlowExplanatoryNotes::cashFlowExplanatoryNotesBackup");
 
 /** 
  * Assinatura do cliente

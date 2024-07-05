@@ -6,12 +6,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Relatório de notas explicativas</h1>
+                    <h1 class="m-0">Relatório backup de notas explicativas</h1>
                 </div><!-- /.col -->
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="<?= url("/admin/cash-flow-group/form") ?>">Formulário de notas explicativas</a></li>
-                        <li class="breadcrumb-item active">Relatório de notas explicativas</li>
+                        <li class="breadcrumb-item"><a href="<?= url("/admin") ?>">Home</a></li>
+                        <li class="breadcrumb-item active">Relatório backup de notas explicativas</li>
                     </ol>
                 </div><!-- /.col -->
             </div><!-- /.row -->
@@ -25,15 +25,14 @@
                 <div class="col">
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">Relatório de notas explicativas</h3>
+                            <h3 class="card-title">Relatório de notas</h3>
                         </div>
 
                         <div class="card-body">
                             <div id="widgets" class="dataTables_wrapper dt-bootstrap4">
-                                <table id="cashFlowExplanatoryNotesReport" class="table table-bordered table-striped">
+                                <table id="cashFlowExplanatoryNotesBackup" class="table table-bordered table-striped">
                                     <thead>
                                         <tr>
-                                            <th>Id</th>
                                             <th>Histórico</th>
                                             <th>Tipo de entrada</th>
                                             <th>Valor</th>
@@ -46,28 +45,16 @@
                                         <?php if (!empty($cashFlowExplanatoryNotesData)) : ?>
                                             <?php foreach ($cashFlowExplanatoryNotesData as $value) : ?>
                                                 <tr>
-                                                    <td><?= $value->getUuid() ?></td>
                                                     <td><?= $value->history ?></td>
                                                     <td><?= $value->entry_type ?></td>
                                                     <td><?= "R$ " . number_format($value->entry, 2, ",", ".") ?></td>
                                                     <td><?= $value->getNote() ?></td>
-                                                    <td><a class="icons" href="<?= url("/admin/cash-flow-explanatory-notes/form/update/" . $value->getUuid() . "") ?>"><i class="fas fa-edit" aria-hidden="true"></i></a></td>
+                                                    <td><a database-icon data-uuid="<?= $value->getUuid() ?>" data-accountname="<?= $value->history ?>" class="icons" href="#"><i class="fas fa-database" aria-hidden="true"></i></a></td>
                                                     <td><a trash-icon data-uuid="<?= $value->getUuid() ?>" data-accountname="<?= $value->history ?>" class="icons" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a></td>
                                                 </tr>
                                             <?php endforeach ?>
                                         <?php endif ?>
                                     </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <th></th>
-                                            <th>Total</th>
-                                            <th></th>
-                                            <th total-value>R$ 0,00</th>
-                                            <th></th>
-                                            <th></th>
-                                            <th></th>
-                                        </tr>
-                                    </tfoot>
                                 </table>
                             </div>
                         </div>

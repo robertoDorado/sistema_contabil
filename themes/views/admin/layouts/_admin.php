@@ -327,7 +327,7 @@
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="#" class="nav-link">
+                                        <a href="<?= url("/admin/cash-flow-explanatory-notes/backup") ?>" class="nav-link">
                                             <p>Backup de notas</p>
                                         </a>
                                     </li>

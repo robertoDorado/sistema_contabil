@@ -37,8 +37,6 @@ if (window.location.pathname == "/admin/cash-flow-explanatory-notes/form") {
         }).then(response => response.json()).then(function (response) {
             btnSubmit.removeAttribute("disabled")
             btnSubmit.innerHTML = "Enviar"
-            cashFlowSelectMultiple.val(null).trigger("change")
-            explanatoryNoteText.value = ''
             
             if (response.error) {
                 message = response.error
@@ -52,6 +50,16 @@ if (window.location.pathname == "/admin/cash-flow-explanatory-notes/form") {
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.success(message)
             }
+
+            const optionsUpdated = response.options_updated
+            cashFlowSelectMultiple.empty()
+
+            optionsUpdated.forEach(function(item) {
+                cashFlowSelectMultiple.append(new Option(item.history, item.uuid))
+            })
+            
+            cashFlowSelectMultiple.val(null).trigger("change")
+            explanatoryNoteText.value = ''
         })
     })
 }

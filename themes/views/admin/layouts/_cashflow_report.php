@@ -58,12 +58,12 @@
                         <?php if (!empty($hasBalance)) : ?>
                             <?php if ($balanceValue > 0) : ?>
                                 <tr style="color:#008000">
+                                    <th rowspan="1" colspan="1"></th>
                                     <th rowspan="1" colspan="1">Total</th>
                                     <th rowspan="1" colspan="1"></th>
                                     <th rowspan="1" colspan="1"></th>
                                     <th rowspan="1" colspan="1"></th>
-                                    <th rowspan="1" colspan="1"></th>
-                                    <th rowspan="1" colspan="1"><?= $balance ?></th>
+                                    <th total-value rowspan="1" colspan="1"><?= $balance ?></th>
                                     <?php if (!empty($hasControls)) : ?>
                                         <th rowspan="1" colspan="1"></th>
                                         <th rowspan="1" colspan="1"></th>
@@ -71,12 +71,12 @@
                                 </tr>
                             <?php elseif (empty($balanceValue)) : ?>
                                 <tr>
+                                    <th rowspan="1" colspan="1"></th>
                                     <th rowspan="1" colspan="1">Total</th>
                                     <th rowspan="1" colspan="1"></th>
                                     <th rowspan="1" colspan="1"></th>
                                     <th rowspan="1" colspan="1"></th>
-                                    <th rowspan="1" colspan="1"></th>
-                                    <th rowspan="1" colspan="1">0,00</th>
+                                    <th total-value rowspan="1" colspan="1">0,00</th>
                                     <?php if (!empty($hasControls)) : ?>
                                         <th rowspan="1" colspan="1"></th>
                                         <th rowspan="1" colspan="1"></th>
@@ -84,12 +84,12 @@
                                 </tr>
                             <?php else : ?>
                                 <tr style="color:#ff0000">
+                                    <th rowspan="1" colspan="1"></th>
                                     <th rowspan="1" colspan="1">Total</th>
                                     <th rowspan="1" colspan="1"></th>
                                     <th rowspan="1" colspan="1"></th>
                                     <th rowspan="1" colspan="1"></th>
-                                    <th rowspan="1" colspan="1"></th>
-                                    <th rowspan="1" colspan="1"><?= $balance ?></th>
+                                    <th total-value rowspan="1" colspan="1"><?= $balance ?></th>
                                     <?php if (!empty($hasControls)) : ?>
                                         <th rowspan="1" colspan="1"></th>
                                         <th rowspan="1" colspan="1"></th>

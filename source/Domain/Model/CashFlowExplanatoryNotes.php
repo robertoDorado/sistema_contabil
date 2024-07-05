@@ -46,6 +46,64 @@ class CashFlowExplanatoryNotes
         return $this->data->$name ?? null;
     }
 
+    public function findAllCashFlowExplanatoryNotes(array $columnsEx, array $columnsCash, User $user, int $companyId)
+    {
+        $columnsEx = empty($columnsEx) ? "*" : implode(", ", $columnsEx);
+        $columnsCash = empty($columnsCash) ? "*" : implode(", ", $columnsCash);
+
+        $response = $this->cashFlowExplanatoryNotes->find(
+            "",
+            "",
+            $columnsEx
+        )->join(
+            CONF_DB_NAME . ".cash_flow",
+            "id",
+            "id_user=:id_user AND id_company=:id_company",
+            ":id_user=" . $user->getId() . "&:id_company=" . $companyId . "",
+            $columnsCash,
+            "id_cash_flow",
+            CONF_DB_NAME . ".cash_flow_explanatory_notes"
+        )->fetch(true);
+
+        if (empty($response)) {
+            return [];
+        }
+
+        return $response;
+    }
+
+    public function findCashFlowExplanatoryNotesByUuid(array $columns, bool $deleted): ?ModelsCashFlowExplanatoryNotes
+    {
+        $deleted = !$deleted ? 0 : 1;
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        return $this->cashFlowExplanatoryNotes->find(
+            "deleted=:deleted AND uuid=:uuid",
+            ":uuid=" . $this->getUuid() . "&:deleted=" . $deleted . "",
+            $columns
+        )->fetch();
+    }
+
+    public function findCashFlowExplanatoryNotesJoinCashFlowByUuid(array $columnsEx, array $columnsCash, User $user, int $companyId, bool $deleted): ?ModelsCashFlowExplanatoryNotes
+    {
+        $deleted = !$deleted ? 0 : 1;
+        $columnsEx = empty($columnsEx) ? "*" : implode(", ", $columnsEx);
+        $columnsCash = empty($columnsCash) ? "*" : implode(", ", $columnsCash);
+
+        return $this->cashFlowExplanatoryNotes->find(
+            "deleted=:deleted AND uuid=:uuid",
+            ":deleted=" . $deleted . "&:uuid=" . $this->getUuid() . "",
+            $columnsEx
+        )->join(
+            CONF_DB_NAME . ".cash_flow",
+            "id",
+            "id_user=:id_user AND id_company=:id_company",
+            ":id_user=" . $user->getId() . "&:id_company=" . $companyId . "",
+            $columnsCash,
+            "id_cash_flow",
+            CONF_DB_NAME . ".cash_flow_explanatory_notes"
+        )->fetch();
+    }
+
     /** @var ModelsCashFlowExplanatoryNotes[] */
     public function findCashFlowExplanatoryNotesJoinCashFlow(array $columnsExp, array $columnsCash, User $user, int $companyId, bool $deleted): array
     {
@@ -57,16 +115,15 @@ class CashFlowExplanatoryNotes
             "deleted=:deleted",
             ":deleted=" . $deleted . "",
             $columnsExp
-        )
-            ->join(
-                CONF_DB_NAME . ".cash_flow",
-                "id",
-                "id_user=:id_user AND id_company=:id_company AND deleted=:deleted",
-                ":id_user=" . $user->getId() . "&:id_company=" . $companyId . "&:deleted=" . $deleted . "",
-                $columnsCash,
-                "id_cash_flow",
-                CONF_DB_NAME . ".cash_flow_explanatory_notes"
-            )->fetch(true);
+        )->join(
+            CONF_DB_NAME . ".cash_flow",
+            "id",
+            "id_user=:id_user AND id_company=:id_company",
+            ":id_user=" . $user->getId() . "&:id_company=" . $companyId . "",
+            $columnsCash,
+            "id_cash_flow",
+            CONF_DB_NAME . ".cash_flow_explanatory_notes"
+        )->fetch(true);
 
         if (empty($response)) {
             return [];

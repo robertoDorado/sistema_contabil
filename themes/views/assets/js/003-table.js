@@ -784,6 +784,12 @@ const cashVariationAnalysis = dataTableConfig($("#cashVariationAnalysis"),
     })
 const cashFlowExplanatoryNotesReport = dataTableConfig($("#cashFlowExplanatoryNotesReport"),
     {
+        "columnDefs": [
+            {
+                "targets": [0],
+                "visible": false
+            }
+        ],
         "language": {
             "url": urlJson
         },
@@ -792,32 +798,32 @@ const cashFlowExplanatoryNotesReport = dataTableConfig($("#cashFlowExplanatoryNo
         "buttons": [
             {
                 "extend": 'copyHtml5',
-                "title": 'Notas explicativas'
+                "title": 'Notas explicativas do fluxo de caixa'
             },
             {
                 "extend": 'excelHtml5',
-                "filename": "Notas explicativas",
-                "title": "Notas explicativas",
+                "filename": "Notas explicativas do fluxo de caixa",
+                "title": "Notas explicativas do fluxo de caixa",
                 customizeData: function (xlsxData) {
                     xlsxData.header = xlsxData.header.filter((data) => data != 'Editar' && data != 'Excluir')
                 }
             },
             {
                 "extend": 'csvHtml5',
-                "filename": "Notas explicativas",
-                "title": "Notas explicativas"
+                "filename": "Notas explicativas do fluxo de caixa",
+                "title": "Notas explicativas do fluxo de caixa"
             },
             {
                 "extend": 'pdfHtml5',
-                "filename": "Notas explicativas",
-                "title": 'Notas explicativas',
+                "filename": "Notas explicativas do fluxo de caixa",
+                "title": 'Notas explicativas do fluxo de caixa',
                 customize: function (doc) {
                     doc.content[1].table.body.forEach(function (row) {
-                        row.splice(2, 3);
+                        row.splice(5, 2);
                     });
 
                     doc.content[1].table.widths = [
-                        '50%', '50%'
+                        '20%', '20%', '20%', '20%', '20%'
                     ];
 
                     var objLayout = {};
@@ -835,6 +841,20 @@ const cashFlowExplanatoryNotesReport = dataTableConfig($("#cashFlowExplanatoryNo
             },
             "colvis"
         ],
+        "initComplete": function () {
+            this.api()
+                .buttons()
+                .container()
+                .appendTo("#widgets .col-md-6:eq(0)");
+        }
+    })
+const cashFlowExplanatoryNotesBackup = dataTableConfig($("#cashFlowExplanatoryNotesBackup"),
+    {
+        "language": {
+            "url": urlJson
+        },
+        "responsive": true,
+        "autoWidth": false,
         "initComplete": function () {
             this.api()
                 .buttons()

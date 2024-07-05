@@ -6,7 +6,6 @@ use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Controller;
 use Source\Domain\Model\CashFlow;
 use Source\Domain\Model\CashFlowExplanatoryNotes as ModelCashFlowExplanatoryNotes;
-use Source\Domain\Model\User;
 
 /**
  * CashFlowExplanatoryNotes Controllers
@@ -24,21 +23,134 @@ class CashFlowExplanatoryNotes extends Controller
         parent::__construct();
     }
 
+    public function cashFlowExplanatoryNotesBackup()
+    {
+        $response = initializeUserAndCompanyId();
+        $cashFlowExplanatoryNotes = new ModelCashFlowExplanatoryNotes();
+        $cashFlowExplanatoryNotesData = $cashFlowExplanatoryNotes->findCashFlowExplanatoryNotesJoinCashFlow(
+            ["note", "uuid"],
+            ["entry", "history", "entry_type"],
+            $response["user"],
+            $response["company_id"],
+            true
+        );
+
+        if (!empty($cashFlowExplanatoryNotesData)) {
+            $cashFlowExplanatoryNotesData = array_map(function($item) {
+                $item->entry_type = empty($item->entry_type) ? "Débito" : "Crédito";
+                return $item;
+            }, $cashFlowExplanatoryNotesData);
+        }
+
+        echo $this->view->render("admin/cash-flow-explanatory-notes-backup", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => ["/admin/cash-flow-explanatory-notes/backup"],
+            "cashFlowExplanatoryNotesData" => $cashFlowExplanatoryNotesData
+        ]);
+    }
+
+    public function cashFlowExplanatoryNotesRemove()
+    {
+        $requestPost = $this->getRequests()->setRequiredFields(["uuid"])
+            ->getAllPostData();
+
+        if (!Uuid::uuid4($requestPost["uuid"])) {
+            http_response_code(500);
+            echo json_encode(["error" => "uuid inválido"]);
+            die;
+        }
+
+        $cashFlowExplanatoryNotes = new ModelCashFlowExplanatoryNotes();
+        $cashFlowExplanatoryNotes->setUuid($requestPost["uuid"]);
+        $cashFlowExplanatoryNotesData = $cashFlowExplanatoryNotes->findCashFlowExplanatoryNotesByUuid([], false);
+
+        if (empty($cashFlowExplanatoryNotesData)) {
+            http_response_code(500);
+            echo json_encode(["error" => "este registro não existe"]);
+            die;
+        }
+
+        $cashFlowExplanatoryNotesData->setRequiredFields(["deleted"]);
+        $cashFlowExplanatoryNotesData->deleted = 1;
+        $cashFlowExplanatoryNotesData->save();
+        echo json_encode(["success" => "registro deletado com sucesso"]);
+    }
+
+    public function cashFlowExplanatoryNotesUpdate(array $data)
+    {
+        $response = initializeUserAndCompanyId();
+        $endpointReport = "/admin/cash-flow-explanatory-notes/report";
+
+        if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            $requestPost = $this->getRequests()->setRequiredFields([
+                "explanatoryNoteText",
+                "csrfToken",
+                "uuid"
+            ])->getAllPostData();
+
+            if (!Uuid::isValid($requestPost["uuid"])) {
+                http_response_code(500);
+                echo json_encode(["error" => "uuid inválido"]);
+                die;
+            }
+
+            $cashFlowExplanatoryNotes = new ModelCashFlowExplanatoryNotes();
+            $cashFlowExplanatoryNotes->setUuid($data["uuid"]);
+            $cashFlowExplanatoryNotesData = $cashFlowExplanatoryNotes->findCashFlowExplanatoryNotesByUuid([], false);
+
+            if (empty($cashFlowExplanatoryNotesData)) {
+                http_response_code(500);
+                echo json_encode(["error" => "este registro não existe"]);
+                die;
+            }
+
+            $cashFlowExplanatoryNotesData->setRequiredFields(["note"]);
+            $cashFlowExplanatoryNotesData->note = $requestPost["explanatoryNoteText"];
+            $cashFlowExplanatoryNotesData->save();
+            echo json_encode(["success" => url($endpointReport)]);
+            die;
+        }
+
+        if (!Uuid::isValid($data["uuid"])) {
+            redirect($endpointReport);
+        }
+
+        $cashFlowExplanatoryNotes = new ModelCashFlowExplanatoryNotes();
+        $cashFlowExplanatoryNotes->setUuid($data["uuid"]);
+        $cashFlowExplanatoryNotesData = $cashFlowExplanatoryNotes->findCashFlowExplanatoryNotesJoinCashFlowByUuid(
+            ["note", "uuid"],
+            ["history", "entry", "entry_type"],
+            $response["user"],
+            $response["company_id"],
+            false
+        );
+
+        $entryType = empty($cashFlowExplanatoryNotesData->entry_type) ? "Débito" : "Crédito";
+        echo $this->view->render("admin/cash-flow-explanatory-notes-form-update", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => [],
+            "dataNote" => $cashFlowExplanatoryNotesData->getNote() ?? null,
+            "history" => $cashFlowExplanatoryNotesData->history ?? null,
+            "entry" => "R$ " . number_format($cashFlowExplanatoryNotesData->entry, 2, ",", ".") ?? null,
+            "entryType" => $entryType ?? null
+        ]);
+    }
+
     public function cashFlowExplanatoryNotesReport()
     {
         $response = initializeUserAndCompanyId();
         $cashFlowExplanatoryNotes = new ModelCashFlowExplanatoryNotes();
         $cashFlowExplanatoryNotesData = $cashFlowExplanatoryNotes->findCashFlowExplanatoryNotesJoinCashFlow(
             ["note", "uuid"],
-            ["entry", "history"],
+            ["entry", "history", "entry_type"],
             $response["user"],
             $response["company_id"],
             false
         );
 
         if (!empty($cashFlowExplanatoryNotesData)) {
-            $cashFlowExplanatoryNotesData = array_map(function($item) {
-                $item->entry_type = $item->entry > 0 ? "Crédito" : "Débito";
+            $cashFlowExplanatoryNotesData = array_map(function ($item) {
+                $item->entry_type = !empty($item->entry_type) ? "Crédito" : "Débito";
                 return $item;
             }, $cashFlowExplanatoryNotesData);
         }
@@ -85,14 +197,80 @@ class CashFlowExplanatoryNotes extends Controller
                 }
             }
 
+            $response = initializeUserAndCompanyId();
+            $cashFlow = new CashFlow();
+            $cashFlowData = $cashFlow->findCashFlowByUser(
+                ["history", "uuid", "id"],
+                $response["user"],
+                $response["company_id"]
+            );
 
-            echo json_encode(["success" => "nota criada com sucesso"]);
+            $cashFlowExplanatoryNotes = new ModelCashFlowExplanatoryNotes();
+            $cashFlowExplanatoryNotesData = $cashFlowExplanatoryNotes->findAllCashFlowExplanatoryNotes(
+                ["id_cash_flow"],
+                ["id"],
+                $response["user"],
+                $response["company_id"]
+            );
+
+            $cashFlowExplanatoryNotesData = array_map(function ($item) {
+                return $item->data();
+            }, $cashFlowExplanatoryNotesData);
+
+            $cashFlowExplanatoryNotesData = array_reduce($cashFlowExplanatoryNotesData, function ($carry, $item) {
+                $carry[] = $item->id_cash_flow;
+                return $carry;
+            }, []);
+
+            $cashFlowData = array_filter($cashFlowData, function ($item) use ($cashFlowExplanatoryNotesData) {
+                if (!in_array($item->id, $cashFlowExplanatoryNotesData)) {
+                    return $item;
+                }
+            });
+
+            $cashFlowData = array_map(function($item) {
+                $item->history = $item->getHistory();
+                $item->uuid = $item->getUuid();
+                return (array)$item->data();
+            }, $cashFlowData);
+
+            $cashFlowData = array_values($cashFlowData);
+            echo json_encode(["success" => "nota criada com sucesso", "options_updated" => $cashFlowData]);
             die;
         }
 
         $response = initializeUserAndCompanyId();
         $cashFlow = new CashFlow();
-        $cashFlowData = $cashFlow->findCashFlowByUser(["history", "uuid"], $response["user"], $response["company_id"]);
+        $cashFlowData = $cashFlow->findCashFlowByUser(
+            ["history", "uuid", "id"],
+            $response["user"],
+            $response["company_id"]
+        );
+
+        $cashFlowExplanatoryNotes = new ModelCashFlowExplanatoryNotes();
+        $cashFlowExplanatoryNotesData = $cashFlowExplanatoryNotes->findAllCashFlowExplanatoryNotes(
+            ["id_cash_flow"],
+            ["id"],
+            $response["user"],
+            $response["company_id"]
+        );
+
+        if (!empty($cashFlowExplanatoryNotesData)) {
+            $cashFlowExplanatoryNotesData = array_map(function ($item) {
+                return $item->data();
+            }, $cashFlowExplanatoryNotesData);
+
+            $cashFlowExplanatoryNotesData = array_reduce($cashFlowExplanatoryNotesData, function ($carry, $item) {
+                $carry[] = $item->id_cash_flow;
+                return $carry;
+            }, []);
+
+            $cashFlowData = array_filter($cashFlowData, function ($item) use ($cashFlowExplanatoryNotesData) {
+                if (!in_array($item->id, $cashFlowExplanatoryNotesData)) {
+                    return $item;
+                }
+            });
+        }
 
         echo $this->view->render("admin/cash-flow-explanatory-notes-form", [
             "userFullName" => showUserFullName(),
