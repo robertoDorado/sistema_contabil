@@ -6,6 +6,8 @@ use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Controller;
 use Source\Domain\Model\CashFlow;
 use Source\Domain\Model\CashFlowExplanatoryNotes as ModelCashFlowExplanatoryNotes;
+use Source\Models\CashFlowExplanatoryNotes as ModelsCashFlowExplanatoryNotes;
+use Source\Support\Message;
 
 /**
  * CashFlowExplanatoryNotes Controllers
@@ -25,6 +27,71 @@ class CashFlowExplanatoryNotes extends Controller
 
     public function cashFlowExplanatoryNotesBackup()
     {
+        if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            $requestPost = $this->getRequests()->setRequiredFields([
+                "csrfToken",
+                "action",
+                "uuid"
+            ])->getAllPostData();
+            
+            $cashFlowExplanatoryNotes = new ModelCashFlowExplanatoryNotes();
+            $cashFlowExplanatoryNotes->setUuid($requestPost["uuid"]);
+            $noteParams = ["id", "deleted"];
+            $cashFlowExplanatoryNotesData = $cashFlowExplanatoryNotes->findCashFlowExplanatoryNotesByUuid($noteParams, true);
+
+            if (empty($cashFlowExplanatoryNotesData)) {
+                http_response_code(500);
+                echo json_encode(["error" => "este registro não existe"]);
+                die;
+            }
+
+            $response = new \stdClass();
+            $message = new Message();
+            $response->message = $message;
+            $response->message->error("nenhuma modificação foi feita");
+            $response->modify = false;
+
+            $verifyAction = [
+                "delete" => function(ModelsCashFlowExplanatoryNotes $model) use ($message) {
+                    $response = new \stdClass();
+                    $response->modify = true;
+
+                    if (!$model->destroy()) {
+                        $message->error("erro ao tentar restaurar o registro");
+                        $response->message = $message;
+                        $response->modify = false;
+                    }
+                    return $response;
+                },
+                "restore" => function(ModelsCashFlowExplanatoryNotes $model) use ($message, $noteParams): object {
+                    $model->setRequiredFields($noteParams);
+                    $model->deleted = 0;
+                    $response = new \stdClass();
+                    $response->modify = true;
+                    
+                    if (!$model->save()) {
+                        $message->error("erro ao tentar restaurar o registro");
+                        $response->message = $message;
+                        $response->modify = false;
+                    }
+                    return $response;
+                }
+            ];
+
+            if (!empty($verifyAction[$requestPost["action"]])) {
+                $response = $verifyAction[$requestPost["action"]]($cashFlowExplanatoryNotesData);
+            }
+
+            if (!$response->modify) {
+                http_response_code(500);
+                echo $response->message->json();
+                die;
+            }
+
+            echo json_encode(["success" => "registro modificado com sucesso"]);
+            die;
+        }
+
         $response = initializeUserAndCompanyId();
         $cashFlowExplanatoryNotes = new ModelCashFlowExplanatoryNotes();
         $cashFlowExplanatoryNotesData = $cashFlowExplanatoryNotes->findCashFlowExplanatoryNotesJoinCashFlow(

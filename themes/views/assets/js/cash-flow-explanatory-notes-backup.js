@@ -1,27 +1,33 @@
-if (window.location.pathname == "/admin/cash-variation-setting/backup") {
-    const dataTransfer = {}
-    $("#cashFlowVariationBackup").on("click", "a.restore-icon,a.trash-icon", function (event) {
+if (window.location.pathname == "/admin/cash-flow-explanatory-notes/backup") {
+    const dataTransfer = {
+        uuid: "",
+        row: null,
+        accountName: "",
+        action: ""
+    }
+
+    const launcModal = $("#launchModal")
+    cashFlowExplanatoryNotesBackup.on("click", "[database-icon],[trash-icon]", function(event) {
         event.preventDefault()
         dataTransfer.uuid = $(this).data("uuid")
-        dataTransfer.account_name = $(this).data("accountname")
-        dataTransfer.csrf = $(this).data("csrf")
-        dataTransfer.change_type = Array.isArray(this.classList.value.match(/restore-icon/)) ? "restore" : "delete"
-        dataTransfer.row = this.closest("tr")
-        $("#launchModal").click()
+        dataTransfer.accountName = $(this).data("accountname")
+        dataTransfer.row = $(this).closest("tr")
+        dataTransfer.action = Array.isArray(this.classList.value.match(/restore-icon/)) ? "restore" : "delete"
+        launcModal.click()
     })
 
-    $("#launchModal").click(function() {
+    launcModal.click(function() {
         $("#modalContainerLabel").html("Atenção!")
         $("#dismissModal").html("Voltar")
         $("#saveChanges").removeClass("btn-primary")
         $("#saveChanges").removeClass("btn-danger")
         
-        if (dataTransfer.change_type == "restore") {
-            $(".modal-body").html(`Você deseja restaurar a conta "${dataTransfer.account_name}"?`)
+        if (dataTransfer.action == "restore") {
+            $(".modal-body").html(`Você deseja restaurar a conta "${dataTransfer.accountName}"?`)
             $("#saveChanges").addClass("btn-primary")
             $("#saveChanges").html("Restaurar")
         }else {
-            $(".modal-body").html(`Você deseja excluir permanentemente a conta "${dataTransfer.account_name}"?`)
+            $(".modal-body").html(`Você deseja excluir permanentemente a conta "${dataTransfer.accountName}"?`)
             $("#saveChanges").addClass("btn-danger")
             $("#saveChanges").html("Excluir")
         }
@@ -33,7 +39,7 @@ if (window.location.pathname == "/admin/cash-variation-setting/backup") {
         
         const form = new FormData()
         form.append("csrfToken", dataTransfer.csrf)
-        form.append("changeType", dataTransfer.change_type)
+        form.append("action", dataTransfer.action)
         form.append("uuid", dataTransfer.uuid)
 
         const url = window.location.origin + window.location.pathname
@@ -42,7 +48,7 @@ if (window.location.pathname == "/admin/cash-variation-setting/backup") {
             body: form
         }).then(response => response.json()).then(function(response) {
             saveChanges.removeAttribute("disabled")
-            saveChanges.innerHTML = dataTransfer.change_type == "restore" ? "Restaurar" : "Excluir"
+            saveChanges.innerHTML = dataTransfer.action == "restore" ? "Restaurar" : "Excluir"
             let message = ""
 
             if (response.error) {
@@ -53,7 +59,10 @@ if (window.location.pathname == "/admin/cash-variation-setting/backup") {
             }
 
             if (response.success) {
-                cashFlowVariationBackup.row(dataTransfer.row).remove().draw()
+                message = response.success
+                message = message.charAt(0).toUpperCase() + message.slice(1)
+                toastr.success(message)
+                cashFlowExplanatoryNotesBackup.row(dataTransfer.row).remove().draw()
                 $("#dismissModal").click()
             }
         })

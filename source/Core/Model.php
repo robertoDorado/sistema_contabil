@@ -804,7 +804,7 @@ abstract class Model
     {
         $data = (array) $this->data();
         foreach ($this->required as $field) {
-            if (empty($data[$field])) {
+            if (!isset($data[$field])) {
                 return false;
             }
             return true;

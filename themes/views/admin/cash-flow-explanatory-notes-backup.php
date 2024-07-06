@@ -49,8 +49,8 @@
                                                     <td><?= $value->entry_type ?></td>
                                                     <td><?= "R$ " . number_format($value->entry, 2, ",", ".") ?></td>
                                                     <td><?= $value->getNote() ?></td>
-                                                    <td><a database-icon data-uuid="<?= $value->getUuid() ?>" data-accountname="<?= $value->history ?>" class="icons" href="#"><i class="fas fa-database" aria-hidden="true"></i></a></td>
-                                                    <td><a trash-icon data-uuid="<?= $value->getUuid() ?>" data-accountname="<?= $value->history ?>" class="icons" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a></td>
+                                                    <td><a database-icon data-uuid="<?= $value->getUuid() ?>" data-accountname="<?= $value->history ?>" class="icons restore-icon" href="#"><i class="fas fa-database" aria-hidden="true"></i></a></td>
+                                                    <td><a trash-icon data-uuid="<?= $value->getUuid() ?>" data-accountname="<?= $value->history ?>" class="icons delete-icon" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a></td>
                                                 </tr>
                                             <?php endforeach ?>
                                         <?php endif ?>
