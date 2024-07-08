@@ -340,13 +340,13 @@
                                 </a>
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
-                                        <a href="#" class="nav-link">
-                                            <p>Registros de auditoria</p>
+                                        <a href="<?= url("/admin/history-audit/report") ?>" class="nav-link">
+                                            <p>Relatório da auditoria</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="#" class="nav-link">
-                                            <p>Relatórios de auditoria</p>
+                                        <a href="<?= url("/admin/history-audit/backup") ?>" class="nav-link">
+                                            <p>Backup da auditoria</p>
                                         </a>
                                     </li>
                                 </ul>

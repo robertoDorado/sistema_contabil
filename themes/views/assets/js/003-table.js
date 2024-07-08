@@ -862,3 +862,69 @@ const cashFlowExplanatoryNotesBackup = dataTableConfig($("#cashFlowExplanatoryNo
                 .appendTo("#widgets .col-md-6:eq(0)");
         }
     })
+const historyAuditReport = dataTableConfig($("#historyAuditReport"),
+    {
+        "columnDefs": [
+            {
+                "targets": [0],
+                "visible": false
+            }
+        ],
+        "language": {
+            "url": urlJson
+        },
+        "responsive": true,
+        "autoWidth": false,
+        "buttons": [
+            {
+                "extend": 'copyHtml5',
+                "title": 'Histórico da auditoria'
+            },
+            {
+                "extend": 'excelHtml5',
+                "filename": "Histórico da auditoria",
+                "title": "Histórico da auditoria",
+                customizeData: function (xlsxData) {
+                    xlsxData.header = xlsxData.header.filter((data) => data != 'Editar' && data != 'Excluir')
+                }
+            },
+            {
+                "extend": 'csvHtml5',
+                "filename": "Histórico da auditoria",
+                "title": "Histórico da auditoria"
+            },
+            {
+                "extend": 'pdfHtml5',
+                "filename": "Histórico da auditoria",
+                "title": 'Histórico da auditoria',
+                customize: function (doc) {
+                    doc.content[1].table.body.forEach(function (row) {
+                        row.splice(4, 2);
+                    });
+
+                    doc.content[1].table.widths = [
+                        '20%', '20%', '20%', '20%', '20%', '20%'
+                    ];
+
+                    var objLayout = {};
+                    objLayout['hLineWidth'] = function (i) { return 0.5; };
+                    objLayout['vLineWidth'] = function (i) { return 0.5; };
+                    objLayout['hLineColor'] = function (i) { return '#aaa'; };
+                    objLayout['vLineColor'] = function (i) { return '#aaa'; };
+                    objLayout['paddingLeft'] = function (i) { return 4; };
+                    objLayout['paddingRight'] = function (i) { return 4; };
+                    objLayout['paddingTop'] = function (i) { return 4; };
+                    objLayout['paddingBottom'] = function (i) { return 4; };
+                    objLayout['fillColor'] = function (i) { return null; };
+                    doc.content[1].layout = objLayout;
+                }
+            },
+            "colvis"
+        ],
+        "initComplete": function () {
+            this.api()
+                .buttons()
+                .container()
+                .appendTo("#widgets .col-md-6:eq(0)");
+        }
+    })

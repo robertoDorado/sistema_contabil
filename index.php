@@ -171,6 +171,15 @@ $route->post("/cash-flow-explanatory-notes/remove", "CashFlowExplanatoryNotes::c
 $route->get("/cash-flow-explanatory-notes/backup", "CashFlowExplanatoryNotes::cashFlowExplanatoryNotesBackup");
 $route->post("/cash-flow-explanatory-notes/backup", "CashFlowExplanatoryNotes::cashFlowExplanatoryNotesBackup");
 
+/**
+ * Histórico e Auditoria
+ */
+$route->get("/history-audit/report", "HistoryAudit::historyAuditReport");
+$route->get("/history-audit/form/{uuid}", "HistoryAudit::historyAuditUpdate");
+$route->post("/history-audit/form", "HistoryAudit::historyAuditUpdate");
+$route->post("/history-audit/create", "HistoryAudit::historyAuditCreate");
+$route->get("/history-audit/backup", "HistoryAudit::historyAuditBackup");
+
 /** 
  * Assinatura do cliente
  */
