@@ -9,7 +9,7 @@ use Ramsey\Uuid\Uuid;
 use Source\Core\Controller;
 use Source\Domain\Model\CashFlow as ModelCashFlow;
 use Source\Domain\Model\CashFlowGroup;
-use Source\Domain\Model\User;
+use Source\Domain\Model\HistoryAudit;
 
 /**
  * CashFlow C:\php-projects\sistema-contabil\source\Controllers
@@ -34,23 +34,61 @@ class CashFlow extends Controller
             throw new Exception("parametro uuid não pode estar vazio", 500);
         }
 
-        $requestPost = $this->getRequests()
-            ->setRequiredFields(["destroy", "restore"])->getAllPostData();
+        $requestPost = $this->getRequests()->setRequiredFields(
+            [
+                "destroy",
+                "restore",
+                "launchValue",
+                "history"
+            ]
+        )->getAllPostData();
         $requestPost["restore"] = filter_var($requestPost["restore"], FILTER_VALIDATE_BOOLEAN);
         $requestPost["destroy"] = filter_var($requestPost["destroy"], FILTER_VALIDATE_BOOLEAN);
 
+        $responseUserAndCompany = initializeUserAndCompanyId();
         $cashFlow = new ModelCashFlow();
+        $historyAudit = new HistoryAudit();
         $response = false;
+        $requestPost["launchValue"] = convertCurrencyRealToFloat($requestPost["launchValue"]);
+
         if ($requestPost["restore"]) {
             $response = $cashFlow->updateCashFlowByUuid([
                 "uuid" => $data["uuid"],
                 "deleted" => 0
+            ]);
+
+            $responseHistoryAudit = $historyAudit->persistData([
+                "uuid" => Uuid::uuid4(),
+                "id_company" => $responseUserAndCompany["company_id"],
+                "id_user" => $responseUserAndCompany["user"],
+                "id_report" => 2,
+                "history_transaction" => "Restauração da conta '{$requestPost["history"]}'",
+                "transaction_value" => $requestPost["launchValue"],
+                "created_at" => date("Y-m-d H:i:s"),
+                "deleted" => 0,
             ]);
         }
 
         if ($requestPost["destroy"]) {
             $cashFlow->setUuid($data["uuid"]);
             $response = $cashFlow->dropCashFlowByUuid();
+
+            $responseHistoryAudit = $historyAudit->persistData([
+                "uuid" => Uuid::uuid4(),
+                "id_company" => $responseUserAndCompany["company_id"],
+                "id_user" => $responseUserAndCompany["user"],
+                "id_report" => 2,
+                "history_transaction" => "Exclusão permanente da conta '{$requestPost["history"]}'",
+                "transaction_value" => $requestPost["launchValue"],
+                "created_at" => date("Y-m-d H:i:s"),
+                "deleted" => 0,
+            ]);
+        }
+
+        if (empty($responseHistoryAudit)) {
+            http_response_code(500);
+            echo $historyAudit->message->json();
+            die;
         }
 
         if (empty($response)) {
@@ -101,16 +139,19 @@ class CashFlow extends Controller
 
         $requiredFieldsExcelFile = [
             "Data lançamento",
+            "Grupo de contas",
             "Histórico",
             "Tipo de entrada",
             "Lançamento"
         ];
 
         $arrayHeader = array_shift($data);
-        if (!empty(array_diff($arrayHeader, $requiredFieldsExcelFile)) && !empty(array_diff($requiredFieldsExcelFile, $arrayHeader))) {
-            http_response_code(500);
-            echo json_encode(["error" => "cabeçalho do arquivo inválido"]);
-            die;
+        foreach ($requiredFieldsExcelFile as $field) {
+            if (!in_array($field, $arrayHeader)) {
+                http_response_code(500);
+                echo json_encode(["error" => "cabeçalho do arquivo inválido"]);
+                die;
+            }
         }
 
         if (empty($data)) {
@@ -156,7 +197,7 @@ class CashFlow extends Controller
             }
         }
 
-        $response = initializeUserAndCompanyId();
+        $responseUserAndCompany = initializeUserAndCompanyId();
         $verifyEntryType = ["Crédito", "Débito"];
         $arrayUuid = [];
         $arrayEdit = [];
@@ -186,9 +227,8 @@ class CashFlow extends Controller
                 $launchValue = $excelData["l"][$key];
             }
 
-
             $cashFlowGroup = new CashFlowGroup();
-            $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByName($excelData["g"][$key], $response["user"]);
+            $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByName($excelData["g"][$key], $responseUserAndCompany["user"]);
 
             if (empty($cashFlowGroupData)) {
                 $errorMessage = "grupo de contas inexistente";
@@ -212,7 +252,7 @@ class CashFlow extends Controller
             $response = $cashFlow->persistData([
                 "uuid" => $uuid,
                 "id_company" => session()->user->company_id,
-                "id_user" => $response["user"],
+                "id_user" => $responseUserAndCompany["user"],
                 "id_cash_flow_group" => $cashFlowGroup,
                 "entry" => $launchValue,
                 "history" => $history,
@@ -254,6 +294,24 @@ class CashFlow extends Controller
             array_push($entryType, $entryTypeString);
             $entryValue = "R$ " . number_format($cashFlowData->getEntry(), 2, ",", ".");
             array_push($launchValue, $entryValue);
+
+            $historyAudit = new HistoryAudit();
+            $responseHistoryAudit = $historyAudit->persistData([
+                "uuid" => Uuid::uuid4(),
+                "id_company" => $responseUserAndCompany["company_id"],
+                "id_user" => $responseUserAndCompany["user"],
+                "id_report" => 2,
+                "history_transaction" => "Importação de arquivo em excel '{$cashFlowData->getHistory()}'",
+                "transaction_value" => $cashFlowData->getEntry(),
+                "created_at" => date("Y-m-d H:i:s"),
+                "deleted" => 0,
+            ]);
+
+            if (empty($responseHistoryAudit)) {
+                http_response_code(500);
+                echo $historyAudit->message->json();
+                die;
+            }
         }
 
         $excelData = [];
@@ -311,10 +369,27 @@ class CashFlow extends Controller
             throw new \Exception($cashFlow->message->json(), 500);
         }
 
-        $response = initializeUserAndCompanyId();
-        $cashFlow = new ModelCashFlow();
+        $responseUserAndCompany = initializeUserAndCompanyId();
+        $historyAudit = new HistoryAudit();
+        $responseHistoryAudit = $historyAudit->persistData([
+            "uuid" => Uuid::uuid4(),
+            "id_company" => $responseUserAndCompany["company_id"],
+            "id_user" => $responseUserAndCompany["user"],
+            "id_report" => 2,
+            "history_transaction" => "Exclusão do registro '{$cashFlowData->getHistory()}'",
+            "transaction_value" => $cashFlowData->getEntry(),
+            "created_at" => date("Y-m-d H:i:s"),
+            "deleted" => 0,
+        ]);
 
-        $balance = $cashFlow->calculateBalance($response["user"], $response["company_id"]);
+        if (empty($responseHistoryAudit)) {
+            http_response_code(500);
+            echo $historyAudit->message->json();
+            die;
+        }
+
+        $cashFlow = new ModelCashFlow();
+        $balance = $cashFlow->calculateBalance($responseUserAndCompany["user"], $responseUserAndCompany["company_id"]);
         $color = ($balance < 0 ? "#ff0000" : ($balance > 0 ? "#008000" : ""));
         $balance = ($balance < 0 ? $balance * -1 : $balance);
 
@@ -352,7 +427,7 @@ class CashFlow extends Controller
                 throw new \Exception("parametro vazio ou inválido para atualização do fluxo de caixa");
             }
 
-            $response = initializeUserAndCompanyId();
+            $responseUserAndCompany = initializeUserAndCompanyId();
             $cashFlow = new ModelCashFlow();
             $cashFlow->setUuid($uriParameter);
             $cashFlowData = $cashFlow->findCashFlowByUuid();
@@ -384,7 +459,7 @@ class CashFlow extends Controller
 
             $response = $cashFlow->updateCashFlowByUuid([
                 "uuid" => $uriParameter,
-                "id_user" => $response["user"],
+                "id_user" => $responseUserAndCompany["user"],
                 "id_cash_flow_group" => $cashFlowGroup,
                 "entry" => $requestPost["launchValue"],
                 "history" => $requestPost["releaseHistory"],
@@ -397,6 +472,42 @@ class CashFlow extends Controller
             if (empty($response)) {
                 http_response_code(500);
                 echo $cashFlow->message->json();
+                die;
+            }
+
+            $dateTime = new DateTime($cashFlowData->created_at);
+            $cashFlowHistoryData = new \stdClass();
+            $cashFlowHistoryData->valor_lacamento = "R$ " . number_format($cashFlowData->getEntry(), 2, ",", ".");
+            $cashFlowHistoryData->data_lancamento = $dateTime->format("d/m/Y");
+            $cashFlowHistoryData->grupo_contas_nome = $cashFlowData->group_name;
+            $cashFlowHistoryData->historico = $cashFlowData->getHistory();
+            $cashFlowHistoryData->tipo_entrada = !empty($cashFlowData->entry_type) ? "Crédito" : "Débito";
+
+            $dateTime = new DateTime($requestPost["createdAt"]);
+            $newCashFlowData = new \stdClass();
+            $newCashFlowData->valor_lacamento = $requestPost["launchValue"];
+            $newCashFlowData->data_lancamento = $dateTime->format("d/m/Y");
+            $newCashFlowData->grupo_contas_nome = $cashFlowGroupData->group_name;
+            $newCashFlowData->historico = $requestPost["releaseHistory"];
+            $newCashFlowData->tipo_entrada = !empty($requestPost["entryType"]) ? "Crédito" : "Débito";
+
+            $requestPost["launchValue"] = convertCurrencyRealToFloat($requestPost["launchValue"]);
+            $historyAudit = new HistoryAudit();
+            $responseHistoryAudit = $historyAudit->persistData([
+                "uuid" => Uuid::uuid4(),
+                "id_company" => $responseUserAndCompany["company_id"],
+                "id_user" => $responseUserAndCompany["user"],
+                "id_report" => 2,
+                "history_transaction" => "Alteração na conta de "
+                 . json_encode($cashFlowHistoryData) . " para " . json_encode($newCashFlowData) . "",
+                "transaction_value" => $requestPost["launchValue"],
+                "created_at" => date("Y-m-d H:i:s"),
+                "deleted" => 0,
+            ]);
+
+            if (empty($responseHistoryAudit)) {
+                http_response_code(500);
+                echo $historyAudit->message->json();
                 die;
             }
 
@@ -511,7 +622,7 @@ class CashFlow extends Controller
                 die;
             }
 
-            $response = initializeUserAndCompanyId();
+            $responseUserAndCompany = initializeUserAndCompanyId();
             $cashFlowGroup = new CashFlowGroup();
             $cashFlowGroup->setUuid($requestPost["accountGroup"]);
             $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid();
@@ -524,11 +635,10 @@ class CashFlow extends Controller
 
             $cashFlowGroup->setId($cashFlowGroupData->id);
             $cashFlow = new ModelCashFlow();
-            
             $response = $cashFlow->persistData([
                 "uuid" => Uuid::uuid4(),
-                "id_user" => $response["user"],
-                "id_company" => $response["company_id"],
+                "id_user" => $responseUserAndCompany["user"],
+                "id_company" => $responseUserAndCompany["company_id"],
                 "id_cash_flow_group" => $cashFlowGroup,
                 "entry" => $requestPost["launchValue"],
                 "history" => $requestPost["releaseHistory"],
@@ -537,6 +647,25 @@ class CashFlow extends Controller
                 "updated_at" => date("Y-m-d"),
                 "deleted" => 0
             ]);
+
+            $historyAudit = new HistoryAudit();
+            $requestPost["launchValue"] = convertCurrencyRealToFloat($requestPost["launchValue"]);
+            $responseHistoryAudit = $historyAudit->persistData([
+                "uuid" => Uuid::uuid4(),
+                "id_company" => $responseUserAndCompany["company_id"],
+                "id_user" => $responseUserAndCompany["user"],
+                "id_report" => 2,
+                "history_transaction" => "Criação de nova conta '{$requestPost["releaseHistory"]}'",
+                "transaction_value" => $requestPost["launchValue"],
+                "created_at" => date("Y-m-d H:i:s"),
+                "deleted" => 0,
+            ]);
+
+            if (empty($responseHistoryAudit)) {
+                http_response_code(500);
+                echo $historyAudit->message->json();
+                die;
+            }
 
             if (empty($response)) {
                 http_response_code(500);

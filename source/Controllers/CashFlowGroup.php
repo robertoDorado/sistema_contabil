@@ -1,12 +1,12 @@
 <?php
+
 namespace Source\Controllers;
 
 use Exception;
 use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Controller;
 use Source\Domain\Model\CashFlowGroup as ModelCashFlowGroup;
-use Source\Domain\Model\Customer;
-use Source\Domain\Model\User;
+use Source\Domain\Model\HistoryAudit;
 
 /**
  * CashFlowGroup C:\php-projects\sistema-contabil\source\Controllers
@@ -32,22 +32,53 @@ class CashFlowGroup extends Controller
         }
 
         $requestPost = $this->getRequests()
-        ->setRequiredFields(["destroy", "restore"])->getAllPostData();
+            ->setRequiredFields(["destroy", "restore", "accountName"])->getAllPostData();
         $requestPost["restore"] = filter_var($requestPost["restore"], FILTER_VALIDATE_BOOLEAN);
         $requestPost["destroy"] = filter_var($requestPost["destroy"], FILTER_VALIDATE_BOOLEAN);
 
         $cashFlowGroup = new ModelCashFlowGroup();
         $response = false;
+        $historyAudit = new HistoryAudit();
+        $responseUserAndCompany = initializeUserAndCompanyId();
+
         if ($requestPost["restore"]) {
             $response = $cashFlowGroup->updateCashFlowGroupByUuid([
-                "uuid"=> $data["uuid"],
+                "uuid" => $data["uuid"],
                 "deleted" => 0
+            ]);
+
+            $responseHistoryAudit = $historyAudit->persistData([
+                "uuid" => Uuid::uuid4(),
+                "id_company" => $responseUserAndCompany["company_id"],
+                "id_user" => $responseUserAndCompany["user"],
+                "id_report" => 2,
+                "history_transaction" => "Restauração do grupo de contas '{$requestPost['accountName']}'",
+                "transaction_value" => 0,
+                "created_at" => date("Y-m-d H:i:s"),
+                "deleted" => 0,
             ]);
         }
 
         if ($requestPost["destroy"]) {
             $cashFlowGroup->setUuid($data["uuid"]);
             $response = $cashFlowGroup->dropCashFlowGroupByUuid();
+
+            $responseHistoryAudit = $historyAudit->persistData([
+                "uuid" => Uuid::uuid4(),
+                "id_company" => $responseUserAndCompany["company_id"],
+                "id_user" => $responseUserAndCompany["user"],
+                "id_report" => 2,
+                "history_transaction" => "Exclusão do grupo de contas '{$requestPost['accountName']}'",
+                "transaction_value" => 0,
+                "created_at" => date("Y-m-d H:i:s"),
+                "deleted" => 0,
+            ]);
+        }
+
+        if (empty($responseHistoryAudit)) {
+            http_response_code(500);
+            echo $historyAudit->message->json();
+            die;
         }
 
         if (empty($response)) {
@@ -97,6 +128,25 @@ class CashFlowGroup extends Controller
             "deleted" => 1
         ]);
 
+        $responseUserAndCompany = initializeUserAndCompanyId();
+        $historyAudit = new HistoryAudit();
+        $responseHistoryAudit = $historyAudit->persistData([
+            "uuid" => Uuid::uuid4(),
+            "id_company" => $responseUserAndCompany["company_id"],
+            "id_user" => $responseUserAndCompany["user"],
+            "id_report" => 2,
+            "history_transaction" => "Exclusão do grupo de contas '{$cashFlowGroupData->group_name}'",
+            "transaction_value" => 0,
+            "created_at" => date("Y-m-d H:i:s"),
+            "deleted" => 0,
+        ]);
+
+        if (empty($responseHistoryAudit)) {
+            http_response_code(500);
+            echo $historyAudit->message->json();
+            die;
+        }
+
         if (empty($response)) {
             http_response_code(500);
             echo $cashFlowGroup->message->json();
@@ -111,7 +161,7 @@ class CashFlowGroup extends Controller
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
             verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $requestPost = $this->getRequests()
-            ->setRequiredFields(["csrfToken", "accountGroup"])->getAllPostData();
+                ->setRequiredFields(["csrfToken", "accountGroup"])->getAllPostData();
 
             $uriParameter = $this->getServer()->getServerByKey("REQUEST_URI");
             $uriParameter = explode("/", $uriParameter);
@@ -137,6 +187,25 @@ class CashFlowGroup extends Controller
                 "updated_at" => date("Y-m-d"),
                 "group_name" => $requestPost["accountGroup"]
             ]);
+
+            $responseUserAndCompany = initializeUserAndCompanyId();
+            $historyAudit = new HistoryAudit();
+            $responseHistoryAudit = $historyAudit->persistData([
+                "uuid" => Uuid::uuid4(),
+                "id_company" => $responseUserAndCompany["company_id"],
+                "id_user" => $responseUserAndCompany["user"],
+                "id_report" => 2,
+                "history_transaction" => "Alteração do grupo de contas '{$cashFlowGroupData->group_name}' para '{$requestPost["accountGroup"]}'",
+                "transaction_value" => 0,
+                "created_at" => date("Y-m-d H:i:s"),
+                "deleted" => 0,
+            ]);
+
+            if (empty($responseHistoryAudit)) {
+                http_response_code(500);
+                echo $historyAudit->message->json();
+                die;
+            }
 
             if (!$response) {
                 http_response_code(500);
@@ -189,21 +258,21 @@ class CashFlowGroup extends Controller
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
             verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $requestPost = $this->getRequests()
-            ->setRequiredFields(["csrfToken", "accountGroup"])->getAllPostData();
+                ->setRequiredFields(["csrfToken", "accountGroup"])->getAllPostData();
 
-            $response = initializeUserAndCompanyId();
+            $responseUserAndCompany = initializeUserAndCompanyId();
             $cashFlowGroup = new ModelCashFlowGroup();
 
-            if (empty($response["company_id"])) {
+            if (empty($responseUserAndCompany["company_id"])) {
                 http_response_code(500);
                 echo json_encode(["error" => "selecione uma empresa antes de criar un grupo de contas"]);
                 die;
             }
-            
+
             $response = $cashFlowGroup->persistData([
                 "uuid" => Uuid::uuid4(),
-                "id_user" => $response["user"],
-                "id_company" => $response["company_id"],
+                "id_user" => $responseUserAndCompany["user"],
+                "id_company" => $responseUserAndCompany["company_id"],
                 "group_name" => $requestPost["accountGroup"],
                 "created_at" => date("Y-m-d"),
                 "updated_at" => date("Y-m-d"),
@@ -213,6 +282,24 @@ class CashFlowGroup extends Controller
             if (empty($response)) {
                 http_response_code(500);
                 echo $cashFlowGroup->message->json();
+                die;
+            }
+
+            $historyAudit = new HistoryAudit();
+            $responseHistoryAudit = $historyAudit->persistData([
+                "uuid" => Uuid::uuid4(),
+                "id_company" => $responseUserAndCompany["company_id"],
+                "id_user" => $responseUserAndCompany["user"],
+                "id_report" => 2,
+                "history_transaction" => "Criação de grupo de contas '{$requestPost["accountGroup"]}'",
+                "transaction_value" => 0,
+                "created_at" => date("Y-m-d H:i:s"),
+                "deleted" => 0,
+            ]);
+
+            if (empty($responseHistoryAudit)) {
+                http_response_code(500);
+                echo $historyAudit->message->json();
                 die;
             }
 

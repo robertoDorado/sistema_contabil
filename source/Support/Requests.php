@@ -65,7 +65,7 @@ class Requests
 
     private function verifyData(string $field, string $key, $value) {
         if ($field == $key) {
-            if (empty($value)) {
+            if (!isset($value)) {
                 throw new \Exception("Campo " . $key . " é obrigatório.");
             }
         }

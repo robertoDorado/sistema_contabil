@@ -55,7 +55,7 @@ class HistoryAudit
 
         $response = $this->historyAudit->find(
             "id_user=:id_user AND id_company=:id_company AND deleted=:deleted",
-            ":id_user=" . $user->getId() . "&:id_company=" . $companyId . ":deleted=" . $deleted . "",
+            ":id_user=" . $user->getId() . "&:id_company=" . $companyId . "&:deleted=" . $deleted . "",
             $columnsH
         )->join(
             CONF_DB_NAME . ".report_system",

@@ -867,7 +867,11 @@ const historyAuditReport = dataTableConfig($("#historyAuditReport"),
         "columnDefs": [
             {
                 "targets": [0],
-                "visible": false
+                "visible": false,
+            },
+            {
+                "width": "12%",
+                "targets": [3]
             }
         ],
         "language": {

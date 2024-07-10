@@ -26,6 +26,12 @@ class HistoryAudit
         $this->ddl = new DDL(ModelsHistoryAudit::class);
     }
 
+    public function setHistoryTransactionToOneThousendCharacters()
+    {
+        $this->ddl->alterTable(["MODIFY COLUMN history_transaction VARCHAR(1000) NOT NULL"]);
+        $this->ddl->executeQuery();
+    }
+
     public function defineTable()
     {
         $this->ddl->setClassProperties();

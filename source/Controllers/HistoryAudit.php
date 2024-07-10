@@ -24,20 +24,21 @@ class HistoryAudit extends Controller
 
     public function historyAuditReport()
     {
-        $response = initializeUserAndCompanyId();
+        $responseUserAndCompany = initializeUserAndCompanyId();
         $historyAudit = new ModelHistoryAudit();
         $historyAuditData = $historyAudit->findAllHistoryAndAuditJoinReportSystem(
             ["uuid", "history_transaction", "transaction_value", "created_at"],
             ["report_name"],
-            $response["user"],
-            $response["company_id"],
+            $responseUserAndCompany["user"],
+            $responseUserAndCompany["company_id"],
             false
         );
 
         if (!empty($historyAuditData)) {
-            $dateTime = new DateTime();
-            $historyAuditData = array_map(function ($item) use ($dateTime) {
-                $item->created_at = $dateTime->format("Y-m-d H:i:s");
+            $historyAuditData = array_map(function ($item) {
+                $dateTime = new DateTime($item->created_at);
+                $item->date_created_at = $dateTime->format("d/m/Y");
+                $item->time_created_at = $dateTime->format("H:i:s");
                 $item->transaction_value = "R$ " . number_format($item->transaction_value, 2, ",", ".");
                 return $item;
             }, $historyAuditData);

@@ -38,6 +38,7 @@
                                             <th>Histórico</th>
                                             <th>Valor</th>
                                             <th>Data do registro</th>
+                                            <th>Hora do registro</th>
                                             <th>Editar</th>
                                             <th>Excluir</th>
                                         </tr>
@@ -50,7 +51,8 @@
                                                     <td><?= $historyAudit->report_name ?></td>
                                                     <td><?= $historyAudit->history_transaction ?></td>
                                                     <td><?= $historyAudit->transaction_value ?></td>
-                                                    <td><?= $historyAudit->created_at ?></td>
+                                                    <td><?= $historyAudit->date_created_at ?></td>
+                                                    <td><?= $historyAudit->time_created_at ?></td>
                                                     <td><a class="icons" href="<?= url("/admin/history-audit/form/" . $historyAudit->getUuid() . "") ?>"><i class="fas fa-edit" aria-hidden="true"></i></a></td>
                                                     <td><a data-csrf="<?= session()->csrf_token ?>" data-company="<?= $historyAudit->history_transaction ?>" data-uuid="<?= $historyAudit->getUuid() ?>" class="icons trash-link" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a></td>
                                                 </tr>

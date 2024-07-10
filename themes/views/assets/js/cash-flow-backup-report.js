@@ -21,6 +21,8 @@ if (window.location.pathname == "/admin/cash-flow/backup/report") {
             const row = this.parentElement.parentElement
             data.row = row
             data.uuid = uuid
+            data.history = this.dataset.history
+            data.launchValue = this.dataset.launchvalue
             data.restore = true
             data.destroy = false
             data.accountReference = Array.from(this.closest("tr").children)[2].innerHTML
@@ -33,6 +35,8 @@ if (window.location.pathname == "/admin/cash-flow/backup/report") {
             const row = this.parentElement.parentElement
             data.row = row
             data.uuid = uuid
+            data.history = this.dataset.history
+            data.launchValue = this.dataset.launchvalue
             data.destroy = true
             data.restore = false
             data.accountReference = Array.from(this.closest("tr").children)[2].innerHTML
@@ -68,6 +72,8 @@ if (window.location.pathname == "/admin/cash-flow/backup/report") {
         const form = new FormData()
         form.append("destroy", data.destroy)
         form.append("restore", data.restore)
+        form.append("launchValue", data.launchValue)
+        form.append("history", data.history)
 
         fetch(window.location.origin + `/admin/cash-flow/modify/${data.uuid}`,
         {
