@@ -1,10 +1,14 @@
 <?php
 
-use Source\Support\Message;
+$response = new \stdClass();
+$response->status = false;
 
-require dirname(dirname(__DIR__)) . "/vendor/autoload.php";
+$verifyData = [
+    "label" => function () use ($response) {
+        $response->status = true;
+        $response->alter = "olá";
+    }
+];
 
-$message = new Message();
-$message->error("erro (A)");
-$message->error("erro (B)");
-echo $message->json();
+$verifyData["label"]();
+var_dump($response);

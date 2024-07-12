@@ -46,6 +46,12 @@ class HistoryAudit
         return $this->data->$name ?? null;
     }
 
+    public function findHistoryAndAuditByUuid(array $columns): ?ModelsHistoryAudit
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        return $this->historyAudit->find("uuid=:uuid", ":uuid=" . $this->getUuid() . "", $columns)->fetch();
+    }
+
     /** @var ModelsHistoryAudit[] */
     public function findAllHistoryAndAuditJoinReportSystem(array $columnsH, array $columnsR, User $user, int $companyId, bool $deleted): array
     {

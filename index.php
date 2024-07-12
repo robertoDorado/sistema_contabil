@@ -175,10 +175,9 @@ $route->post("/cash-flow-explanatory-notes/backup", "CashFlowExplanatoryNotes::c
  * Histórico e Auditoria
  */
 $route->get("/history-audit/report", "HistoryAudit::historyAuditReport");
-$route->get("/history-audit/form/{uuid}", "HistoryAudit::historyAuditUpdate");
-$route->post("/history-audit/form", "HistoryAudit::historyAuditUpdate");
-$route->post("/history-audit/create", "HistoryAudit::historyAuditCreate");
 $route->get("/history-audit/backup", "HistoryAudit::historyAuditBackup");
+$route->post("/history-audit/backup", "HistoryAudit::historyAuditBackup");
+$route->post("/history-audit/remove", "HistoryAudit::historyAuditRemove");
 
 /** 
  * Assinatura do cliente

@@ -903,11 +903,11 @@ const historyAuditReport = dataTableConfig($("#historyAuditReport"),
                 "title": 'Histórico da auditoria',
                 customize: function (doc) {
                     doc.content[1].table.body.forEach(function (row) {
-                        row.splice(4, 2);
+                        row.splice(6, 1);
                     });
 
                     doc.content[1].table.widths = [
-                        '20%', '20%', '20%', '20%', '20%', '20%'
+                        '16.66%', '16.66%', '16.66%', '16.66%', '16.66%', '16.66%'
                     ];
 
                     var objLayout = {};
@@ -925,6 +925,30 @@ const historyAuditReport = dataTableConfig($("#historyAuditReport"),
             },
             "colvis"
         ],
+        "initComplete": function () {
+            this.api()
+                .buttons()
+                .container()
+                .appendTo("#widgets .col-md-6:eq(0)");
+        }
+    })
+const historyAuditBackup = dataTableConfig($("#historyAuditBackup"),
+    {
+        "columnDefs": [
+            {
+                "targets": [0],
+                "visible": false,
+            },
+            {
+                "width": "12%",
+                "targets": [3]
+            }
+        ],
+        "language": {
+            "url": urlJson
+        },
+        "responsive": true,
+        "autoWidth": false,
         "initComplete": function () {
             this.api()
                 .buttons()
