@@ -36,7 +36,7 @@ class OperatingCashFlow
             "TINYINT(1) NOT NULL",
             "CONSTRAINT fk_operating_cash_flow_group FOREIGN KEY (cash_flow_group_id) REFERENCES cash_flow_group(id) ON DELETE CASCADE ON UPDATE CASCADE"
         ]);
-        $this->ddl->dropTableIfExists()->createTableQuery();
+        $this->ddl->setForeignKeyChecks(0)->dropTableIfExists()->createTableQuery()->setForeignKeyChecks(1);
         return $this->ddl->executeQuery();
     }
 }

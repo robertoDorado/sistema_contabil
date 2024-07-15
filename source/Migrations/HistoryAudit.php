@@ -52,7 +52,7 @@ class HistoryAudit
             "CONSTRAINT fk_history_audit_report_system FOREIGN KEY (id_report) REFERENCES report_system(id) ON DELETE CASCADE ON UPDATE CASCADE",
             "CONSTRAINT fk_history_audit_company FOREIGN KEY (id_company) REFERENCES company(id) ON DELETE CASCADE ON UPDATE CASCADE"
         ]);
-        $this->ddl->dropTableIfExists()->createTableQuery();
+        $this->ddl->setForeignKeyChecks(0)->dropTableIfExists()->createTableQuery()->setForeignKeyChecks(1);
         $this->ddl->executeQuery();
     }
 }

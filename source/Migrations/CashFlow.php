@@ -53,7 +53,7 @@ class CashFlow
             "CONSTRAINT fk_cash_flow_cash_flow_group FOREIGN KEY (id_cash_flow_group) REFERENCES cash_flow_group(id) ON DELETE CASCADE ON UPDATE CASCADE",
             "CONSTRAINT fk_cash_flow_company FOREIGN KEY (id_company) REFERENCES company(id) ON DELETE CASCADE ON UPDATE CASCADE"
         ]);
-        $this->ddl->dropTableIfExists()->createTableQuery();
+        $this->ddl->setForeignKeyChecks(0)->dropTableIfExists()->createTableQuery()->setForeignKeyChecks(1);
         $this->ddl->executeQuery();
     }
 }

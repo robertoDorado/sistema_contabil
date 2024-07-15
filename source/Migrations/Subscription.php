@@ -37,7 +37,7 @@ class Subscription
             "DATE NOT NULL", "DATE NOT NULL", "VARCHAR(255) NOT NULL",
             "CONSTRAINT fk_customer_subscription FOREIGN KEY (customer_id) REFERENCES customer(id) ON DELETE CASCADE ON UPDATE CASCADE"
         ]);
-        $this->ddl->dropTableIfExists()->createTableQuery();
+        $this->ddl->setForeignKeyChecks(0)->dropTableIfExists()->createTableQuery()->setForeignKeyChecks(1);
         return $this->ddl->executeQuery();
     }
 }
