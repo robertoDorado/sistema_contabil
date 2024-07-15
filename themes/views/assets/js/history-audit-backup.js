@@ -4,7 +4,7 @@ if (window.location.pathname == "/admin/history-audit/backup") {
 
     historyAuditBackup.on("click", ".restore-link,.trash-link", function(event) {
         event.preventDefault()
-        dataTransfer.row = $(this).closest("tr").prev().is("tr") ? $(this).closest("tr").prev() : $(this).closest("tr")
+        dataTransfer.row = $(this).closest("td").closest("tr")
         dataTransfer.uuid = $(this).data("uuid")
         dataTransfer.action = Array.isArray($(this).attr("class").match(/restore-link/)) ? "restore" : "delete"
         $("#launchModal").click()

@@ -7,7 +7,7 @@ if (window.location.pathname == "/admin/history-audit/report") {
     historyAuditReport.on("click", ".trash-link", function(event) {
         event.preventDefault()
         dataTransfer.uuid = $(this).data("uuid")
-        dataTransfer.row = $(this).closest("tr").prev().is("tr") ? $(this).closest("tr").prev() : $(this).closest("tr")
+        dataTransfer.row = $(this).closest("td").closest("tr")
         $("#launchModal").click()
     })
 
