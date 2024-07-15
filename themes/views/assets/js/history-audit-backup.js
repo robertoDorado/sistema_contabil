@@ -2,15 +2,16 @@ if (window.location.pathname == "/admin/history-audit/backup") {
     const dataTransfer = {}
     const saveChanges = $("#saveChanges")
 
-    historyAuditBackup.on("click", ".restore-link,.trash-link", function(event) {
+    historyAuditBackup.on("click", ".restore-link,.trash-link", function (event) {
         event.preventDefault()
-        dataTransfer.row = $(this).closest("td").closest("tr")
+        dataTransfer.row = $(this).closest("td").closest("tr").attr("class") == 'child' ?
+            $(this).closest("td").closest("tr").prev() : $(this).closest("td").closest("tr")
         dataTransfer.uuid = $(this).data("uuid")
         dataTransfer.action = Array.isArray($(this).attr("class").match(/restore-link/)) ? "restore" : "delete"
         $("#launchModal").click()
     })
 
-    $("#launchModal").click(function() {
+    $("#launchModal").click(function () {
         $("#modalContainerLabel").html("Atenção!")
         $("#dismissModal").html("Voltar")
 
@@ -19,7 +20,7 @@ if (window.location.pathname == "/admin/history-audit/backup") {
             saveChanges.removeClass("btn-danger")
             saveChanges.addClass("btn-primary")
             saveChanges.html("Restaurar")
-        }else {
+        } else {
             $(".modal-body").html(`Você deseja mesmo deletar permanentemente o registro ${dataTransfer.uuid}?`)
             saveChanges.removeClass("btn-primary")
             saveChanges.addClass("btn-danger")
@@ -27,18 +28,18 @@ if (window.location.pathname == "/admin/history-audit/backup") {
         }
     })
 
-    saveChanges.click(function() {
+    saveChanges.click(function () {
         showSpinner(this)
 
         const form = new FormData()
         form.append("uuid", dataTransfer.uuid)
         form.append("action", dataTransfer.action)
-        
+
         const url = window.location.origin + "/admin/history-audit/backup"
         fetch(url, {
             method: "POST",
             body: form
-        }).then(response => response.json()).then(function(response) {
+        }).then(response => response.json()).then(function (response) {
             saveChanges.removeAttr("disabled")
             let btnLabel = dataTransfer.action == "restore" ? "Restaurar" : "Excluir"
             saveChanges.html(btnLabel)
@@ -51,7 +52,7 @@ if (window.location.pathname == "/admin/history-audit/backup") {
                 toastr.error(message)
                 throw new Error(message)
             }
-            
+
             if (response.success) {
                 message = response.success
                 message = message.charAt(0).toUpperCase() + message.slice(1)
