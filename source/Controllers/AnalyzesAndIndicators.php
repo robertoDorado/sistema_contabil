@@ -159,23 +159,7 @@ class AnalyzesAndIndicators extends Controller
                 return $item;
             }, $cashFlowData);
 
-            $allowGroupNameKeys = [
-                "recebimentos de clientes",
-                "pagamentos a fornecedores e empregados",
-                "despesas de capital",
-                "emissão de dívidas ou ações",
-                "pagamento de dívidas ou dividendos",
-                "compra de ativos fixos",
-                "venda de investimentos",
-                "pagamentos de juros",
-                "pagamentos de dívidas",
-                "lucro líquido",
-                "receita líquida",
-                "período médio de cobrança",
-                "período médio de estoque",
-                "período médio de pagamento"
-            ];
-
+            $allowGroupNameKeys = financialIndicators();
             $cashFlowData = array_filter($cashFlowData, function ($item) use ($allowGroupNameKeys) {
                 return in_array($item->group_name, $allowGroupNameKeys);
             });

@@ -39,55 +39,119 @@
                                     <div class="card-header">
                                         <h4 class="card-title w-100">
                                             <a class="d-block w-100" data-toggle="collapse" href="#collapseOne">
-                                               Fluxo de Caixa Dinâmico
+                                                Fluxo de Caixa Dinâmico
                                             </a>
                                         </h4>
                                     </div>
                                     <div id="collapseOne" class="collapse show" data-parent="#accordion">
                                         <div class="card-body documentation">
-                                            Uma das características distintivas do nosso Sistema de Gestão Contábil 
-                                            é a robusta funcionalidade de Fluxo de Caixa. Essencial para uma gestão 
-                                            financeira eficiente, nossa plataforma oferece um painel intuitivo que 
-                                            permite uma visão holística e detalhada do fluxo de entrada e saída de 
-                                            recursos financeiros.
+                                            <h6><strong>Documentação</strong></h6>
+                                            <p>
+                                                O menu "Fluxo de Caixa" no sistema contábil é uma ferramenta essencial
+                                                para gerenciar, monitorar e analisar o movimento de caixa da empresa.
+                                                Ele fornece informações detalhadas sobre as entradas e saídas de caixa,
+                                                ajudando a empresa a manter a liquidez e a planejar suas finanças.
+                                                A seguir, é apresentada uma documentação detalhada das funcionalidades
+                                                e submenus do menu "Fluxo de Caixa".
+                                            </p>
+                                            <h6><strong>Estrutura do Menu Fluxo de Caixa</strong></h6>
+                                            <ol>
+                                                <li>Visão Geral do Fluxo de Caixa</li>
+                                                <li>Configuração do Fluxo de Caixa</li>
+                                                <li>Lançamentos de Caixa</li>
+                                                <li>Backup de contas</li>
+                                                <li>Conciliação Bancária</li>
+                                                <li>Análises e Indicadores</li>
+                                                <li>Configuração Variação de caixa</li>
+                                                <li>Planejamento de Caixa</li>
+                                                <li>Notas Explicativas</li>
+                                                <li>Auditoria e Histórico</li>
+                                            </ol>
+                                            <h6><strong>Visão Geral do Fluxo de Caixa</strong></h6>
+                                            <h6><strong>Funcionalidades:</strong></h6>
                                             <ul>
-                                                <li>
-                                                    <strong>Previsões Precisas:</strong>
-                                                    Antecipe-se às necessidades financeiras da sua empresa com previsões 
-                                                    de fluxo de caixa precisas. Nosso sistema utiliza algoritmos avançados 
-                                                    para analisar dados históricos e tendências, proporcionando uma projeção 
-                                                    confiável das finanças futuras.
-                                                </li>
-                                                <li>
-                                                    <strong>Controle de Despesas e Receitas:</strong>
-                                                    Mantenha um controle rigoroso sobre todas as despesas e receitas. 
-                                                    Nossa plataforma categoriza automaticamente as transações, 
-                                                    simplificando a identificação de áreas de oportunidade para redução de custos
-                                                    ou aumento de receitas.
-                                                </li>
-                                                <li>
-                                                    <strong>Tomada de Decisões Estratégicas:</strong>
-                                                    Capacite sua equipe de gestão com informações em tempo real. 
-                                                    O acesso fácil e rápido ao fluxo de caixa permite uma tomada de decisões 
-                                                    estratégicas fundamentada, auxiliando na alocação eficiente de recursos 
-                                                    e na identificação de oportunidades de investimento.
-                                                </li>
-                                                <li>
-                                                    <strong>Análise gráfica:</strong>
-                                                    A plataforma inclui indicadores de gráfico de linha que agrupam os movimentos diários, 
-                                                    fornecendo uma visão clara e contínua das atividades financeiras diárias. 
-                                                    Esses gráficos permitem que os gestores identifiquem rapidamente 
-                                                    tendências e variações no fluxo de caixa, facilitando a tomada de decisões informadas.
-                                                    O gráfico de pizza mostra o total de contas que existe no grupo de contas. 
-                                                    Esse tipo de visualização torna mais fácil compreender a distribuição dos recursos 
-                                                    e identificar quais contas representam uma maior parte do total, 
-                                                    ajudando a direcionar esforços para a gestão dessas contas de maneira mais eficaz.
-                                                </li>
+                                                <li><strong>Painel Resumido:</strong> Exibição de um resumo das entradas e saídas de caixa para o período selecionado.</li>
+                                                <li><strong>Saldos de Caixa:</strong> Mostra o saldo inicial, entradas totais, saídas totais e saldo final.</li>
+                                                <li><strong>Importação de Lançamentos:</strong> Importação de transações de caixa a partir de arquivos Excel, extensão .xlsx</li>
+                                                <li><strong>Filtro por data:</strong> Filtro por data de lançamento da conta.</li>
+                                                <li><strong>Campo de busca:</strong> Campo de busca genérico por qualquer item que existe no relatório</li>
+                                                <li><strong>Editar/Excluir Lançamentos:</strong> Ferramentas para editar ou excluir lançamentos existentes.</li>
                                             </ul>
-                                            O Fluxo de Caixa Dinâmico do nosso sistema não apenas simplifica a gestão diária das finanças, 
-                                            mas também se torna uma ferramenta estratégica vital para o crescimento sustentável 
-                                            da sua empresa. Tenha o controle total das finanças e transforme dados em ações, 
-                                            impulsionando o sucesso financeiro do seu negócio.
+                                            <h6><strong>Configuração do Fluxo de Caixa</strong></h6>
+                                            <h6><strong>Funcionalidades:</strong></h6>
+                                            <ul>
+                                                <li><strong>Lançar grupo de contas:</strong> Lançamento do nome do grupo de contas para agrupamento do fluxo de caixa.</li>
+                                                <li><strong>Editar/Excluir Lançamentos:</strong> Ferramentas para editar ou excluir grupo de contas existentes.</li>
+                                                <li><strong>Campo de busca:</strong> Campo de busca genérico por qualquer item que existe no relatório</li>
+                                                <li><strong>Relatório grupo de contas:</strong> Demonstrativo de todos os grupos de contas ativos para a empresa selecionada.</li>
+                                                <li><strong>Backup grupo de contas:</strong> Demonstrativo de todos os grupos de contas que foram excluídos para a empresa selecionada. Possibilitando o usuário de restaurar a conta ou excluir permanentemente.</li>
+                                            </ul>
+                                            <h6><strong>Lançamentos de Caixa</strong></h6>
+                                            <h6><strong>Funcionalidades:</strong></h6>
+                                            <ul>
+                                                <li><strong>Novo Lançamento:</strong> Registro de novas transações de caixa, incluindo data, valor, categoria e descrição.</li>
+                                            </ul>
+                                            <h6><strong>Backup de contas</strong></h6>
+                                            <h6><strong>Funcionalidades:</strong></h6>
+                                            <ul>
+                                                <li><strong>Relatório backup de contas:</strong> Demonstrativo de todas as contas que foram excluídas para a empresa selecionada. Possibilitando o usuário de restaurar a conta ou excluir permanentemente.</li>
+                                                <li><strong>Campo de busca:</strong> Campo de busca genérico por qualquer item que existe no relatório</li>
+                                            </ul>
+                                            <h6><strong>Conciliação bancária</strong></h6>
+                                            <h6><strong>Funcionalidades:</strong></h6>
+                                            <ul>
+                                                <li><strong>Importar Extratos Bancários:</strong> Importação de extratos bancários no formato OFX.</li>
+                                                <li><strong>Conciliação Automática:</strong> Ferramentas para conciliação automática das transações bancárias com os registros internos.</li>
+                                                <li><strong>Conciliação Manual:</strong> Interface para conciliação manual das transações, permitindo associar manualmente transações bancárias com registros internos.</li>
+                                                <li><strong>Relatórios de Conciliação:</strong> Geração de relatórios detalhados mostrando as transações conciliadas e não conciliadas.</li>
+                                            </ul>
+                                            <h6><strong>Análises e Indicadores</strong></h6>
+                                            <h6><strong>Funcionalidades:</strong></h6>
+                                            <ul>
+                                                <li><strong>Projeções de caixa:</strong> Previsão de entradas e saídas de dinheiro em um determinado período futuro, possiblitando filtrar por período.</li>
+                                                <li><strong>Indicadores Financeiros:</strong> Cálculo e exibição de indicadores financeiros. 
+                                                Abaixo a lista dos indicadores financeiros que devem estar cadastrados no grupo de contas para serem exibidas no relatório.</li>
+                                                <?php if (!empty(financialIndicators())) : ?>
+                                                    <ol>
+                                                        <?php foreach(financialIndicators() as $value): ?>
+                                                            <li><?= strtoupper(substr($value, 0, 1)) . substr($value, 1) ?></li>
+                                                        <?php endforeach ?>
+                                                    </ol>
+                                                <?php endif ?>
+                                                <li><strong>Gráficos e visualizações:</strong> Gráficos de barras ou linhas que mostram as tendências de entradas e saídas de caixa ao longo do tempo.</li>
+                                            </ul>
+                                            <h6><strong>Configuração Variação de Caixa</strong></h6>
+                                            <h6><strong>Funcionalidades:</strong></h6>
+                                            <ul>
+                                                <li><strong>Lançar variação de caixa:</strong> Lançamento de grupo de contas para agrupamento de variação de caixa. Abaixo as variações de caixa que exercem o agrupamento das contas.</li>
+                                                <ol>
+                                                    <li>Fluxo de caixa operacional</li>
+                                                    <li>Fluxo de caixa de investimento</li>
+                                                    <li>Fluxo de caixa de financiamento</li>
+                                                </ol>
+                                                <li><strong>Relatório variação de caixa:</strong> Geração de relatórios detalhados mostrando as variações de caixa cadastradas.</li>
+                                                <li><strong>Backup variação de caixa:</strong> Demonstrativo de todas variações de caixa que foram excluídas para a empresa selecionada. Possibilitando o usuário de restaurar a conta ou excluir permanentemente.</li>
+                                            </ul>
+                                            <h6><strong>Planejamento de Caixa</strong></h6>
+                                            <h6><strong>Funcionalidades:</strong></h6>
+                                            <ul>
+                                                <li><strong>Orçamentos de Caixa:</strong> Ferramenta para análise orçamentos de caixa possibilitando filtros por período.</li>
+                                                <li><strong>Análise de Variação:</strong> Relatório para análise de atividades operacionais, atividades de investimento e atividades de financiamento.</li>
+                                            </ul>
+                                            <h6><strong>Notas Explicativas</strong></h6>
+                                            <h6><strong>Funcionalidades:</strong></h6>
+                                            <ul>
+                                                <li><strong>Adicionar Notas:</strong> Inserção de notas explicativas para transações específicas.</li>
+                                                <li><strong>Editar/Excluir Notas:</strong> Ferramentas para editar ou excluir notas existentes.</li>
+                                                <li><strong>Visualizar Notas:</strong> Exibição de notas explicativas associadas a transações no relatório de fluxo de caixa.</li>
+                                                <li><strong>Backup de Notas:</strong> Demonstrativo de todas as notas explicativas que foram excluídas para a empresa selecionada. Possibilitando o usuário de restaurar a conta ou excluir permanentemente.</li>
+                                            </ul>
+                                            <h6><strong>Auditoria e Históricos</strong></h6>
+                                            <h6><strong>Funcionalidades:</strong></h6>
+                                            <ul>
+                                                <li><strong>Registro de Atividades:</strong> Histórico detalhado de todas as atividades relacionadas ao fluxo de caixa, incluindo criação, edição, exclusão e importação das transações.</li>
+                                                <li><strong>Relatórios de Auditoria:</strong> Geração de relatórios detalhados para auditoria interna e externa, mostrando todas as alterações e atividades no fluxo de caixa.</li>
+                                            </ul>
                                         </div>
                                     </div>
                                 </div>

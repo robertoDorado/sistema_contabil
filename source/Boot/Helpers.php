@@ -1,4 +1,22 @@
 <?php
+function financialIndicators(): array {
+    return [
+        "recebimentos de clientes",
+        "pagamentos a fornecedores e empregados",
+        "despesas de capital",
+        "emissão de dívidas ou ações",
+        "pagamento de dívidas ou dividendos",
+        "compra de ativos fixos",
+        "venda de investimentos",
+        "pagamentos de juros",
+        "pagamentos de dívidas",
+        "lucro líquido",
+        "receita líquida",
+        "período médio de cobrança",
+        "período médio de estoque",
+        "período médio de pagamento"
+    ];
+}
 function initializeUserAndCompanyId(): array {
     $user = new \Source\Domain\Model\User();
     $user->setEmail(session()->user->user_email);
