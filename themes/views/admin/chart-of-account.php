@@ -23,13 +23,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-6 d-flex align-items-center">
-                    <form id="exportExcelModelChartOfAccount">
-                        <div class="form-row">
-                            <div class="col-md-12">
-                                <button type="submit" class="btn btn-primary">Exportar modelo de plano de contas</button>
-                            </div>
-                        </div>
-                    </form>
+                    <button id="exportExcelModelChartOfAccount" type="submit" class="btn btn-primary">Exportar modelo de plano de contas</button>
                 </div>
                 <div class="col-md-6">
                     <form id="importExcelForm">
@@ -58,7 +52,7 @@
                             <div class="card-body">
                                 <div class="form-group">
                                     <label for="accountValue">Conta</label>
-                                    <input name="accountValue" class="form-control">
+                                    <input name="accountValue" data-mask="accountValue" class="form-control">
                                     <input type="hidden" name="csrfToken" id="csrfToken" value="<?= session()->csrf_token ?>">
                                 </div>
                                 <div class="form-group">
@@ -89,9 +83,22 @@
                                             <th>Id</th>
                                             <th>Conta</th>
                                             <th>Nome</th>
+                                            <th>Editar</th>
+                                            <th>Excluir</th>
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <?php if (!empty($chartOfAccountData)) : ?>
+                                            <?php foreach ($chartOfAccountData as $value) : ?>
+                                                <tr>
+                                                    <td><?= $value->getUuid() ?></td>
+                                                    <td><?= $value->account_number ?></td>
+                                                    <td><?= $value->account_name ?></td>
+                                                    <td><a class="icons" href="<?= url("/admin/balance-sheet/chart-of-account/" . $value->getUuid() . "") ?>"><i class="fas fa-edit" aria-hidden="true"></i></a></td>
+                                                    <td><a class="icons" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a></td>
+                                                </tr>
+                                            <?php endforeach ?>
+                                        <?php endif ?>
                                     </tbody>
                                 </table>
                             </div>

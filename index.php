@@ -183,6 +183,8 @@ $route->post("/history-audit/remove", "HistoryAudit::historyAuditRemove");
  * Balanço Patrimonial - Plano de contas
  */
 $route->get("/balance-sheet/chart-of-account", "BalanceSheet::chartOfAccount");
+$route->post("/balance-sheet/chart-of-account", "BalanceSheet::chartOfAccount");
+$route->post("/balance-sheet/export-model-chart-of-account", "BalanceSheet::exportChartOfAccountModelExcelFile");
 
 /** 
  * Assinatura do cliente

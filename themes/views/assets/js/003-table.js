@@ -969,6 +969,52 @@ const chartOfAccount = dataTableConfig($("#chartOfAccount"),
         },
         "responsive": true,
         "autoWidth": false,
+        "buttons": [
+            {
+                "extend": 'copyHtml5',
+                "title": 'Plano de contas'
+            },
+            {
+                "extend": 'excelHtml5',
+                "filename": "Plano de contas",
+                "title": "Plano de contas",
+                customizeData: function (xlsxData) {
+                    xlsxData.header = xlsxData.header.filter((data) => data != 'Editar' && data != 'Excluir')
+                }
+            },
+            {
+                "extend": 'csvHtml5',
+                "filename": "Plano de contas",
+                "title": "Plano de contas"
+            },
+            {
+                "extend": 'pdfHtml5',
+                "filename": "Plano de contas",
+                "title": 'Plano de contas',
+                customize: function (doc) {
+                    doc.content[1].table.body.forEach(function (row) {
+                        row.splice(3, 2);
+                    });
+
+                    doc.content[1].table.widths = [
+                        '33.33%', '33.33%', '33.33%'
+                    ];
+
+                    var objLayout = {};
+                    objLayout['hLineWidth'] = function (i) { return 0.5; };
+                    objLayout['vLineWidth'] = function (i) { return 0.5; };
+                    objLayout['hLineColor'] = function (i) { return '#aaa'; };
+                    objLayout['vLineColor'] = function (i) { return '#aaa'; };
+                    objLayout['paddingLeft'] = function (i) { return 4; };
+                    objLayout['paddingRight'] = function (i) { return 4; };
+                    objLayout['paddingTop'] = function (i) { return 4; };
+                    objLayout['paddingBottom'] = function (i) { return 4; };
+                    objLayout['fillColor'] = function (i) { return null; };
+                    doc.content[1].layout = objLayout;
+                }
+            },
+            "colvis"
+        ],
         "initComplete": function () {
             this.api()
                 .buttons()
