@@ -73,7 +73,7 @@
                                 </a>
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
-                                        <a href="#" class="nav-link">
+                                        <a href="<?= url("/admin/balance-sheet/chart-of-account") ?>" class="nav-link">
                                             <p>Plano de contas</p>
                                         </a>
                                     </li>

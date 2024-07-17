@@ -8,8 +8,7 @@ if (allowEndponts.indexOf(window.location.pathname) != -1) {
         dataFilter.each(function (row) {
             let entry = row.filter((value) => value.match(/^R\$\s[-\d,\.]+$/))
             entry = entry[0] ? entry[0] : 'R$ 0,00'
-            let entryValue = parseFloat(entry.replace("R$", "")
-                .replace(".", "").replace(",", ".").trim())
+            let entryValue = parseFloat(entry.replace('R$', '').replace(/\./g, '').replace(',', '.').trim())
 
             balance += entryValue
         })

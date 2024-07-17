@@ -31,7 +31,7 @@
                             <label for="fileInput" class="form-label">Selecione um arquivo Excel:</label>
                             <div class="input-group">
                                 <div class="custom-file">
-                                    <input type="file" name="excelFile" class="custom-file-input" id="fileInput" accept=".xls,.xlsx">
+                                    <input type="file" name="excelFile" class="custom-file-input" id="fileInput" accept=".xls,.xlsx,.csv">
                                     <label for="excelFile" class="custom-file-label">Nome do arquivo</label>
                                 </div>
                                 <button class="btn btn-primary" type="submit">

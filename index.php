@@ -179,6 +179,11 @@ $route->get("/history-audit/backup", "HistoryAudit::historyAuditBackup");
 $route->post("/history-audit/backup", "HistoryAudit::historyAuditBackup");
 $route->post("/history-audit/remove", "HistoryAudit::historyAuditRemove");
 
+/**
+ * Balanço Patrimonial - Plano de contas
+ */
+$route->get("/balance-sheet/chart-of-account", "BalanceSheet::chartOfAccount");
+
 /** 
  * Assinatura do cliente
  */

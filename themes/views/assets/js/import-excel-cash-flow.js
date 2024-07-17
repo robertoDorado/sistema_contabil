@@ -2,7 +2,7 @@ if (window.location.pathname == '/admin/cash-flow/report') {
     const importExcelForm = document.getElementById("importExcelForm")
     const inputExcelFile = document.querySelector('[name="excelFile"]')
     const standardLabelNameExcelFile = inputExcelFile.nextElementSibling.innerHTML
-    const verifyExtensionFile = ["xls", "xlsx"]
+    const verifyExtensionFile = ["xls", "xlsx", "csv"]
 
     inputExcelFile.addEventListener("change", function() {
         const extensionName = extensionFileName(this.value)

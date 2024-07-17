@@ -1,5 +1,6 @@
 <?php
-function financialIndicators(): array {
+function financialIndicators(): array
+{
     return [
         "recebimentos de clientes",
         "pagamentos a fornecedores e empregados",
@@ -17,22 +18,24 @@ function financialIndicators(): array {
         "período médio de pagamento"
     ];
 }
-function initializeUserAndCompanyId(): array {
+function initializeUserAndCompanyId(): array
+{
     $user = new \Source\Domain\Model\User();
     $user->setEmail(session()->user->user_email);
     $userData = $user->findUserByEmail();
-    
+
     $user->setId($userData->id);
     $companyId = empty(session()->user->company_id) ? 0 : session()->user->company_id;
 
     return [
-        "user" => $user, 
+        "user" => $user,
         "company_id" => $companyId,
         "user_data" => $userData
     ];
 }
 
-function verifyRequestHttpOrigin(?string $serverOrigin) {
+function verifyRequestHttpOrigin(?string $serverOrigin)
+{
     $allowedOrigin = [
         CONF_URL_BASE,
         CONF_URL_TEST
@@ -50,7 +53,8 @@ function verifyRequestHttpOrigin(?string $serverOrigin) {
     }
 }
 
-function monthsInPortuguese(): array {
+function monthsInPortuguese(): array
+{
     return [
         1 => 'Janeiro',
         2 => 'Fevereiro',
@@ -67,7 +71,8 @@ function monthsInPortuguese(): array {
     ];
 }
 
-function getCompanysNameByUserId(): array {
+function getCompanysNameByUserId(): array
+{
     $user = new \Source\Domain\Model\User();
     $user->setEmail(session()->user->user_email);
     $userData = $user->findUserByEmail();
@@ -153,13 +158,10 @@ function session()
 
 function convertCurrencyRealToFloat(string $value)
 {
-    if (empty($value)) {
-        throw new \Exception("Valor a ser convertido não pode estar vazio.");
-    }
-
-    $value = preg_replace("/[^\d\.,]+/", "", $value);
-    $value = str_replace(".", "", $value);
-    $value = str_replace(",", ".", $value);
+    $value = trim($value);
+    $value = preg_replace("/^(.+)(,\d{1,2}|\.\d{1,2})$/", "$1;$2", $value);
+    $value = preg_replace("/[^\d;]+/", "", $value);
+    $value = preg_replace("/;/", ".", $value);
     return $value;
 }
 

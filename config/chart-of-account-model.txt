@@ -1,0 +1,397 @@
+1.    ATIVO                    
+1.1    ATIVO CIRCULANTE                    
+1.1.1    DISPONÍVEL                    
+1.1.1.01    Bens Numerários                    
+1.1.1.01.0001        Caixa - fundo fixo                
+1.1.1.02    Bancos Conta Movimento                    
+1.1.1.02.0001        Banco X S/A                
+1.1.1.02.0002        Banco Y S/A                
+1.1.1.02.0003        Banco Alfa S/A               
+1.1.1.03    Aplicações Financeiras                    
+1.1.1.03.0001        Banco X S/A                
+1.1.1.03.0002        Banco Y S/A                
+1.1.1.03.0003        Banco Alfa S/A                
+1.1.2    CRÉDITOS                    
+1.1.2.01    Clientes                    
+1.1.2.01.0001        Clientes nacionais                
+1.1.2.01.0002        Clientes estrangeiros                
+1.1.2.01.0003        (-) Perdas estimadas em crédito de liquidação duvidosa                
+1.1.2.01.0004        (-) Ajuste a valor presente                
+1.1.2.01.0005        Faturamento para entrega futura                
+1.1.2.02    Outros créditos                    
+1.1.2.02.0001        Contas a receber                
+1.1.2.02.0002        Títulos a receber                
+1.1.2.03    Créditos de Funcionários                    
+1.1.2.03.0002        Adiantamento a funcionários                
+1.1.2.03.0002        Empréstimos a funcionários                
+1.1.2.03.0003        Adiantamento de férias                
+1.1.2.04    Impostos e Contribuições a Recuperar                    
+1.1.2.04.0001        ICMS a recuperar                
+1.1.2.04.0002        IPI a recuperar                
+1.1.2.04.0003        IRRF a recuperar                
+1.1.2.04.0004        CSLL a recuperar                
+1.1.2.04.0005        PIS a recuperar                
+1.1.2.04.0006        INSS a recuperar                
+1.1.2.04.0007        COFINS a recuperar                
+1.1.2.04.0008        Outros tributos a recuperar                
+1.1.3    ESTOQUES                    
+1.1.3.01    Mercadorias                    
+1.1.3.01.0001        Mercadorias para Revenda                
+1.1.3.02    Produtos                    
+1.1.3.02.0001        Produtos acabados                
+1.1.3.02.0002        Produtos em elaboração                
+1.1.3.02.0003        Matéria prima                
+1.1.3.03    Outros Custos                    
+1.1.3.03.0001        Importação em andamento                
+1.1.3.03.0002        Adiantamento a fornecedores                
+1.1.3.03.0003        (-) Perdas estimadas para redução ao valor recuperável                
+1.1.4    ATIVOS ESPECIAIS                    
+1.1.4.01    Ativos especiais                    
+1.1.4.01.0001        Ativos especiais em produção                
+1.1.4.01.0002        (-) Amortização acumulada                
+1.1.4.01.0003        (-) Perdas estimadas para redução ao valor recuperável                
+1.1.5    DESPESAS DO EXERCÍCIO SEGUINTE PAGAS ANTECIPADAMENTE                    
+1.1.5.01    Despesas antecipadas                    
+1.1.5.01.0001        Prêmios de seguros a apropriar                
+1.1.5.01.0002        Encargos financeiros a apropriar                
+1.1.5.01.0003        Assinaturas e anuidades a apropriar                
+1.2    ATIVO NÃO CIRCULANTE                    
+1.2.1    REALIZÁVEL A LONGO PRAZO                    
+1.2.1.01    Créditos                    
+1.2.1.01.0001        Adiantamento a terceiros                
+1.2.1.01.0002        (-) Ajuste a valor presente                
+1.2.1.02    Tributos Diferidos                    
+1.2.1.02.0001        IRPJ Diferido                
+1.2.1.02.0002        CSLL Diferida                
+1.2.2    INVESTIMENTOS                    
+1.2.2.01    Participações Permanentes em Outras Sociedades                    
+1.2.2.01.0001        Avaliadas pela equivalência patrimonial                
+1.2.2.01.0002        Avaliadas pelo custo                
+1.2.2.02    Propriedades para Investimento                    
+1.2.2.02.0001        Propriedades para investimento                
+1.2.2.03    Outros Investimentos Permanentes                    
+1.2.2.03.0001        Obras de arte                
+1.2.3    IMOBILIZADO                    
+1.2.3.01    Bens em Operação                    
+1.2.3.01.0001        Terrenos                
+1.2.3.01.0002        Obras civis                
+1.2.3.01.0003        Instalações                
+1.2.3.01.0004        Máquinas, equipamentos e ferramentas                
+1.2.3.01.0005        Móveis e utensílios                
+1.2.3.01.0006        Computadores e periféricos                
+1.2.3.01.0007        Veículos                
+1.2.3.01.0008        Ferramentas                
+1.2.3.01.0009        Florestamento e reflorestamento                
+1.2.3.01.0010        Benfeitorias em propriedades de terceiros                
+1.2.3.02    (-) Depreciação, Amortização e Exaustão Acumulada e Perdas por Redução ao Valor Recuperável                    
+1.2.3.02.0001        Terrenos                
+1.2.3.02.0002        Obras civis                
+1.2.3.02.0003        Instalações                
+1.2.3.02.0004        Máquinas, equipamentos e ferramentas                
+1.2.3.02.0005        Móveis e utensílios                
+1.2.3.02.0006        Computadores e periféricos                
+1.2.3.02.0007        Veículos                
+1.2.3.02.0008        Ferramentas                
+1.2.3.02.0009        Florestamento e reflorestamento                
+1.2.3.02.0010        Benfeitorias em propriedades de terceiros                
+1.2.3.02.0011        Perdas estimadas por redução ao valore recuperável                
+1.2.3.03    Imobilizado Arrendado                    
+1.2.3.03.0001        Veículos arrendados                
+1.2.3.03.0002        Máquinas arrendadas                
+1.2.3.04    (-) Depreciação Acumulada de Bens Arrendados                    
+1.2.3.04.0001        Veículos arrendados                
+1.2.3.04.0002        Máquinas arrendadas                
+1.2.3.05    Imobilizado em Andamento                    
+1.2.3.05.0001        Construção em andamento                
+1.2.3.05.0002        Importação de bens do imobilizado em andamento                
+1.2.3.05.0003        Adiantamento a fornecedores de imobilizado                
+1.2.4    INTANGÍVEL                    
+1.2.4.01    Custo                     
+1.2.4.01.0001        Marcas                
+1.2.4.01.0002        Patentes                
+1.2.4.01.0003        Concessões                
+1.2.4.01.0004        Ágio (good will)                
+1.2.4.01.0006        Direitos autorais                
+1.2.4.02    (-) Amortização Acumulada e Perdas por Redução ao Valor Recuperável                    
+1.2.4.02.0001        Marcas                
+1.2.4.02.0002        Patentes                
+1.2.4.02.0003        Concessões                
+1.2.4.02.0004        Ágio (good will)                
+1.2.4.02.0006        Direitos autorais                
+                        
+2.    PASSIVO                    
+2.1    PASSIVO CIRCULANTE                    
+2.1.1    OBRIGAÇÕES DE CURTO PRAZO                    
+2.1.1.01    Fornecedores                    
+2.1.1.01.0001        Fornecedores demonstração                
+2.1.1.02    Salários e Encargos Sociais                    
+2.1.1.02.0001        Salários a pagar                
+2.1.1.02.0002        13º a pagar                
+2.1.1.02.0003        Férias a pagar                
+2.1.1.02.0004        INSS a pagar                
+2.1.1.02.0005        FGTS a pagar                
+2.1.1.02.0006        IRRF a pagar                
+2.1.1.02.0007        Pró-labore a pagar                
+2.1.1.03    Obrigações Fiscais                    
+2.1.1.03.0001        ICMS a pagar                
+2.1.1.03.0002        IPI a pagar                
+2.1.1.03.0003        PIS / Pasep a pagar                
+2.1.1.03.0004        Cofins a pagar                
+2.1.1.03.0005        ISS a pagar                
+2.1.1.03.0006        IRPJ a pagar                
+2.1.1.03.0007        CSLL a pagar                
+2.1.1.03.0008        Refis a pagar                
+2.1.1.03.0009        (-) Ajuste a valor presente                
+2.1.1.04    Empréstimos e Financiamentos                    
+2.1.1.04.0001        Empréstimos e financiamentos bancários de curto prazo                
+2.1.1.04.0002        Duplicatas descontadas                
+2.1.1.04.0003        Títulos a pagar                
+2.1.1.04.0004        (-) Juros a apropriar                
+2.1.1.05    Debêntures                     
+2.1.1.05.0001        Conversíveis em ações                
+2.1.1.06    Outras Obrigações Diversas                    
+2.1.1.06.0001        Adiantamento de clientes                
+2.1.1.06.0002        Contas a pagar                
+2.1.1.06.0003        Comissões a pagar                
+2.2    PASSIVO NÃO CIRCULANTE                    
+2.2.1    OBRIGAÇÕES DE LONGO PRAZO                    
+2.2.1.01    Empréstimos e Financiamentos                    
+2.2.1.01.0001        Empréstimos e financiamentos bancários de longo prazo                
+2.2.1.02    Debêntures                     
+2.2.1.02.0001        Conversíveis em ações                
+2.2.1.03    Tributos Diferidos                    
+2.2.1.03.0001        IRPJ Diferido                
+2.2.1.03.0002        CSLL Diferida                
+2.2.1.04    Parcelamentos                    
+2.2.1.04.0001        Refis a pagar                
+2.2.1.04.0002        Paes a pagar                
+2.2.1.04.0003        (-) Ajuste a valor presente                
+2.2.1.05    Provisões                    
+2.2.1.05.0001        Provisões para garantias                
+2.2.1.05.0002        Provisões fiscais                
+                        
+2.3    PATRIMÔNIO LÍQUIDO                    
+2.3.1    PATRIMÔNIO LÍQUIDO DOS SÓCIOS                    
+2.3.1.01    Capital Social                    
+2.3.1.01.0001        Capital subscrito                
+2.3.1.01.0002        (-) capital a integralizar                
+2.3.1.02    Reserva de Capital                    
+2.3.1.02.0001        Ágio na emissão de ações                
+2.3.1.03    Opções Outorgadas Reconhecidas                    
+2.3.1.03.0001        Opções Outorgadas Reconhecidas                
+2.3.1.04    Reserva de Reavaliação - Saldos até d/m/Y                    
+2.3.1.04.0001        Reavaliação de imobilizado                
+2.3.1.05    Ajuste de Avaliação Patrimonial                    
+2.3.1.05.0001        Custo atribuído Imobilizado - ICPC 10                
+2.3.1.06    Reserva de Lucros                    
+2.3.1.06.0001        Reserva Legal                
+2.3.1.06.0002        Reserva Estatutária                
+2.3.1.06.0003        Reserva para Contingências                
+2.3.1.06.0004        Reserva de lucros a realizar                
+2.3.1.06.0005        Reserva de lucros para expansão                
+2.3.1.06.0006        Reserva Especial para Dividendos Obrigatórios Não Distribuídos                
+2.3.1.06.0007        Reserva de Incentivos Fiscais                
+2.3.1.07    (-) Ações em Tesouraria                    
+2.3.1.07.0001        Ações em  tesouraria                
+2.3.1.08    Ajuste Acumulado de Conversão                    
+2.3.1.08.0001        Ajuste Acumulado de Conversão                
+2.3.1.09    Lucro ou Prejuízos Acumulados                    
+2.3.1.09.0001        Lucro acumulados                
+2.3.1.09.0002        (-) Prejuízos acumulados                
+2.3.1.10    Participação de Acionistas não Controladores (só no Balanço Consolidado)                    
+2.3.1.10.0001        Participação de Acionistas não controladores                 
+                        
+3.    RECEITAS DE VENDAS                    
+3.1    RECEITAS DE VENDAS DE PRODUTOS E SERVIÇOS                    
+3.1.1    RECEITA BRUTA DE VENDA DE PRODUTOS E SERVIÇOS                    
+3.1.1.01    Receita Bruta de Vendas de Produtos                    
+3.1.1.01.0001        Mercado nacional                
+3.1.1.01.0002        Exportação                
+3.1.1.02    Receita Bruta de Vendas de Serviços                    
+3.1.2.02.0001        Mercado nacional                
+3.1.2.02.0002        Exportação                
+3.1.2    (-) DEDUÇÕES DA RECEITA BRUTA DE VENDA DE PRODUTOS E SERVIÇOS                    
+3.1.2.01    Deduções da Receita Bruta de Vendas de Produtos e Serviços                    
+3.1.2.01.0001        Vendas canceladas e devoluções                
+3.1.2.01.0002        Abatimentos                 
+3.1.2.01.0003        ICMS                
+3.1.2.01.0004        COFINS                
+3.1.2.01.0005        PIS/Pasep                
+3.1.2.01.0006        Cofins                
+3.1.2.01.0007        ISS                
+3.1.2.02    Ajuste a Valor Presente (AVP) de Clientes                     
+3.1.2.02.0001        Juros a apropriar de clientes                
+                        
+4.    CUSTOS DAS VENDAS                    
+4.1    CUSTO DAS VENDAS                    
+4.1.1    CUSTOS DAS VENDAS DOS PRODUTOS, MERCADORIAS E SERVIÇOS                    
+4.1.1.01    Custo dos Produtos Vendidos (CPV)                    
+4.1.1.01.0001        Matéria-prima                
+4.1.1.01.0002        Mão-de-obra direta                
+4.1.1.01.0003        Custos indiretos de fabricação                
+4.1.1.02    Custo das Mercadorias Vendidas (CMV)                    
+4.1.1.02.0001        Custo das mercadorias vendidas                
+4.1.1.03    Custo dos Serviços Prestados (CSP)                    
+4.1.1.03.0001        Custo dos serviços prestados                
+                        
+5.    DESPSAS                    
+5.1    DESPESAS OPERACIONAIS                    
+5.1.1    DESPESAS ADMINISTRATIVAS                    
+5.1.1.01    Despesas com Pessoal da Administração                    
+5.1.1.01.0001        Salários e ordenados                
+5.1.1.01.0002        Gratificações                
+5.1.1.01.0004        Férias                 
+5.1.1.01.0005        13º salário                
+5.1.1.01.0006        INSS                
+5.1.1.01.0007        FGTS                
+5.1.1.01.0008        Indenizações                
+5.1.1.01.0009        Assistência média e farmácia                
+5.1.1.01.0010        Refeições-PAT                
+5.1.1.01.0011        Cestas básicas                
+5.1.1.01.0012        Treinamentos                
+5.1.1.01.0013        Seguro de vida                
+5.1.1.01.0014        Previdência privada                
+5.1.1.02    Despesas com Ocupação                    
+5.1.1.02.0001        Aluguéis e condomínios                
+5.1.1.02.0002        Depreciações e amortizações                
+5.1.1.02.0003        Manutenção e reparos                
+5.1.1.02.0004        Higiene e limpeza                
+5.1.1.02.0005        Seguros                
+5.1.1.02.0006        Segurança e vigilância                
+5.1.1.03    Despesas com Utilidades                    
+5.1.1.03.0001        Energia elétrica                
+5.1.1.03.0002        Água                
+5.1.1.03.0003        Comunicação                
+5.1.1.04    Despesas Gerais                    
+5.1.1.04.0001        Material de escritório                
+5.1.1.04.0002        Doações e contribuições                
+5.1.1.04.0003        Jornais e revistas                
+5.1.1.04.0004        Serviços profissionais                
+5.1.1.04.0005        Auditoria                
+5.1.1.04.0006        Consultoria                
+                        
+5.1.2    DESPESAS DE VENDAS                    
+5.1.2.01    Despesas com Pessoal de Vendas                    
+5.1.2.01.0001        Salários e ordenados                
+5.1.2.01.0002        Gratificações                
+5.1.2.01.0003        Férias                 
+5.1.2.01.0004        13º salário                
+5.1.2.01.0005        INSS                
+5.1.2.01.0006        FGTS                
+5.1.2.01.0007        Indenizações                
+5.1.2.01.0008        Assistência média e farmácia                
+5.1.2.01.0009        Refeições-PAT                
+5.1.2.01.0010        Cestas básicas                
+5.1.2.01.0011        Treinamentos                
+5.1.2.01.0012        Seguro de vida                
+5.1.2.01.0013        Previdência privada                
+5.1.2.02    Comissões de Vendas                    
+5.1.2.02.0001        Despesas com comissão de vendas                
+5.1.2.03    Propaganda e Publicidade                    
+5.1.2.03.0001        Propaganda                 
+5.1.2.03.0002        Publicidade                
+5.1.2.03.0003        Amostra                
+5.1.2.03.0004        Anúncio                
+5.1.2.03.0005        Revistas                
+5.1.2.04    Despesas com Ocupação                    
+5.1.2.04.0001        aluguéis e condomínios                
+5.1.2.04.0002        Depreciações e amortizações                
+5.1.2.04.0003        Manutenção e reparos                
+5.1.2.04.0004        Higiene e limpeza                
+5.1.2.04.0005        Seguros                
+5.1.2.04.0006        Segurança e vigilância                
+5.1.2.05    Despesas com Utilidades                    
+5.1.2.05.0001        Energia elétrica                
+5.1.2.05.0002        Água                
+5.1.2.05.0003        Comunicação                
+5.1.2.06    Despesas Gerais                    
+5.1.2.06.0001        Material de escritório                
+5.1.2.06.0002        Doações e contribuições                
+5.1.2.06.0003        Jornais e revistas                
+5.1.2.06.0004        Serviços profissionais                
+5.1.2.06.0005        Auditoria                
+5.1.2.06.0006        Consultoria                
+                        
+5.1.3    SÓCIOS E DIRIGENTES                    
+5.1.3.01    Despesas Gerais Sócios e Dirigentes                    
+5.1.3.01.0001        Pró-labore                
+5.1.3.01.0002        Remunerações indiretas                
+5.1.3.01.0003        Remunerações do conselho                
+5.1.3.01.0004        Viagens e estadias                
+                        
+5.1.4    TRIBUTOS E CONTRIBUIÇÕES                     
+5.1.4.01    Despesas como Tributos e Contribuições                    
+5.1.4.01.0001        Pis sobre outras receitas                
+5.1.4.01.0002        Cofins sobre outras receitas                
+5.1.4.01.0003        IPVA                
+5.1.4.01.0004        IPTU                
+5.1.4.01.0005        Contribuição sindical                
+                        
+5.1.5    PROVISÕES  E PERDAS ESTIMADAS                    
+5.1.5.01    Despesas com Provisões e Perdas Estimadas                    
+5.1.5.01.0001        Perdas estimadas com devedores duvidosos                
+5.1.5.01.0002        Perdas estimadas com estoques                
+5.1.5.01.0003        Provisão para garantia de produtos                
+5.1.5.01.0004        Provisão para contingências fiscais                
+5.1.5.01.0005        Reversão da Provisão para contingências fiscais                
+                        
+5.1.6    RESULTADO FINANCEIRO LÍQUIDO                    
+5.1.6.01    Despesas Financeiras                    
+5.1.6.01.0001        Juros pagos ou incorridos                
+5.1.6.01.0002        Descontos concedidos                
+5.1.6.01.0003        Despesas bancárias                
+5.1.6.02    Receitas Financeiras                    
+5.1.6.02.0001        Descontos obtidos                
+5.1.6.02.0002        Juros recebidos                
+5.1.6.02.0003        Rendimentos de aplicações financeiras                
+                        
+5.1.6.03    Variações Cambiais Passivas                    
+5.1.6.03.0001        Variações cambiais passivas                
+                        
+5.1.6.04    Variações Cambiais Ativas                    
+5.1.6.04.0001        Variações cambiais ativas                
+                        
+5.1.7    OUTRAS RECEITAS E DESPESAS OPERACIONAIS                    
+5.1.7.01    lucros e Prejuízos em Participações Societárias                    
+5.1.7.01.0001        Participações nos resultados de controladoras e coligadas pela equivalência patrimonial                
+5.1.7.01.0002        Amortização de ágio ou deságio em investimentos                
+                        
+5.1.7.02    Ganhos e Perdas de Capital nos Investimentos                    
+5.1.7.02.0001        Ganhos e perdas na alienação de investimentos                
+5.1.7.02.0002        Ganho com compra vantajosa - Ágio                
+                        
+5.1.7.03    Ganhos e Perdas de Capital no Imobilização                    
+5.1.7.03.0001        Ganhos e perdas na alienação de imobilizado                
+                        
+5.1.7.04    Ganhos e Perdas de Capital no Intangível                    
+5.1.7.04.0001        Custo da baixa de intangíveis                
+                        
+5.1.7.05    Outras Receitas de Vendas Operacionais                    
+5.1.7.05.0001        Receita de venda de sucata                
+                        
+5.1.7.06    Resultado de Operações Descontinuadas                    
+5.1.7.06.0001        Ganhos ou perdas dos ativos de operações descontinuadas                
+5.1.7.06.0002        Tributos sobre as operações descontinuadas                
+                        
+6    IMPOSTO DE RENDA E CONTRIBUIÇÃO SOCIAL                    
+6.1    IMPOSTO DE RENDA E CONTRIBUIÇÃO SOCIAL                    
+6.1.1    IRPJ E CSLL - CORRENTE E DIFERIDO                    
+6.1.1.01    IRPJ e CSLL Correntes                    
+6.1.1.01.0001        Despesas de IRPJ - Corrente                
+6.1.1.01.0001        Despesas de CSLL - Corrente                
+6.1.1.02    IRPJ e CSLL Diferidos                    
+6.1.1.02.0001        Despesas de IRPJ - Diferido                
+6.1.1.02.0002        Despesas de CSLL - Diferida                
+                        
+7    PARTICIPAÇÕES E CONTRIBUIÇÕES                    
+7.1    PARTICIPAÇÕES E CONTRIBUIÇÕES                    
+7.1.1    PARTICIPAÇÕES E CONTRIBUIÇÕES                    
+7.1.1.01    Debêntures                    
+7.1.1.02    Empregados                    
+7.1.1.03    Administradores                    
+7.1.1.04    Partes Beneficiárias                    
+7.1.1.05    Instituições ou Fundo de Assistência ou Previdência a Empregados                    
+                        
+8    APURAÇÃO DO RESULTADO DO EXERCÍCIO                    
+8.1    APURAÇÃO DO RESULTADO DO EXERCÍCIO                    
+8.1.1    APURAÇÃO DO RESULTADO DO EXERCÍCIO

@@ -125,7 +125,7 @@ class CashFlow extends Controller
     {
         verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
         $file = $this->getRequestFiles()->getFile("excelFile");
-        $verifyExtensions = ["xls", "xlsx"];
+        $verifyExtensions = ["xls", "xlsx", "csv"];
 
         $fileExtension = explode(".", $file["name"]);
         $fileExtension = strtolower(array_pop($fileExtension));
@@ -176,14 +176,34 @@ class CashFlow extends Controller
             die;
         }
 
-        foreach ($excelData["d"] as $date) {
-            $dateObj = DateTime::createFromFormat("Y-m-d", $date);
-            if (!$dateObj) {
-                http_response_code(500);
-                echo json_encode(["error" => "campo data no arquivo está mal formatado"]);
-                die;
+        $formatDateByFileExtension = [
+            "xls" => function ($item) {
+                $item = preg_replace("/^(\d{1})\/(\d+)\/(\d+)$/", "0$1/$2/$3", $item);
+                $item = preg_replace("/^(\d+)\/(\d{1})\/(\d+)$/", "$1/0$2/$3", $item);
+                $item = preg_replace("/^(\d+)\/(\d+)\/(\d+)$/", "$3-$1-$2", $item);
+                return $item;
+            },
+
+            "xlsx" => function ($item) {
+                $item = preg_replace("/^(\d{1})\/(\d+)\/(\d+)$/", "0$1/$2/$3", $item);
+                $item = preg_replace("/^(\d+)\/(\d{1})\/(\d+)$/", "$1/0$2/$3", $item);
+                $item = preg_replace("/^(\d+)\/(\d+)\/(\d+)$/", "$3-$1-$2", $item);
+                return $item;
+            },
+
+            "csv" => function ($item) {
+                $item = preg_replace("/^(\d{1})\/(\d+)\/(\d+)$/", "0$1/$2/$3", $item);
+                $item = preg_replace("/^(\d+)\/(\d{1})\/(\d+)$/", "$1/0$2/$3", $item);
+                $item = preg_replace("/^(\d+)\/(\d+)\/(\d+)$/", "$3-$2-$1", $item);
+                return $item;
             }
-        }
+        ];
+
+        $excelData["d"] = array_map(function ($item) use ($formatDateByFileExtension, $fileExtension) {
+            if (!empty($formatDateByFileExtension[$fileExtension])) {
+                return $formatDateByFileExtension[$fileExtension]($item);
+            }
+        }, $excelData["d"]);
 
         $verifyTotalDataFromExcelFile = array_map("count", $excelData);
         $verifyTotalDataFromExcelFile = array_unique($verifyTotalDataFromExcelFile);
@@ -217,16 +237,6 @@ class CashFlow extends Controller
             }
 
             $entryType = $excelData["t"][$key] == "Crédito" ? 1 : 0;
-
-            if ($this->getServer()->getServerByKey("HTTP_HOST") == "localhost") {
-                $launchValue = str_replace([",", "R$", "-"], "", $excelData["l"][$key]);
-                $launchValue = str_replace(".", ",", $launchValue);
-                $launchValue = str_replace(",", ".", $launchValue);
-                $launchValue = number_format(trim($launchValue), 2, ",", ".");
-            } else {
-                $launchValue = $excelData["l"][$key];
-            }
-
             $cashFlowGroup = new CashFlowGroup();
             $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByName($excelData["g"][$key], $responseUserAndCompany["user"]);
 
@@ -254,7 +264,7 @@ class CashFlow extends Controller
                 "id_company" => session()->user->company_id,
                 "id_user" => $responseUserAndCompany["user"],
                 "id_cash_flow_group" => $cashFlowGroup,
-                "entry" => $launchValue,
+                "entry" => $excelData["l"][$key],
                 "history" => $history,
                 "entry_type" => $entryType,
                 "created_at" => $excelData["d"][$key],
@@ -499,7 +509,7 @@ class CashFlow extends Controller
                 "id_user" => $responseUserAndCompany["user"],
                 "id_report" => 2,
                 "history_transaction" => "Alteração na conta de "
-                 . json_encode($cashFlowHistoryData) . " para " . json_encode($newCashFlowData) . "",
+                    . json_encode($cashFlowHistoryData) . " para " . json_encode($newCashFlowData) . "",
                 "transaction_value" => $requestPost["launchValue"],
                 "created_at" => date("Y-m-d H:i:s"),
                 "deleted" => 0,
