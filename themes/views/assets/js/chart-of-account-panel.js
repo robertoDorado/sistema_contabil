@@ -1,24 +1,38 @@
-if (window.location.pathname == "/admin/balance-sheet/chart-of-account") {
-    const exportExcelModelChartOfAccount = document.getElementById("exportExcelModelChartOfAccount")
-    exportExcelModelChartOfAccount.addEventListener("click", function () {
-        const btnExport = this
-        showSpinner(btnExport)
+const chartOfAccountPathName = window.location.pathname.replace(/\/\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/, '')
+const chartOfAccountUuid = Array.isArray(window.location.pathname.match(/\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/)) ?
+    window.location.pathname.match(/\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/)[0] : ""
 
-        fetch(window.location.origin + "/admin/balance-sheet/export-model-chart-of-account", {
-            method: "POST"
-        }).then(response => response.blob()).then(function (response) {
-            const url = window.URL.createObjectURL(response)
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = 'modelo-plano-de-contas.xlsx';
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            btnExport.removeAttribute("disabled")
-            btnExport.innerHTML = "Exportar modelo de plano de contas"
+const verifyChartOfAccountPathname = [
+    "/admin/balance-sheet/chart-of-account",
+    "/admin/balance-sheet/chart-of-account/update"
+]
+
+if (verifyChartOfAccountPathname.indexOf(chartOfAccountPathName) != -1) {
+    const chartOfAccount = $("#chartOfAccount")
+    const exportExcelModelChartOfAccount = document.getElementById("exportExcelModelChartOfAccount")
+    const dataTransfer = {}
+    
+    if (exportExcelModelChartOfAccount) {
+        exportExcelModelChartOfAccount.addEventListener("click", function () {
+            const btnExport = this
+            showSpinner(btnExport)
+
+            fetch(window.location.origin + "/admin/balance-sheet/export-model-chart-of-account", {
+                method: "POST"
+            }).then(response => response.blob()).then(function (response) {
+                const url = window.URL.createObjectURL(response)
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'modelo-plano-de-contas.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                btnExport.removeAttribute("disabled")
+                btnExport.innerHTML = "Exportar modelo de plano de contas"
+            })
         })
-    })
+    }
 
     const mask = {
         accountValue: function (value) {
@@ -27,12 +41,12 @@ if (window.location.pathname == "/admin/balance-sheet/chart-of-account") {
     }
 
     const accountValue = document.querySelector("[name='accountValue']")
-    accountValue.addEventListener("input", function() {
+    accountValue.addEventListener("input", function () {
         this.value = mask[this.dataset.mask](this.value)
     })
 
-    const cashFlowGroupForm = document.getElementById("cashFlowGroupForm")
-    cashFlowGroupForm.addEventListener("submit", function(event) {
+    const chartOfAccountForm = document.getElementById("chartOfAccountForm")
+    chartOfAccountForm.addEventListener("submit", function (event) {
         event.preventDefault()
         const btnSubmit = this.querySelector("button[type='submit']")
 
@@ -42,13 +56,19 @@ if (window.location.pathname == "/admin/balance-sheet/chart-of-account") {
         }
 
         const form = new FormData(this)
-        const url = window.location.origin + "/admin/balance-sheet/chart-of-account"
-        showSpinner(btnSubmit)
+        if (chartOfAccountPathName == "/admin/balance-sheet/chart-of-account/update") {
+            form.append("uuid", chartOfAccountUuid)
+        }
 
+        const url = chartOfAccountPathName == "/admin/balance-sheet/chart-of-account" ?
+            window.location.origin + "/admin/balance-sheet/chart-of-account" :
+            window.location.origin + "/admin/balance-sheet/chart-of-account/update"
+
+        showSpinner(btnSubmit)
         fetch(url, {
             method: "POST",
             body: form
-        }).then(response => response.json()).then(function(response) {
+        }).then(response => response.json()).then(function (response) {
             btnSubmit.removeAttribute("disabled")
             btnSubmit.innerHTML = "Enviar"
             let message = ""
@@ -60,18 +80,79 @@ if (window.location.pathname == "/admin/balance-sheet/chart-of-account") {
                 throw new Error(message)
             }
 
-            if (response.success) {
-                message = response.success
-                message = message.charAt(0).toUpperCase() + message.slice(1)
-                toastr.success(message)
-                chartOfAccount.row.add([
-                    response.data.uuid,
-                    response.data.accountValue,
-                    response.data.accountName,
-                    response.data.editBtn,
-                    response.data.excludeBtn
-                ]).draw(false)
+            if (chartOfAccountPathName == "/admin/balance-sheet/chart-of-account") {
+                if (response.success) {
+                    message = response.success
+                    message = message.charAt(0).toUpperCase() + message.slice(1)
+                    toastr.success(message)
+                    chartOfAccount.row.add([
+                        response.data.uuid,
+                        response.data.accountValue,
+                        response.data.accountName,
+                        response.data.editBtn,
+                        response.data.excludeBtn
+                    ]).draw()
+                }
+            } else {
+                if (response.success) {
+                    modal.style.display = "flex"
+                    window.location.href = response.url
+                }
             }
         })
     })
+
+    if (chartOfAccount) {
+        const launchModal = $("#launchModal")
+        chartOfAccount.on("click", ".trash-link", function(event) {
+            event.preventDefault()
+            dataTransfer.uuid = $(this).data("uuid")
+            dataTransfer.account_name = $(this).data("accountname")
+            dataTransfer.row = $(this).closest("td").closest("tr")
+            launchModal.click()
+        })
+
+        const dismissModal = $("#dismissModal")
+        const saveChanges = $("#saveChanges")
+        launchModal.click(function() {
+            $("#modalContainerLabel").html("Atenção!")
+            $(".modal-body").html(`Deseja mesmo excluir a conta "${dataTransfer.account_name}"?`)
+            dismissModal.html("Voltar")
+            saveChanges.removeClass("btn-primary")
+            saveChanges.addClass("btn-danger")
+            saveChanges.html("Excluir")
+        })
+
+        saveChanges.click(function() {
+            showSpinner(this)
+
+            const url = window.location.origin + "/admin/balance-sheet/chart-of-account/delete"
+            const form = new FormData()
+            form.append("uuid", dataTransfer.uuid)
+
+            fetch(url, {
+                method: "POST",
+                body: form
+            }).then(response => response.json()).then(function(response) {
+                saveChanges.removeAttr("disabled")
+                saveChanges.html("Excluir")
+                dismissModal.click()
+                let message = ""
+
+                if (response.error) {
+                    message = response.error
+                    message = message.charAt(0).toUpperCase() + message.slice(1)
+                    toastr.error(message)
+                    throw new Error(message)
+                }
+
+                if (response.success) {
+                    message = response.success
+                    message = message.charAt(0).toUpperCase() + message.slice(1)
+                    toastr.success(message)
+                    chartOfAccount.row(dataTransfer.row).remove().draw()
+                }
+            })
+        })
+    }
 }

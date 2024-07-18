@@ -185,6 +185,9 @@ $route->post("/history-audit/remove", "HistoryAudit::historyAuditRemove");
 $route->get("/balance-sheet/chart-of-account", "BalanceSheet::chartOfAccount");
 $route->post("/balance-sheet/chart-of-account", "BalanceSheet::chartOfAccount");
 $route->post("/balance-sheet/export-model-chart-of-account", "BalanceSheet::exportChartOfAccountModelExcelFile");
+$route->get("/balance-sheet/chart-of-account/update/{uuid}", "BalanceSheet::chartOfAccountFormUpdate");
+$route->post("/balance-sheet/chart-of-account/update", "BalanceSheet::chartOfAccountFormUpdate");
+$route->post("/balance-sheet/chart-of-account/delete", "BalanceSheet::chartOfAccountFormDelete");
 
 /** 
  * Assinatura do cliente

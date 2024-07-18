@@ -25,6 +25,69 @@ class BalanceSheet extends Controller
         parent::__construct();
     }
 
+    public function chartOfAccountFormDelete()
+    {
+        verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
+        $requestPost = $this->getRequests()->setRequiredFields(["uuid"])->getAllPostData();
+
+        $chartOfAccount = new ChartOfAccount();
+        $response = $chartOfAccount->updateChartOfAccountByUuid([
+            "uuid" => $requestPost["uuid"],
+            "deleted" => 1
+        ]);
+
+        if (!$response) {
+            http_response_code(500);
+            echo $chartOfAccount->message->json();
+            die;
+        }
+
+        echo json_encode(["success" => "registro deletado com sucesso"]);
+    }
+
+    public function chartOfAccountFormUpdate(array $data)
+    {
+        if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
+            $requestPost = $this->getRequests()->setRequiredFields([
+                "csrfToken",
+                "accountName",
+                "accountValue",
+                "uuid"
+            ])->getAllPostData();
+
+            $chartOfAccount = new ChartOfAccount();
+            $response = $chartOfAccount->updateChartOfAccountByUuid([
+                "uuid" => $requestPost["uuid"],
+                "account_name" => $requestPost["accountName"],
+                "account_number" => $requestPost["accountValue"]
+            ]);
+
+            if (!$response) {
+                http_response_code(500);
+                echo $chartOfAccount->message->json();
+                die;
+            }
+            
+            echo json_encode(["success" => true, "url" => url("/admin/balance-sheet/chart-of-account")]);
+            die;
+        }
+
+        if (!Uuid::isValid($data["uuid"])) {
+            redirect("/admin/balance-sheet/chart-of-account");
+        }
+
+        $chartOfAccount = new ChartOfAccount();
+        $chartOfAccount->setUuid($data["uuid"]);
+        $chartOfAccountData = $chartOfAccount->findChartOfAccountByUuid(["account_name", "account_number"]);
+
+        echo $this->view->render("admin/chart-of-account-update", [
+            "userFullName" => showUserFullName(),
+            "chartOfAccountData" => $chartOfAccountData,
+            "endpoints" => []
+        ]);
+    }
+
     public function exportChartOfAccountModelExcelFile()
     {
         verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));

@@ -68,7 +68,7 @@ class ChartOfAccount
         return $this->chartOfAccount->find("uuid=:uuid", ":uuid=" . $this->getUuid() . "", $columns)->fetch();
     }
 
-    public function updateCashFlowByUuid(array $data): bool
+    public function updateChartOfAccountByUuid(array $data): bool
     {
         $tools = new Tools($this->chartOfAccount, ModelsChartOfAccount::class);
         $response = $tools->updateData(

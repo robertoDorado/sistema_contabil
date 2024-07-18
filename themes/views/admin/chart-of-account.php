@@ -48,7 +48,7 @@
                         <div class="card-header">
                             <h3 class="card-title">Plano de contas</h3>
                         </div>
-                        <form id="cashFlowGroupForm">
+                        <form id="chartOfAccountForm">
                             <div class="card-body">
                                 <div class="form-group">
                                     <label for="accountValue">Conta</label>
@@ -94,8 +94,8 @@
                                                     <td><?= $value->getUuid() ?></td>
                                                     <td><?= $value->account_number ?></td>
                                                     <td><?= $value->account_name ?></td>
-                                                    <td><a class="icons" href="<?= url("/admin/balance-sheet/chart-of-account/" . $value->getUuid() . "") ?>"><i class="fas fa-edit" aria-hidden="true"></i></a></td>
-                                                    <td><a class="icons" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a></td>
+                                                    <td><a class="icons" href="<?= url("/admin/balance-sheet/chart-of-account/update/" . $value->getUuid() . "") ?>"><i class="fas fa-edit" aria-hidden="true"></i></a></td>
+                                                    <td><a class="icons trash-link" data-accountname="<?= $value->account_name ?>" data-uuid="<?= $value->getUuid() ?>" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a></td>
                                                 </tr>
                                             <?php endforeach ?>
                                         <?php endif ?>
