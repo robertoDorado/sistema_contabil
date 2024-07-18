@@ -77,7 +77,7 @@
 
                         <div class="card-body">
                             <div id="widgets" class="dataTables_wrapper dt-bootstrap4">
-                                <table id="chartOfAccount" class="table table-bordered table-striped">
+                                <table id="chartOfAccountTable" class="table table-bordered table-striped">
                                     <thead>
                                         <tr>
                                             <th>Id</th>

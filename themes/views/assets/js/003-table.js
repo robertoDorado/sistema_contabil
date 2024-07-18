@@ -956,7 +956,7 @@ const historyAuditBackup = dataTableConfig($("#historyAuditBackup"),
                 .appendTo("#widgets .col-md-6:eq(0)");
         }
     })
-const chartOfAccount = dataTableConfig($("#chartOfAccount"),
+const chartOfAccountTable = dataTableConfig($("#chartOfAccountTable"),
     {
         "columnDefs": [
             {

@@ -8,7 +8,6 @@ const verifyChartOfAccountPathname = [
 ]
 
 if (verifyChartOfAccountPathname.indexOf(chartOfAccountPathName) != -1) {
-    const chartOfAccount = $("#chartOfAccount")
     const exportExcelModelChartOfAccount = document.getElementById("exportExcelModelChartOfAccount")
     const dataTransfer = {}
     
@@ -64,6 +63,7 @@ if (verifyChartOfAccountPathname.indexOf(chartOfAccountPathName) != -1) {
             window.location.origin + "/admin/balance-sheet/chart-of-account" :
             window.location.origin + "/admin/balance-sheet/chart-of-account/update"
 
+        const resetInputValues = [this.accountName, this.accountValue]
         showSpinner(btnSubmit)
         fetch(url, {
             method: "POST",
@@ -85,13 +85,17 @@ if (verifyChartOfAccountPathname.indexOf(chartOfAccountPathName) != -1) {
                     message = response.success
                     message = message.charAt(0).toUpperCase() + message.slice(1)
                     toastr.success(message)
-                    chartOfAccount.row.add([
+                    chartOfAccountTable.row.add([
                         response.data.uuid,
                         response.data.accountValue,
                         response.data.accountName,
                         response.data.editBtn,
                         response.data.excludeBtn
-                    ]).draw()
+                    ]).draw(false)
+
+                    resetInputValues.forEach(function(element) {
+                        element.value = ""
+                    })
                 }
             } else {
                 if (response.success) {
@@ -102,9 +106,9 @@ if (verifyChartOfAccountPathname.indexOf(chartOfAccountPathName) != -1) {
         })
     })
 
-    if (chartOfAccount) {
+    if (chartOfAccountTable) {
         const launchModal = $("#launchModal")
-        chartOfAccount.on("click", ".trash-link", function(event) {
+        chartOfAccountTable.on("click", ".trash-link", function(event) {
             event.preventDefault()
             dataTransfer.uuid = $(this).data("uuid")
             dataTransfer.account_name = $(this).data("accountname")
@@ -150,7 +154,7 @@ if (verifyChartOfAccountPathname.indexOf(chartOfAccountPathName) != -1) {
                     message = response.success
                     message = message.charAt(0).toUpperCase() + message.slice(1)
                     toastr.success(message)
-                    chartOfAccount.row(dataTransfer.row).remove().draw()
+                    chartOfAccountTable.row(dataTransfer.row).remove().draw()
                 }
             })
         })
