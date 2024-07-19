@@ -93,7 +93,7 @@ if (window.location.pathname == "/admin/company/backup/report") {
                 message = response.success
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.success(message)
-                companyDeletedReport.row(data.row).remove().draw()
+                companyDeletedReport.row(data.row).remove().draw(false)
                 dismissModal.click()
             }
         })

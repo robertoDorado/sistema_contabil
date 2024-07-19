@@ -2,7 +2,9 @@
 
 namespace Source\Controllers;
 
+use DateTime;
 use OfxParser\Parser;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use Source\Core\Controller;
 use Source\Domain\Model\CashFlow;
 use Source\Domain\Model\User;
@@ -21,6 +23,172 @@ class BankReconciliation extends Controller
     public function __construct()
     {
         parent::__construct();
+    }
+
+    public function importExcelFile()
+    {
+        verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
+        if (empty(session()->user->company_id)) {
+            echo json_encode(["error" => "selecione uma empresa antes de importar o arquivo"]);
+            die;
+        }
+
+        $file = $this->getRequestFiles()->getFile("excelFile");
+        $verifyExtensions = ["xls", "xlsx", "csv"];
+
+        $fileExtension = explode(".", $file["name"]);
+        $fileExtension = strtolower(array_pop($fileExtension));
+
+        if (!in_array($fileExtension, $verifyExtensions)) {
+            throw new \Exception("tipo de arquivo inválido", 500);
+        }
+
+        $spreadSheetFile = IOFactory::load($file["tmp_name"]);
+        $data = $spreadSheetFile->getActiveSheet()->toArray();
+        $httpReferer = $this->getServer()->getServerByKey("HTTP_REFERER");
+        $urlComponents = parse_url($httpReferer);
+
+        $requiredFieldsExcelFile = [
+            "Data lançamento",
+            "Grupo de contas",
+            "Histórico",
+            "Tipo de entrada",
+            "Lançamento"
+        ];
+
+        $arrayHeader = array_shift($data);
+        foreach ($requiredFieldsExcelFile as $field) {
+            if (!in_array($field, $arrayHeader)) {
+                http_response_code(500);
+                echo json_encode(["error" => "cabeçalho do arquivo inválido"]);
+                die;
+            }
+        }
+
+        $excelData = [];
+        foreach ($data as $arrayData) {
+            foreach ($arrayData as $key => $value) {
+                $excelData[strtolower(substr($arrayHeader[$key], 0, 1))][] = $value;
+            }
+        }
+
+        $formatDateByFileExtension = [
+            "xls" => function ($item) {
+                $item = preg_replace("/^(\d{1})\/(\d+)\/(\d+)$/", "0$1/$2/$3", $item);
+                $item = preg_replace("/^(\d+)\/(\d{1})\/(\d+)$/", "$1/0$2/$3", $item);
+                $item = preg_replace("/^(\d+)\/(\d+)\/(\d+)$/", "$3-$1-$2", $item);
+                return $item;
+            },
+
+            "xlsx" => function ($item) {
+                $item = preg_replace("/^(\d{1})\/(\d+)\/(\d+)$/", "0$1/$2/$3", $item);
+                $item = preg_replace("/^(\d+)\/(\d{1})\/(\d+)$/", "$1/0$2/$3", $item);
+                $item = preg_replace("/^(\d+)\/(\d+)\/(\d+)$/", "$3-$1-$2", $item);
+                return $item;
+            },
+
+            "csv" => function ($item) {
+                $item = preg_replace("/^(\d{1})\/(\d+)\/(\d+)$/", "0$1/$2/$3", $item);
+                $item = preg_replace("/^(\d+)\/(\d{1})\/(\d+)$/", "$1/0$2/$3", $item);
+                $item = preg_replace("/^(\d+)\/(\d+)\/(\d+)$/", "$3-$2-$1", $item);
+                return $item;
+            }
+        ];
+
+        $excelData["d"] = array_map(function($item) use ($formatDateByFileExtension, $fileExtension) {
+            if (!empty($formatDateByFileExtension[$fileExtension])) {
+                return $formatDateByFileExtension[$fileExtension]($item);
+            }
+        }, $excelData["d"]);
+
+        $excelData["d"] = array_map(function($item) {
+            return (new DateTime($item))->format("d/m/Y");
+        }, $excelData["d"]);
+
+        $excelData["l"] = array_map(function($item) {
+            return convertCurrencyRealToFloat($item);
+        }, $excelData["l"]);
+
+        foreach ($excelData["l"] as $key => &$launchValue) {
+            $launchValue = $excelData["t"][$key] == "Crédito" ? $launchValue : $launchValue * -1;
+        }
+
+        $totalEntry = array_reduce($excelData["l"], function($acc, $item) {
+            $acc += $item;
+            return $acc;
+        }, 0);
+        echo "<pre>";
+        print_r($excelData["l"]);
+        die;
+
+        $excelData["l"] = array_map(function($item) {
+            return "R$ " . number_format($item, 2, ",", ".");
+        }, $excelData["l"]);
+        
+        if ($urlComponents["path"] == "/admin/bank-reconciliation/cash-flow/manual") {
+            $excelData = array_intersect_key($excelData, array_flip(["d", "h", "l"]));
+            echo json_encode(
+                [
+                    "success" => "importação realizada com sucesso", 
+                    "data" => $excelData, 
+                    "total" => "R$ " . number_format($totalEntry, 2, ",", ".")
+                ]
+            );
+        }else {
+            $responseUserAndCompany = initializeUserAndCompanyId();
+            $cashFlow = new CashFlow();
+            $cashFlowData = $cashFlow->findCashFlowByUser(
+                [
+                    "history", 
+                    "entry",
+                    "created_at"
+                ], 
+                $responseUserAndCompany["user"], $responseUserAndCompany["company_id"]
+            );
+
+            $formatExcelData = [];
+            $cashFlowData = array_map(function($item) {
+                $item->history = $item->getHistory();
+                $item->entry = $item->getEntry();
+                return (array) $item->data();
+            }, $cashFlowData);
+
+            $excelData["l"] = array_map(function($item) {
+                return convertCurrencyRealToFloat($item);
+            }, $excelData["l"]);
+
+            foreach ($excelData["l"] as $key => &$launchValue) {
+                $launchValue = $excelData["t"][$key] == "Crédito" ? $launchValue : $launchValue * -1;
+                $formatExcelData[$key]["created_at"] = $excelData["d"][$key];
+                $formatExcelData[$key]["entry"] = $excelData["l"][$key];
+                $formatExcelData[$key]["history"] = $excelData["h"][$key];
+            }
+
+            $differentData = array_udiff($formatExcelData, $cashFlowData, function ($a, $b) {
+                if ($a['entry'] == $b['entry']) {
+                    return 0;
+                }
+                return ($a['entry'] < $b['entry']) ? -1 : 1;
+            });
+
+            $total = 0;
+            if (!empty($differentData)) {
+                $total = array_reduce($differentData, function($acc, $item) {
+                    $acc += $item["entry"];
+                    return $acc;
+                }, 0);
+
+                $differentData = array_map(function($item) {
+                    $item["entry"] = "R$ " . number_format($item["entry"], 2, ",", ".");
+                    return $item;
+                }, $differentData);
+            }
+
+            $differentData = array_values($differentData);
+            echo empty($differentData) ?
+                json_encode(["success" => "todas as contas estão conciliadas"]) :
+                json_encode(["data" => $differentData, "total" => "R$ " . number_format($total, 2, ",", ".")]);
+        }
     }
 
     public function importOfxFile()
@@ -93,7 +261,7 @@ class BankReconciliation extends Controller
                 return $item->data();
             }, $cashFlowData);
 
-            $transactions = array_map(function ($item) {
+            $transactions = array_map(function($item) {
                 $item->amount_formated = "R$ " . number_format($item->amount, 2, ",", ".");
                 $item->date = $item->date->format("d/m/Y");
                 return $item;

@@ -6,6 +6,7 @@ use DateTime;
 use Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Ramsey\Uuid\Uuid;
+use Source\Core\Connect;
 use Source\Core\Controller;
 use Source\Domain\Model\CashFlow as ModelCashFlow;
 use Source\Domain\Model\CashFlowGroup;
@@ -124,6 +125,7 @@ class CashFlow extends Controller
     public function importExcelFile()
     {
         verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
+        Connect::getInstance()->beginTransaction();
         $file = $this->getRequestFiles()->getFile("excelFile");
         $verifyExtensions = ["xls", "xlsx", "csv"];
 
@@ -223,10 +225,24 @@ class CashFlow extends Controller
         $arrayEdit = [];
         $arrayDelete = [];
         $errorMessage = "";
+        $invalidCashFlowGroup = [];
+        $invalidEntryValue = [];
+        $invalidDate = [];
+        $invalidEntryType = [];
 
         foreach ($excelData['h'] as $key => $history) {
             if (!in_array($excelData["t"][$key], $verifyEntryType)) {
-                $errorMessage = "tipo de entrada inválida";
+                $invalidEntryType[] = $excelData["t"][$key];
+                continue;
+            }
+
+            if (!preg_match("/^[R\\$\s\d\,\.-]+$/", $excelData["l"][$key])) {
+                $invalidEntryValue[] = $excelData["l"][$key];
+                continue;
+            }
+
+            if (!preg_match("/^(\d{4}-\d{2}-\d{2}|\d{2}\/\d{2}\/\d{4})$/", $excelData["d"][$key])) {
+                $invalidDate[] = $excelData["d"][$key];
                 continue;
             }
 
@@ -241,7 +257,7 @@ class CashFlow extends Controller
             $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByName($excelData["g"][$key], $responseUserAndCompany["user"]);
 
             if (empty($cashFlowGroupData)) {
-                $errorMessage = "grupo de contas inexistente";
+                $invalidCashFlowGroup[] = $excelData["g"][$key];
                 continue;
             }
 
@@ -279,6 +295,54 @@ class CashFlow extends Controller
             }
         }
 
+        if (!empty($invalidEntryType)) {
+            $errorMessage = "tipo de entrada inválido";
+            foreach ($invalidEntryType as $value) {
+                $errorMessage .= ", {$value}";
+            }
+
+            http_response_code(500);
+            echo json_encode(["error" => $errorMessage]);
+            Connect::getInstance()->rollBack();
+            die;
+        }
+        
+        if (!empty($invalidDate)) {
+            $errorMessage = "data inválida";
+            foreach ($invalidDate as $value) {
+                $errorMessage .= ", {$value}";
+            }
+
+            http_response_code(500);
+            echo json_encode(["error" => $errorMessage]);
+            Connect::getInstance()->rollBack();
+            die;
+        }
+
+        if (!empty($invalidEntryValue)) {
+            $errorMessage = "valor de lançamento inválido";
+            foreach ($invalidEntryValue as $value) {
+                $errorMessage .= ", {$value}";
+            }
+
+            http_response_code(500);
+            echo json_encode(["error" => $errorMessage]);
+            Connect::getInstance()->rollBack();
+            die;
+        }
+
+        if (!empty($invalidCashFlowGroup)) {
+            $errorMessage = "grupo de contas inexistente";
+            foreach ($invalidCashFlowGroup as $value) {
+                $errorMessage .= ", {$value}";
+            }
+
+            http_response_code(500);
+            echo json_encode(["error" => $errorMessage]);
+            Connect::getInstance()->rollBack();
+            die;
+        }
+
         $accountGroup = [];
         $launchDate = [];
         $history = [];
@@ -292,6 +356,7 @@ class CashFlow extends Controller
 
             if (empty($cashFlowData)) {
                 echo $cashFlow->message->json();
+                Connect::getInstance()->rollBack();
                 die;
             }
 
@@ -320,6 +385,7 @@ class CashFlow extends Controller
             if (empty($responseHistoryAudit)) {
                 http_response_code(500);
                 echo $historyAudit->message->json();
+                Connect::getInstance()->rollBack();
                 die;
             }
         }
@@ -343,12 +409,13 @@ class CashFlow extends Controller
         if (!empty($errorMessage)) {
             http_response_code(500);
             unset($response["full_success"]);
-            $response["success"] = true;
             $response["error"] = $errorMessage;
             echo json_encode($response);
+            Connect::getInstance()->rollBack();
             die;
         }
 
+        Connect::getInstance()->commit();
         echo json_encode($response);
     }
 

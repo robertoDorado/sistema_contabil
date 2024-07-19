@@ -48,7 +48,7 @@ if (window.location.pathname == "/admin/cash-flow-explanatory-notes/report") {
             if (response.success) {
                 message = response.success
                 message = message.charAt(0).toUpperCase() + message.slice(1)
-                cashFlowExplanatoryNotesReport.row(dataTransfer.row).remove().draw()
+                cashFlowExplanatoryNotesReport.row(dataTransfer.row).remove().draw(false)
             }
         })
     })

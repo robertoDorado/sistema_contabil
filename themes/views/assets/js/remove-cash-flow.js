@@ -81,7 +81,7 @@ if (window.location.pathname == '/admin/cash-flow/report') {
                     message = response.message
                     message = message.charAt(0).toUpperCase() + message.slice(1)
                     toastr.success(message)
-                    cashFlowTable.row(dataDelete.row).remove().draw()
+                    cashFlowTable.row(dataDelete.row).remove().draw(false)
                     dismissModal.click()
                 }
             })

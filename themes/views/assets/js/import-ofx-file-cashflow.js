@@ -20,9 +20,7 @@ if (allowPathNamesImportOfxFile.indexOf(window.location.pathname) != -1) {
             let balance = 0
     
             dataFilter.each(function (row) {
-                let entryValue = parseFloat(row[2].replace("R$", "")
-                    .replace(".", "").replace(",", ".").trim())
-    
+                let entryValue = parseFloat(row[2].replace('R$', '').replace(/\./g, '').replace(',', '.').trim())
                 balance += entryValue
             })
     
@@ -35,9 +33,7 @@ if (allowPathNamesImportOfxFile.indexOf(window.location.pathname) != -1) {
             let balance = 0
     
             dataFilter.each(function (row) {
-                let entryValue = parseFloat(row[2].replace("R$", "")
-                    .replace(".", "").replace(",", ".").trim())
-    
+                let entryValue = parseFloat(row[2].replace('R$', '').replace(/\./g, '').replace(',', '.').trim())
                 balance += entryValue
             })
     

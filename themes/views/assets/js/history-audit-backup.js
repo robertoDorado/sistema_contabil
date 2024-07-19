@@ -57,7 +57,7 @@ if (window.location.pathname == "/admin/history-audit/backup") {
                 message = response.success
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.success(message)
-                historyAuditBackup.row(dataTransfer.row).remove().draw()
+                historyAuditBackup.row(dataTransfer.row).remove().draw(false)
             }
         })
     })

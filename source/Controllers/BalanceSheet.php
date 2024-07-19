@@ -2,9 +2,11 @@
 
 namespace Source\Controllers;
 
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Ramsey\Uuid\Nonstandard\Uuid;
+use Source\Core\Connect;
 use Source\Core\Controller;
 use Source\Domain\Model\ChartOfAccount;
 use Source\Domain\Model\ChartOfAccountModel;
@@ -23,6 +25,85 @@ class BalanceSheet extends Controller
     public function __construct()
     {
         parent::__construct();
+    }
+
+    public function chartOfAccountImportFile()
+    {
+        verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
+        $file = $this->getRequestFiles()->getFile("excelFile");
+        $verifyExtensions = ["xls", "xlsx"];
+
+        $fileExtension = explode(".", $file["name"]);
+        $fileExtension = strtolower(array_pop($fileExtension));
+
+        if (!in_array($fileExtension, $verifyExtensions)) {
+            throw new \Exception("tipo de arquivo inválido", 500);
+        }
+
+        $spreadSheetFile = IOFactory::load($file["tmp_name"]);
+        $data = $spreadSheetFile->getActiveSheet()->toArray();
+        $responseUserAndCompany = initializeUserAndCompanyId();
+
+        if (empty($responseUserAndCompany["company_id"])) {
+            http_response_code(500);
+            echo json_encode(["error" => "selecione uma empresa antes de importar o plano de contas"]);
+            die;
+        }
+
+        if (empty($data)) {
+            http_response_code(500);
+            echo json_encode(["error" => "o arquivo plano de contas está vazio"]);
+            die;
+        }
+
+        Connect::getInstance()->beginTransaction();
+        foreach ($data as $array) {
+            $chartOfAccount = new ChartOfAccount();
+            $response = $chartOfAccount->persistData([
+                "uuid" => Uuid::uuid4(),
+                "id_company" => $responseUserAndCompany["company_id"],
+                "id_user" => $responseUserAndCompany["user"],
+                "account_number" => $array[1],
+                "account_name" => $array[0],
+                "deleted" => 0
+            ]);
+
+            if (!$response) {
+                http_response_code(500);
+                echo $chartOfAccount->message->json();
+                Connect::getInstance()->rollBack();
+                die;
+            }
+        }
+        Connect::getInstance()->commit();
+        $chartOfAccount = new ChartOfAccount();
+        $chartOfAccountData = $chartOfAccount->findAllChartOfAccount(
+            [
+                "uuid", 
+                "account_name", 
+                "account_number"
+            ], 
+            [
+                "id_company" => $responseUserAndCompany["company_id"], 
+                "id_user" => $responseUserAndCompany["user"]->getId(),
+                "deleted" => 0
+            ]
+        );
+
+        if (empty($chartOfAccountData)) {
+            http_response_code(500);
+            echo json_encode(["error" => "registro plano de contas não encontrado"]);
+            die;
+        }
+
+        $chartOfAccountData = array_map(function($item) {
+            $item->edit_btn = '<a class="icons" href="' . url("/admin/balance-sheet/chart-of-account/update/" . $item->getUuid() . "") . '"><i class="fas fa-edit" aria-hidden="true"></i></a>';
+            $item->delete_btn = '<a class="icons" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a>';
+            $item->uuid = $item->getUuid();
+            return (array) $item->data();
+        }, $chartOfAccountData);
+
+        echo json_encode(["success" => "arquivo importado com sucess", "data" => $chartOfAccountData]);
     }
 
     public function chartOfAccountFormDelete()
@@ -68,7 +149,7 @@ class BalanceSheet extends Controller
                 echo $chartOfAccount->message->json();
                 die;
             }
-            
+
             echo json_encode(["success" => true, "url" => url("/admin/balance-sheet/chart-of-account")]);
             die;
         }
@@ -164,7 +245,7 @@ class BalanceSheet extends Controller
                 "uuid" => $chartOfAccountData->getUuid(),
                 "accountName" => $chartOfAccountData->account_name,
                 "accountValue" => $chartOfAccountData->account_number,
-                "editBtn" => '<a class="icons" href="' . url("/admin/balance-sheet/chart-of-account/" . $chartOfAccountData->getUuid() . "") . '"><i class="fas fa-edit" aria-hidden="true"></i></a>',
+                "editBtn" => '<a class="icons" href="' . url("/admin/balance-sheet/chart-of-account/update/" . $chartOfAccountData->getUuid() . "") . '"><i class="fas fa-edit" aria-hidden="true"></i></a>',
                 "excludeBtn" => '<a class="icons" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a>'
             ]]);
             die;

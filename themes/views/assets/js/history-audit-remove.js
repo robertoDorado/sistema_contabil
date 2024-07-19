@@ -47,7 +47,7 @@ if (window.location.pathname == "/admin/history-audit/report") {
                 message = response.success
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.success(message)
-                historyAuditReport.row(dataTransfer.row).remove().draw()
+                historyAuditReport.row(dataTransfer.row).remove().draw(false)
                 $("#dismissModal").click()
             }
         })

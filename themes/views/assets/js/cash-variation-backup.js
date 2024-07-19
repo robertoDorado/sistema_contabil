@@ -53,7 +53,7 @@ if (window.location.pathname == "/admin/cash-variation-setting/backup") {
             }
 
             if (response.success) {
-                cashFlowVariationBackup.row(dataTransfer.row).remove().draw()
+                cashFlowVariationBackup.row(dataTransfer.row).remove().draw(false)
                 $("#dismissModal").click()
             }
         })

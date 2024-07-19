@@ -128,6 +128,7 @@ $route->get("/warning/empty-company", "Company::warningEmptyCompany");
 $route->get("/bank-reconciliation/cash-flow/automatic", "BankReconciliation::automaticReconciliationCashFlow");
 $route->get("/bank-reconciliation/cash-flow/manual", "BankReconciliation::manualReconciliationCashFlow");
 $route->post("/bank-reconciliation/cash-flow/import-ofx-file", "BankReconciliation::importOfxFile");
+$route->post("/bank-reconciliation/cash-flow/import-excel-file", "BankReconciliation::importExcelFile");
 
 /**
  * Análises e indicadores
@@ -188,6 +189,7 @@ $route->post("/balance-sheet/export-model-chart-of-account", "BalanceSheet::expo
 $route->get("/balance-sheet/chart-of-account/update/{uuid}", "BalanceSheet::chartOfAccountFormUpdate");
 $route->post("/balance-sheet/chart-of-account/update", "BalanceSheet::chartOfAccountFormUpdate");
 $route->post("/balance-sheet/chart-of-account/delete", "BalanceSheet::chartOfAccountFormDelete");
+$route->post("/balance-sheet/chart-of-account/import-file", "BalanceSheet::chartOfAccountImportFile");
 
 /** 
  * Assinatura do cliente

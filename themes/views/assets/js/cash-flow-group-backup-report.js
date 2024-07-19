@@ -92,7 +92,7 @@ if (window.location.pathname == "/admin/cash-flow-group/backup/report") {
                 message = response.success
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.success(message)
-                cashFlowGroupDeletedReport.row(data.row).remove().draw()
+                cashFlowGroupDeletedReport.row(data.row).remove().draw(false)
                 dismissModal.click()
             }
         })

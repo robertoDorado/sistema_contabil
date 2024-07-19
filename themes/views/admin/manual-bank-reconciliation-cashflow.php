@@ -18,21 +18,39 @@
     </div>
     <!-- /.content-header -->
     <div class="content">
-        <div class="col-md-6 mb-5">
-            <form id="importOfxFile">
-                <div class="mb-3">
-                    <label for="fileInput" class="form-label">Selecione um arquivo OFX:</label>
-                    <div class="input-group">
-                        <div class="custom-file">
-                            <input type="file" name="ofxFile" class="custom-file-input" id="fileInput" accept=".ofx">
-                            <label for="ofxFile" class="custom-file-label">Nome do arquivo</label>
+        <div class="row">
+            <div class="col-md-6 mb-5">
+                <form id="importOfxFile">
+                    <div class="mb-3">
+                        <label for="fileInput" class="form-label">Selecione um arquivo OFX:</label>
+                        <div class="input-group">
+                            <div class="custom-file">
+                                <input type="file" name="ofxFile" class="custom-file-input" id="fileInput" accept=".ofx">
+                                <label for="ofxFile" class="custom-file-label">Nome do arquivo</label>
+                            </div>
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fa fa-cloud-upload"></i> Importar
+                            </button>
                         </div>
-                        <button class="btn btn-primary" type="submit">
-                            <i class="fa fa-cloud-upload"></i> Importar
-                        </button>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
+            <div class="col-md-6 mb-5">
+                <form id="importExcelForm">
+                    <div class="mb-3">
+                        <label for="fileInput" class="form-label">Selecione um arquivo Excel:</label>
+                        <div class="input-group">
+                            <div class="custom-file">
+                                <input type="file" name="excelFile" class="custom-file-input" id="fileInput" accept=".xls,.xlsx,.csv">
+                                <label for="excelFile" class="custom-file-label">Nome do arquivo</label>
+                            </div>
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fa fa-cloud-upload"></i> Importar
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
         <?= $v->insert("admin/layouts/_cashflow_report.php") ?>
         <div class="col">

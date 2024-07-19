@@ -62,7 +62,7 @@ if (window.location.pathname == "/admin/cash-flow-explanatory-notes/backup") {
                 message = response.success
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.success(message)
-                cashFlowExplanatoryNotesBackup.row(dataTransfer.row).remove().draw()
+                cashFlowExplanatoryNotesBackup.row(dataTransfer.row).remove().draw(false)
                 $("#dismissModal").click()
             }
         })

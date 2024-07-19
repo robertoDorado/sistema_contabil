@@ -48,7 +48,7 @@ if (window.location.pathname == "/admin/cash-variation-setting/report") {
                 message = response.success
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.success(message)
-                cashFlowVariation.row(dataTransfer.row).remove().draw()
+                cashFlowVariation.row(dataTransfer.row).remove().draw(false)
             }
         })
     })

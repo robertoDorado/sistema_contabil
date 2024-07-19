@@ -37,7 +37,7 @@ if (window.location.pathname == '/admin/company/report') {
                 }
 
                 if (response.success) {
-                    companyReport.row(deleteData.trElement).remove().draw()
+                    companyReport.row(deleteData.trElement).remove().draw(false)
                     $("#dismissModal").click()
                 }
             })

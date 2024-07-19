@@ -154,7 +154,7 @@ if (verifyChartOfAccountPathname.indexOf(chartOfAccountPathName) != -1) {
                     message = response.success
                     message = message.charAt(0).toUpperCase() + message.slice(1)
                     toastr.success(message)
-                    chartOfAccountTable.row(dataTransfer.row).remove().draw()
+                    chartOfAccountTable.row(dataTransfer.row).remove().draw(false)
                 }
             })
         })
