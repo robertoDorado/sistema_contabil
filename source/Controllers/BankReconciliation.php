@@ -117,9 +117,6 @@ class BankReconciliation extends Controller
             $acc += $item;
             return $acc;
         }, 0);
-        echo "<pre>";
-        print_r($excelData["l"]);
-        die;
 
         $excelData["l"] = array_map(function($item) {
             return "R$ " . number_format($item, 2, ",", ".");
