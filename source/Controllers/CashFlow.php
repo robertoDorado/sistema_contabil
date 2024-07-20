@@ -126,6 +126,12 @@ class CashFlow extends Controller
     {
         verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
         Connect::getInstance()->beginTransaction();
+        if (empty(session()->user->company_id)) {
+            http_response_code(500);
+            echo json_encode(["error" => "selecione uma empresa antes de importar um arquivo"]);
+            die;
+        }
+
         $file = $this->getRequestFiles()->getFile("excelFile");
         $verifyExtensions = ["xls", "xlsx", "csv"];
 
@@ -175,6 +181,41 @@ class CashFlow extends Controller
         if (count(array_unique($lengths)) != 1) {
             http_response_code(500);
             echo json_encode(["error" => "alguns dados possuem valores a mais no arquivo"]);
+            die;
+        }
+
+        $errorLaunchValue = [];
+        foreach ($excelData["l"] as $key => $value) {
+            $tempValue = trim($value);
+            $tempValue = preg_replace("/^(.+)(,\d{1,2}|\.\d{1,2})$/", "$1;$2", $tempValue);
+            $tempValue = preg_replace("/[^-\d;]+/", "", $tempValue);
+            $tempValue = preg_replace("/;/", ".", $tempValue);
+
+            if ($excelData["t"][$key] == "Crédito" && $tempValue < 0) {
+                $errorLaunchValue["credit"][$key] = $tempValue;
+            }
+
+            if ($excelData["t"][$key] == "Débito" && $tempValue > 0) {
+                $errorLaunchValue["debit"][$key] = $tempValue;
+            }
+        }
+
+        if (!empty($errorLaunchValue)) {
+            $errorMessage = "lançamento incorreto dos valores";
+            if (!empty($errorLaunchValue["credit"])) {
+                foreach ($errorLaunchValue["credit"] as $value) {
+                    $errorMessage .= ", Crédito = {$value}";
+                }
+            }
+
+            if (!empty($errorLaunchValue["debit"])) {
+                foreach ($errorLaunchValue["debit"] as $value) {
+                    $errorMessage .= ", Débito = {$value}";
+                }
+            }
+
+            http_response_code(500);
+            echo json_encode(["error" => $errorMessage]);
             die;
         }
 
@@ -269,12 +310,6 @@ class CashFlow extends Controller
             array_push($arrayEdit, "<a class='icons' href=" . url("/admin/cash-flow/update/form/" . $uuid . "") . "><i class='fas fa-edit' aria-hidden='true'></i>");
             array_push($arrayDelete, "<a class='icons' href='#'><i style='color:#ff0000' class='fa fa-trash' aria-hidden='true'></i></a>");
 
-            if (empty(session()->user->company_id)) {
-                http_response_code(500);
-                echo json_encode(["error" => "selecione uma empresa antes de criar uma conta"]);
-                die;
-            }
-
             $response = $cashFlow->persistData([
                 "uuid" => $uuid,
                 "id_company" => session()->user->company_id,
@@ -306,7 +341,7 @@ class CashFlow extends Controller
             Connect::getInstance()->rollBack();
             die;
         }
-        
+
         if (!empty($invalidDate)) {
             $errorMessage = "data inválida";
             foreach ($invalidDate as $value) {
