@@ -131,7 +131,8 @@ class BalanceSheet extends Controller
         }
 
         Connect::getInstance()->beginTransaction();
-        foreach ($data as $array) {
+        foreach ($data as &$array) {
+            $array[1] = preg_replace("/,/", ".", $array[1]);
             $chartOfAccount = new ChartOfAccount();
             $response = $chartOfAccount->persistData([
                 "uuid" => Uuid::uuid4(),
