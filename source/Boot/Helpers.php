@@ -1,4 +1,32 @@
 <?php
+function arrayWithMostItems(array ...$arrays) {
+    $maxCount = 0;
+    $resultArray = [];
+
+    foreach ($arrays as $array) {
+        $currentCount = countItems($array);
+        if ($currentCount > $maxCount) {
+            $maxCount = $currentCount;
+            $resultArray = $array;
+        }
+    }
+
+    return $resultArray;
+};
+
+function countItems(array $array)
+{
+    $count = 0;
+    foreach ($array as $element) {
+        if (is_array($element)) {
+            $count += countItems($element);
+        } else {
+            $count++;
+        }
+    }
+    return $count;
+};
+
 function financialIndicators(): array
 {
     return [

@@ -161,14 +161,29 @@ class BankReconciliation extends Controller
                 $formatExcelData[$key]["history"] = $excelData["h"][$key];
             }
 
-            $differentData = array_udiff($formatExcelData, $cashFlowData, function ($a, $b) {
+            $differentDateData = array_udiff($formatExcelData, $cashFlowData, function ($a, $b) {
+                if ($a['created_at'] == $b['created_at']) {
+                    return 0;
+                }
+                return ($a['created_at'] < $b['created_at']) ? -1 : 1;
+            });
+
+            $differentEntryData = array_udiff($formatExcelData, $cashFlowData, function ($a, $b) {
                 if ($a['entry'] == $b['entry']) {
                     return 0;
                 }
                 return ($a['entry'] < $b['entry']) ? -1 : 1;
             });
 
+            $differentHistoryData = array_udiff($formatExcelData, $cashFlowData, function ($a, $b) {
+                if ($a['history'] == $b['history']) {
+                    return 0;
+                }
+                return ($a['history'] < $b['history']) ? -1 : 1;
+            });
+
             $total = 0;
+            $differentData = arrayWithMostItems($differentDateData, $differentEntryData, $differentHistoryData);
             if (!empty($differentData)) {
                 $total = array_reduce($differentData, function($acc, $item) {
                     $acc += $item["entry"];
@@ -267,13 +282,28 @@ class BankReconciliation extends Controller
 
         $total = 0;
         if ($urlComponents['path'] == "/admin/bank-reconciliation/cash-flow/automatic") {
-            $differentData = array_udiff($transactions, $cashFlowData, function ($a, $b) {
+            $differentDateData = array_udiff($transactions, $cashFlowData, function ($a, $b) {
+                if ($a['date'] == $b['date']) {
+                    return 0;
+                }
+                return ($a['date'] < $b['date']) ? -1 : 1;
+            });
+
+            $differentAmountData = array_udiff($transactions, $cashFlowData, function ($a, $b) {
                 if ($a['amount'] == $b['amount']) {
                     return 0;
                 }
                 return ($a['amount'] < $b['amount']) ? -1 : 1;
             });
-            
+
+            $differentMemoData = array_udiff($transactions, $cashFlowData, function ($a, $b) {
+                if ($a['memo'] == $b['memo']) {
+                    return 0;
+                }
+                return ($a['memo'] < $b['memo']) ? -1 : 1;
+            });
+
+            $differentData = arrayWithMostItems($differentDateData, $differentAmountData, $differentMemoData);
             if (!empty($differentData)) {
                 $differentData = array_map(function ($data) {
                     $data["date"] = date("d/m/Y", strtotime($data["date"]));
