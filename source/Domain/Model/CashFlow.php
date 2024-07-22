@@ -47,6 +47,23 @@ class CashFlow
         return $this->data->$name ?? null;
     }
 
+    public function findCashFlowToCompareAutomaticImportsFile(User $user, int $companyId, array $columns)
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        $response = $this->cashFlow->find(
+            "id_company=:id_company AND id_user=:id_user",
+            ":id_company=" . $companyId
+                . "&:id_user=" . $user->getId() . "",
+            $columns
+        )->fetch(true);
+
+        if (empty($response)) {
+            return [];
+        }
+
+        return $response;
+    }
+
     /** @return ModelsCashFlow[] */
     public function findCashFlowDeletedTrue(array $columns, User $user, int $companyId): array
     {
