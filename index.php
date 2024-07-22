@@ -190,6 +190,8 @@ $route->get("/balance-sheet/chart-of-account/update/{uuid}", "BalanceSheet::char
 $route->post("/balance-sheet/chart-of-account/update", "BalanceSheet::chartOfAccountFormUpdate");
 $route->post("/balance-sheet/chart-of-account/delete", "BalanceSheet::chartOfAccountFormDelete");
 $route->post("/balance-sheet/chart-of-account/import-file", "BalanceSheet::chartOfAccountImportFile");
+$route->get("/balance-sheet/chart-of-account/backup", "BalanceSheet::chartOfAccountBackup");
+$route->post("/balance-sheet/chart-of-account/backup", "BalanceSheet::chartOfAccountBackup");
 
 /** 
  * Assinatura do cliente

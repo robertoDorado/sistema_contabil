@@ -8,8 +8,10 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Connect;
 use Source\Core\Controller;
+use Source\Core\Model;
 use Source\Domain\Model\ChartOfAccount;
 use Source\Domain\Model\ChartOfAccountModel;
+use Source\Support\Message;
 
 /**
  * BalanceSheet Controllers
@@ -25,6 +27,78 @@ class BalanceSheet extends Controller
     public function __construct()
     {
         parent::__construct();
+    }
+
+    public function chartOfAccountBackup()
+    {
+        if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            $requestPost = $this->getRequests()->setRequiredFields(["uuid", "action"])->getAllPostData();
+            $chartOfAccount = new ChartOfAccount();
+            
+            $chartOfAccount->setUuid($requestPost["uuid"]);
+            $chartOfAccountData = $chartOfAccount->findChartOfAccountByUuid(["id"]);
+
+            if (!empty($chartOfAccountData)) {
+                $chartOfAccountData->setRequiredFields(["deleted"]);
+            }
+            
+            $response = new \stdClass();
+            $response->error = true;
+            $response->message = new Message();
+            $response->message->error("erro interno ao modificar o registro");
+
+            $verifyAction = [
+                "restore" => function(Model $model) use ($response) {
+                    $model->deleted = 0;
+                    if ($model->save()) {
+                        $response->error = false;
+                        $response->message->success("registro restaurado com sucesso");
+                    }
+                },
+
+                "delete" => function(Model $model) use ($response) {
+                    if ($model->destroy()) {
+                        $response->error = false;
+                        $response->message->success("registro removido com sucesso");
+                    }
+                }
+            ];
+
+            if (!empty($verifyAction[$requestPost["action"]])) {
+                $verifyAction[$requestPost["action"]]($chartOfAccountData);
+            }
+
+            if ($response->error) {
+                http_response_code(500);
+                echo $response->message->json();
+                die;
+            }
+
+            echo $response->message->json();
+            die;
+        }
+
+        $chartOfAccount = new ChartOfAccount();
+        $responseInitializeUserAndCompany = initializeUserAndCompanyId();
+        $chartOfAccountData = $chartOfAccount->findAllChartOfAccount(
+            [
+                "account_name",
+                "account_number",
+                "deleted",
+                "uuid"
+            ],
+            [
+                "id_company" => $responseInitializeUserAndCompany["company_id"],
+                "id_user" => $responseInitializeUserAndCompany["user"]->getId(),
+                "deleted" => 1
+            ]
+        );
+
+        echo $this->view->render("admin/chart-of-account-backup", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => ["/admin/balance-sheet/chart-of-account/backup"],
+            "chartOfAccountData" => $chartOfAccountData
+        ]);
     }
 
     public function chartOfAccountImportFile()

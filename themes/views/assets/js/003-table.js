@@ -1022,3 +1022,17 @@ const chartOfAccountTable = dataTableConfig($("#chartOfAccountTable"),
                 .appendTo("#widgets .col-md-6:eq(0)");
         }
     })
+const chartOfAccountBackup = dataTableConfig($("#chartOfAccountBackup"),
+    {
+        "columnDefs": [
+            {
+                "targets": [0],
+                "visible": false,
+            }
+        ],
+        "language": {
+            "url": urlJson
+        },
+        "responsive": true,
+        "autoWidth": false
+    })

@@ -78,6 +78,11 @@
                                         </a>
                                     </li>
                                     <li class="nav-item">
+                                        <a href="<?= url("/admin/balance-sheet/chart-of-account/backup") ?>" class="nav-link">
+                                            <p>Backup plano de contas</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
                                         <a href="#" class="nav-link">
                                             <p>Categorias de contas</p>
                                         </a>
