@@ -126,7 +126,7 @@
 2.1.1.01.0001        Fornecedores demonstração                
 2.1.1.02    Salários e Encargos Sociais                    
 2.1.1.02.0001        Salários a pagar                
-2.1.1.02.0002        13º a pagar                
+2.1.1.02.0002        Décimo terceiro a pagar                
 2.1.1.02.0003        Férias a pagar                
 2.1.1.02.0004        INSS a pagar                
 2.1.1.02.0005        FGTS a pagar                
@@ -182,7 +182,7 @@
 2.3.1.04    Reserva de Reavaliação - Saldos até d/m/Y                    
 2.3.1.04.0001        Reavaliação de imobilizado                
 2.3.1.05    Ajuste de Avaliação Patrimonial                    
-2.3.1.05.0001        Custo atribuído Imobilizado - ICPC 10                
+2.3.1.05.0001        Custo atribuído Imobilizado - ICPC dez                
 2.3.1.06    Reserva de Lucros                    
 2.3.1.06.0001        Reserva Legal                
 2.3.1.06.0002        Reserva Estatutária                
@@ -241,7 +241,7 @@
 5.1.1.01.0001        Salários e ordenados                
 5.1.1.01.0002        Gratificações                
 5.1.1.01.0004        Férias                 
-5.1.1.01.0005        13º salário                
+5.1.1.01.0005        Décimo terceiro salário                
 5.1.1.01.0006        INSS                
 5.1.1.01.0007        FGTS                
 5.1.1.01.0008        Indenizações                
@@ -275,7 +275,7 @@
 5.1.2.01.0001        Salários e ordenados                
 5.1.2.01.0002        Gratificações                
 5.1.2.01.0003        Férias                 
-5.1.2.01.0004        13º salário                
+5.1.2.01.0004        Décimo terceiro salário                
 5.1.2.01.0005        INSS                
 5.1.2.01.0006        FGTS                
 5.1.2.01.0007        Indenizações                

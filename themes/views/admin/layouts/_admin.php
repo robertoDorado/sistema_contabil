@@ -83,8 +83,8 @@
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="#" class="nav-link">
-                                            <p>Categorias de contas</p>
+                                        <a href="<?= url("/admin/balance-sheet/chart-of-account-group") ?>" class="nav-link">
+                                            <p>Categoria de contas</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">

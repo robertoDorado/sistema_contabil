@@ -8,6 +8,7 @@ const verifyChartOfAccountPathname = [
 ]
 
 if (verifyChartOfAccountPathname.indexOf(chartOfAccountPathName) != -1) {
+    $("#chartOfAccountGroupSelect").select2()
     const exportExcelModelChartOfAccount = document.getElementById("exportExcelModelChartOfAccount")
     const dataTransfer = {}
     

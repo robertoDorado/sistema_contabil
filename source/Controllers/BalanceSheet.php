@@ -10,6 +10,7 @@ use Source\Core\Connect;
 use Source\Core\Controller;
 use Source\Core\Model;
 use Source\Domain\Model\ChartOfAccount;
+use Source\Domain\Model\ChartOfAccountGroup;
 use Source\Domain\Model\ChartOfAccountModel;
 use Source\Support\Message;
 
@@ -29,6 +30,30 @@ class BalanceSheet extends Controller
         parent::__construct();
     }
 
+    public function chartOfAccountGroup()
+    {
+        $chartOfAccountGroup = new ChartOfAccountGroup();
+        $responseUserAndCompany = initializeUserAndCompanyId();
+        $chartOfAccountGroupData = $chartOfAccountGroup->findAllChartOfAccountGroup(
+            [
+                "uuid", 
+                "account_name", 
+                "account_number"
+            ], 
+            [
+                "id_user" => $responseUserAndCompany["user"]->getId(),
+                "id_company" => $responseUserAndCompany["company_id"],
+                "deleted" => 0
+            ]
+        );
+
+        echo $this->view->render("admin/chart-of-account-group", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => ["/admin/balance-sheet/chart-of-account-group"],
+            "chartOfAccountGroupData" => $chartOfAccountGroupData
+        ]);
+    }
+
     public function chartOfAccountBackup()
     {
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
@@ -41,14 +66,14 @@ class BalanceSheet extends Controller
             if (!empty($chartOfAccountData)) {
                 $chartOfAccountData->setRequiredFields(["deleted"]);
             }
-            
+
             $response = new \stdClass();
             $response->error = true;
             $response->message = new Message();
             $response->message->error("erro interno ao modificar o registro");
 
             $verifyAction = [
-                "restore" => function(Model $model) use ($response) {
+                "restore" => function (Model $model) use ($response) {
                     $model->deleted = 0;
                     if ($model->save()) {
                         $response->error = false;
@@ -56,7 +81,7 @@ class BalanceSheet extends Controller
                     }
                 },
 
-                "delete" => function(Model $model) use ($response) {
+                "delete" => function (Model $model) use ($response) {
                     if ($model->destroy()) {
                         $response->error = false;
                         $response->message->success("registro removido com sucesso");
@@ -131,35 +156,122 @@ class BalanceSheet extends Controller
         }
 
         Connect::getInstance()->beginTransaction();
-        foreach ($data as &$array) {
-            $array[1] = preg_replace("/,/", ".", $array[1]);
-            $chartOfAccount = new ChartOfAccount();
-            $response = $chartOfAccount->persistData([
-                "uuid" => Uuid::uuid4(),
-                "id_company" => $responseUserAndCompany["company_id"],
-                "id_user" => $responseUserAndCompany["user"],
-                "account_number" => $array[1],
-                "account_name" => $array[0],
-                "deleted" => 0
-            ]);
+        $chartOfAccountGroupFile = array_filter($data, function ($array) {
+            if (preg_match("/^\d+$/", $array[1])) {
+                return $array;
+            }
+        });
+
+        $chartOfAccountGroupFile = array_values($chartOfAccountGroupFile);
+        $params = [
+            "id_company" => $responseUserAndCompany["company_id"],
+            "id_user" => $responseUserAndCompany["user"],
+            "deleted" => 0
+        ];
+
+        foreach ($chartOfAccountGroupFile as $accountGroup) {
+            $chartOfAccountGroup = new ChartOfAccountGroup();
+            $params["uuid"] = Uuid::uuid4();
+            $params["account_name"] = $accountGroup[0];
+            $params["account_number"] = $accountGroup[1];
+            $response = $chartOfAccountGroup->persistData($params);
 
             if (!$response) {
                 http_response_code(500);
-                echo $chartOfAccount->message->json();
+                echo $chartOfAccountGroup->message->json();
                 Connect::getInstance()->rollBack();
                 die;
             }
         }
+
+        $chartOfAccountGroup = new ChartOfAccountGroup();
+        $chartOfAccountGroupData = $chartOfAccountGroup->findAllChartOfAccountGroup(
+            [
+                "id",
+                "account_number"
+            ],
+            [
+                "id_company" => $responseUserAndCompany["company_id"],
+                "id_user" => $responseUserAndCompany["user"]->getId(),
+                "deleted" => 0
+            ]
+        );
+
+        if (empty($chartOfAccountGroupData)) {
+            http_response_code(500);
+            echo json_encode(["error" => "grupo de contas não foi importado corretamente"]);
+            die;
+        }
+
+        $chartOfAccountGroupData = array_map(function ($item) {
+            return (array) $item->data();
+        }, $chartOfAccountGroupData);
+
+        $groupChartOfAccount = [];
+        $groupValue = "";
+
+        foreach ($data as $array) {
+            if (preg_match("/^\d+$/", $array[1])) {
+                $groupValue = $array[1];
+            }
+
+            if (preg_match("/[\d\.,]+/", $array[1])) {
+                if (!empty($groupValue)) {
+                    $groupChartOfAccount[$groupValue][] = $array;
+                }
+            }
+        }
+
+        foreach ($chartOfAccountGroupData as $value) {
+            if (!empty($groupChartOfAccount[$value["account_number"]])) {
+                $groupChartOfAccount[$value["account_number"]] = array_map(function ($array) use ($value) {
+                    $array[] = $value["id"];
+                    return $array;
+                }, $groupChartOfAccount[$value["account_number"]]);
+            }
+        }
+
+        foreach ($groupChartOfAccount as &$array) {
+            array_shift($array);
+        }
+
+        foreach ($groupChartOfAccount as $arrayA) {
+            foreach ($arrayA as &$arrayB) {
+                $arrayB = array_map(function ($item) {
+                    $item[1] = preg_replace("/,/", ".", $item);
+                    return $item;
+                }, $arrayB);
+            }
+        }
+
+        foreach ($groupChartOfAccount as $arrayA) {
+            foreach ($arrayA as $arrayB) {
+                $chartOfAccount = new ChartOfAccount();
+                $params["uuid"] = Uuid::uuid4();
+                $params["account_name"] = $arrayB[0];
+                $params["account_number"] = $arrayB[1];
+                $params["id_chart_of_account_group"] = $arrayB[2];
+
+                $response = $chartOfAccount->persistData($params);
+                if (!$response) {
+                    http_response_code(500);
+                    echo $chartOfAccount->message->json();
+                    Connect::getInstance()->rollBack();
+                    die;
+                }
+            }
+        }
+
         Connect::getInstance()->commit();
         $chartOfAccount = new ChartOfAccount();
         $chartOfAccountData = $chartOfAccount->findAllChartOfAccount(
             [
-                "uuid", 
-                "account_name", 
+                "uuid",
+                "account_name",
                 "account_number"
-            ], 
+            ],
             [
-                "id_company" => $responseUserAndCompany["company_id"], 
+                "id_company" => $responseUserAndCompany["company_id"],
                 "id_user" => $responseUserAndCompany["user"]->getId(),
                 "deleted" => 0
             ]
@@ -171,14 +283,14 @@ class BalanceSheet extends Controller
             die;
         }
 
-        $chartOfAccountData = array_map(function($item) {
+        $chartOfAccountData = array_map(function ($item) {
             $item->edit_btn = '<a class="icons" href="' . url("/admin/balance-sheet/chart-of-account/update/" . $item->getUuid() . "") . '"><i class="fas fa-edit" aria-hidden="true"></i></a>';
             $item->delete_btn = '<a class="icons" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a>';
             $item->uuid = $item->getUuid();
             return (array) $item->data();
         }, $chartOfAccountData);
 
-        echo json_encode(["success" => "arquivo importado com sucess", "data" => $chartOfAccountData]);
+        echo json_encode(["success" => "arquivo importado com sucesso", "data" => $chartOfAccountData]);
     }
 
     public function chartOfAccountFormDelete()
@@ -326,6 +438,12 @@ class BalanceSheet extends Controller
             die;
         }
 
+        $params = [
+            "id_company" => $responseInitializeUserAndCompany["company_id"],
+            "id_user" => $responseInitializeUserAndCompany["user"]->getId(),
+            "deleted" => 0
+        ];
+
         $chartOfAccount = new ChartOfAccount();
         $chartOfAccountData = $chartOfAccount->findAllChartOfAccount(
             [
@@ -333,17 +451,23 @@ class BalanceSheet extends Controller
                 "account_name",
                 "account_number"
             ],
+            $params
+        );
+
+        $chartOfAccountGroup = new ChartOfAccountGroup();
+        $chartOfAccountGroupData = $chartOfAccountGroup->findAllChartOfAccountGroup(
             [
-                "id_company" => $responseInitializeUserAndCompany["company_id"],
-                "id_user" => $responseInitializeUserAndCompany["user"]->getId(),
-                "deleted" => 0
-            ]
+                "uuid",
+                "account_name",
+            ],
+            $params
         );
 
         echo $this->view->render("admin/chart-of-account", [
             "userFullName" => showUserFullName(),
             "endpoints" => ["/admin/balance-sheet/chart-of-account"],
-            "chartOfAccountData" => $chartOfAccountData
+            "chartOfAccountData" => $chartOfAccountData,
+            "chartOfAccountGroupData" => $chartOfAccountGroupData
         ]);
     }
 }

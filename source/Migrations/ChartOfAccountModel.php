@@ -5,6 +5,7 @@ require dirname(dirname(__DIR__)) . "/vendor/autoload.php";
 
 use Exception;
 use Ramsey\Uuid\Nonstandard\Uuid;
+use Source\Core\Connect;
 use Source\Migrations\Core\DDL;
 use Source\Models\ChartOfAccountModel as ModelsChartOfAccountModel;
 
@@ -48,7 +49,7 @@ class ChartOfAccountModel
 
         $data = [];
         preg_match_all("/[\d\.]+/", $chartOfAccountContent, $data["account_value"]);
-        preg_match_all("/[À-ÿA-Za-z\s\(\)\-\/]+/", $chartOfAccountContent, $data["account_name"]);
+        preg_match_all("/[À-ÿA-Za-z\s,\(\)\-\/]+/", $chartOfAccountContent, $data["account_name"]);
 
         if (empty($data["account_name"][0])) {
             throw new Exception("erro ao tentar capturar os nomes das contas");
@@ -79,13 +80,17 @@ class ChartOfAccountModel
         });
 
         $data["account_name"] = array_values($data["account_name"]);
+        Connect::getInstance()->beginTransaction();
         foreach ($data["account_value"] as $key => $value) {
             $chartOfAccountModel = new ModelsChartOfAccountModel();
             $chartOfAccountModel->uuid = Uuid::uuid4();
             $chartOfAccountModel->account_number = $value;
             $chartOfAccountModel->account_name = $data["account_name"][$key];
-            $chartOfAccountModel->save();
+            if (!$chartOfAccountModel->save()) {
+                Connect::getInstance()->rollBack();
+            }
         }
+        Connect::getInstance()->commit();
     }
 }
 executeMigrations(ChartOfAccountModel::class);

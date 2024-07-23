@@ -192,6 +192,9 @@ $route->post("/balance-sheet/chart-of-account/delete", "BalanceSheet::chartOfAcc
 $route->post("/balance-sheet/chart-of-account/import-file", "BalanceSheet::chartOfAccountImportFile");
 $route->get("/balance-sheet/chart-of-account/backup", "BalanceSheet::chartOfAccountBackup");
 $route->post("/balance-sheet/chart-of-account/backup", "BalanceSheet::chartOfAccountBackup");
+$route->get("/balance-sheet/chart-of-account-group", "BalanceSheet::chartOfAccountGroup");
+$route->get("/balance-sheet/chart-of-account-group/update/{uuid}", "BalanceSheet::chartOfAccountGroupUpdate");
+$route->post("/balance-sheet/chart-of-account-group/update", "BalanceSheet::chartOfAccountGroupUpdate");
 
 /** 
  * Assinatura do cliente

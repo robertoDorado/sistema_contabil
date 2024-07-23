@@ -4,12 +4,12 @@ namespace Source\Models;
 use Source\Core\Model;
 
 /**
- * ChartOfAccount Models
+ * ChartOfAccountGroup Models
  * @link 
  * @author Roberto Dorado <robertodorado7@gmail.com>
  * @package Source\Models
  */
-class ChartOfAccount extends Model
+class ChartOfAccountGroup extends Model
 {
     /** @var string Uuid do fluxo de caixa */
     protected string $uuid = "uuid";
@@ -19,9 +19,6 @@ class ChartOfAccount extends Model
 
     /** @var string id do usuário (chave de relacionamento) */
     protected string $idUser = "id_user";
-
-    /** @var string id grupo plano de contas */
-    protected string $idChartOfAccountGroup = "id_chart_of_account_group";
 
     /** @var string Número da conta */
     protected string $accountNumber = "account_number";
@@ -33,15 +30,14 @@ class ChartOfAccount extends Model
     protected string $deleted = "deleted";
 
     /**
-     * ChartOfAccount constructor
+     * ChartOfAccountGroup constructor
      */
     public function __construct()
     {
-        parent::__construct(CONF_DB_NAME . ".chart_of_account", ["id"], [
+        parent::__construct(CONF_DB_NAME . ".chart_of_account_group", ["id"], [
             $this->uuid,
             $this->idCompany,
             $this->idUser,
-            $this->idChartOfAccountGroup,
             $this->accountNumber,
             $this->accountName,
             $this->deleted
