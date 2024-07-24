@@ -83,8 +83,18 @@
                                         </a>
                                     </li>
                                     <li class="nav-item">
+                                        <a href="<?= url("/admin/balance-sheet/chart-of-account-group/form") ?>" class="nav-link">
+                                            <p>Nova categoria de contas</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
                                         <a href="<?= url("/admin/balance-sheet/chart-of-account-group") ?>" class="nav-link">
                                             <p>Categoria de contas</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="<?= url("/admin/balance-sheet/chart-of-account-group/backup") ?>" class="nav-link">
+                                            <p>Backup categoria de contas</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">

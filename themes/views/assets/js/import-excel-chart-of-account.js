@@ -59,6 +59,7 @@ if (window.location.pathname == "/admin/balance-sheet/chart-of-account") {
                 response.data.forEach(function(item) {
                     chartOfAccountTable.row.add([
                         item.uuid,
+                        item.account_name_group,
                         item.account_number,
                         item.account_name,
                         item.edit_btn,

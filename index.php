@@ -195,6 +195,11 @@ $route->post("/balance-sheet/chart-of-account/backup", "BalanceSheet::chartOfAcc
 $route->get("/balance-sheet/chart-of-account-group", "BalanceSheet::chartOfAccountGroup");
 $route->get("/balance-sheet/chart-of-account-group/update/{uuid}", "BalanceSheet::chartOfAccountGroupUpdate");
 $route->post("/balance-sheet/chart-of-account-group/update", "BalanceSheet::chartOfAccountGroupUpdate");
+$route->get("/balance-sheet/chart-of-account-group/form", "BalanceSheet::chartOfAccountGroupForm");
+$route->post("/balance-sheet/chart-of-account-group/form", "BalanceSheet::chartOfAccountGroupForm");
+$route->post("/balance-sheet/chart-of-account-group/delete", "BalanceSheet::chartOfAccountGroupDelete");
+$route->get("/balance-sheet/chart-of-account-group/backup", "BalanceSheet::chartOfAccountGroupBackup");
+$route->post("/balance-sheet/chart-of-account-group/backup", "BalanceSheet::chartOfAccountGroupBackup");
 
 /** 
  * Assinatura do cliente

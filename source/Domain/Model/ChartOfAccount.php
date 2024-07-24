@@ -1,4 +1,5 @@
 <?php
+
 namespace Source\Domain\Model;
 
 use Exception;
@@ -46,11 +47,40 @@ class ChartOfAccount
     }
 
     /** @var ModelsChartOfAccount[] */
+    public function findAllChartOfAccountJoinChartOfAccountGroup(array $columnsA, array $columnsB, array $params): array
+    {
+        $columnsA = empty($columnsA) ? "*" : implode(", ", $columnsA);
+        $columnsB = empty($columnsB) ? "*" : implode(", ", $columnsB);
+        $terms = "id_user=:id_user AND id_company=:id_company AND deleted=:deleted";
+        $params = ":id_user={$params['id_user']}&:id_company={$params['id_company']}&:deleted={$params['deleted']}";
+
+        $response = $this->chartOfAccount->find(
+            $terms,
+            $params,
+            $columnsA
+        )->join(
+            CONF_DB_NAME . ".chart_of_account_group",
+            "id",
+            $terms,
+            $params,
+            $columnsB,
+            "id_chart_of_account_group",
+            CONF_DB_NAME . ".chart_of_account"
+        )->fetch(true);
+
+        if (empty($response)) {
+            return [];
+        }
+
+        return $response;
+    }
+
+    /** @var ModelsChartOfAccount[] */
     public function findAllChartOfAccount(array $columns = [], array $params): array
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
         $response = $this->chartOfAccount->find(
-            "id_company=:id_company AND id_user=:id_user AND deleted=:deleted", 
+            "id_company=:id_company AND id_user=:id_user AND deleted=:deleted",
             ":id_company=" . $params["id_company"] . "&:id_user=" . $params["id_user"] . "&:deleted=" . $params["deleted"] . "",
             $columns
         )->fetch(true);

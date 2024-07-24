@@ -45,6 +45,12 @@ class ChartOfAccountGroup
         return $this->data->$name ?? null;
     }
 
+    public function findChartOfAccountGroupByUuid(array $columns): ?ModelsChartOfAccountGroup
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        return $this->chartOfAccountGroup->find("uuid=:uuid", ":uuid=" . $this->getUuid() . "", $columns)->fetch();
+    }
+
     /** @var ModelsChartOfAccount[] */
     public function findAllChartOfAccountGroup(array $columns = [], array $params): array
     {

@@ -91,6 +91,7 @@
                                     <thead>
                                         <tr>
                                             <th>Id</th>
+                                            <th>Grupo de contas</th>
                                             <th>Conta</th>
                                             <th>Nome</th>
                                             <th>Editar</th>
@@ -102,6 +103,7 @@
                                             <?php foreach ($chartOfAccountData as $value) : ?>
                                                 <tr>
                                                     <td><?= $value->getUuid() ?></td>
+                                                    <td><?= $value->account_name_group ?></td>
                                                     <td><?= $value->account_number ?></td>
                                                     <td><?= $value->account_name ?></td>
                                                     <td><a class="icons" href="<?= url("/admin/balance-sheet/chart-of-account/update/" . $value->getUuid() . "") ?>"><i class="fas fa-edit" aria-hidden="true"></i></a></td>

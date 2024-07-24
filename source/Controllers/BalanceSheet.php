@@ -30,16 +30,171 @@ class BalanceSheet extends Controller
         parent::__construct();
     }
 
+    public function chartOfAccountGroupBackup()
+    {
+        $responseInitializeUserAndCompany = initializeUserAndCompanyId();
+        $chartOfAccountGroup = new ChartOfAccountGroup();
+        $chartOfAccountGroupData = $chartOfAccountGroup->findAllChartOfAccountGroup(
+            [
+                "uuid",
+                "account_name",
+                "account_number"
+            ],
+            [
+                "id_user" => $responseInitializeUserAndCompany["user"]->getId(),
+                "id_company" => $responseInitializeUserAndCompany["company_id"],
+                "deleted" => 1
+            ],
+        );
+
+        echo $this->view->render("admin/chart-of-account-group-backup", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => ["/admin/balance-sheet/chart-of-account-group/backup"],
+            "chartOfAccountGroupData" => $chartOfAccountGroupData
+        ]);
+    }
+
+    public function chartOfAccountGroupDelete()
+    {
+        verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
+        $requestPost = $this->getRequests()->setRequiredFields(["uuid"])->getAllPostData();
+
+        $chartOfAccountGroup = new ChartOfAccountGroup();
+        $response = $chartOfAccountGroup->updateChartOfAccountGroupByUuid([
+            "uuid" => $requestPost["uuid"],
+            "deleted" => 1
+        ]);
+
+        if (!$response) {
+            http_response_code(500);
+            echo $chartOfAccountGroup->message->json();
+            die;
+        }
+
+        echo json_encode(["success" => "grupo plano de contas removido com sucesso"]);
+    }
+
+    public function chartOfAccountGroupUpdate(array $data)
+    {
+        if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
+            $requestPost = $this->getRequests()->setRequiredFields(
+                [
+                    "uuid",
+                    "accountName",
+                    "accountNumber",
+                    "csrfToken"
+                ]
+            )->getAllPostData();
+
+            $responseInitializeUserAndCompany = initializeUserAndCompanyId();
+            if (empty($responseInitializeUserAndCompany["company_id"])) {
+                http_response_code(500);
+                echo json_encode(["error" => "selecione uma empresa antes de atualizar uma categoria de contas"]);
+                die;
+            }
+
+            $chartOfAccountGroup = new ChartOfAccountGroup();
+            $response = $chartOfAccountGroup->updateChartOfAccountGroupByUuid([
+                "uuid" => $requestPost["uuid"],
+                "account_name" => $requestPost["accountName"],
+                "account_number" => $requestPost["accountNumber"]
+            ]);
+
+            if (!$response) {
+                http_response_code(500);
+                echo $chartOfAccountGroup->message->json();
+                die;
+            }
+
+            echo json_encode(["success" => true, "url" => url("/admin/balance-sheet/chart-of-account-group")]);
+            die;
+        }
+
+        if (empty($data["uuid"])) {
+            redirect("/admin/balance-sheet/chart-of-account-group");
+        }
+
+        if (!Uuid::isValid($data["uuid"])) {
+            redirect("/admin/balance-sheet/chart-of-account-group");
+        }
+
+        $chartOfAccountGroup = new ChartOfAccountGroup();
+        $chartOfAccountGroup->setUuid($data["uuid"]);
+        $chartOfAccountGroupData = $chartOfAccountGroup->findChartOfAccountGroupByUuid(
+            [
+                "uuid",
+                "account_name",
+                "account_number"
+            ]
+        );
+
+        if (empty($chartOfAccountGroupData)) {
+            redirect("/admin/balance-sheet/chart-of-account-group");
+        }
+
+        echo $this->view->render("admin/chart-of-account-group-update", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => ["/admin/balance-sheet/chart-of-account-group/update"],
+            "chartOfAccountGroupData" => $chartOfAccountGroupData
+        ]);
+    }
+
+    public function chartOfAccountGroupForm()
+    {
+        if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
+            $requestPost = $this->getRequests()->setRequiredFields(
+                [
+                    "accountName",
+                    "accountNumber",
+                    "csrfToken"
+                ]
+            )->getAllPostData();
+
+            $responseInitializeUserAndCompany = initializeUserAndCompanyId();
+            if (empty($responseInitializeUserAndCompany["company_id"])) {
+                http_response_code(500);
+                echo json_encode(["error" => "selecione uma empresa antes de criar uma categoria de contas"]);
+                die;
+            }
+
+            $chartOfAccountGroup = new ChartOfAccountGroup();
+            $response = $chartOfAccountGroup->persistData([
+                "uuid" => Uuid::uuid4(),
+                "id_user" => $responseInitializeUserAndCompany["user"],
+                "id_company" => $responseInitializeUserAndCompany["company_id"],
+                "account_name" => $requestPost["accountName"],
+                "account_number" => $requestPost["accountNumber"],
+                "deleted" => 0
+            ]);
+
+            if (empty($response)) {
+                http_response_code(500);
+                echo $chartOfAccountGroup->message->json();
+                die;
+            }
+
+            echo json_encode(["success" => "categoria de contas criada com sucesso"]);
+            die;
+        }
+
+        echo $this->view->render("admin/chart-of-account-group-form", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => ["/admin/balance-sheet/chart-of-account-group/form"]
+        ]);
+    }
+
     public function chartOfAccountGroup()
     {
         $chartOfAccountGroup = new ChartOfAccountGroup();
         $responseUserAndCompany = initializeUserAndCompanyId();
         $chartOfAccountGroupData = $chartOfAccountGroup->findAllChartOfAccountGroup(
             [
-                "uuid", 
-                "account_name", 
+                "uuid",
+                "account_name",
                 "account_number"
-            ], 
+            ],
             [
                 "id_user" => $responseUserAndCompany["user"]->getId(),
                 "id_company" => $responseUserAndCompany["company_id"],
@@ -57,9 +212,10 @@ class BalanceSheet extends Controller
     public function chartOfAccountBackup()
     {
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $requestPost = $this->getRequests()->setRequiredFields(["uuid", "action"])->getAllPostData();
             $chartOfAccount = new ChartOfAccount();
-            
+
             $chartOfAccount->setUuid($requestPost["uuid"]);
             $chartOfAccountData = $chartOfAccount->findChartOfAccountByUuid(["id"]);
 
@@ -264,11 +420,14 @@ class BalanceSheet extends Controller
 
         Connect::getInstance()->commit();
         $chartOfAccount = new ChartOfAccount();
-        $chartOfAccountData = $chartOfAccount->findAllChartOfAccount(
+        $chartOfAccountData = $chartOfAccount->findAllChartOfAccountJoinChartOfAccountGroup(
             [
                 "uuid",
                 "account_name",
                 "account_number"
+            ],
+            [
+                "account_name AS account_name_group"
             ],
             [
                 "id_company" => $responseUserAndCompany["company_id"],
@@ -280,6 +439,7 @@ class BalanceSheet extends Controller
         if (empty($chartOfAccountData)) {
             http_response_code(500);
             echo json_encode(["error" => "registro plano de contas não encontrado"]);
+            Connect::getInstance()->rollBack();
             die;
         }
 
@@ -321,12 +481,24 @@ class BalanceSheet extends Controller
                 "csrfToken",
                 "accountName",
                 "accountValue",
+                "chartOfAccountGroupSelect",
                 "uuid"
             ])->getAllPostData();
+
+            $chartOfAccountGroup = new ChartOfAccountGroup();
+            $chartOfAccountGroup->setUuid($requestPost["chartOfAccountGroupSelect"]);
+            $chartOfAccountGroupData = $chartOfAccountGroup->findChartOfAccountGroupByUuid(["id"]);
+
+            if (empty($chartOfAccountGroupData)) {
+                http_response_code(500);
+                echo json_encode(["error" => "grupo de contas inexistente"]);
+                die;
+            }
 
             $chartOfAccount = new ChartOfAccount();
             $response = $chartOfAccount->updateChartOfAccountByUuid([
                 "uuid" => $requestPost["uuid"],
+                "id_chart_of_account_group" => $chartOfAccountGroupData->id,
                 "account_name" => $requestPost["accountName"],
                 "account_number" => $requestPost["accountValue"]
             ]);
@@ -345,13 +517,29 @@ class BalanceSheet extends Controller
             redirect("/admin/balance-sheet/chart-of-account");
         }
 
+        $responseInitializeUserAndCompany = initializeUserAndCompanyId();
+        $chartOfAccountGroup = new ChartOfAccountGroup();
+        $chartOfAccountGroupData = $chartOfAccountGroup->findAllChartOfAccountGroup(
+            [
+                "id",
+                "uuid",
+                "account_name"
+            ],
+            [
+                "id_user" => $responseInitializeUserAndCompany["user"]->getId(),
+                "id_company" => $responseInitializeUserAndCompany["company_id"],
+                "deleted" => 0
+            ]
+        );
+
         $chartOfAccount = new ChartOfAccount();
         $chartOfAccount->setUuid($data["uuid"]);
-        $chartOfAccountData = $chartOfAccount->findChartOfAccountByUuid(["account_name", "account_number"]);
+        $chartOfAccountData = $chartOfAccount->findChartOfAccountByUuid(["id_chart_of_account_group", "account_name", "account_number"]);
 
         echo $this->view->render("admin/chart-of-account-update", [
             "userFullName" => showUserFullName(),
             "chartOfAccountData" => $chartOfAccountData,
+            "chartOfAccountGroupData" => $chartOfAccountGroupData,
             "endpoints" => []
         ]);
     }
@@ -389,9 +577,11 @@ class BalanceSheet extends Controller
     {
         $responseInitializeUserAndCompany = initializeUserAndCompanyId();
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $requestPost = $this->getRequests()->setRequiredFields([
                 "accountValue",
                 "accountName",
+                "chartOfAccountGroupSelect",
                 "csrfToken"
             ])->getAllPostData();
 
@@ -401,10 +591,26 @@ class BalanceSheet extends Controller
                 die;
             }
 
+            $chartOfAccountGroup = new ChartOfAccountGroup();
+            $chartOfAccountGroup->setUuid($requestPost["chartOfAccountGroupSelect"]);
+            $chartOfAccountGroupData = $chartOfAccountGroup->findChartOfAccountGroupByUuid(
+                [
+                    "id",
+                    "account_name"
+                ]
+            );
+
+            if (empty($chartOfAccountGroupData)) {
+                http_response_code(500);
+                echo json_encode(["error" => "grupo de contas inexistente"]);
+                die;
+            }
+
             $uuid = Uuid::uuid4();
             $chartOfAccount = new ChartOfAccount();
             $response = $chartOfAccount->persistData([
                 "id_user" => $responseInitializeUserAndCompany["user"],
+                "id_chart_of_account_group" => $chartOfAccountGroupData->id,
                 "id_company" => $responseInitializeUserAndCompany["company_id"],
                 "uuid" => $uuid,
                 "account_number" => $requestPost["accountValue"],
@@ -431,6 +637,7 @@ class BalanceSheet extends Controller
             echo json_encode(["success" => "conta criada com sucesso", "data" => [
                 "uuid" => $chartOfAccountData->getUuid(),
                 "accountName" => $chartOfAccountData->account_name,
+                "accountNameGroup" => $chartOfAccountGroupData->account_name,
                 "accountValue" => $chartOfAccountData->account_number,
                 "editBtn" => '<a class="icons" href="' . url("/admin/balance-sheet/chart-of-account/update/" . $chartOfAccountData->getUuid() . "") . '"><i class="fas fa-edit" aria-hidden="true"></i></a>',
                 "excludeBtn" => '<a class="icons" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a>'
@@ -445,11 +652,15 @@ class BalanceSheet extends Controller
         ];
 
         $chartOfAccount = new ChartOfAccount();
-        $chartOfAccountData = $chartOfAccount->findAllChartOfAccount(
+        $chartOfAccount = new ChartOfAccount();
+        $chartOfAccountData = $chartOfAccount->findAllChartOfAccountJoinChartOfAccountGroup(
             [
                 "uuid",
                 "account_name",
                 "account_number"
+            ],
+            [
+                "account_name AS account_name_group"
             ],
             $params
         );

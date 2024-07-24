@@ -50,6 +50,26 @@ if (verifyChartOfAccountPathname.indexOf(chartOfAccountPathName) != -1) {
         event.preventDefault()
         const btnSubmit = this.querySelector("button[type='submit']")
 
+        if (!this.accountValue.value) {
+            toastr.warning("Número da conta é obrigatório")
+            throw new Error("Número da conta é obrigatório")
+        }
+
+        if (!this.accountName.value) {
+            toastr.warning("Nome da conta é obrigatório")
+            throw new Error("Nome da conta é obrigatório")
+        }
+
+        if (!this.chartOfAccountGroupSelect.value) {
+            toastr.warning("Grupo de contas é obrigatório")
+            throw new Error("Grupo de contas é obrigatório")
+        }
+
+        if (!this.csrfToken.value) {
+            toastr.warning("Token csrf é obrigatório")
+            throw new Error("Token csrf é obrigatório")
+        }
+
         if (Array.isArray(this.accountValue.value.match(/\d+\.$/))) {
             toastr.error("Número de conta inválido")
             throw new Error("Número de conta inválido")
@@ -88,12 +108,14 @@ if (verifyChartOfAccountPathname.indexOf(chartOfAccountPathName) != -1) {
                     toastr.success(message)
                     chartOfAccountTable.row.add([
                         response.data.uuid,
+                        response.data.accountNameGroup,
                         response.data.accountValue,
                         response.data.accountName,
                         response.data.editBtn,
                         response.data.excludeBtn
                     ]).draw(false)
 
+                    $("#chartOfAccountGroupSelect").val(null).trigger("change")
                     resetInputValues.forEach(function(element) {
                         element.value = ""
                     })

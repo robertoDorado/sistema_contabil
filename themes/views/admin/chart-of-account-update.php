@@ -37,6 +37,16 @@
                                     <label for="accountName">Nome</label>
                                     <input name="accountName" value="<?= empty($chartOfAccountData->account_name) ? "" : $chartOfAccountData->account_name ?>" class="form-control">
                                 </div>
+                                <div class="form-group">
+                                    <select id="chartOfAccountGroupSelect" name="chartOfAccountGroupSelect" style="width: 50%">
+                                    <option value="" disabled selected>Selecione um grupo do plano de contas</option>
+                                        <?php if (!empty($chartOfAccountGroupData)) : ?>
+                                            <?php foreach($chartOfAccountGroupData as $chartOfAccountGroup) : ?>
+                                                <option value="<?= $chartOfAccountGroup->getUuid() ?>" <?= $chartOfAccountGroup->id == $chartOfAccountData->id_chart_of_account_group ? "selected" : "" ?>><?= $chartOfAccountGroup->account_name ?></option>
+                                            <?php endforeach ?>
+                                        <?php endif ?>
+                                    </select>
+                                </div>
                             </div>
 
                             <div class="card-footer">

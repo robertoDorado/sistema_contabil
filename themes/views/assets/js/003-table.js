@@ -993,11 +993,11 @@ const chartOfAccountTable = dataTableConfig($("#chartOfAccountTable"),
                 "title": 'Plano de contas',
                 customize: function (doc) {
                     doc.content[1].table.body.forEach(function (row) {
-                        row.splice(3, 2);
+                        row.splice(4, 2);
                     });
 
                     doc.content[1].table.widths = [
-                        '33.33%', '33.33%', '33.33%'
+                        '25%', '25%', '25%', '25%'
                     ];
 
                     var objLayout = {};
@@ -1089,6 +1089,20 @@ const chartOfAccountGroup = dataTableConfig($("#chartOfAccountGroup"),
         }
     })
 const chartOfAccountBackup = dataTableConfig($("#chartOfAccountBackup"),
+    {
+        "columnDefs": [
+            {
+                "targets": [0],
+                "visible": false,
+            }
+        ],
+        "language": {
+            "url": urlJson
+        },
+        "responsive": true,
+        "autoWidth": false
+    })
+const chartOfAccountGroupBackup = dataTableConfig($("#chartOfAccountGroupBackup"),
     {
         "columnDefs": [
             {

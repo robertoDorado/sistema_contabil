@@ -75,13 +75,13 @@ class CashFlow
                 $columns
             )
             ->join(
-                "cash_flow_group",
+                CONF_DB_NAME . ".cash_flow_group",
                 "id",
                 "id_user=:id_user AND deleted=0 AND id_company=:id_company",
                 ":id_user=" . $user->getId() . "&:id_company=" . $companyId . "",
                 "group_name",
                 "id_cash_flow_group",
-                "cash_flow"
+                CONF_DB_NAME . ".cash_flow"
             )
             ->fetch(true);
 
@@ -122,13 +122,13 @@ class CashFlow
                     $columns
                 )
                 ->join(
-                    "cash_flow_group",
+                    CONF_DB_NAME . ".cash_flow_group",
                     "id",
                     "deleted=0 AND id_user=:id_user AND id_company=:id_company",
                     ":id_user=" . $user->getId() . ":id_company=" . $companyId,
                     "group_name",
                     "id_cash_flow_group",
-                    "cash_flow"
+                    CONF_DB_NAME . ".cash_flow"
                 )
                 ->between(
                     "created_at",
@@ -179,13 +179,13 @@ class CashFlow
         $cashFlowData = $this->cashFlow
             ->find("uuid=:uuid", ":uuid={$this->getUuid()}")
             ->join(
-                "cash_flow_group",
+                CONF_DB_NAME . ".cash_flow_group",
                 "id",
                 "deleted=:deleted",
                 ":deleted=0",
                 "group_name",
                 "id_cash_flow_group",
-                "cash_flow"
+                CONF_DB_NAME . ".cash_flow"
             )
             ->fetch();
 
@@ -222,13 +222,13 @@ class CashFlow
             $columns
         )
             ->join(
-                "cash_flow_group",
+                CONF_DB_NAME . ".cash_flow_group",
                 "id",
                 "deleted=:deleted AND id_user=:id_user AND id_company=:id_company",
                 ":deleted=0&:id_user=" . $user->getId() . "&:id_company=" . $companyId,
                 "group_name",
                 "id_cash_flow_group",
-                "cash_flow"
+                CONF_DB_NAME . ".cash_flow"
             )
             ->fetch(true);
 
