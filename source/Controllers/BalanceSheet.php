@@ -440,12 +440,6 @@ class BalanceSheet extends Controller
             array_shift($array);
         }
 
-        foreach ($groupChartOfAccount as &$arrayA) {
-            foreach ($arrayA as &$arrayB) {
-                $arrayB[1] = str_replace(",", ".", $arrayB[1]);
-            }
-        }
-
         foreach ($groupChartOfAccount as $arrayA) {
             foreach ($arrayA as $arrayB) {
                 $chartOfAccount = new ChartOfAccount();
