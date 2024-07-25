@@ -30,7 +30,7 @@
                             <div class="card-body">
                                 <div class="form-group">
                                     <label for="accountNumber">Número da conta</label>
-                                    <input value="<?= empty($chartOfAccountGroupData->account_number) ? "" : $chartOfAccountGroupData->account_number ?>" data-mask="accountNumber" name="accountNumber" class="form-control">
+                                    <input data-mask="accountNumber" value="<?= empty($chartOfAccountGroupData->account_number) ? "" : $chartOfAccountGroupData->account_number ?>" data-mask="accountNumber" name="accountNumber" class="form-control">
                                 </div>
                                 <div class="form-group">
                                     <label for="accountName">Nome da conta</label>

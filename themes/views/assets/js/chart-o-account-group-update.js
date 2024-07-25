@@ -4,6 +4,17 @@ if (chartOfAccountGroupEndpoint == "/admin/balance-sheet/chart-of-account-group/
     const chartOfAccountGroupUuid = Array.isArray(window.location.pathname.match(/\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/))
     ? window.location.pathname.match(/\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/)[0] : ""
 
+    const mask = {
+        accountNumber: function (value) {
+            return value.replace(/[^\d\.]+/g, '').replace(/\.(\.)/, '$1')
+        }
+    }
+
+    const accountNumber = document.querySelector("[name='accountNumber']")
+    accountNumber.addEventListener("input", function () {
+        this.value = mask[this.dataset.mask](this.value)
+    })
+
     const chartOfAccountGroupFormUpdate = document.getElementById("chartOfAccountGroupFormUpdate")
     chartOfAccountGroupFormUpdate.addEventListener("submit", function(event) {
         event.preventDefault()
