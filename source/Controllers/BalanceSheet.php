@@ -430,7 +430,7 @@ class BalanceSheet extends Controller
         foreach ($chartOfAccountGroupData as $value) {
             if (!empty($groupChartOfAccount[$value["account_number"]])) {
                 $groupChartOfAccount[$value["account_number"]] = array_map(function ($array) use ($value) {
-                    $array[] = $value["id"];
+                    $array[2] = $value["id"];
                     return $array;
                 }, $groupChartOfAccount[$value["account_number"]]);
             }
@@ -440,12 +440,9 @@ class BalanceSheet extends Controller
             array_shift($array);
         }
 
-        foreach ($groupChartOfAccount as $arrayA) {
+        foreach ($groupChartOfAccount as &$arrayA) {
             foreach ($arrayA as &$arrayB) {
-                $arrayB = array_map(function ($item) {
-                    $item[1] = preg_replace("/,/", ".", $item[1]);
-                    return $item;
-                }, $arrayB);
+                $arrayB[1] = str_replace(",", ".", $arrayB[1]);
             }
         }
 
