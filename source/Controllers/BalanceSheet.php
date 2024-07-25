@@ -443,7 +443,7 @@ class BalanceSheet extends Controller
         foreach ($groupChartOfAccount as $arrayA) {
             foreach ($arrayA as &$arrayB) {
                 $arrayB = array_map(function ($item) {
-                    $item[1] = preg_replace("/,/", ".", $item);
+                    $item[1] = preg_replace("/,/", ".", $item[1]);
                     return $item;
                 }, $arrayB);
             }
