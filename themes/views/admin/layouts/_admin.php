@@ -97,11 +97,6 @@
                                             <p>Backup categoria de contas</p>
                                         </a>
                                     </li>
-                                    <li class="nav-item">
-                                        <a href="#" class="nav-link">
-                                            <p>Config. períodos contábeis</p>
-                                        </a>
-                                    </li>
                                 </ul>
                             </li>
                             <li class="nav-item">

@@ -692,7 +692,6 @@ class BalanceSheet extends Controller
         ];
 
         $chartOfAccount = new ChartOfAccount();
-        $chartOfAccount = new ChartOfAccount();
         $chartOfAccountData = $chartOfAccount->findAllChartOfAccountJoinChartOfAccountGroup(
             [
                 "uuid",
