@@ -24,8 +24,8 @@ if (chartOfAccountGroupEndpoint == "/admin/balance-sheet/chart-of-account-group/
             throw new Error("Token csrf é obrigatório")
         }
 
-        if (Array.isArray(this.accountNumber.value.match(/\d+\.$/))) {
-            toastr.error("Número de conta inválido")
+        if (Array.isArray(this.accountNumber.value.match(/^\.$/))) {
+            toastr.error("Número da conta inválido")
             throw new Error("Número de conta inválido")
         }
 

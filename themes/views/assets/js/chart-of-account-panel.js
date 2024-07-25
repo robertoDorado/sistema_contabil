@@ -69,9 +69,9 @@ if (verifyChartOfAccountPathname.indexOf(chartOfAccountPathName) != -1) {
             toastr.warning("Token csrf é obrigatório")
             throw new Error("Token csrf é obrigatório")
         }
-
-        if (Array.isArray(this.accountValue.value.match(/\d+\.$/))) {
-            toastr.error("Número de conta inválido")
+        
+        if (Array.isArray(this.accountNumber.value.match(/^\.$/))) {
+            toastr.error("Número da conta inválido")
             throw new Error("Número de conta inválido")
         }
 

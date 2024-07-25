@@ -32,6 +32,55 @@ class BalanceSheet extends Controller
 
     public function chartOfAccountGroupBackup()
     {
+        if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
+            $requestPost = $this->getRequests()->setRequiredFields(["uuid", "action"])->getAllPostData();
+
+            $chartOfAccountGroup = new ChartOfAccountGroup();
+            $chartOfAccountGroup->setUuid($requestPost["uuid"]);
+            $chartOfAccountGroupData = $chartOfAccountGroup->findChartOfAccountGroupByUuid(["id"]);
+
+            if (empty($chartOfAccountGroupData)) {
+                http_response_code(500);
+                echo json_encode(["error" => "registro não encontrado"]);
+                die;
+            }
+
+            $response = new \stdClass();
+            $response->message = new Message();
+            $response->message->error("erro interno ao tentar modificar o registro");
+            $response->error = true;
+
+            $verifyAction = [
+                "restore" => function(Model $model) use ($response) {
+                    $model->setRequiredFields(["deleted"]);
+                    $model->deleted = 0;
+                    
+                    $response->error = !$model->save() ? true : false;
+                    $response->error ? $response->message->error("erro ao tentar restaurar o registro") : 
+                    $response->message->success("registro restaurado com sucesso");
+                },
+                "delete" => function(Model $model) use ($response) {
+                    $response->error = !$model->destroy() ? true : false;
+                    $response->error ? $response->message->error("erro ao tentar excluir o registro") : 
+                    $response->message->success("registro excluído com sucesso");
+                },
+            ];
+
+            if (!empty($verifyAction[$requestPost["action"]])) {
+                $verifyAction[$requestPost["action"]]($chartOfAccountGroupData);
+            }
+
+            if ($response->error) {
+                http_response_code(500);
+                echo $response->message->json();
+                die;
+            }
+
+            echo $response->message->json();
+            die;
+        }
+
         $responseInitializeUserAndCompany = initializeUserAndCompanyId();
         $chartOfAccountGroup = new ChartOfAccountGroup();
         $chartOfAccountGroupData = $chartOfAccountGroup->findAllChartOfAccountGroup(
