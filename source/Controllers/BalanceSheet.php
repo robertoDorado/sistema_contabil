@@ -362,7 +362,7 @@ class BalanceSheet extends Controller
 
         Connect::getInstance()->beginTransaction();
         $chartOfAccountGroupFile = array_filter($data, function ($array) {
-            if (preg_match("/^\d+$/", $array[1])) {
+            if (preg_match("/^\d+\.\d+$/", $array[1])) {
                 return $array;
             }
         });
@@ -416,11 +416,11 @@ class BalanceSheet extends Controller
         $groupValue = "";
 
         foreach ($data as $array) {
-            if (preg_match("/^\d+$/", $array[1])) {
+            if (preg_match("/^\d+\.\d+$/", $array[1])) {
                 $groupValue = $array[1];
             }
 
-            if (preg_match("/[\d\.,]+/", $array[1])) {
+            if (preg_match("/[\d\.]+/", $array[1])) {
                 if (!empty($groupValue)) {
                     $groupChartOfAccount[$groupValue][] = $array;
                 }
@@ -437,7 +437,11 @@ class BalanceSheet extends Controller
         }
 
         foreach ($groupChartOfAccount as &$array) {
-            array_shift($array);
+            $array = array_filter($array, function($item) {
+                if (!preg_match("/^\d+\.\d+$/", $item[1]) && !preg_match("/^\d+$/", $item[1])) {
+                    return $item;
+                }
+            });
         }
 
         foreach ($groupChartOfAccount as $arrayA) {
