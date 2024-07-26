@@ -100,7 +100,7 @@
                                 </ul>
                             </li>
                             <li class="nav-item">
-                                <a href="#" class="nav-link">
+                                <a href="<?= url("/admin/balance-sheet/balance-sheet-overview/form") ?>" class="nav-link">
                                     <p>Lançamentos contábeis</p>
                                 </a>
                             </li>

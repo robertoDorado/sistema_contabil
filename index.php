@@ -201,6 +201,12 @@ $route->post("/balance-sheet/chart-of-account-group/delete", "BalanceSheet::char
 $route->get("/balance-sheet/chart-of-account-group/backup", "BalanceSheet::chartOfAccountGroupBackup");
 $route->post("/balance-sheet/chart-of-account-group/backup", "BalanceSheet::chartOfAccountGroupBackup");
 
+/**
+ * Balanço Patrimonial - Visão geral
+ */
+$route->get("/balance-sheet/balance-sheet-overview/form", "BalanceSheetOverView::balanceSheetForm");
+$route->post("/balance-sheet/balance-sheet-overview/form", "BalanceSheetOverView::balanceSheetForm");
+
 /** 
  * Assinatura do cliente
  */
