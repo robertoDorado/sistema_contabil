@@ -20,7 +20,13 @@ error_reporting(E_ALL & (~E_NOTICE | ~E_USER_NOTICE));
 ini_set('error_log', $path);
 ini_set('log_errors', true);
 
-if (empty($_POST["request"]) && !empty($_SERVER["REDIRECT_URL"]) && $_SERVER["REDIRECT_URL"] != "/admin/logout") {
+$verifyGlobalEndpoints = [
+    "/admin/logout",
+    "/customer/subscribe",
+    "/customer/subscription/thanks-purchase"
+];
+
+if (empty($_POST["request"]) && !empty($_SERVER["REDIRECT_URL"]) && !in_array($_SERVER["REDIRECT_URL"], $verifyGlobalEndpoints)) {
     if (empty(session()->user)) {
         redirect("/admin/login");
     } else if ($_SERVER["REDIRECT_URL"] != "/admin/company/register") {
