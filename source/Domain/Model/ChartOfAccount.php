@@ -46,6 +46,16 @@ class ChartOfAccount
         return $this->data->$name ?? null;
     }
 
+    public function findChartOfAccountByAccountNumber(array $columns, array $params): ?ModelsChartOfAccount
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        return $this->chartOfAccount->find(
+            "account_number=:account_number AND id_company=:id_company AND id_user=:id_user AND deleted=:deleted", 
+            ":account_number=" . $params["account_number"] . "&:id_company=" . $params["id_company"] . "&:id_user=" . $params["id_user"] . "&:deleted=" . $params["deleted"] . "", 
+            $columns    
+        )->fetch();
+    }
+
     /** @var ModelsChartOfAccount[] */
     public function findAllChartOfAccountJoinChartOfAccountGroup(array $columnsA, array $columnsB, array $params): array
     {

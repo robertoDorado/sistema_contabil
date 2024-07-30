@@ -25,6 +25,14 @@ class ChartOfAccountGroup
         $this->ddl = new DDL(ModelsChartOfAccountGroup::class);
     }
 
+    public function alterTable()
+    {
+        $this->ddl->alterTable([
+            "MODIFY account_number VARCHAR(255) UNIQUE NOT NULL"
+        ]);
+        $this->ddl->executeQuery();
+    }
+
     public function defineTable()
     {
         $this->ddl->setClassProperties();

@@ -50,21 +50,52 @@ class BalanceSheet
         return $this->data->$name ?? null;
     }
 
-    public function findAllShareholdersEquity(array $columnsA, array $columnsB, array $columnsC, array $params)
+    /** @var ModelsBalanceSheet[] */
+    public function findAllBalanceSheet(array $columnsA, array $columnsB, array $params, bool $onlyData = false): array
+    {
+        $columnsA = empty($columnsA) ? "*" : implode(", ", $columnsA);
+        $columnsB = empty($columnsB) ? "*" : implode(", ", $columnsB);
+
+        $terms = "id_user=:id_user AND id_company=:id_company AND deleted=:deleted";
+        $paramsQuery = ":id_company=" . $params["id_company"] . "&:id_user=" . $params['id_user'] . "&:deleted=" . $params['deleted'] . "";
+        
+        $response = $this->balanceSheet->find(
+            $terms,
+            $paramsQuery,
+            $columnsA
+        )->join(
+            CONF_DB_NAME . ".chart_of_account",
+            "id",
+            $terms,
+            $paramsQuery,
+            $columnsB,
+            "id_chart_of_account",
+            CONF_DB_NAME . ".balance_sheet"
+        )->fetch(true);
+
+        if (empty($response)) {
+            return [];
+        }
+
+        return !$onlyData ? $response : $response->data();
+    }
+
+    /** @var ModelsBalanceSheet[] */
+    public function findAllShareholdersEquity(array $columnsA, array $columnsB, array $columnsC, array $params): array
     {
         $columnsA = empty($columnsA) ? "*" : implode(", ", $columnsA);
         $columnsB = empty($columnsB) ? "*" : implode(", ", $columnsB);
         $columnsC = empty($columnsC) ? "*" : implode(", ", $columnsC);
 
         $terms = "id_user=:id_user AND id_company=:id_company AND deleted=:deleted";
-        $params = ":id_user={$params['id_user']}&:id_company={$params['id_company']}&:deleted={$params['deleted']}";
+        $queryParams = ":id_user={$params['id_user']}&:id_company={$params['id_company']}&:deleted={$params['deleted']}";
 
-        $this->balanceSheetReport = $this->balanceSheet->find($terms, $params, $columnsA)
+        $this->balanceSheetReport = $this->balanceSheet->find($terms, $queryParams, $columnsA)
             ->join(
                 CONF_DB_NAME . ".chart_of_account",
                 "id",
                 $terms,
-                $params,
+                $queryParams,
                 $columnsB,
                 "id_chart_of_account",
                 CONF_DB_NAME . ".balance_sheet"
@@ -73,10 +104,14 @@ class BalanceSheet
                 CONF_DB_NAME . ".chart_of_account_group",
                 "id",
                 $terms,
-                $params,
+                $queryParams,
                 $columnsC,
                 "id_chart_of_account_group",
                 CONF_DB_NAME . ".chart_of_account"
+            )->between(
+                "created_at",
+                CONF_DB_NAME . ".balance_sheet",
+                $params["date"]
             )->fetch(true);
 
         if (empty($this->balanceSheetReport)) {
@@ -86,21 +121,22 @@ class BalanceSheet
         return $this->dataProcessing("patrimonioliquido");
     }
 
-    public function findAllNonCurrentLiabilities(array $columnsA, array $columnsB, array $columnsC, array $params)
+    /** @var ModelsBalanceSheet[] */
+    public function findAllNonCurrentLiabilities(array $columnsA, array $columnsB, array $columnsC, array $params): array
     {
         $columnsA = empty($columnsA) ? "*" : implode(", ", $columnsA);
         $columnsB = empty($columnsB) ? "*" : implode(", ", $columnsB);
         $columnsC = empty($columnsC) ? "*" : implode(", ", $columnsC);
 
         $terms = "id_user=:id_user AND id_company=:id_company AND deleted=:deleted";
-        $params = ":id_user={$params['id_user']}&:id_company={$params['id_company']}&:deleted={$params['deleted']}";
+        $queryParams = ":id_user={$params['id_user']}&:id_company={$params['id_company']}&:deleted={$params['deleted']}";
 
-        $this->balanceSheetReport = $this->balanceSheet->find($terms, $params, $columnsA)
+        $this->balanceSheetReport = $this->balanceSheet->find($terms, $queryParams, $columnsA)
             ->join(
                 CONF_DB_NAME . ".chart_of_account",
                 "id",
                 $terms,
-                $params,
+                $queryParams,
                 $columnsB,
                 "id_chart_of_account",
                 CONF_DB_NAME . ".balance_sheet"
@@ -109,10 +145,14 @@ class BalanceSheet
                 CONF_DB_NAME . ".chart_of_account_group",
                 "id",
                 $terms,
-                $params,
+                $queryParams,
                 $columnsC,
                 "id_chart_of_account_group",
                 CONF_DB_NAME . ".chart_of_account"
+            )->between(
+                "created_at",
+                CONF_DB_NAME . ".balance_sheet",
+                $params["date"]
             )->fetch(true);
 
         if (empty($this->balanceSheetReport)) {
@@ -122,21 +162,22 @@ class BalanceSheet
         return $this->dataProcessing("passivonaocirculante");
     }
 
-    public function findAllCurrentLiabilities(array $columnsA, array $columnsB, array $columnsC, array $params)
+    /** @var ModelsBalanceSheet[] */
+    public function findAllCurrentLiabilities(array $columnsA, array $columnsB, array $columnsC, array $params): array
     {
         $columnsA = empty($columnsA) ? "*" : implode(", ", $columnsA);
         $columnsB = empty($columnsB) ? "*" : implode(", ", $columnsB);
         $columnsC = empty($columnsC) ? "*" : implode(", ", $columnsC);
 
         $terms = "id_user=:id_user AND id_company=:id_company AND deleted=:deleted";
-        $params = ":id_user={$params['id_user']}&:id_company={$params['id_company']}&:deleted={$params['deleted']}";
+        $queryParams = ":id_user={$params['id_user']}&:id_company={$params['id_company']}&:deleted={$params['deleted']}";
 
-        $this->balanceSheetReport = $this->balanceSheet->find($terms, $params, $columnsA)
+        $this->balanceSheetReport = $this->balanceSheet->find($terms, $queryParams, $columnsA)
             ->join(
                 CONF_DB_NAME . ".chart_of_account",
                 "id",
                 $terms,
-                $params,
+                $queryParams,
                 $columnsB,
                 "id_chart_of_account",
                 CONF_DB_NAME . ".balance_sheet"
@@ -145,10 +186,14 @@ class BalanceSheet
                 CONF_DB_NAME . ".chart_of_account_group",
                 "id",
                 $terms,
-                $params,
+                $queryParams,
                 $columnsC,
                 "id_chart_of_account_group",
                 CONF_DB_NAME . ".chart_of_account"
+            )->between(
+                "created_at",
+                CONF_DB_NAME . ".balance_sheet",
+                $params["date"]
             )->fetch(true);
 
         if (empty($this->balanceSheetReport)) {
@@ -158,21 +203,22 @@ class BalanceSheet
         return $this->dataProcessing("passivocirculante");
     }
 
-    public function findAllNonCurrentAssets(array $columnsA, array $columnsB, array $columnsC, array $params)
+    /** @var ModelsBalanceSheet[] */
+    public function findAllNonCurrentAssets(array $columnsA, array $columnsB, array $columnsC, array $params): array
     {
         $columnsA = empty($columnsA) ? "*" : implode(", ", $columnsA);
         $columnsB = empty($columnsB) ? "*" : implode(", ", $columnsB);
         $columnsC = empty($columnsC) ? "*" : implode(", ", $columnsC);
 
         $terms = "id_user=:id_user AND id_company=:id_company AND deleted=:deleted";
-        $params = ":id_user={$params['id_user']}&:id_company={$params['id_company']}&:deleted={$params['deleted']}";
+        $queryParams = ":id_user={$params['id_user']}&:id_company={$params['id_company']}&:deleted={$params['deleted']}";
 
-        $this->balanceSheetReport = $this->balanceSheet->find($terms, $params, $columnsA)
+        $this->balanceSheetReport = $this->balanceSheet->find($terms, $queryParams, $columnsA)
             ->join(
                 CONF_DB_NAME . ".chart_of_account",
                 "id",
                 $terms,
-                $params,
+                $queryParams,
                 $columnsB,
                 "id_chart_of_account",
                 CONF_DB_NAME . ".balance_sheet"
@@ -181,10 +227,14 @@ class BalanceSheet
                 CONF_DB_NAME . ".chart_of_account_group",
                 "id",
                 $terms,
-                $params,
+                $queryParams,
                 $columnsC,
                 "id_chart_of_account_group",
                 CONF_DB_NAME . ".chart_of_account"
+            )->between(
+                "created_at",
+                CONF_DB_NAME . ".balance_sheet",
+                $params["date"]
             )->fetch(true);
 
         if (empty($this->balanceSheetReport)) {
@@ -196,7 +246,7 @@ class BalanceSheet
 
     private function dataProcessing(string $referenceName): array
     {
-        $data = array_map(function($item) {
+        $data = array_map(function ($item) {
             $item->uuid = $item->getUuid();
             $item->created_at = (new DateTime($item->created_at))->format("d/m/Y");
             $item->account_name = $item->account_number . " " . $item->account_name;
@@ -204,23 +254,23 @@ class BalanceSheet
             return (array)$item->data();
         }, $this->balanceSheetReport);
 
-        $data = array_filter($data, function($item) use ($referenceName) {
+        $data = array_filter($data, function ($item) use ($referenceName) {
             if ($item["account_name_group"] == $referenceName) {
                 return $item;
             }
         });
 
-        $data = array_map(function($item) use ($referenceName) {
+        $data = array_map(function ($item) use ($referenceName) {
             if (preg_match("/ativo/", $referenceName)) {
                 $item["account_value"] = empty($item["account_type"]) ? $item["account_value"] : $item["account_value"] * -1;
-            }else {
+            } else {
                 $item["account_value"] = empty($item["account_type"]) ? $item["account_value"] * -1 : $item["account_value"];
             }
             return $item;
         }, $data);
 
         $grouppedData = [];
-        foreach($data as $value) {
+        foreach ($data as $value) {
             if (empty($grouppedData[$value["account_name"]])) {
                 $grouppedData[$value["account_name"]] = $value;
                 $grouppedData[$value["account_name"]]["account_value"] = 0;
@@ -229,12 +279,12 @@ class BalanceSheet
             $grouppedData[$value["account_name"]]["account_value"] += $value["account_value"];
         }
 
-        $total = array_reduce($data, function($acc, $item) {
+        $total = array_reduce($data, function ($acc, $item) {
             $acc += $item["account_value"];
             return $acc;
         }, 0);
 
-        $grouppedData = array_map(function($item) {
+        $grouppedData = array_map(function ($item) {
             $item["account_value"] = $item["account_value"] > 0 ? $item["account_value"] : $item["account_value"] * -1;
             $item["account_value"] = "R$ " . number_format($item["account_value"], 2, ",", ".");
             return $item;
@@ -251,14 +301,14 @@ class BalanceSheet
         $columnsC = empty($columnsC) ? "*" : implode(", ", $columnsC);
 
         $terms = "id_user=:id_user AND id_company=:id_company AND deleted=:deleted";
-        $params = ":id_user={$params['id_user']}&:id_company={$params['id_company']}&:deleted={$params['deleted']}";
+        $queryParams = ":id_user={$params['id_user']}&:id_company={$params['id_company']}&:deleted={$params['deleted']}";
 
-        $this->balanceSheetReport = $this->balanceSheet->find($terms, $params, $columnsA)
+        $this->balanceSheetReport = $this->balanceSheet->find($terms, $queryParams, $columnsA)
             ->join(
                 CONF_DB_NAME . ".chart_of_account",
                 "id",
                 $terms,
-                $params,
+                $queryParams,
                 $columnsB,
                 "id_chart_of_account",
                 CONF_DB_NAME . ".balance_sheet"
@@ -267,10 +317,14 @@ class BalanceSheet
                 CONF_DB_NAME . ".chart_of_account_group",
                 "id",
                 $terms,
-                $params,
+                $queryParams,
                 $columnsC,
                 "id_chart_of_account_group",
                 CONF_DB_NAME . ".chart_of_account"
+            )->between(
+                "created_at",
+                CONF_DB_NAME . ".balance_sheet",
+                $params["date"]
             )->fetch(true);
 
         if (empty($this->balanceSheetReport)) {
@@ -280,7 +334,7 @@ class BalanceSheet
         return $this->dataProcessing("ativocirculante");
     }
 
-    public function updateBalanceSheetDataByUuid(array $data)
+    public function updateBalanceSheetDataByUuid(array $data): bool
     {
         $tools = new Tools($this->balanceSheet, ModelsBalanceSheet::class);
         $response = $tools->updateData(

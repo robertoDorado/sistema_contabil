@@ -21,10 +21,10 @@
 1.1.2.02    Outros créditos                    
 1.1.2.02.0001        Contas a receber                
 1.1.2.02.0002        Títulos a receber                
-1.1.2.03    Créditos de Funcionários                    
-1.1.2.03.0002        Adiantamento a funcionários                
-1.1.2.03.0002        Empréstimos a funcionários                
-1.1.2.03.0003        Adiantamento de férias                
+1.1.2.03    Créditos de Funcionários
+1.1.2.03.0002        Empréstimos a funcionários
+1.1.2.03.0003        Adiantamento de férias                    
+1.1.2.03.0004        Adiantamento a funcionários                
 1.1.2.04    Impostos e Contribuições a Recuperar                    
 1.1.2.04.0001        ICMS a recuperar                
 1.1.2.04.0002        IPI a recuperar                
@@ -207,9 +207,9 @@
 3.1.1.01    Receita Bruta de Vendas de Produtos                    
 3.1.1.01.0001        Mercado nacional                
 3.1.1.01.0002        Exportação                
-3.1.1.02    Receita Bruta de Vendas de Serviços                    
-3.1.2.02.0001        Mercado nacional                
-3.1.2.02.0002        Exportação                
+3.1.1.02    Receita Bruta de Vendas de Serviços
+3.1.2.02.0002        Exportação                    
+3.1.2.02.0003        Mercado nacional                                
 3.1.2    (-) DEDUÇÕES DA RECEITA BRUTA DE VENDA DE PRODUTOS E SERVIÇOS                    
 3.1.2.01    Deduções da Receita Bruta de Vendas de Produtos e Serviços                    
 3.1.2.01.0001        Vendas canceladas e devoluções                
@@ -376,9 +376,9 @@
 6    IMPOSTO DE RENDA E CONTRIBUIÇÃO SOCIAL                    
 6.1    IMPOSTO DE RENDA E CONTRIBUIÇÃO SOCIAL                    
 6.1.1    IRPJ E CSLL - CORRENTE E DIFERIDO                    
-6.1.1.01    IRPJ e CSLL Correntes                    
-6.1.1.01.0001        Despesas de IRPJ - Corrente                
-6.1.1.01.0001        Despesas de CSLL - Corrente                
+6.1.1.01    IRPJ e CSLL Correntes
+6.1.1.01.0001        Despesas de CSLL - Corrente                     
+6.1.1.01.0002        Despesas de IRPJ - Corrente                               
 6.1.1.02    IRPJ e CSLL Diferidos                    
 6.1.1.02.0001        Despesas de IRPJ - Diferido                
 6.1.1.02.0002        Despesas de CSLL - Diferida                

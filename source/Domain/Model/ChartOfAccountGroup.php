@@ -45,6 +45,16 @@ class ChartOfAccountGroup
         return $this->data->$name ?? null;
     }
 
+    public function findChartOfAccountGroupByAccountNumber(array $columns, array $params): ?ModelsChartOfAccountGroup
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        return $this->chartOfAccountGroup->find(
+            "account_number=:account_number AND id_company=:id_company AND id_user=:id_user AND deleted=:deleted", 
+            ":account_number=" . $params["account_number"] . "&:id_company=" . $params["id_company"] . "&:id_user=" . $params["id_user"] . "&:deleted=" . $params["deleted"] . "", 
+            $columns    
+        )->fetch();
+    }
+
     public function findChartOfAccountGroupByUuid(array $columns): ?ModelsChartOfAccountGroup
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);

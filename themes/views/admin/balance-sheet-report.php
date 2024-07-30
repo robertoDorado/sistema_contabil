@@ -21,9 +21,12 @@
 
     <div class="content">
         <div class="container-fluid">
-            <div class="row">
+            <div class="row" style="align-items: end">
                 <div class="col-md-6 mb-5">
                     <?= $v->insert("admin/layouts/_daterange_input") ?>
+                </div>
+                <div class="col-md-6 mb-5">
+                    <button id="closeAccountingPeriod" class="btn btn-primary">Encerrar período contábil</button>
                 </div>
             </div>
             <div class="row">

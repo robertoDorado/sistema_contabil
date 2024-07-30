@@ -52,18 +52,18 @@ class BalanceSheet extends Controller
             $response->error = true;
 
             $verifyAction = [
-                "restore" => function(Model $model) use ($response) {
+                "restore" => function (Model $model) use ($response) {
                     $model->setRequiredFields(["deleted"]);
                     $model->deleted = 0;
-                    
+
                     $response->error = !$model->save() ? true : false;
-                    $response->error ? $response->message->error("erro ao tentar restaurar o registro") : 
-                    $response->message->success("registro restaurado com sucesso");
+                    $response->error ? $response->message->error("erro ao tentar restaurar o registro") :
+                        $response->message->success("registro restaurado com sucesso");
                 },
-                "delete" => function(Model $model) use ($response) {
+                "delete" => function (Model $model) use ($response) {
                     $response->error = !$model->destroy() ? true : false;
-                    $response->error ? $response->message->error("erro ao tentar excluir o registro") : 
-                    $response->message->success("registro excluído com sucesso");
+                    $response->error ? $response->message->error("erro ao tentar excluir o registro") :
+                        $response->message->success("registro excluído com sucesso");
                 },
             ];
 
@@ -144,6 +144,25 @@ class BalanceSheet extends Controller
             }
 
             $chartOfAccountGroup = new ChartOfAccountGroup();
+            $chartOfAccountGroupData = $chartOfAccountGroup->findChartOfAccountGroupByAccountNumber(
+                [
+                    "id"
+                ],
+                [
+                    "account_number" => $requestPost["accountNumber"],
+                    "id_user" => $responseInitializeUserAndCompany["user_data"]->id,
+                    "id_company" => $responseInitializeUserAndCompany["company_id"],
+                    "deleted" => 0
+                ]
+            );
+
+            if (!empty($chartOfAccountGroupData)) {
+                http_response_code(500);
+                echo json_encode(["error" => "esta conta {$requestPost['accountNumber']} já esta cadastrada"]);
+                die;
+            }
+
+            $chartOfAccountGroup = new ChartOfAccountGroup();
             $response = $chartOfAccountGroup->updateChartOfAccountGroupByUuid([
                 "uuid" => $requestPost["uuid"],
                 "account_name" => $requestPost["accountName"],
@@ -205,6 +224,25 @@ class BalanceSheet extends Controller
             if (empty($responseInitializeUserAndCompany["company_id"])) {
                 http_response_code(500);
                 echo json_encode(["error" => "selecione uma empresa antes de criar uma categoria de contas"]);
+                die;
+            }
+
+            $chartOfAccountGroup = new ChartOfAccountGroup();
+            $chartOfAccountGroupData = $chartOfAccountGroup->findChartOfAccountGroupByAccountNumber(
+                [
+                    "id"
+                ],
+                [
+                    "account_number" => $requestPost["accountNumber"],
+                    "id_user" => $responseInitializeUserAndCompany["user_data"]->id,
+                    "id_company" => $responseInitializeUserAndCompany["company_id"],
+                    "deleted" => 0
+                ]
+            );
+
+            if (!empty($chartOfAccountGroupData)) {
+                http_response_code(500);
+                echo json_encode(["error" => "esta conta {$requestPost['accountNumber']} já esta cadastrada"]);
                 die;
             }
 
@@ -437,7 +475,7 @@ class BalanceSheet extends Controller
         }
 
         foreach ($groupChartOfAccount as &$array) {
-            $array = array_filter($array, function($item) {
+            $array = array_filter($array, function ($item) {
                 if (!preg_match("/^\d+\.\d+$/", $item[1]) && !preg_match("/^\d+$/", $item[1])) {
                     return $item;
                 }
@@ -452,6 +490,21 @@ class BalanceSheet extends Controller
                 $params["account_number"] = $arrayB[1];
                 $params["id_chart_of_account_group"] = $arrayB[2];
 
+                $chartOfAccount = new ChartOfAccount();
+                $chartOfAccountData = $chartOfAccount->findChartOfAccountByAccountNumber(["id"], [
+                    "account_number" => $params["account_number"],
+                    "id_user" => $responseUserAndCompany["user_data"]->id,
+                    "id_company" => $responseUserAndCompany["company_id"],
+                    "deleted" => 0
+                ]);
+
+                if (!empty($chartOfAccountData)) {
+                    http_response_code(500);
+                    echo json_encode(["error" => "esta conta {$params["account_number"]} já está cadastrada"]);
+                    Connect::getInstance()->rollBack();
+                    die;
+                }
+
                 $response = $chartOfAccount->persistData($params);
                 if (!$response) {
                     http_response_code(500);
@@ -462,7 +515,6 @@ class BalanceSheet extends Controller
             }
         }
 
-        Connect::getInstance()->commit();
         $chartOfAccount = new ChartOfAccount();
         $chartOfAccountData = $chartOfAccount->findAllChartOfAccountJoinChartOfAccountGroup(
             [
@@ -487,6 +539,7 @@ class BalanceSheet extends Controller
             die;
         }
 
+        Connect::getInstance()->commit();
         $chartOfAccountData = array_map(function ($item) {
             $item->edit_btn = '<a class="icons" href="' . url("/admin/balance-sheet/chart-of-account/update/" . $item->getUuid() . "") . '"><i class="fas fa-edit" aria-hidden="true"></i></a>';
             $item->delete_btn = '<a class="icons" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a>';
@@ -519,6 +572,7 @@ class BalanceSheet extends Controller
 
     public function chartOfAccountFormUpdate(array $data)
     {
+        $responseInitializeUserAndCompany = initializeUserAndCompanyId();
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
             verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $requestPost = $this->getRequests()->setRequiredFields([
@@ -536,6 +590,20 @@ class BalanceSheet extends Controller
             if (empty($chartOfAccountGroupData)) {
                 http_response_code(500);
                 echo json_encode(["error" => "grupo de contas inexistente"]);
+                die;
+            }
+
+            $chartOfAccount = new ChartOfAccount();
+            $chartOfAccountData = $chartOfAccount->findChartOfAccountByAccountNumber(["id"], [
+                "account_number" => $requestPost["accountValue"],
+                "id_user" => $responseInitializeUserAndCompany["user_data"]->id,
+                "id_company" => $responseInitializeUserAndCompany["company_id"],
+                "deleted" => 0
+            ]);
+
+            if (!empty($chartOfAccountData)) {
+                http_response_code(500);
+                echo json_encode(["error" => "esta conta {$requestPost['accountValue']} já está cadastrada"]);
                 die;
             }
 
@@ -561,7 +629,6 @@ class BalanceSheet extends Controller
             redirect("/admin/balance-sheet/chart-of-account");
         }
 
-        $responseInitializeUserAndCompany = initializeUserAndCompanyId();
         $chartOfAccountGroup = new ChartOfAccountGroup();
         $chartOfAccountGroupData = $chartOfAccountGroup->findAllChartOfAccountGroup(
             [
@@ -647,6 +714,20 @@ class BalanceSheet extends Controller
             if (empty($chartOfAccountGroupData)) {
                 http_response_code(500);
                 echo json_encode(["error" => "grupo de contas inexistente"]);
+                die;
+            }
+
+            $chartOfAccount = new ChartOfAccount();
+            $chartOfAccountData = $chartOfAccount->findChartOfAccountByAccountNumber(["id"], [
+                "account_number" => $requestPost["accountValue"],
+                "id_user" => $responseInitializeUserAndCompany["user_data"]->id,
+                "id_company" => $responseInitializeUserAndCompany["company_id"],
+                "deleted" => 0
+            ]);
+
+            if (!empty($chartOfAccountData)) {
+                http_response_code(500);
+                echo json_encode(["error" => "esta conta {$requestPost['accountValue']} já está cadastrada"]);
                 die;
             }
 

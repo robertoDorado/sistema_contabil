@@ -41,7 +41,7 @@ class ChartOfAccountModel
         $this->ddl->setKeysToProperties([
             "BIGINT AUTO_INCREMENT PRIMARY KEY",
             "VARCHAR(36) UNIQUE NOT NULL",
-            "VARCHAR(255) NOT NULL",
+            "VARCHAR(255) UNIQUE NOT NULL",
             "VARCHAR(255) NOT NULL"
         ]);
         $this->ddl->setForeignKeyChecks(0)->dropTableIfExists()->createTableQuery()->setForeignKeyChecks(1);
