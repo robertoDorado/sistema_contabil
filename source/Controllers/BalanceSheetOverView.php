@@ -2,6 +2,7 @@
 
 namespace Source\Controllers;
 
+use DateTime;
 use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Controller;
 use Source\Domain\Model\BalanceSheet;
@@ -23,9 +24,70 @@ class BalanceSheetOverView extends Controller
         parent::__construct();
     }
 
+    public function balanceSheetReport()
+    {
+        $responseInitializeUserAndCompany = initializeUserAndCompanyId();
+        $params = [
+            [
+                "uuid", 
+                "account_type", 
+                "account_value", 
+                "history_account", 
+                "created_at"
+            ],
+            [
+                "account_number",
+                "account_name"
+            ],
+            [
+                "account_name AS account_name_group"
+            ],
+            [
+                "id_user" => $responseInitializeUserAndCompany["user_data"]->id,
+                "id_company" => $responseInitializeUserAndCompany["company_id"],
+                "deleted" => 0
+            ]
+        ];
+
+        $balanceSheet = new BalanceSheet();
+        $currentAssets = $balanceSheet->findAllCurrentAssets(...$params);
+
+        $balanceSheet = new BalanceSheet();
+        $nonCurrentAssets = $balanceSheet->findAllNonCurrentAssets(...$params);
+
+        $balanceSheet = new BalanceSheet();
+        $currentLiabilities = $balanceSheet->findAllCurrentLiabilities(...$params);
+
+        $balanceSheet = new BalanceSheet();
+        $nonCurrentLiabilities = $balanceSheet->findAllNonCurrentLiabilities(...$params);
+        
+        $balanceSheet = new BalanceSheet();
+        $shareholdersEquity = $balanceSheet->findAllShareholdersEquity(...$params);
+        
+        $accounttingCaculationAssets = $currentAssets["total"] + $nonCurrentAssets["total"];
+        $accountingCalculationLiabilities = $currentLiabilities["total"] + $nonCurrentLiabilities["total"] + $shareholdersEquity["total"];
+
+        echo $this->view->render("admin/balance-sheet-report", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => ["/admin/balance-sheet/balnace-sheet-overview/report"],
+            "currentAssetsData" => $currentAssets["data"],
+            "nonCurrentAssetsData" => $nonCurrentAssets["data"],
+            "currentLiabilitiesData" => $currentLiabilities["data"],
+            "nonCurrentLiabilitiesData" => $nonCurrentLiabilities["data"],
+            "shareholdersEquityData" => $shareholdersEquity["data"],
+            "totalCurrentAssets" => "R$ " . number_format($currentAssets["total"], 2, ",", "."),
+            "totalNonCurrentAssets" => "R$ " . number_format($nonCurrentAssets["total"], 2, ",", "."),
+            "totalCurrentLiabilities" => "R$ " . number_format($currentLiabilities["total"], 2, ",", "."),
+            "totalNonCurrentLiabilities" => "R$ " . number_format($nonCurrentLiabilities["total"], 2, ",", "."),
+            "totalShareholdersEquity" => "R$ " . number_format($shareholdersEquity["total"], 2, ",", "."),
+            "accounttingCaculationAssets" => $accounttingCaculationAssets,
+            "accountingCalculationLiabilities" => $accountingCalculationLiabilities
+        ]);
+    }
+
     public function balanceSheetForm()
     {
-        $responseInitalizeUserAndCompany = initializeUserAndCompanyId();
+        $responseInitializeUserAndCompany = initializeUserAndCompanyId();
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
             verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $requestPost = $this->getRequests()->setRequiredFields(
@@ -46,7 +108,7 @@ class BalanceSheetOverView extends Controller
                 die;
             };
 
-            if (empty($responseInitalizeUserAndCompany["company_id"])) {
+            if (empty($responseInitializeUserAndCompany["company_id"])) {
                 $errorMessage("selecione uma empresa antes de fazer um lançamento");
             }
 
@@ -77,8 +139,8 @@ class BalanceSheetOverView extends Controller
             $balanceSheet = new BalanceSheet();
             $response = $balanceSheet->persistData([
                 "uuid" => Uuid::uuid4(),
-                "id_company" => $responseInitalizeUserAndCompany["company_id"],
-                "id_user" => $responseInitalizeUserAndCompany["user"],
+                "id_company" => $responseInitializeUserAndCompany["company_id"],
+                "id_user" => $responseInitializeUserAndCompany["user"],
                 "id_chart_of_account" => $chartOfAccountData->id,
                 "account_type" => $requestPost["accountType"],
                 "account_value" => $requestPost["accountValue"],
@@ -104,19 +166,11 @@ class BalanceSheetOverView extends Controller
                 "account_number"
             ],
             [
-                "id_user" => $responseInitalizeUserAndCompany["user_data"]->id,
-                "id_company" => $responseInitalizeUserAndCompany["company_id"],
+                "id_user" => $responseInitializeUserAndCompany["user_data"]->id,
+                "id_company" => $responseInitializeUserAndCompany["company_id"],
                 "deleted" => 0
             ]
         );
-
-        if (!empty($chartOfAccountData)) {
-            $chartOfAccountData = array_filter($chartOfAccountData, function ($item) {
-                if (!preg_match("/^\d+\.\d+\.\d+$/", $item->account_number)) {
-                    return $item;
-                }
-            });
-        }
 
         echo $this->view->render("admin/balance-sheet-form", [
             "userFullName" => showUserFullName(),

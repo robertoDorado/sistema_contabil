@@ -212,6 +212,7 @@ $route->post("/balance-sheet/chart-of-account-group/backup", "BalanceSheet::char
  */
 $route->get("/balance-sheet/balance-sheet-overview/form", "BalanceSheetOverView::balanceSheetForm");
 $route->post("/balance-sheet/balance-sheet-overview/form", "BalanceSheetOverView::balanceSheetForm");
+$route->get("/balance-sheet/balance-sheet-overview/report", "BalanceSheetOverView::balanceSheetReport");
 
 /** 
  * Assinatura do cliente

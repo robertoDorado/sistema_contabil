@@ -1116,3 +1116,85 @@ const chartOfAccountGroupBackup = dataTableConfig($("#chartOfAccountGroupBackup"
         "responsive": true,
         "autoWidth": false
     })
+
+const balanceSheetOptions = function (fileName, selectorName, isVisibleFirstColumn = false) {
+    const columnDefs = isVisibleFirstColumn ?
+        [
+            {
+                "targets": [0],
+                "visible": true,
+                "width": "50%"
+            }
+        ] :
+        [
+            {
+                "targets": [0],
+                "visible": false,
+            }
+        ]
+
+    return {
+        "ordering": false,
+        "searching": false,
+        "lengthChange": false,
+        "paging": false,
+        "columnDefs": columnDefs,
+        "language": {
+            "url": urlJson
+        },
+        "responsive": true,
+        "autoWidth": false,
+        "buttons": [
+            {
+                "extend": 'copyHtml5',
+                "title": fileName
+            },
+            {
+                "extend": 'excelHtml5',
+                "filename": fileName,
+                "title": fileName
+            },
+            {
+                "extend": 'csvHtml5',
+                "filename": fileName,
+                "title": fileName
+            },
+            {
+                "extend": 'pdfHtml5',
+                "filename": fileName,
+                "title": fileName,
+                customize: function (doc) {
+                    doc.content[1].table.widths = [
+                        '20%', '20%', '20%', '20%', '20%'
+                    ];
+
+                    var objLayout = {};
+                    objLayout['hLineWidth'] = function (i) { return 0.5; };
+                    objLayout['vLineWidth'] = function (i) { return 0.5; };
+                    objLayout['hLineColor'] = function (i) { return '#aaa'; };
+                    objLayout['vLineColor'] = function (i) { return '#aaa'; };
+                    objLayout['paddingLeft'] = function (i) { return 4; };
+                    objLayout['paddingRight'] = function (i) { return 4; };
+                    objLayout['paddingTop'] = function (i) { return 4; };
+                    objLayout['paddingBottom'] = function (i) { return 4; };
+                    objLayout['fillColor'] = function (i) { return null; };
+                    doc.content[1].layout = objLayout;
+                }
+            },
+            "colvis"
+        ],
+        "initComplete": function () {
+            this.api()
+                .buttons()
+                .container()
+                .appendTo(`${selectorName} .col-md-6:eq(0)`);
+        }
+    }
+}
+
+const currentAssets = dataTableConfig($("#currentAssets"), balanceSheetOptions("Ativo circulante", "#currentAssetsWidgets"))
+const nonCurrentAssets = dataTableConfig($("#nonCurrentAssets"), balanceSheetOptions("Ativo não circulante", "#nonCurrentAssetsWidgets"))
+const currentLiabilities = dataTableConfig($("#currentLiabilities"), balanceSheetOptions("Passivo circulante", "#currentLiabilitiesWidgets"))
+const nonCurrentLiabilities = dataTableConfig($("#nonCurrentLiabilities"), balanceSheetOptions("Passivo não circulante", "#nonCurrentLiabilitiesWidgets"))
+const shareholdersEquity = dataTableConfig($("#shareholdersEquity"), balanceSheetOptions("Patrimônio líquido", "#shareholdersEquityWidgets"))
+const accountingCalculation = dataTableConfig($("#accountingCalculation"), balanceSheetOptions("Pauração contabil", "#accountingCalculationWidget", true))

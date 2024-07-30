@@ -62,7 +62,7 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="#" class="nav-link">
+                                <a href="<?= url("/admin/balance-sheet/balance-sheet-overview/report") ?>" class="nav-link">
                                     <p>Visão geral do balanço</p>
                                 </a>
                             </li>
