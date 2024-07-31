@@ -51,14 +51,15 @@ class BalanceSheet
     }
 
     /** @var ModelsBalanceSheet[] */
-    public function findAllBalanceSheet(array $columnsA, array $columnsB, array $params, bool $onlyData = false): array
+    public function findAllBalanceSheet(array $columnsA, array $columnsB, array $columnsC, array $params, bool $onlyData = false): array
     {
         $columnsA = empty($columnsA) ? "*" : implode(", ", $columnsA);
         $columnsB = empty($columnsB) ? "*" : implode(", ", $columnsB);
+        $columnsC = empty($columnsC) ? "*" : implode(", ", $columnsC);
 
         $terms = "id_user=:id_user AND id_company=:id_company AND deleted=:deleted";
         $paramsQuery = ":id_company=" . $params["id_company"] . "&:id_user=" . $params['id_user'] . "&:deleted=" . $params['deleted'] . "";
-        
+
         $response = $this->balanceSheet->find(
             $terms,
             $paramsQuery,
@@ -71,13 +72,27 @@ class BalanceSheet
             $columnsB,
             "id_chart_of_account",
             CONF_DB_NAME . ".balance_sheet"
+        )->join(
+            CONF_DB_NAME . ".chart_of_account_group",
+            "id",
+            $terms,
+            $paramsQuery,
+            $columnsC,
+            "id_chart_of_account_group",
+            CONF_DB_NAME . ".chart_of_account"
         )->fetch(true);
 
         if (empty($response)) {
             return [];
         }
 
-        return !$onlyData ? $response : $response->data();
+        if ($onlyData) {
+            $response = array_map(function ($item) {
+                return $item->data();
+            }, $response);
+        }
+
+        return $response;
     }
 
     /** @var ModelsBalanceSheet[] */

@@ -45,9 +45,13 @@ class BalanceSheetOverView extends Controller
                 die;
             }
 
-            echo "<pre>";
-            print_r($requestPost);
-            die;
+            if (empty($requestPost["date"])) {
+                $dateTime = new DateTime();
+                $requestPost["date"] = $dateTime->format("01/m/Y") . " - " . $dateTime->format("t/m/Y");
+            }
+
+            $requestPost["date"] = preg_replace("/^(\d{2})\/(\d{2})\/(\d{4})$/", "$3-$2-$1", trim($requestPost["date"]));
+            $requestPost["date"] = explode("-", $requestPost["date"]);
 
             $balanceSheet = new BalanceSheet();
             $balanceSheetData = $balanceSheet->findAllBalanceSheet(
@@ -58,15 +62,22 @@ class BalanceSheetOverView extends Controller
                     "account_name"
                 ],
                 [
+                    "account_name AS account_name_group"
+                ],
+                [
                     "id_user" => $responseInitializeUserAndCompany["user_data"]->id,
                     "id_company" => $responseInitializeUserAndCompany["company_id"],
                     "deleted" => 0,
                     "date" => [
-                        "date_ini" => $dateRange[0],
-                        "date_end" => $dateRange[1]
+                        "date_ini" => $requestPost["date"][0],
+                        "date_end" => $requestPost["date"][1]
                     ]
-                ]
+                ],
+                true
             );
+            
+            echo json_encode(["success" => "apuração realizada com sucesso"]);
+            die;
         }
 
         $params = [
