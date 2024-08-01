@@ -29,6 +29,20 @@ if (window.location.pathname == "/admin/balance-sheet/balance-sheet-overview/rep
                 message = response.success
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.success(message)
+                shareholdersEquity.row.add([
+                    response.profit_accounting.uuid,
+                    response.profit_accounting.created_at,
+                    response.profit_accounting.account_number  + " " + response.profit_accounting.account_name,
+                    response.profit_accounting.account_value_formated
+                ]).draw(false)
+
+                let totalShareholdersEquityAndLiabilities = document.getElementById("totalShareholdersEquityAndLiabilities").innerHTML
+                totalShareholdersEquityAndLiabilities = parseFloat(totalShareholdersEquityAndLiabilities
+                .replace(/\./g, "").replace(/[R\$\s]+/, "").replace(",", "."))
+
+                totalShareholdersEquityAndLiabilities += response.profit_accounting.account_value
+                document.getElementById("totalShareholdersEquityAndLiabilities").innerHTML = totalShareholdersEquityAndLiabilities
+                .toLocaleString("pt-br", { "currency": "BRL", "style": "currency" })
             }
         })
     })

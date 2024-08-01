@@ -46,21 +46,43 @@ class ChartOfAccount
         return $this->data->$name ?? null;
     }
 
-    public function findChartOfAccountLikeAccountName(array $columns, array $params): ?ModelsChartOfAccount
+    /** @var ModelsChartOfAccount[] */
+    public function findChartOfAccountLikeAccountName(array $columnsA, $columnsB, array $params): array
     {
-        $columns = empty($columns) ? "*" : implode(", ", $columns);
-        $terms = "id_user=:id_user AND id_company=:id_company AND deleted=:deleted AND account_name LIKE '%{$params['account_name']}%'";
+        $columnsA = empty($columnsA) ? "*" : implode(", ", $columnsA);
+        $columnsB = empty($columnsB) ? "*" : implode(", ", $columnsB);
+
+        $terms = "id_user=:id_user AND id_company=:id_company AND deleted=:deleted";
         $queryParams = ":id_user=" . $params['id_user'] . "&:id_company=" . $params['id_company'] . "&:deleted=" . $params['deleted'] . "";
-        return $this->chartOfAccount->find($terms, $queryParams, $columns)->fetch();
+
+        $response = $this->chartOfAccount->find(
+            $terms . " AND account_name LIKE :account_name",
+            $queryParams . "&:account_name=%{$params['account_name']}%",
+            $columnsA
+        )->join(
+            CONF_DB_NAME . ".chart_of_account_group",
+            "id",
+            $terms,
+            $queryParams,
+            $columnsB,
+            "id_chart_of_account_group",
+            CONF_DB_NAME . ".chart_of_account"
+        )->fetch(true);
+
+        if (empty($response)) {
+            return [];
+        }
+
+        return $response;
     }
 
     public function findChartOfAccountByAccountNumber(array $columns, array $params): ?ModelsChartOfAccount
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
         return $this->chartOfAccount->find(
-            "account_number=:account_number AND id_company=:id_company AND id_user=:id_user AND deleted=:deleted", 
-            ":account_number=" . $params["account_number"] . "&:id_company=" . $params["id_company"] . "&:id_user=" . $params["id_user"] . "&:deleted=" . $params["deleted"] . "", 
-            $columns    
+            "account_number=:account_number AND id_company=:id_company AND id_user=:id_user AND deleted=:deleted",
+            ":account_number=" . $params["account_number"] . "&:id_company=" . $params["id_company"] . "&:id_user=" . $params["id_user"] . "&:deleted=" . $params["deleted"] . "",
+            $columns
         )->fetch();
     }
 

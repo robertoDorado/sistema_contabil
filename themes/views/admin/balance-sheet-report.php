@@ -268,7 +268,7 @@
                                     <tbody>
                                         <tr>
                                             <td><?= "R$ " . number_format($accounttingCaculationAssets, 2, ",", ".") ?></td>
-                                            <td><?= "R$ " . number_format($accountingCalculationLiabilities, 2, ",", ".") ?></td>
+                                            <td id="totalShareholdersEquityAndLiabilities"><?= "R$ " . number_format($accountingCalculationLiabilities, 2, ",", ".") ?></td>
                                         </tr>
                                     </tbody>
                                 </table>

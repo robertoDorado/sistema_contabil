@@ -80,6 +80,10 @@ class BalanceSheet
             $columnsC,
             "id_chart_of_account_group",
             CONF_DB_NAME . ".chart_of_account"
+        )->between(
+            "created_at",
+            CONF_DB_NAME . ".balance_sheet",
+            $params["date"]
         )->fetch(true);
 
         if (empty($response)) {
@@ -88,7 +92,7 @@ class BalanceSheet
 
         if ($onlyData) {
             $response = array_map(function ($item) {
-                return $item->data();
+                return (array) $item->data();
             }, $response);
         }
 
@@ -133,7 +137,7 @@ class BalanceSheet
             return ["data" => [], "total" => 0];
         }
 
-        return $this->dataProcessing("patrimonioliquido");
+        return $this->dataProcessing("patrimonio liquido");
     }
 
     /** @var ModelsBalanceSheet[] */
@@ -174,7 +178,7 @@ class BalanceSheet
             return ["data" => [], "total" => 0];
         }
 
-        return $this->dataProcessing("passivonaocirculante");
+        return $this->dataProcessing("passivo nao circulante");
     }
 
     /** @var ModelsBalanceSheet[] */
@@ -215,7 +219,7 @@ class BalanceSheet
             return ["data" => [], "total" => 0];
         }
 
-        return $this->dataProcessing("passivocirculante");
+        return $this->dataProcessing("passivo circulante");
     }
 
     /** @var ModelsBalanceSheet[] */
@@ -256,7 +260,7 @@ class BalanceSheet
             return ["data" => [], "total" => 0];
         }
 
-        return $this->dataProcessing("ativonaocirculante");
+        return $this->dataProcessing("ativo nao circulante");
     }
 
     private function dataProcessing(string $referenceName): array
@@ -265,7 +269,7 @@ class BalanceSheet
             $item->uuid = $item->getUuid();
             $item->created_at = (new DateTime($item->created_at))->format("d/m/Y");
             $item->account_name = $item->account_number . " " . $item->account_name;
-            $item->account_name_group = preg_replace("/\s/", "", strtolower(removeAccets($item->account_name_group)));
+            $item->account_name_group = strtolower(removeAccets($item->account_name_group));
             return (array)$item->data();
         }, $this->balanceSheetReport);
 
@@ -276,9 +280,9 @@ class BalanceSheet
         });
 
         $data = array_map(function ($item) use ($referenceName) {
-            if (preg_match("/ativo/", $referenceName)) {
+            if (preg_match("/(ativo)/", $referenceName)) {
                 $item["account_value"] = empty($item["account_type"]) ? $item["account_value"] : $item["account_value"] * -1;
-            } else {
+            }else if (preg_match("/(passivo)/", $referenceName)) {
                 $item["account_value"] = empty($item["account_type"]) ? $item["account_value"] * -1 : $item["account_value"];
             }
             return $item;
@@ -291,16 +295,19 @@ class BalanceSheet
                 $grouppedData[$value["account_name"]]["account_value"] = 0;
             }
 
-            $grouppedData[$value["account_name"]]["account_value"] += $value["account_value"];
+            if (!preg_match("/(lucro acumulado)/", strtolower($value["account_name"]))) {
+                $grouppedData[$value["account_name"]]["account_value"] += $value["account_value"];
+            }else {
+                $grouppedData[$value["account_name"]]["account_value"] = $value["account_value"];
+            }
         }
 
-        $total = array_reduce($data, function ($acc, $item) {
+        $total = array_reduce($grouppedData, function ($acc, $item) {
             $acc += $item["account_value"];
             return $acc;
         }, 0);
 
         $grouppedData = array_map(function ($item) {
-            $item["account_value"] = $item["account_value"] > 0 ? $item["account_value"] : $item["account_value"] * -1;
             $item["account_value"] = "R$ " . number_format($item["account_value"], 2, ",", ".");
             return $item;
         }, $grouppedData);
@@ -346,7 +353,7 @@ class BalanceSheet
             return ["data" => [], "total" => 0];
         }
 
-        return $this->dataProcessing("ativocirculante");
+        return $this->dataProcessing("ativo circulante");
     }
 
     public function updateBalanceSheetDataByUuid(array $data): bool
