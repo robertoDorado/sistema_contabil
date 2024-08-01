@@ -91,7 +91,15 @@ class BalanceSheetOverView extends Controller
                     $groupAccounting[$balanceSheet["account_name_group"]]["account_value"] += $balanceSheet["account_value"];
                 }
 
-                if (preg_match("/(despesa|custo|imposto|depreciacao|amortizacao)/", strtolower(removeAccets($balanceSheet["account_name_group"])))) {
+                if (preg_match("/custo/", strtolower($balanceSheet["account_name_group"]))) {
+                    if (empty($groupAccounting[$balanceSheet["account_name_group"]])) {
+                        $groupAccounting[$balanceSheet["account_name_group"]] = $balanceSheet;
+                        $groupAccounting[$balanceSheet["account_name_group"]]["account_value"] = 0;
+                    }
+                    $groupAccounting[$balanceSheet["account_name_group"]]["account_value"] += $balanceSheet["account_value"];
+                }
+
+                if (preg_match("/(despesa|imposto|depreciacao|amortizacao)/", strtolower(removeAccets($balanceSheet["account_name_group"])))) {
                     if (empty($groupAccounting[$balanceSheet["account_name_group"]])) {
                         $groupAccounting[$balanceSheet["account_name_group"]] = $balanceSheet;
                         $groupAccounting[$balanceSheet["account_name_group"]]["account_value"] = 0;
@@ -100,14 +108,24 @@ class BalanceSheetOverView extends Controller
                 }
             }
 
-            $calculationAccounting = array_map(function ($item) {
-                if (preg_match("/(despesa|custo|imposto|depreciacao|amortizacao)/", strtolower(removeAccets($item["account_name_group"])))) {
-                    $item["account_value"] = $item["account_value"] * -1;
+            $expensesAccounting = array_filter($groupAccounting, function ($item) {
+                if (preg_match("/(despesa|imposto|depreciacao|amortizacao)/", strtolower(removeAccets($item["account_name_group"])))) {
+                    return $item;
                 }
-                return $item;
-            }, $groupAccounting);
+            });
 
-            $calculationAccounting = array_reduce($calculationAccounting, function ($acc, $item) {
+            $expensesAccountingValue = array_reduce($expensesAccounting, function($acc, $item) {
+                $acc += $item["account_value"];
+                return $acc;
+            }, 0);
+
+            $costAccounting = array_filter($groupAccounting, function ($item) {
+                if (preg_match("/custo/", strtolower($item["account_name_group"]))) {
+                    return $item;
+                }
+            });
+
+            $costAccountingValue = array_reduce($costAccounting, function($acc, $item) {
                 $acc += $item["account_value"];
                 return $acc;
             }, 0);
@@ -118,12 +136,11 @@ class BalanceSheetOverView extends Controller
                 }
             });
 
-            $revenueAccounting = array_reduce($revenueAccounting, function ($acc, $item) {
-                $acc[] = $item["account_value"];
+            $revenueAccountingValue = array_reduce($revenueAccounting, function($acc, $item) {
+                $acc += $item["account_value"];
                 return $acc;
-            }, []);
-
-            $revenueAccounting = array_sum($revenueAccounting);
+            }, 0);
+            
             $chartOfAccountParams = [
                 [
                     "id",
@@ -152,7 +169,7 @@ class BalanceSheetOverView extends Controller
             }
 
             $profitAccounting = array_filter($profitAccounting, function ($item) {
-                if (preg_match("/^(lucro acumulado|lucros acumulados|lucro acumulados|lucros acumulado)$/", strtolower($item->account_name))) {
+                if (preg_match("/lucro acumulado/", strtolower($item->account_name))) {
                     return $item;
                 }
             });
@@ -164,7 +181,7 @@ class BalanceSheetOverView extends Controller
             }
 
             $profitAccounting = array_filter($profitAccounting, function ($item) {
-                if (preg_match("/^(patrimonio liquido|patrimonios liquidos|patrimonio liquidos|patrimonios liquido)$/", strtolower(removeAccets($item->account_name_group)))) {
+                if (preg_match("/patrimonio liquido/", strtolower(removeAccets($item->account_name_group)))) {
                     return $item;
                 }
             });
@@ -187,42 +204,65 @@ class BalanceSheetOverView extends Controller
             }
 
             $salesRevenueAccounting = array_filter($salesRevenueAccounting, function ($item) {
-                if (preg_match("/(receita bruta|receitas brutas|receita brutas|receitas bruta)/", strtolower($item->account_name))) {
+                if (preg_match("/receita bruta de venda de produtos e servicos/", strtolower(removeAccets($item->account_name)))) {
                     return $item;
                 }
             });
 
             if (empty($salesRevenueAccounting)) {
                 http_response_code(500);
-                echo json_encode(["error" => "não foi encontrada a conta receita bruta de venda"]);
+                echo json_encode(["error" => "não foi encontrada a conta receita bruta de venda de produtos e serviços"]);
                 die;
             }
 
             $salesRevenueAccounting = array_filter($salesRevenueAccounting, function ($item) {
-                if (preg_match("/(produto e servico|produto|servico|produtos e servicos|produtos|servicos)/", strtolower(removeAccets($item->account_name)))) {
+                if (preg_match("/receitas de vendas de produtos e servicos/", strtolower(removeAccets($item->account_name_group)))) {
                     return $item;
                 }
             });
 
             if (empty($salesRevenueAccounting)) {
                 http_response_code(500);
-                echo json_encode(["error" => "não foi encontrada a conta receita bruta de venda produto e serviço"]);
-                die;
-            }
-
-            $salesRevenueAccounting = array_filter($salesRevenueAccounting, function ($item) {
-                if (preg_match("/(receita de venda|receitas de vendas|receita de vendas|receitas de venda)/", strtolower($item->account_name_group))) {
-                    return $item;
-                }
-            });
-
-            if (empty($salesRevenueAccounting)) {
-                http_response_code(500);
-                echo json_encode(["error" => "a conta receita bruta de venda produto e serviço não pertence ao grupo receita de venda"]);
+                echo json_encode(["error" => "a conta receita bruta de venda de produtos e serviços não pertence ao grupo receitas de vendas de produtos e serviços"]);
                 die;
             }
 
             $salesRevenueAccounting = array_shift($salesRevenueAccounting);
+            $chartOfAccount = new ChartOfAccount();
+            $chartOfAccountParams[2]["account_name"] = "custo";
+            $costOfProductsSold = $chartOfAccount->findChartOfAccountLikeAccountName(...$chartOfAccountParams);
+
+            if (empty($costOfProductsSold)) {
+                http_response_code(500);
+                echo json_encode(["error" => "conta {$chartOfAccountParams[2]['account_name']} não existe"]);
+                die;
+            }
+
+            $costOfProductsSold = array_filter($costOfProductsSold, function ($item) {
+                if (preg_match("/custo dos produtos vendidos/", strtolower($item->account_name))) {
+                    return $item;
+                }
+            });
+
+            if (empty($costOfProductsSold)) {
+                http_response_code(500);
+                echo json_encode(["error" => "não foi encontrada custo dos produtos vendidos"]);
+                die;
+            }
+
+            $costOfProductsSold = array_filter($costOfProductsSold, function ($item) {
+                if (preg_match("/custo das vendas/", strtolower($item->account_name_group))) {
+                    return $item;
+                }
+            });
+
+            if (empty($costOfProductsSold)) {
+                http_response_code(500);
+                echo json_encode(["error" => "a conta custo dos produtos vendidos não pertence a conta custo das vendas"]);
+                die;
+            }
+
+            $costOfProductsSold = array_shift($costOfProductsSold);
             $chartOfAccount = new ChartOfAccount();
             $chartOfAccountParams[2]["account_name"] = "despesa";
             $expensesAdminitrativeAccounting = $chartOfAccount->findChartOfAccountLikeAccountName(...$chartOfAccountParams);
@@ -234,26 +274,26 @@ class BalanceSheetOverView extends Controller
             }
 
             $expensesAdminitrativeAccounting = array_filter($expensesAdminitrativeAccounting, function ($item) {
-                if (preg_match("/^(despesa administrativa|despesas administrativas|despesa administrativas|despesas administrativa)$/", strtolower($item->account_name))) {
+                if (preg_match("/despesas administrativas/", strtolower($item->account_name))) {
                     return $item;
                 }
             });
 
             if (empty($expensesAdminitrativeAccounting)) {
                 http_response_code(500);
-                echo json_encode(["error" => "não foi encontrada a conta despesa administrativa"]);
+                echo json_encode(["error" => "não foi encontrada a conta despesas administrativas"]);
                 die;
             }
 
             $expensesAdminitrativeAccounting = array_filter($expensesAdminitrativeAccounting, function ($item) {
-                if (preg_match("/^(despesa operacional|despesas operacionais|despesa operacionais|despesas operacional)$/", strtolower($item->account_name_group))) {
+                if (preg_match("/despesas operacionais/", strtolower($item->account_name_group))) {
                     return $item;
                 }
             });
 
             if (empty($expensesAdminitrativeAccounting)) {
                 http_response_code(500);
-                echo json_encode(["error" => "a conta despesa administrativa não pertence ao groupo de contas despesas operacionais"]);
+                echo json_encode(["error" => "a conta despesas administrativas não pertence ao grupo de contas despesas operacionais"]);
                 die;
             }
             
@@ -266,7 +306,7 @@ class BalanceSheetOverView extends Controller
                 "id_company" => $responseInitializeUserAndCompany["company_id"],
                 "account_type" => 0,
                 "id_chart_of_account" => $salesRevenueAccounting->id,
-                "account_value" => $revenueAccounting,
+                "account_value" => $revenueAccountingValue,
                 "history_account" => "encerramento contábil no mês de " . monthsInPortuguese()[$dateTime->format("n")] . "/" . $dateTime->format("Y") . "",
                 "created_at" => $requestPost["date"][1],
                 "updated_at" => $requestPost["date"][1],
@@ -297,10 +337,39 @@ class BalanceSheetOverView extends Controller
                 die;
             }
 
-            if ($revenueAccounting != $calculationAccounting) {
+            if (!empty($costAccountingValue)) {
                 $balanceSheetParams["uuid"] = Uuid::uuid4();
                 $balanceSheetParams["account_type"] = 0;
-                $balanceSheetParams["account_value"] = $calculationAccounting;
+                $balanceSheetParams["account_value"] = $costAccountingValue;
+                $response = $balanceSheet->persistData($balanceSheetParams);
+                if (!$response) {
+                    http_response_code(500);
+                    echo json_encode([
+                        "error" => "erro ao tentar realizar o encerramento contábil para a conta D - lucro acumulado"
+                    ]);
+                    Connect::getInstance()->rollBack();
+                    die;
+                }
+
+                $balanceSheetParams["uuid"] = Uuid::uuid4();
+                $balanceSheetParams["account_type"] = 1;
+                $balanceSheetParams["id_chart_of_account"] = $costOfProductsSold->id;
+                $response = $balanceSheet->persistData($balanceSheetParams);
+                if (!$response) {
+                    http_response_code(500);
+                    echo json_encode([
+                        "error" => "erro ao tentar realizar o encerramento contábil para a conta C - custo dos produtos vendidos"
+                    ]);
+                    Connect::getInstance()->rollBack();
+                    die;
+                }
+            }
+
+            if (!empty($expensesAccountingValue)) {
+                $balanceSheetParams["uuid"] = Uuid::uuid4();
+                $balanceSheetParams["account_type"] = 0;
+                $balanceSheetParams["account_value"] = $expensesAccountingValue;
+                $balanceSheetParams["id_chart_of_account"] = $profitAccounting->id;
                 $response = $balanceSheet->persistData($balanceSheetParams);
                 if (!$response) {
                     http_response_code(500);
@@ -324,8 +393,8 @@ class BalanceSheetOverView extends Controller
                     die;
                 }
             }
-
             Connect::getInstance()->commit();
+            $calculationAccounting = $revenueAccountingValue - ($costAccountingValue + $expensesAccountingValue);
             $profitAccounting->created_at = preg_replace("/^(\d{4})-(\d{2})-(\d{2})$/", "$3/$2/$1", $requestPost["date"][1]);
             $profitAccounting->uuid = $profitAccounting->getUuid();
             $profitAccounting->account_value_formated = "R$ " . number_format($calculationAccounting, 2, ",", ".");
@@ -333,7 +402,7 @@ class BalanceSheetOverView extends Controller
 
             echo json_encode(
                 [
-                    "success" => "apuração realizada com sucesso", 
+                    "success" => "apuração realizada com sucesso",
                     "profit_accounting" => (array) $profitAccounting->data()
                 ]
             );

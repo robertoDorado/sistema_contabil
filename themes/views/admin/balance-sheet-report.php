@@ -54,7 +54,7 @@
                                                     <td><?= $currentAssets["uuid"] ?></td>
                                                     <td><?= $currentAssets["created_at"] ?></td>
                                                     <td><?= $currentAssets["account_name"] ?></td>
-                                                    <td><?= $currentAssets["account_value"] ?></td>
+                                                    <td><?= $currentAssets["account_value_format"] ?></td>
                                                 </tr>
                                             <?php endforeach ?>
                                         <?php endif ?>
@@ -98,7 +98,7 @@
                                                     <td><?= $nonCurrentAssets["uuid"] ?></td>
                                                     <td><?= $nonCurrentAssets["created_at"] ?></td>
                                                     <td><?= $nonCurrentAssets["account_name"] ?></td>
-                                                    <td><?= $nonCurrentAssets["account_value"] ?></td>
+                                                    <td><?= $nonCurrentAssets["account_value_format"] ?></td>
                                                 </tr>
                                             <?php endforeach ?>
                                         <?php endif ?>
@@ -142,7 +142,7 @@
                                                     <td><?= $currentLiabilities["uuid"] ?></td>
                                                     <td><?= $currentLiabilities["created_at"] ?></td>
                                                     <td><?= $currentLiabilities["account_name"] ?></td>
-                                                    <td><?= $currentLiabilities["account_value"] ?></td>
+                                                    <td><?= $currentLiabilities["account_value_format"] ?></td>
                                                 </tr>
                                             <?php endforeach ?>
                                         <?php endif ?>
@@ -186,7 +186,7 @@
                                                     <td><?= $nonCurrentLiabilities["uuid"] ?></td>
                                                     <td><?= $nonCurrentLiabilities["created_at"] ?></td>
                                                     <td><?= $nonCurrentLiabilities["account_name"] ?></td>
-                                                    <td><?= $nonCurrentLiabilities["account_value"] ?></td>
+                                                    <td><?= $nonCurrentLiabilities["account_value_format"] ?></td>
                                                 </tr>
                                             <?php endforeach ?>
                                         <?php endif ?>
@@ -230,7 +230,7 @@
                                                     <td><?= $shareholdersEquity["uuid"] ?></td>
                                                     <td><?= $shareholdersEquity["created_at"] ?></td>
                                                     <td><?= $shareholdersEquity["account_name"] ?></td>
-                                                    <td><?= $shareholdersEquity["account_value"] ?></td>
+                                                    <td data-shareholdersvalue="<?= $shareholdersEquity["account_value"] ?>"><?= $shareholdersEquity["account_value_format"] ?></td>
                                                 </tr>
                                             <?php endforeach ?>
                                         <?php endif ?>
@@ -240,7 +240,7 @@
                                             <td></td>
                                             <td>Total</td>
                                             <td></td>
-                                            <td><?= $totalShareholdersEquity ?></td>
+                                            <td id="totalShareholdersEquity"><?= $totalShareholdersEquity ?></td>
                                         </tr>
                                     </tfoot>
                                 </table>

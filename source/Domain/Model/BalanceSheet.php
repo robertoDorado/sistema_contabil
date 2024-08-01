@@ -282,7 +282,7 @@ class BalanceSheet
         $data = array_map(function ($item) use ($referenceName) {
             if (preg_match("/(ativo)/", $referenceName)) {
                 $item["account_value"] = empty($item["account_type"]) ? $item["account_value"] : $item["account_value"] * -1;
-            }else if (preg_match("/(passivo)/", $referenceName)) {
+            }else {
                 $item["account_value"] = empty($item["account_type"]) ? $item["account_value"] * -1 : $item["account_value"];
             }
             return $item;
@@ -295,11 +295,7 @@ class BalanceSheet
                 $grouppedData[$value["account_name"]]["account_value"] = 0;
             }
 
-            if (!preg_match("/(lucro acumulado)/", strtolower($value["account_name"]))) {
-                $grouppedData[$value["account_name"]]["account_value"] += $value["account_value"];
-            }else {
-                $grouppedData[$value["account_name"]]["account_value"] = $value["account_value"];
-            }
+            $grouppedData[$value["account_name"]]["account_value"] += $value["account_value"];
         }
 
         $total = array_reduce($grouppedData, function ($acc, $item) {
@@ -308,7 +304,7 @@ class BalanceSheet
         }, 0);
 
         $grouppedData = array_map(function ($item) {
-            $item["account_value"] = "R$ " . number_format($item["account_value"], 2, ",", ".");
+            $item["account_value_format"] = "R$ " . number_format($item["account_value"], 2, ",", ".");
             return $item;
         }, $grouppedData);
 

@@ -143,35 +143,22 @@ class BalanceSheet extends Controller
                 die;
             }
 
-            $chartOfAccountGroup = new ChartOfAccountGroup();
-            $chartOfAccountGroupData = $chartOfAccountGroup->findChartOfAccountGroupByAccountNumber(
-                [
-                    "id"
-                ],
-                [
-                    "account_number" => $requestPost["accountNumber"],
-                    "id_user" => $responseInitializeUserAndCompany["user_data"]->id,
-                    "id_company" => $responseInitializeUserAndCompany["company_id"],
-                    "deleted" => 0
-                ]
-            );
+            try {
+                $chartOfAccountGroup = new ChartOfAccountGroup();
+                $response = $chartOfAccountGroup->updateChartOfAccountGroupByUuid([
+                    "uuid" => $requestPost["uuid"],
+                    "account_name" => $requestPost["accountName"],
+                    "account_number" => $requestPost["accountNumber"]
+                ]);
 
-            if (!empty($chartOfAccountGroupData)) {
+                if (!$response) {
+                    http_response_code(500);
+                    echo $chartOfAccountGroup->message->json();
+                    die;
+                }
+            } catch (\PDOException $_) {
                 http_response_code(500);
-                echo json_encode(["error" => "esta conta {$requestPost['accountNumber']} já esta cadastrada"]);
-                die;
-            }
-
-            $chartOfAccountGroup = new ChartOfAccountGroup();
-            $response = $chartOfAccountGroup->updateChartOfAccountGroupByUuid([
-                "uuid" => $requestPost["uuid"],
-                "account_name" => $requestPost["accountName"],
-                "account_number" => $requestPost["accountNumber"]
-            ]);
-
-            if (!$response) {
-                http_response_code(500);
-                echo $chartOfAccountGroup->message->json();
+                echo json_encode(["error" => "erro ao tentar atualizar o registro"]);
                 die;
             }
 
@@ -593,21 +580,8 @@ class BalanceSheet extends Controller
                 die;
             }
 
-            $chartOfAccount = new ChartOfAccount();
-            $chartOfAccountData = $chartOfAccount->findChartOfAccountByAccountNumber(["id"], [
-                "account_number" => $requestPost["accountValue"],
-                "id_user" => $responseInitializeUserAndCompany["user_data"]->id,
-                "id_company" => $responseInitializeUserAndCompany["company_id"],
-                "deleted" => 0
-            ]);
-
-            if (!empty($chartOfAccountData)) {
-                http_response_code(500);
-                echo json_encode(["error" => "esta conta {$requestPost['accountValue']} já está cadastrada"]);
-                die;
-            }
-
-            $chartOfAccount = new ChartOfAccount();
+            try {
+                $chartOfAccount = new ChartOfAccount();
             $response = $chartOfAccount->updateChartOfAccountByUuid([
                 "uuid" => $requestPost["uuid"],
                 "id_chart_of_account_group" => $chartOfAccountGroupData->id,
@@ -618,6 +592,12 @@ class BalanceSheet extends Controller
             if (!$response) {
                 http_response_code(500);
                 echo $chartOfAccount->message->json();
+                die;
+            }
+            
+            } catch (\PDOException $_) {
+                http_response_code(500);
+                echo json_encode(["error" => "erro ao tentar atualizar o registro"]);
                 die;
             }
 

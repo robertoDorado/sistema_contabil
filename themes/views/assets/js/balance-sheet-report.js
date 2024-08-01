@@ -32,17 +32,30 @@ if (window.location.pathname == "/admin/balance-sheet/balance-sheet-overview/rep
                 shareholdersEquity.row.add([
                     response.profit_accounting.uuid,
                     response.profit_accounting.created_at,
-                    response.profit_accounting.account_number  + " " + response.profit_accounting.account_name,
+                    response.profit_accounting.account_number + " " + response.profit_accounting.account_name,
                     response.profit_accounting.account_value_formated
                 ]).draw(false)
 
+                let shareholdersEquityValue = Array.from($("#shareholdersEquity").find("tbody").find("tr").children())
+                shareholdersEquityValue = shareholdersEquityValue.filter(element => element.dataset.shareholdersvalue)
+                shareholdersEquityValue = shareholdersEquityValue.map(element => parseFloat(element.dataset.shareholdersvalue))
+                shareholdersEquityValue = shareholdersEquityValue.reduce(function (acc, item) {
+                    acc += item
+                    return acc
+                }, 0)
+
+                shareholdersEquityValue += response.profit_accounting.account_value
+                document.getElementById("totalShareholdersEquity").innerHTML = shareholdersEquityValue
+                    .toLocaleString("pt-br", { "currency": "BRL", "style": "currency" })
+
                 let totalShareholdersEquityAndLiabilities = document.getElementById("totalShareholdersEquityAndLiabilities").innerHTML
                 totalShareholdersEquityAndLiabilities = parseFloat(totalShareholdersEquityAndLiabilities
-                .replace(/\./g, "").replace(/[R\$\s]+/, "").replace(",", "."))
+                    .replace(/\./g, "").replace(/[R\$\s]+/, "").replace(",", "."))
 
                 totalShareholdersEquityAndLiabilities += response.profit_accounting.account_value
                 document.getElementById("totalShareholdersEquityAndLiabilities").innerHTML = totalShareholdersEquityAndLiabilities
-                .toLocaleString("pt-br", { "currency": "BRL", "style": "currency" })
+                    .toLocaleString("pt-br", { "currency": "BRL", "style": "currency" })
+
             }
         })
     })
