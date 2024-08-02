@@ -215,6 +215,11 @@ $route->post("/balance-sheet/balance-sheet-overview/form", "BalanceSheetOverView
 $route->get("/balance-sheet/balance-sheet-overview/report", "BalanceSheetOverView::balanceSheetReport");
 $route->post("/balance-sheet/balance-sheet-overview/report", "BalanceSheetOverView::balanceSheetReport");
 
+/**
+ * Livro Diário
+ */
+$route->get("/balance-sheet/daily-journal/report", "DailyJournal::dailyJournalReport");
+
 /** 
  * Assinatura do cliente
  */

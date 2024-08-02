@@ -123,8 +123,8 @@
                                 </ul>
                             </li>
                             <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <p>Relatórios de balanço</p>
+                                <a href="<?= url("/admin/balance-sheet/daily-journal/report") ?>" class="nav-link">
+                                    <p>Livro diário</p>
                                 </a>
                             </li>
                             <li class="nav-item">

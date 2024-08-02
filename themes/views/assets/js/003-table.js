@@ -1207,3 +1207,75 @@ const nonCurrentLiabilities = dataTableConfig($("#nonCurrentLiabilities"), balan
 const shareholdersEquity = dataTableConfig($("#shareholdersEquity"), balanceSheetOptions("Patrimônio líquido", "#shareholdersEquityWidgets"))
 const accountingCalculation = dataTableConfig($("#accountingCalculation"), balanceSheetOptions("Apauração contabil", "#accountingCalculationWidget", true, "total"))
 const balanceSheetReport = dataTableConfig($("#balanceSheetReport"), balanceSheetOptions("Balanço patrimonial", "#balanceSheetReportWidgets"))
+
+const dailyJournalReport = dataTableConfig($("#dailyJournalReport"),
+    {
+        "columnDefs": [
+            {
+                "targets": [0],
+                "visible": false,
+            },
+            {
+                "targets": [5],
+                "width": "15%"
+            }
+        ],
+        "language": {
+            "url": urlJson
+        },
+        "responsive": true,
+        "autoWidth": false,
+        "buttons": [
+            {
+                "extend": 'copyHtml5',
+                "title": 'Livro diário'
+            },
+            {
+                "extend": 'excelHtml5',
+                "filename": "Livro diário",
+                "title": "Livro diário",
+                customizeData: function (xlsxData) {
+                    xlsxData.header = xlsxData.header.filter((data) => data != 'Editar' && data != 'Excluir')
+                }
+            },
+            {
+                "extend": 'csvHtml5',
+                "filename": "Livro diário",
+                "title": "Livro diário"
+            },
+            {
+                "extend": 'pdfHtml5',
+                "filename": "Livro diário",
+                "title": 'Livro diário',
+                customize: function (doc) {
+                    doc.content[1].table.body.forEach(function (row) {
+                        row.splice(0, 1);
+                        row.splice(6, 2);
+                    });
+
+                    doc.content[1].table.widths = [
+                        '16.66%', '16.66%', '16.66%', '16.66%', '16.66%', '16.66%'
+                    ];
+
+                    var objLayout = {};
+                    objLayout['hLineWidth'] = function (i) { return 0.5; };
+                    objLayout['vLineWidth'] = function (i) { return 0.5; };
+                    objLayout['hLineColor'] = function (i) { return '#aaa'; };
+                    objLayout['vLineColor'] = function (i) { return '#aaa'; };
+                    objLayout['paddingLeft'] = function (i) { return 4; };
+                    objLayout['paddingRight'] = function (i) { return 4; };
+                    objLayout['paddingTop'] = function (i) { return 4; };
+                    objLayout['paddingBottom'] = function (i) { return 4; };
+                    objLayout['fillColor'] = function (i) { return null; };
+                    doc.content[1].layout = objLayout;
+                }
+            },
+            "colvis"
+        ],
+        "initComplete": function () {
+            this.api()
+                .buttons()
+                .container()
+                .appendTo("#widgets .col-md-6:eq(0)");
+        }
+    })
