@@ -53,6 +53,12 @@ class BalanceSheetOverView extends Controller
                 $requestPost["date"] = $dateTime->format("01/m/Y") . " - " . $dateTime->format("t/m/Y");
             }
 
+            if (empty($responseInitializeUserAndCompany["company_id"])) {
+                http_response_code(500);
+                echo json_encode(["error" => "selecione uma empresa antes de encerrar um período contábil"]);
+                die;
+            }
+
             $requestPost["date"] = explode("-", $requestPost["date"]);
             $requestPost["date"] = array_map(function ($date) {
                 return preg_replace("/(\d{2})\/(\d{2})\/(\d{4})/", "$3-$2-$1", trim($date));

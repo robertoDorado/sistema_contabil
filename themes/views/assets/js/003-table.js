@@ -1117,7 +1117,11 @@ const chartOfAccountGroupBackup = dataTableConfig($("#chartOfAccountGroupBackup"
         "autoWidth": false
     })
 
-const balanceSheetOptions = function (fileName, selectorName, isVisibleFirstColumn = false) {
+const balanceSheetOptions = function (fileName, selectorName, isVisibleFirstColumn = false, pdfFileType = "default") {
+    const verifyFileType = {
+        "default": ["33.33%", "33.33%", "33.33%"],
+        "total": ["50%", "50%"]
+    }
     const columnDefs = isVisibleFirstColumn ?
         [
             {
@@ -1164,9 +1168,13 @@ const balanceSheetOptions = function (fileName, selectorName, isVisibleFirstColu
                 "filename": fileName,
                 "title": fileName,
                 customize: function (doc) {
-                    doc.content[1].table.widths = [
-                        '20%', '20%', '20%', '20%', '20%'
-                    ];
+                    if (pdfFileType == "default") {
+                        doc.content[1].table.body.forEach(function (row) {
+                            row.splice(0, 1);
+                        });
+                    }
+
+                    doc.content[1].table.widths = verifyFileType[pdfFileType];
 
                     var objLayout = {};
                     objLayout['hLineWidth'] = function (i) { return 0.5; };
@@ -1197,4 +1205,5 @@ const nonCurrentAssets = dataTableConfig($("#nonCurrentAssets"), balanceSheetOpt
 const currentLiabilities = dataTableConfig($("#currentLiabilities"), balanceSheetOptions("Passivo circulante", "#currentLiabilitiesWidgets"))
 const nonCurrentLiabilities = dataTableConfig($("#nonCurrentLiabilities"), balanceSheetOptions("Passivo não circulante", "#nonCurrentLiabilitiesWidgets"))
 const shareholdersEquity = dataTableConfig($("#shareholdersEquity"), balanceSheetOptions("Patrimônio líquido", "#shareholdersEquityWidgets"))
-const accountingCalculation = dataTableConfig($("#accountingCalculation"), balanceSheetOptions("Pauração contabil", "#accountingCalculationWidget", true))
+const accountingCalculation = dataTableConfig($("#accountingCalculation"), balanceSheetOptions("Apauração contabil", "#accountingCalculationWidget", true, "total"))
+const balanceSheetReport = dataTableConfig($("#balanceSheetReport"), balanceSheetOptions("Balanço patrimonial", "#balanceSheetReportWidgets"))

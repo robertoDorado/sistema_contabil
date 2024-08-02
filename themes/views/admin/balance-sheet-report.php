@@ -33,6 +33,189 @@
                 <div class="col">
                     <div class="card">
                         <div class="card-header">
+                            <h3 class="card-title">Balanço patrimonial</h3>
+                        </div>
+
+                        <div class="card-body">
+                            <div id="balanceSheetReportWidgets" class="dataTables_wrapper dt-bootstrap4">
+                                <table id="balanceSheetReport" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Id</th>
+                                            <th>Data lançamento</th>
+                                            <th>Conta</th>
+                                            <th>Valor de lançamento</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>-</td>
+                                            <td><strong>Ativo circulante</strong></td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                        </tr>
+                                        <?php if (!empty($currentAssetsData)) : ?>
+                                            <?php foreach ($currentAssetsData as $currentAssets) : ?>
+                                                <tr>
+                                                    <td><?= $currentAssets["uuid"] ?></td>
+                                                    <td><?= $currentAssets["created_at"] ?></td>
+                                                    <td><?= $currentAssets["account_name"] ?></td>
+                                                    <td><?= $currentAssets["account_value_format"] ?></td>
+                                                </tr>
+                                            <?php endforeach ?>
+                                        <?php else : ?>
+                                            <tr>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                        <?php endif ?>
+                                        <tr>
+                                            <td>-</td>
+                                            <td><strong>Total</strong></td>
+                                            <td>-</td>
+                                            <td><strong><?= $totalCurrentAssets ?></strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td>-</td>
+                                            <td><strong>Ativo não circulante</strong></td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                        </tr>
+                                        <?php if (!empty($nonCurrentAssetsData)) : ?>
+                                            <?php foreach ($nonCurrentAssetsData as $nonCurrentAssets) : ?>
+                                                <tr>
+                                                    <td><?= $nonCurrentAssets["uuid"] ?></td>
+                                                    <td><?= $nonCurrentAssets["created_at"] ?></td>
+                                                    <td><?= $nonCurrentAssets["account_name"] ?></td>
+                                                    <td><?= $nonCurrentAssets["account_value_format"] ?></td>
+                                                </tr>
+                                            <?php endforeach ?>
+                                        <?php else : ?>
+                                            <tr>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                        <?php endif ?>
+                                        <tr>
+                                            <td>-</td>
+                                            <td><strong>Total</strong></td>
+                                            <td>-</td>
+                                            <td><strong><?= $totalNonCurrentAssets ?></strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td>-</td>
+                                            <td><strong>Passivo circulante</strong></td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                        </tr>
+                                        <?php if (!empty($currentLiabilitiesData)) : ?>
+                                            <?php foreach ($currentLiabilitiesData as $currentLiabilities) : ?>
+                                                <tr>
+                                                    <td><?= $currentLiabilities["uuid"] ?></td>
+                                                    <td><?= $currentLiabilities["created_at"] ?></td>
+                                                    <td><?= $currentLiabilities["account_name"] ?></td>
+                                                    <td><?= $currentLiabilities["account_value_format"] ?></td>
+                                                </tr>
+                                            <?php endforeach ?>
+                                        <?php else : ?>
+                                            <tr>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                        <?php endif ?>
+                                        <tr>
+                                            <td>-</td>
+                                            <td><strong>Total</strong></td>
+                                            <td>-</td>
+                                            <td><strong><?= $totalCurrentLiabilities ?></strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td>-</td>
+                                            <td><strong>Passivo não circulante</strong></td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                        </tr>
+                                        <?php if (!empty($nonCurrentLiabilitiesData)) : ?>
+                                            <?php foreach ($nonCurrentLiabilitiesData as $nonCurrentLiabilities) : ?>
+                                                <tr>
+                                                    <td><?= $nonCurrentLiabilities["uuid"] ?></td>
+                                                    <td><?= $nonCurrentLiabilities["created_at"] ?></td>
+                                                    <td><?= $nonCurrentLiabilities["account_name"] ?></td>
+                                                    <td><?= $nonCurrentLiabilities["account_value_format"] ?></td>
+                                                </tr>
+                                            <?php endforeach ?>
+                                        <?php else : ?>
+                                            <tr>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                        <?php endif ?>
+                                        <tr>
+                                            <td>-</td>
+                                            <td><strong>Total</strong></td>
+                                            <td>-</td>
+                                            <td><strong><?= $totalNonCurrentLiabilities ?></strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td>-</td>
+                                            <td><strong>Patrimônio líquido</strong></td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                        </tr>
+                                        <?php if (!empty($shareholdersEquityData)) : ?>
+                                            <?php foreach ($shareholdersEquityData as $shareholdersEquity) : ?>
+                                                <tr>
+                                                    <td><?= $shareholdersEquity["uuid"] ?></td>
+                                                    <td><?= $shareholdersEquity["created_at"] ?></td>
+                                                    <td><?= $shareholdersEquity["account_name"] ?></td>
+                                                    <td><?= $shareholdersEquity["account_value_format"] ?></td>
+                                                </tr>
+                                            <?php endforeach ?>
+                                        <?php else : ?>
+                                            <tr>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                        <?php endif ?>
+                                        <tr>
+                                            <td>-</td>
+                                            <td><strong>Total</strong></td>
+                                            <td>-</td>
+                                            <td><strong><?= $totalShareholdersEquity ?></strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td>-</td>
+                                            <td><strong>Total Ativo</strong></td>
+                                            <td>-</td>
+                                            <td><strong>Total Passivo + Patrimônio líquido</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td>-</td>
+                                            <td><strong><?= "R$ " . number_format($accounttingCaculationAssets, 2, ",", ".") ?></strong></td>
+                                            <td>-</td>
+                                            <td><strong><?= "R$ " . number_format($accountingCalculationLiabilities, 2, ",", ".") ?></strong></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-header">
                             <h3 class="card-title">Ativo - Circulante</h3>
                         </div>
 
