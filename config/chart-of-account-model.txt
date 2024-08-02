@@ -196,7 +196,7 @@
 2.3.1.08    Ajuste Acumulado de Conversão                    
 2.3.1.08.0001        Ajuste Acumulado de Conversão                
 2.3.1.09    Lucro ou Prejuízos Acumulados                    
-2.3.1.09.0001        Lucro acumulados                
+2.3.1.09.0001        Lucro acumulado                
 2.3.1.09.0002        (-) Prejuízos acumulados                
 2.3.1.10    Participação de Acionistas não Controladores (só no Balanço Consolidado)                    
 2.3.1.10.0001        Participação de Acionistas não controladores                 
