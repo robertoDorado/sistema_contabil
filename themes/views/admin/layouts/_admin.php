@@ -123,9 +123,17 @@
                                 </ul>
                             </li>
                             <li class="nav-item">
-                                <a href="<?= url("/admin/balance-sheet/daily-journal/report") ?>" class="nav-link">
-                                    <p>Livro diário</p>
+                                <a href="#" class="nav-link">
+                                    <p>Relatórios contábeis</p>
+                                    <i class="right fas fa-angle-left"></i>
                                 </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="<?= url("/admin/balance-sheet/daily-journal/report") ?>" class="nav-link">
+                                            <p>Livro diário</p>
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
                             <li class="nav-item">
                                 <a href="#" class="nav-link">

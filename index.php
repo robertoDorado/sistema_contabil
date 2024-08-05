@@ -219,6 +219,8 @@ $route->post("/balance-sheet/balance-sheet-overview/report", "BalanceSheetOverVi
  * Livro Diário
  */
 $route->get("/balance-sheet/daily-journal/report", "DailyJournal::dailyJournalReport");
+$route->get("/balance-sheet/daily-journal/form/{uuid}", "DailyJournal::dailyJournalUpdate");
+$route->post("/balance-sheet/daily-journal/form", "DailyJournal::dailyJournalUpdate");
 
 /** 
  * Assinatura do cliente

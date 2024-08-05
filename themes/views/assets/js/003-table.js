@@ -1210,13 +1210,14 @@ const balanceSheetReport = dataTableConfig($("#balanceSheetReport"), balanceShee
 
 const dailyJournalReport = dataTableConfig($("#dailyJournalReport"),
     {
+        "ordering": false,
         "columnDefs": [
             {
                 "targets": [0],
                 "visible": false,
             },
             {
-                "targets": [5],
+                "targets": [4],
                 "width": "15%"
             }
         ],

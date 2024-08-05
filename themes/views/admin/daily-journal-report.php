@@ -37,12 +37,11 @@
                                     <thead>
                                         <tr>
                                             <th>Id</th>
-                                            <th>Grupo conta</th>
-                                            <th>Nome conta</th>
-                                            <th>Tipo de conta</th>
-                                            <th>Histórico da conta</th>
-                                            <th>Valor da conta</th>
                                             <th>Data criada</th>
+                                            <th>Conta</th>
+                                            <th>Débito/Crédito</th>
+                                            <th>Valor</th>
+                                            <th>Histórico</th>
                                             <th>Editar</th>
                                             <th>Excluir</th>
                                         </tr>
@@ -51,14 +50,13 @@
                                         <?php if (!empty($dailyJournalData)) : ?>
                                             <?php foreach ($dailyJournalData as $dailyJournal) : ?>
                                                 <tr>
-                                                    <td><?= $dailyJournal->getUuid() ?></td>
-                                                    <td><?= $dailyJournal->account_name_group ?></td>
-                                                    <td><?= $dailyJournal->account_name ?></td>
-                                                    <td><?= $dailyJournal->account_type ?></td>
-                                                    <td><?= $dailyJournal->history_account ?></td>
-                                                    <td><?= $dailyJournal->account_value ?></td>
-                                                    <td><?= $dailyJournal->created_at ?></td>
-                                                    <td><a class="icons" href="<?= url("/admin/cash-flow/update/form/" . $dailyJournal->getUuid() . "") ?>"><i class="fas fa-edit" aria-hidden="true"></i></a></td>
+                                                    <td><?= $dailyJournal["uuid"] ?></td>
+                                                    <td><?= $dailyJournal["created_at"] ?></td>
+                                                    <td><?= $dailyJournal["account_name"] ?></td>
+                                                    <td><?= $dailyJournal["account_type"] ?></td>
+                                                    <td><?= $dailyJournal["account_value"] ?></td>
+                                                    <td><?= $dailyJournal["history_account"] ?></td>
+                                                    <td><a class="icons" href="<?= url("/admin/balance-sheet/daily-journal/form/" . $dailyJournal["uuid"] . "") ?>"><i class="fas fa-edit" aria-hidden="true"></i></a></td>
                                                     <td><a class="icons" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a></td>
                                                 </tr>
                                             <?php endforeach ?>

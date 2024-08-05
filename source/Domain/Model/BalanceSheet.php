@@ -50,6 +50,12 @@ class BalanceSheet
         return $this->data->$name ?? null;
     }
 
+    public function findBalanceSheetByUuid(array $columns): ?ModelsBalanceSheet
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        return $this->balanceSheet->find("uuid=:uuid", ":uuid=" . $this->getUuid() . "", $columns)->fetch();
+    }
+
     /** @var ModelsBalanceSheet[] */
     public function findAllBalanceSheet(array $columnsA, array $columnsB, array $columnsC, array $params, bool $onlyData = false): array
     {
