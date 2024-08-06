@@ -6,7 +6,7 @@ require __DIR__ . '/vendor/autoload.php';
 
 use Source\Core\MyRouter;
 
-setlocale(LC_ALL, 'pt_BR');
+setlocale(LC_ALL, 'en_US.UTF-8');
 date_default_timezone_set("America/Sao_Paulo");
 
 $path = "./Logs/error.log";
