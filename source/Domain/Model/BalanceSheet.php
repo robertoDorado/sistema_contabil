@@ -57,14 +57,14 @@ class BalanceSheet
     }
 
     /** @var ModelsBalanceSheet[] */
-    public function findAllBalanceSheet(array $columnsA, array $columnsB, array $columnsC, array $params, bool $onlyData = false): array
+    public function findAllBalanceSheetJoinChartOfAccountAndJoinChartOfAccountGroup(array $columnsA, array $columnsB, array $columnsC, array $params, bool $onlyData = false): array
     {
         $columnsA = empty($columnsA) ? "*" : implode(", ", $columnsA);
         $columnsB = empty($columnsB) ? "*" : implode(", ", $columnsB);
         $columnsC = empty($columnsC) ? "*" : implode(", ", $columnsC);
 
-        $terms = "id_user=:id_user AND id_company=:id_company AND deleted=:deleted";
-        $paramsQuery = ":id_company=" . $params["id_company"] . "&:id_user=" . $params['id_user'] . "&:deleted=" . $params['deleted'] . "";
+        $terms = "id_user=:id_user AND id_company=:id_company";
+        $paramsQuery = ":id_company=" . $params["id_company"] . "&:id_user=" . $params['id_user'] . "";
 
         $response = $this->balanceSheet->find(
             $terms,
@@ -86,20 +86,26 @@ class BalanceSheet
             $columnsC,
             "id_chart_of_account_group",
             CONF_DB_NAME . ".chart_of_account"
-        )->between(
-            "created_at",
-            CONF_DB_NAME . ".balance_sheet",
-            $params["date"]
-        )->fetch(true);
+        );
 
-        if (empty($response)) {
+        if (empty($response->fetch(true))) {
             return [];
+        }
+
+        if (!empty($params["date"])) {
+            $response = $response->between(
+                "created_at",
+                CONF_DB_NAME . ".balance_sheet",
+                $params["date"]
+            );
         }
 
         if ($onlyData) {
             $response = array_map(function ($item) {
                 return (array) $item->data();
-            }, $response);
+            }, $response->fetch(true));
+        }else {
+            $response = $response->fetch(true);
         }
 
         return $response;

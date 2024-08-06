@@ -8,7 +8,7 @@
             <li class="nav-item">
                 <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
             </li>
-            <li class="nav-item d-none d-sm-inline-block">
+            <li class="nav-item d-sm-inline-block">
                 <a href="<?= url("/admin/logout") ?>" id="logout" class="nav-link">Sair</a>
             </li>
         </ul>
@@ -131,6 +131,11 @@
                                     <li class="nav-item">
                                         <a href="<?= url("/admin/balance-sheet/daily-journal/report") ?>" class="nav-link">
                                             <p>Livro diário</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="<?= url("/admin/balance-sheet/daily-journal/report/backup") ?>" class="nav-link">
+                                            <p>Backup do livro diário</p>
                                         </a>
                                     </li>
                                 </ul>

@@ -6,12 +6,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Relatório livro diário</h1>
+                    <h1 class="m-0">Relatório backup do livro diário</h1>
                 </div><!-- /.col -->
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="<?= url("/admin") ?>">Início</a></li>
-                        <li class="breadcrumb-item active">Relatório livro diário</li>
+                        <li class="breadcrumb-item active">Relatório backup do livro diário</li>
                     </ol>
                 </div><!-- /.col -->
             </div><!-- /.row -->
@@ -22,20 +22,15 @@
     <div class="content">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-6 mb-5">
-                    <?= $v->insert("admin/layouts/_daterange_input") ?>
-                </div>
-            </div>
-            <div class="row">
                 <div class="col">
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">Relatório livro diário</h3>
+                            <h3 class="card-title">Backup do livro diário</h3>
                         </div>
 
                         <div class="card-body">
                             <div id="widgets" class="dataTables_wrapper dt-bootstrap4">
-                                <table id="dailyJournalReport" class="table table-bordered table-striped">
+                                <table id="dailyJournalBackup" class="table table-bordered table-striped">
                                     <thead>
                                         <tr>
                                             <th>Id</th>
@@ -58,7 +53,7 @@
                                                     <td><?= $dailyJournal["account_type"] ?></td>
                                                     <td><?= $dailyJournal["account_value"] ?></td>
                                                     <td><?= $dailyJournal["history_account"] ?></td>
-                                                    <td><a class="icons" href="<?= url("/admin/balance-sheet/daily-journal/form/" . $dailyJournal["uuid"] . "") ?>"><i class="fas fa-edit" aria-hidden="true"></i></a></td>
+                                                    <td><a id="restoreLink" class="icons" data-accountname="<?= $dailyJournal["account_name"] ?>" data-uuid="<?= $dailyJournal["uuid"] ?>" href="#"><i class="fas fa-database" aria-hidden="true"></i></a></td>
                                                     <td><a id="trashLink" class="icons" data-accountname="<?= $dailyJournal["account_name"] ?>" data-uuid="<?= $dailyJournal["uuid"] ?>" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a></td>
                                                 </tr>
                                             <?php endforeach ?>

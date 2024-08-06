@@ -79,10 +79,9 @@ class Server extends Controller
                 throw new Exception($user->message->json() . json_encode(["subscription_id" => $id]));
             }
 
-            $path = dirname(dirname(__DIR__)) . "/Logs/subscription-canceled.log";
-            $response = file_put_contents($path, json_encode($subscriptionData->data())  . PHP_EOL, FILE_APPEND);
+            $response = file_put_contents(CONF_SUBSCRIPTION_CANCELED_PATH, json_encode($subscriptionData->data())  . PHP_EOL, FILE_APPEND);
             if (!$response) {
-                throw new Exception("Não foi possível criar o arquivo {$path}");
+                throw new Exception("Não foi possível criar o arquivo " . CONF_SUBSCRIPTION_CANCELED_PATH . "");
             }
         }
     }

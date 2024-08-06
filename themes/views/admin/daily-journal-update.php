@@ -26,7 +26,7 @@
                         <div class="card-header">
                             <h3 class="card-title">Fazer uma atualização</h3>
                         </div>
-                        <form id="dailyJournalUpdate">
+                        <form id="dailyJournalFormUpdate">
                             <div class="card-body">
                                 <div class="form-group">
                                     <label for="createdAt">Data criada</label>

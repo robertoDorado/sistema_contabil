@@ -148,8 +148,18 @@ class Tools
             $dataResponse->$key = $value;
         }
 
-        $dataResponse->setRequiredFields(array_keys($data));
-        return $dataResponse->save();
+        try {
+            $dataResponse->setRequiredFields(array_keys($data));
+            return $dataResponse->save();
+        } catch (\PDOException $th) {
+            http_response_code(500);
+            echo json_encode(["error" => "erro ao tentar atualizar o registro"]);
+            $response = file_put_contents(CONF_ERROR_PATH, $th->getMessage() . PHP_EOL, FILE_APPEND);
+            if (!$response) {
+                throw new Exception("Erro ao tentar gravar o erro no arquivo de log");
+            }
+            die;
+        }
     }
 
     private function validateModelProperties(string $class, array $data): void
@@ -204,8 +214,17 @@ class Tools
             $this->model->$key = $value;
         }
 
-        $this->model->save();
-        $this->lastId = Connect::getInstance()->lastInsertId();
-        return true;
+        try {
+            $this->model->save();
+            $this->lastId = Connect::getInstance()->lastInsertId();
+            return true;
+        } catch (\PDOException $th) {
+            http_response_code(500);
+            $response = file_put_contents(CONF_ERROR_PATH, $th->getMessage() . PHP_EOL, FILE_APPEND);
+            if (!$response) {
+                throw new Exception("Erro ao tentar gravar o erro no arquivo de log");
+            }
+            die;
+        }
     }
 }

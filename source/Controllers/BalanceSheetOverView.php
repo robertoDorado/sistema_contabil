@@ -65,9 +65,10 @@ class BalanceSheetOverView extends Controller
             }, $requestPost["date"]);
 
             $balanceSheet = new BalanceSheet();
-            $balanceSheetData = $balanceSheet->findAllBalanceSheet(
+            $balanceSheetData = $balanceSheet->findAllBalanceSheetJoinChartOfAccountAndJoinChartOfAccountGroup(
                 [
-                    "account_value"
+                    "account_value",
+                    "deleted"
                 ],
                 [
                     "account_name"
@@ -78,14 +79,24 @@ class BalanceSheetOverView extends Controller
                 [
                     "id_user" => $responseInitializeUserAndCompany["user_data"]->id,
                     "id_company" => $responseInitializeUserAndCompany["company_id"],
-                    "deleted" => 0,
                     "date" => [
                         "date_ini" => $requestPost["date"][0],
                         "date_end" => $requestPost["date"][1]
                     ]
-                ],
-                true
+                ]
             );
+
+            if (!empty($balanceSheetData)) {
+                $balanceSheetData = array_filter($balanceSheetData, function ($item) {
+                    if (empty($item->getDeleted())) {
+                        return $item;
+                    }
+                });
+
+                $balanceSheetData = array_map(function($item) {
+                    return (array) $item->data();
+                }, $balanceSheetData);
+            }
 
             $groupAccounting = [];
             foreach ($balanceSheetData as $balanceSheet) {
@@ -120,7 +131,7 @@ class BalanceSheetOverView extends Controller
                 }
             });
 
-            $expensesAccountingValue = array_reduce($expensesAccounting, function($acc, $item) {
+            $expensesAccountingValue = array_reduce($expensesAccounting, function ($acc, $item) {
                 $acc += $item["account_value"];
                 return $acc;
             }, 0);
@@ -131,7 +142,7 @@ class BalanceSheetOverView extends Controller
                 }
             });
 
-            $costAccountingValue = array_reduce($costAccounting, function($acc, $item) {
+            $costAccountingValue = array_reduce($costAccounting, function ($acc, $item) {
                 $acc += $item["account_value"];
                 return $acc;
             }, 0);
@@ -142,11 +153,11 @@ class BalanceSheetOverView extends Controller
                 }
             });
 
-            $revenueAccountingValue = array_reduce($revenueAccounting, function($acc, $item) {
+            $revenueAccountingValue = array_reduce($revenueAccounting, function ($acc, $item) {
                 $acc += $item["account_value"];
                 return $acc;
             }, 0);
-            
+
             $chartOfAccountParams = [
                 [
                     "id",
@@ -302,7 +313,7 @@ class BalanceSheetOverView extends Controller
                 echo json_encode(["error" => "a conta despesas administrativas não pertence ao grupo de contas despesas operacionais"]);
                 die;
             }
-            
+
             $expensesAdminitrativeAccounting = array_shift($expensesAdminitrativeAccounting);
             $balanceSheet = new BalanceSheet();
             $dateTime = new DateTime($requestPost["date"][1]);
@@ -385,7 +396,7 @@ class BalanceSheetOverView extends Controller
                     Connect::getInstance()->rollBack();
                     die;
                 }
-    
+
                 $balanceSheetParams["uuid"] = Uuid::uuid4();
                 $balanceSheetParams["account_type"] = 1;
                 $balanceSheetParams["id_chart_of_account"] = $expensesAdminitrativeAccounting->id;

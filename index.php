@@ -220,7 +220,10 @@ $route->post("/balance-sheet/balance-sheet-overview/report", "BalanceSheetOverVi
  */
 $route->get("/balance-sheet/daily-journal/report", "DailyJournal::dailyJournalReport");
 $route->get("/balance-sheet/daily-journal/form/{uuid}", "DailyJournal::dailyJournalUpdate");
+$route->get("/balance-sheet/daily-journal/report/backup", "DailyJournal::dailyJournalReportBackup");
+$route->post("/balance-sheet/daily-journal/report/backup", "DailyJournal::dailyJournalReportBackup");
 $route->post("/balance-sheet/daily-journal/form", "DailyJournal::dailyJournalUpdate");
+$route->post("/balance-sheet/daily-journal/delete", "DailyJournal::dailyJournalDelete");
 
 /** 
  * Assinatura do cliente
