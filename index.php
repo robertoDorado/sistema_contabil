@@ -215,6 +215,8 @@ $route->post("/balance-sheet/balance-sheet-overview/form", "BalanceSheetOverView
 $route->get("/balance-sheet/balance-sheet-overview/report", "BalanceSheetOverView::balanceSheetReport");
 $route->post("/balance-sheet/balance-sheet-overview/report", "BalanceSheetOverView::balanceSheetReport");
 
+// Relatórios Contábeis
+
 /**
  * Livro Diário
  */
@@ -224,6 +226,12 @@ $route->get("/balance-sheet/daily-journal/report/backup", "DailyJournal::dailyJo
 $route->post("/balance-sheet/daily-journal/report/backup", "DailyJournal::dailyJournalReportBackup");
 $route->post("/balance-sheet/daily-journal/form", "DailyJournal::dailyJournalUpdate");
 $route->post("/balance-sheet/daily-journal/delete", "DailyJournal::dailyJournalDelete");
+
+/**
+ * Balancete de verificação, Livro razão
+ */
+$route->get("/balance-sheet/trial-balance/report", "FinancialStatements::trialBalanceReport");
+$route->get("/balance-sheet/general-ledge/report", "FinancialStatements::generalLedgeReport");
 
 /** 
  * Assinatura do cliente

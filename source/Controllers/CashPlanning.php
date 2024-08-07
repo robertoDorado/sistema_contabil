@@ -201,7 +201,7 @@ class CashPlanning extends Controller
         $grouppedCashFlowData = [];
         $cashBudget = [
             "opening_cash_balance" => 0,
-            "month" => $months[$dateTime->format("n")] . $dateTime->format("Y")
+            "month" => $months[$dateTime->format("n")] .  "/" . $dateTime->format("Y")
         ];
 
         $cashReceipts = [];

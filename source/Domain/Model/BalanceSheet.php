@@ -88,10 +88,6 @@ class BalanceSheet
             CONF_DB_NAME . ".chart_of_account"
         );
 
-        if (empty($response->fetch(true))) {
-            return [];
-        }
-
         if (!empty($params["date"])) {
             $response = $response->between(
                 "created_at",
@@ -106,6 +102,10 @@ class BalanceSheet
             }, $response->fetch(true));
         }else {
             $response = $response->fetch(true);
+        }
+
+        if (empty($response)) {
+            return [];
         }
 
         return $response;

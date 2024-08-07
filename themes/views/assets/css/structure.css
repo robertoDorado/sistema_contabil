@@ -46,6 +46,9 @@
 #cashFlowSelectMultiple + .select2.select2-container.select2-container--default > .selection > .select2-selection.select2-selection--multiple > .select2-selection__rendered > .select2-selection__choice {
     color: #000;
 }
+#selectChartOfAccountMultiple + .select2.select2-container.select2-container--default > .selection > .select2-selection.select2-selection--multiple > .select2-selection__rendered > .select2-selection__choice {
+    color: #000;
+}
 #toast-container > .toast.toast-warning > .toast-close-button {
     color: #000;
 }

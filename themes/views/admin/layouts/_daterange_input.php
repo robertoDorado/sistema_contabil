@@ -1,4 +1,4 @@
-<form id="searchCashFlowById" method="get" action="<?= !empty($urlDateRangeInput) ? $urlDateRangeInput : "#" ?>">
+<form id="searchByDate" method="get" action="<?= !empty($urlDateRangeInput) ? $urlDateRangeInput : "#" ?>">
     <div class="form-row">
         <div class="col-md-6">
             <label for="date-range">Busca por data:</label>

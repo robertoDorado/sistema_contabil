@@ -138,6 +138,16 @@
                                             <p>Backup do livro diário</p>
                                         </a>
                                     </li>
+                                    <li class="nav-item">
+                                        <a href="<?= url("/admin/balance-sheet/trial-balance/report") ?>" class="nav-link">
+                                            <p>Balancete de verificação</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="<?= url("/admin/balance-sheet/general-ledge/report") ?>" class="nav-link">
+                                            <p>Livro razão</p>
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
                             <li class="nav-item">

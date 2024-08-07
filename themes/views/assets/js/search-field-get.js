@@ -5,7 +5,8 @@ const endpointsSearchCashFlowGet = [
     `/admin/cash-planning/cash-flow/cash-budget${window.location.search}`,
     `/admin/cash-planning/cash-flow/cash-variation-analysis${window.location.search}`,
     `/admin/balance-sheet/balance-sheet-overview/report${window.location.search}`,
-    `/admin/balance-sheet/daily-journal/report${window.location.search}`
+    `/admin/balance-sheet/daily-journal/report${window.location.search}`,
+    `/admin/balance-sheet/trial-balance/report${window.location.search}`
 ]
 
 const currentUrlSearchCashFlowGet = window.location.pathname + window.location.search
@@ -22,8 +23,8 @@ if (endpointsSearchCashFlowGet.indexOf(currentUrlSearchCashFlowGet) != -1) {
         });
     });
 
-    const searchCashFlowById = document.getElementById("searchCashFlowById")
-    searchCashFlowById.addEventListener("submit", function(event) {
+    const searchByDate = document.getElementById("searchByDate")
+    searchByDate.addEventListener("submit", function(event) {
         event.preventDefault()
         const btnSubmit = this.querySelector("[type='submit']")
         showSpinner(btnSubmit)

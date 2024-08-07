@@ -302,15 +302,23 @@ class DailyJournal extends Controller
     {
         $balanceSheet = new BalanceSheet();
         $responseInitializeUserAndCompany = initializeUserAndCompanyId();
+        $params = [
+            "id_user" => $responseInitializeUserAndCompany["user_data"]->id,
+            "id_company" => $responseInitializeUserAndCompany["company_id"]
+        ];
 
-        $dateTime = new DateTime();
-        $dateRange = empty($this->getRequests()->get("daterange")) ?
-            $dateTime->format("01/01/Y") . "-" . $dateTime->format("t/12/Y") : $this->getRequests()->get("daterange");
+        $dateRange = $this->getRequests()->get("daterange");
+        if (!empty($dateRange)) {
+            $date = explode("-", $dateRange);
+            $date = array_map(function ($item) {
+                return preg_replace("/(\d{2})\/(\d{2})\/(\d{4})/", "$3-$2-$1", $item);
+            }, $date);
 
-        $date = explode("-", $dateRange);
-        $date = array_map(function ($item) {
-            return preg_replace("/(\d{2})\/(\d{2})\/(\d{4})/", "$3-$2-$1", $item);
-        }, $date);
+            $params["date"] = [
+                "date_ini" => $date[0],
+                "date_end" => $date[1]
+            ];
+        }
 
         $dailyJournalData = $balanceSheet->findAllBalanceSheetJoinChartOfAccountAndJoinChartOfAccountGroup(
             [
@@ -322,16 +330,13 @@ class DailyJournal extends Controller
                 "deleted"
             ],
             [
-                "account_name"
+                "account_name",
+                "account_number"
             ],
             [
                 "id"
             ],
-            [
-                "id_user" => $responseInitializeUserAndCompany["user_data"]->id,
-                "id_company" => $responseInitializeUserAndCompany["company_id"],
-                "date" => $date
-            ]
+            $params
         );
 
         if (!empty($dailyJournalData)) {
@@ -350,6 +355,7 @@ class DailyJournal extends Controller
                 $item->account_value = "R$ " . number_format($item->account_value, 2, ",", ".");
                 $item->account_type = empty($item->account_type) ? "Débito" : "Crédito";
                 $item->created_at = (new DateTime($item->created_at))->format("d/m/Y");
+                $item->account_name = $item->account_number . " " . $item->account_name;
                 return (array) $item->data();
             }, $dailyJournalData);
         }
