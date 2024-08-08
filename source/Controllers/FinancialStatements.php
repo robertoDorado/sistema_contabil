@@ -23,6 +23,190 @@ class FinancialStatements extends Controller
         parent::__construct();
     }
 
+    public function incomeStatementReport()
+    {
+        $responseInitializaUserAndCompany = initializeUserAndCompanyId();
+        $params = [
+            "id_user" => $responseInitializaUserAndCompany["user_data"]->id,
+            "id_company" => $responseInitializaUserAndCompany["company_id"]
+        ];
+
+        $dateRange = $this->getRequests()->get("daterange");
+        if (!empty($dateRange)) {
+            $date = explode("-", $dateRange);
+            $date = array_map(function ($item) {
+                return preg_replace("/(\d{2})\/(\d{2})\/(\d{4})/", "$3-$2-$1", $item);
+            }, $date);
+
+            $params["date"] = [
+                "date_ini" => $date[0],
+                "date_end" => $date[1],
+            ];
+        }
+
+        $balanceSheet = new BalanceSheet();
+        $incomeStatement = $balanceSheet->findAllBalanceSheetJoinChartOfAccountAndJoinChartOfAccountGroup(
+            [
+                "uuid",
+                "account_type",
+                "account_value",
+                "history_account",
+                "created_at",
+                "deleted"
+            ],
+            [
+                "account_name",
+                "account_number"
+            ],
+            [
+                "account_name AS account_name_group",
+                "account_number AS account_number_group"
+            ],
+            $params
+        );
+
+        $totalRevenueSale = 0;
+        $salesDeductions = 0;
+        $costOfSold = 0;
+        $totalOperationalExpenses = 0;
+        $operationalExpenses = [];
+        $financingRevenue = 0;
+
+        if (!empty($incomeStatement)) {
+            $incomeStatement = array_filter($incomeStatement, function ($item) {
+                if (empty($item->getDeleted())) {
+                    return $item;
+                }
+            });
+
+            $revenueResponse = array_filter($incomeStatement, function ($item) {
+                if (preg_match("/receita/", strtolower($item->account_name))) {
+                    return $item;
+                }
+            });
+
+            $validateFinancingRevenue = [
+                "juros recebidos", 
+                "descontos obtidos", 
+                "rendimentos de aplicacoes financeiras", 
+                "dividendos",
+                "variacao cambial ativa",
+                "ganhos de capital sobre investimentos"
+            ];
+
+            $financingRevenue = array_filter($revenueResponse, function ($item) use ($validateFinancingRevenue) {
+                foreach ($validateFinancingRevenue as $sentence) {
+                    if (preg_match("/{$sentence}/", strtolower(removeAccets($item->account_name)))) {
+                        return $item;
+                    }
+                }
+            });
+            
+            $financingRevenue = array_reduce($financingRevenue, function ($acc, $item) {
+                $acc += $item->account_value;
+                return $acc;
+            }, 0);
+
+            $validateRevenueSale = [
+                "venda",
+                "produto",
+                "servico"
+            ];
+
+            $totalRevenueSale = array_filter($revenueResponse, function ($item) use ($validateRevenueSale) {
+                foreach ($validateRevenueSale as $sentence) {
+                    if (preg_match("/{$sentence}/", strtolower(removeAccets($item->account_name)))) {
+                        return $item;
+                    }
+                }
+            });
+
+            $totalRevenueSale = array_reduce($totalRevenueSale, function ($acc, $item) {
+                $acc += $item->account_value;
+                return $acc;
+            }, 0);
+
+            $validateSalesDeduction = [
+                "devolucoes",
+                "devolucao",
+                "abatimento",
+                "desconto",
+                "imposto"
+            ];
+
+            $salesDeductions = array_filter($incomeStatement, function ($item) use ($validateSalesDeduction) {
+                foreach ($validateSalesDeduction as $sentence) {
+                    if (preg_match("/{$sentence}/", strtolower(removeAccets($item->account_name)))) {
+                        return $item;
+                    }
+                }
+            });
+
+            $salesDeductions = array_reduce($salesDeductions, function ($acc, $item) {
+                $acc += $item->account_value;
+                return $acc;
+            }, 0);
+
+            $costOfSold = array_reduce($incomeStatement, function ($acc, $item) {
+                if (preg_match("/custo/", strtolower(removeAccets($item->account_name)))) {
+                    $acc += $item->account_value;
+                }
+                return $acc;
+            }, 0);
+
+            $operationalExpenses = array_filter($incomeStatement, function ($item) {
+                if (preg_match("/despesa/", strtolower($item->account_name))) {
+                    return $item;
+                }
+            });
+        }
+
+        if (!empty($operationalExpenses)) {
+            $operationalExpenses = array_reduce($operationalExpenses, function ($acc, $item) {
+                if (!isset($acc[$item->account_name])) {
+                    $acc[$item->account_name] = $item;
+                    $acc[$item->account_name]->total = 0;
+                }
+
+                $acc[$item->account_name]->total += $item->account_value;
+                return $acc;
+            }, []);
+
+            $operationalExpenses = array_map(function ($item) {
+                $item->total_formated = "R$ " . number_format($item->total, 2, ",", ".");
+                return $item;
+            }, $operationalExpenses);
+
+            $totalOperationalExpenses = array_reduce($operationalExpenses, function ($acc, $item) {
+                $acc += $item->total;
+                return $acc;
+            }, 0);
+        }
+        
+        $resultRevenueSalesValue = ($totalRevenueSale - $salesDeductions);
+        $resultRevenueSales = "R$ " . number_format($resultRevenueSalesValue, 2, ",", ".");
+        $grossProfit = "R$ " . number_format(($resultRevenueSalesValue - $costOfSold), 2, ",", ".");
+        $totalRevenueSale = "R$ " . number_format($totalRevenueSale, 2, ",", ".");
+        $salesDeductions = "R$ " . number_format($salesDeductions, 2, ",", ".");
+        $costOfSold = "R$ " . number_format($costOfSold, 2, ",", ".");
+        $totalOperationalExpenses = "R$ " . number_format($totalOperationalExpenses, 2, ",", ".");
+        $financingRevenue = "R$ " . number_format($financingRevenue, 2, ",", ".");
+
+        echo $this->view->render("admin/income-statement-report", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => ["/admin/balance-sheet/income-statement/report"],
+            "incomeStatementData" => $incomeStatement,
+            "totalRevenue" => $totalRevenueSale,
+            "salesDeductions" => $salesDeductions,
+            "resultRevenueSales" => $resultRevenueSales,
+            "costOfSold" => $costOfSold,
+            "grossProfit" => $grossProfit,
+            "operationalExpenses" => $operationalExpenses,
+            "totalOperationalExpenses" => $totalOperationalExpenses,
+            "financingRevenue" => $financingRevenue
+        ]);
+    }
+
     public function generalLedgeReport()
     {
         $responseInitializaUserAndCompany = initializeUserAndCompanyId();
@@ -83,7 +267,6 @@ class FinancialStatements extends Controller
                 return $item;
             }, $chartOfAccountData);
         }
-
 
         $chartOfAccountSelected = !empty($this->getRequests()->get("selectChartOfAccountMultiple")) ?
             $this->getRequests()->get("selectChartOfAccountMultiple") : [];

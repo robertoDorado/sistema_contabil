@@ -6,7 +6,8 @@ const endpointsSearchCashFlowGet = [
     `/admin/cash-planning/cash-flow/cash-variation-analysis${window.location.search}`,
     `/admin/balance-sheet/balance-sheet-overview/report${window.location.search}`,
     `/admin/balance-sheet/daily-journal/report${window.location.search}`,
-    `/admin/balance-sheet/trial-balance/report${window.location.search}`
+    `/admin/balance-sheet/trial-balance/report${window.location.search}`,
+    `/admin/balance-sheet/income-statement/report${window.location.search}`
 ]
 
 const currentUrlSearchCashFlowGet = window.location.pathname + window.location.search

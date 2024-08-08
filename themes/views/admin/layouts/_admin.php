@@ -148,6 +148,11 @@
                                             <p>Livro razão</p>
                                         </a>
                                     </li>
+                                    <li class="nav-item">
+                                        <a href="<?= url("/admin/balance-sheet/income-statement/report") ?>" class="nav-link">
+                                            <p>DRE</p>
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
                             <li class="nav-item">

@@ -228,10 +228,11 @@ $route->post("/balance-sheet/daily-journal/form", "DailyJournal::dailyJournalUpd
 $route->post("/balance-sheet/daily-journal/delete", "DailyJournal::dailyJournalDelete");
 
 /**
- * Balancete de verificação, Livro razão
+ * Balancete de verificação, Livro razão, DRE
  */
 $route->get("/balance-sheet/trial-balance/report", "FinancialStatements::trialBalanceReport");
 $route->get("/balance-sheet/general-ledge/report", "FinancialStatements::generalLedgeReport");
+$route->get("/balance-sheet/income-statement/report", "FinancialStatements::incomeStatementReport");
 
 /** 
  * Assinatura do cliente
