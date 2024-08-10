@@ -45,15 +45,31 @@
                                     <tbody>
                                         <tr>
                                             <td><strong>Receita Bruta de vendas</strong></td>
-                                            <td><?= $totalRevenue ?></td>
+                                            <td><strong><?= $totalRevenue ?></strong></td>
                                         </tr>
+                                        <?php if (!empty($totalRevenueSalesData)) : ?>
+                                            <?php foreach($totalRevenueSalesData as $revenue): ?>
+                                                <tr>
+                                                    <td><?= $revenue->account_name ?></td>
+                                                    <td><?= $revenue->total_formated ?></td>
+                                                </tr>
+                                            <?php endforeach ?>
+                                        <?php endif ?>
                                         <tr>
                                             <td><strong>(-) Deduções de vendas</strong></td>
-                                            <td><?= $salesDeductions ?></td>
+                                            <td><strong><?= $salesDeductions ?></strong></td>
                                         </tr>
+                                        <?php if (!empty($salesDeductionsData)) : ?>
+                                            <?php foreach($salesDeductionsData as $salesDeduction): ?>
+                                                <tr>
+                                                    <td><?= $salesDeduction->account_name ?></td>
+                                                    <td><?= $salesDeduction->total_formated ?></td>
+                                                </tr>
+                                            <?php endforeach ?>
+                                        <?php endif ?>
                                         <tr>
                                             <td><strong>(=) Receita Líquida de Vendas</strong></td>
-                                            <td><?= $resultRevenueSales ?></td>
+                                            <td><strong><?= $resultRevenueSales ?></strong></td>
                                         </tr>
                                         <tr>
                                             <td>-</td>
@@ -61,11 +77,19 @@
                                         </tr>
                                         <tr>
                                             <td><strong>(-) Custo das Mercadorias Vendidas (CMV)</strong></td>
-                                            <td><?= $costOfSold ?></td>
+                                            <td><strong><?= $costOfSold ?></strong></td>
                                         </tr>
+                                        <?php if (!empty($costOfSoldData)) : ?>
+                                            <?php foreach($costOfSoldData as $cost): ?>
+                                                <tr>
+                                                    <td><?= $cost->account_name ?></td>
+                                                    <td><?= $cost->total_formated ?></td>
+                                                </tr>
+                                            <?php endforeach ?>
+                                        <?php endif ?>
                                         <tr>
                                             <td><strong>(=) Lucro Bruto</strong></td>
-                                            <td><?= $grossProfit ?></td>
+                                            <td><strong><?= $grossProfit ?></strong></td>
                                         </tr>
                                         <tr>
                                             <td>-</td>
@@ -85,7 +109,7 @@
                                         <?php endif ?>
                                         <tr>
                                             <td><strong>(=) Resultado Operacional</strong></td>
-                                            <td><?= $totalOperationalExpenses ?></td>
+                                            <td><strong><?= $totalOperationalExpenses ?></strong></td>
                                         </tr>
                                         <tr>
                                             <td>-</td>
@@ -93,15 +117,31 @@
                                         </tr>
                                         <tr>
                                             <td><strong>(+) Receitas Financeiras</strong></td>
-                                            <td><?= $financingRevenue ?></td>
+                                            <td><strong><?= $financingRevenue ?></strong></td>
                                         </tr>
+                                        <?php if (!empty($financingRevenueData)) : ?>
+                                            <?php foreach($financingRevenueData as $financing): ?>
+                                                <tr>
+                                                    <td><?= $financing->account_name ?></td>
+                                                    <td><?= $financing->total_formated ?></td>
+                                                </tr>
+                                            <?php endforeach ?>
+                                        <?php endif ?>
                                         <tr>
                                             <td><strong>(-) Despesas Financeiras</strong></td>
-                                            <td>{variavel}</td>
+                                            <td><strong><?= $financialExpenses ?></strong></td>
                                         </tr>
+                                        <?php if (!empty($financialExpensesData)) : ?>
+                                            <?php foreach($financialExpensesData as $financing): ?>
+                                                <tr>
+                                                    <td><?= $financing->account_name ?></td>
+                                                    <td><?= $financing->total_formated ?></td>
+                                                </tr>
+                                            <?php endforeach ?>
+                                        <?php endif ?>
                                         <tr>
                                             <td><strong>(=) Resultado Antes dos Tributos</strong></td>
-                                            <td>{variavel}</td>
+                                            <td><strong><?= $taxesOnProfit ?></strong></td>
                                         </tr>
                                         <tr>
                                             <td>-</td>
@@ -109,11 +149,19 @@
                                         </tr>
                                         <tr>
                                             <td><strong>(-) Impostos sobre o Lucro</strong></td>
-                                            <td>{variavel}</td>
+                                            <td><strong><?= $taxProfit ?></strong></td>
                                         </tr>
+                                        <?php if (!empty($taxProfitData)) : ?>
+                                            <?php foreach($taxProfitData as $tax): ?>
+                                                <tr>
+                                                    <td><?= $tax->account_name ?></td>
+                                                    <td><?= $tax->total_formated ?></td>
+                                                </tr>
+                                            <?php endforeach ?>
+                                        <?php endif ?>
                                         <tr>
                                             <td><strong>(=) Resultado Líquido do Exercício</strong></td>
-                                            <td>{variavel}</td>
+                                            <td><strong><?= $resultOfExercise ?></strong></td>
                                         </tr>
                                     </tbody>
                                 </table>

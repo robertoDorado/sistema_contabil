@@ -1494,6 +1494,7 @@ const generalLedgeReport = dataTableConfig($("#generalLedgeReport"),
     })
 const incomeStatement = dataTableConfig($("#incomeStatement"),
     {
+        "searching": false,
         "paging": false,
         "pageLength": 100,
         "ordering": false,
@@ -1505,32 +1506,28 @@ const incomeStatement = dataTableConfig($("#incomeStatement"),
         "buttons": [
             {
                 "extend": 'copyHtml5',
-                "title": 'Livro razão'
+                "title": 'Demonstração de resultados do exercício'
             },
             {
                 "extend": 'excelHtml5',
-                "filename": "Livro razão",
-                "title": "Livro razão",
+                "filename": "Demonstração de resultados do exercício",
+                "title": "Demonstração de resultados do exercício",
                 customizeData: function (xlsxData) {
                     xlsxData.header = xlsxData.header.filter((data) => data != 'Editar' && data != 'Excluir')
                 }
             },
             {
                 "extend": 'csvHtml5',
-                "filename": "Livro razão",
-                "title": "Livro razão"
+                "filename": "Demonstração de resultados do exercício",
+                "title": "Demonstração de resultados do exercício"
             },
             {
                 "extend": 'pdfHtml5',
-                "filename": "Livro razão",
-                "title": 'Livro razão',
+                "filename": "Demonstração de resultados do exercício",
+                "title": 'Demonstração de resultados do exercício',
                 customize: function (doc) {
-                    doc.content[1].table.body.forEach(function (row) {
-                        row.splice(0, 1);
-                    });
-
                     doc.content[1].table.widths = [
-                        '14.28%', '14.28%', '14.28%', '14.28%', '14.28%', '14.28%', '14.28%'
+                        '50%', '50%'
                     ];
 
                     var objLayout = {};

@@ -69,8 +69,30 @@ class FinancialStatements extends Controller
         $salesDeductions = 0;
         $costOfSold = 0;
         $totalOperationalExpenses = 0;
-        $operationalExpenses = [];
         $financingRevenue = 0;
+        $financialExpenses = 0;
+        $taxProfit = 0;
+
+        $operationalExpenses = [];
+        $totalRevenueSalesData = [];
+        $salesDeductionsData = [];
+        $costOfSoldData = [];
+        $financingRevenueData = [];
+        $financialExpensesData = [];
+        $taxProfitData = [];
+
+        $sortAccounts = function ($item, $array) {
+            foreach ($array as $account) {
+                if (preg_match("/{$account}/", strtolower(removeAccets($item->account_name)))) {
+                    return $item;
+                }
+            }
+        };
+
+        $calculateTotalAccount = function ($acc, $item) {
+            $acc += $item->account_value;
+            return $acc;
+        };
 
         if (!empty($incomeStatement)) {
             $incomeStatement = array_filter($incomeStatement, function ($item) {
@@ -94,18 +116,11 @@ class FinancialStatements extends Controller
                 "ganhos de capital sobre investimentos"
             ];
 
-            $financingRevenue = array_filter($revenueResponse, function ($item) use ($validateFinancingRevenue) {
-                foreach ($validateFinancingRevenue as $sentence) {
-                    if (preg_match("/{$sentence}/", strtolower(removeAccets($item->account_name)))) {
-                        return $item;
-                    }
-                }
+            $financingRevenueData = array_filter($revenueResponse, function ($item) use ($validateFinancingRevenue, $sortAccounts) {
+                return $sortAccounts($item, $validateFinancingRevenue);
             });
             
-            $financingRevenue = array_reduce($financingRevenue, function ($acc, $item) {
-                $acc += $item->account_value;
-                return $acc;
-            }, 0);
+            $financingRevenue = array_reduce($financingRevenueData, $calculateTotalAccount, 0);
 
             $validateRevenueSale = [
                 "venda",
@@ -113,76 +128,140 @@ class FinancialStatements extends Controller
                 "servico"
             ];
 
-            $totalRevenueSale = array_filter($revenueResponse, function ($item) use ($validateRevenueSale) {
-                foreach ($validateRevenueSale as $sentence) {
-                    if (preg_match("/{$sentence}/", strtolower(removeAccets($item->account_name)))) {
-                        return $item;
-                    }
-                }
+            $totalRevenueSalesData = array_filter($revenueResponse, function ($item) use ($validateRevenueSale, $sortAccounts) {
+                return $sortAccounts($item, $validateRevenueSale);
             });
 
-            $totalRevenueSale = array_reduce($totalRevenueSale, function ($acc, $item) {
-                $acc += $item->account_value;
-                return $acc;
-            }, 0);
+            $totalRevenueSale = array_reduce($totalRevenueSalesData, $calculateTotalAccount, 0);
 
             $validateSalesDeduction = [
                 "devolucoes",
                 "devolucao",
                 "abatimento",
                 "desconto",
-                "imposto"
+                "icms",
+                "iss",
+                "pis",
+                "cofins",
+                "frete",
+                "ipi",
+                "inss sobre receita bruta"
             ];
 
-            $salesDeductions = array_filter($incomeStatement, function ($item) use ($validateSalesDeduction) {
-                foreach ($validateSalesDeduction as $sentence) {
-                    if (preg_match("/{$sentence}/", strtolower(removeAccets($item->account_name)))) {
-                        return $item;
-                    }
-                }
+            $salesDeductionsData = array_filter($incomeStatement, function ($item) use ($validateSalesDeduction, $sortAccounts) {
+                return $sortAccounts($item, $validateSalesDeduction);
             });
 
-            $salesDeductions = array_reduce($salesDeductions, function ($acc, $item) {
-                $acc += $item->account_value;
-                return $acc;
-            }, 0);
+            $salesDeductions = array_reduce($salesDeductionsData, $calculateTotalAccount, 0);
 
-            $costOfSold = array_reduce($incomeStatement, function ($acc, $item) {
-                if (preg_match("/custo/", strtolower(removeAccets($item->account_name)))) {
-                    $acc += $item->account_value;
-                }
-                return $acc;
-            }, 0);
+            $validateCostOfSold = [
+                "custo das mercadorias vendidas",
+                "custo dos produtos vendidos",
+                "cpv"
+            ];
 
-            $operationalExpenses = array_filter($incomeStatement, function ($item) {
-                if (preg_match("/despesa/", strtolower($item->account_name))) {
-                    return $item;
-                }
+            $costOfSoldData = array_filter($incomeStatement, function ($item) use ($validateCostOfSold, $sortAccounts) {
+                return $sortAccounts($item, $validateCostOfSold);
             });
+
+            $costOfSold = array_reduce($costOfSoldData, $calculateTotalAccount, 0);
+
+            $validateOperationalExpenses = [
+                "despesa",
+                "inss sobre folha de pagamento"
+            ];
+
+            $operationalExpensesData = array_filter($incomeStatement, function ($item) use ($validateOperationalExpenses, $sortAccounts) {
+                return $sortAccounts($item, $validateOperationalExpenses);
+            });
+
+            $totalOperationalExpenses = array_reduce($operationalExpensesData, $calculateTotalAccount, 0);
+
+            $validateFinancialExpenses = [
+                "juros pagos",
+                "encargos financeiros",
+                "variacao cambial passiva",
+                "perdas com investimentos",
+                "provisao para perdas em investimentos"
+            ];
+
+            $financialExpensesData = array_filter($incomeStatement, function ($item) use ($validateFinancialExpenses, $sortAccounts) {
+                return $sortAccounts($item, $validateFinancialExpenses);
+            });
+
+            $financialExpenses = array_reduce($financialExpensesData, $calculateTotalAccount, 0);
+
+            $validateTaxProfit = [
+                "imposto de renda a pagar",
+                "provisao para imposto de renda",
+                "contribuicao social a pagar",
+                "provisao para contribuicao social",
+                "imposto de renda diferido",
+                "contribuicao social diferida",
+                "imposto sobre lucros retidos no exterior",
+                "tributos sobre o lucro a pagar"
+            ];
+
+            $taxProfitData = array_filter($incomeStatement, function ($item) use ($validateTaxProfit, $sortAccounts) {
+                return $sortAccounts($item, $validateTaxProfit);
+            });
+
+            $taxProfit = array_reduce($taxProfitData, $calculateTotalAccount, 0);
         }
 
-        if (!empty($operationalExpenses)) {
-            $operationalExpenses = array_reduce($operationalExpenses, function ($acc, $item) {
-                if (!isset($acc[$item->account_name])) {
-                    $acc[$item->account_name] = $item;
-                    $acc[$item->account_name]->total = 0;
-                }
+        $groupData = function ($acc, $item) {
+            if (!isset($acc[$item->account_name])) {
+                $acc[$item->account_name] = $item;
+                $acc[$item->account_name]->total = 0;
+            }
+            $acc[$item->account_name]->total += $item->account_value;
+            return $acc;
+        };
 
-                $acc[$item->account_name]->total += $item->account_value;
-                return $acc;
-            }, []);
+        $formatCurrency = function ($item) {
+            $item->total_formated = "R$ " . number_format($item->total, 2, ",", ".");
+            return $item;
+        };
 
-            $operationalExpenses = array_map(function ($item) {
-                $item->total_formated = "R$ " . number_format($item->total, 2, ",", ".");
-                return $item;
-            }, $operationalExpenses);
+        if (!empty($taxProfitData)) {
+            $taxProfitData = array_reduce($taxProfitData, $groupData, []);
+            $taxProfitData = array_map($formatCurrency, $taxProfitData);
+        }
 
-            $totalOperationalExpenses = array_reduce($operationalExpenses, function ($acc, $item) {
-                $acc += $item->total;
-                return $acc;
-            }, 0);
+        if (!empty($financialExpensesData)) {
+            $financialExpensesData = array_reduce($financialExpensesData, $groupData, []);
+            $financialExpensesData = array_map($formatCurrency, $financialExpensesData);
+        }
+
+        if (!empty($financingRevenueData)) {
+            $financingRevenueData = array_reduce($financingRevenueData, $groupData, []);
+            $financingRevenueData = array_map($formatCurrency, $financingRevenueData);
+        }
+
+        if (!empty($costOfSoldData)) {
+            $costOfSoldData = array_reduce($costOfSoldData, $groupData, []);
+            $costOfSoldData = array_map($formatCurrency, $costOfSoldData);
+        }
+
+        if (!empty($salesDeductionsData)) {
+            $salesDeductionsData = array_reduce($salesDeductionsData, $groupData, []);
+            $salesDeductionsData = array_map($formatCurrency, $salesDeductionsData);
+        }
+
+        if (!empty($totalRevenueSalesData)) {
+            $totalRevenueSalesData = array_reduce($totalRevenueSalesData, $groupData, []);
+            $totalRevenueSalesData = array_map($formatCurrency, $totalRevenueSalesData);
+        }
+
+        if (!empty($operationalExpensesData)) {
+            $operationalExpensesData = array_reduce($operationalExpensesData, $groupData, []);
+            $operationalExpenses = array_map($formatCurrency, $operationalExpensesData);
         }
         
+        $taxesOnProfitValue = $totalOperationalExpenses + ($financingRevenue - $financialExpenses);
+        $resultOfExercise = "R$ " . number_format($taxesOnProfitValue - $taxProfit, 2, ",", ".");
+        $taxProfit = "R$ " . number_format($taxProfit, 2, ",", ".");
+        $taxesOnProfit = "R$ " . number_format($taxesOnProfitValue, 2, ",", ".");
         $resultRevenueSalesValue = ($totalRevenueSale - $salesDeductions);
         $resultRevenueSales = "R$ " . number_format($resultRevenueSalesValue, 2, ",", ".");
         $grossProfit = "R$ " . number_format(($resultRevenueSalesValue - $costOfSold), 2, ",", ".");
@@ -191,6 +270,7 @@ class FinancialStatements extends Controller
         $costOfSold = "R$ " . number_format($costOfSold, 2, ",", ".");
         $totalOperationalExpenses = "R$ " . number_format($totalOperationalExpenses, 2, ",", ".");
         $financingRevenue = "R$ " . number_format($financingRevenue, 2, ",", ".");
+        $financialExpenses = "R$ " . number_format($financialExpenses, 2, ",", ".");
 
         echo $this->view->render("admin/income-statement-report", [
             "userFullName" => showUserFullName(),
@@ -203,7 +283,17 @@ class FinancialStatements extends Controller
             "grossProfit" => $grossProfit,
             "operationalExpenses" => $operationalExpenses,
             "totalOperationalExpenses" => $totalOperationalExpenses,
-            "financingRevenue" => $financingRevenue
+            "financingRevenue" => $financingRevenue,
+            "financialExpenses" => $financialExpenses,
+            "taxesOnProfit" => $taxesOnProfit,
+            "taxProfit" => $taxProfit,
+            "resultOfExercise" => $resultOfExercise,
+            "totalRevenueSalesData" => $totalRevenueSalesData,
+            "salesDeductionsData" => $salesDeductionsData,
+            "costOfSoldData" => $costOfSoldData,
+            "financingRevenueData" => $financingRevenueData,
+            "financialExpensesData" => $financialExpensesData,
+            "taxProfitData" => $taxProfitData
         ]);
     }
 

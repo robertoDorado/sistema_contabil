@@ -48,7 +48,7 @@ class BalanceSheetOverView extends Controller
                 die;
             }
 
-            if (empty($requestPost["date"])) {
+            if ($requestPost["date"] == "null") {
                 $dateTime = new DateTime();
                 $requestPost["date"] = $dateTime->format("01/m/Y") . " - " . $dateTime->format("t/m/Y");
             }
@@ -93,7 +93,7 @@ class BalanceSheetOverView extends Controller
                     }
                 });
 
-                $balanceSheetData = array_map(function($item) {
+                $balanceSheetData = array_map(function ($item) {
                     return (array) $item->data();
                 }, $balanceSheetData);
             }
