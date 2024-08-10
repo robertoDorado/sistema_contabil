@@ -46,6 +46,12 @@ class ChartOfAccount
         return $this->data->$name ?? null;
     }
 
+    public function findChartOfAccountById(array $columns, int $id): ?ModelsChartOfAccount
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        return $this->chartOfAccount->findById($id);
+    }
+
     /** @var ModelsChartOfAccount[] */
     public function findChartOfAccountLikeAccountName(array $columnsA, $columnsB, array $params): array
     {

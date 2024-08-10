@@ -157,7 +157,10 @@ class FinancialStatements extends Controller
             $validateCostOfSold = [
                 "custo das mercadorias vendidas",
                 "custo dos produtos vendidos",
-                "cpv"
+                "cpv",
+                "cmv",
+                "cpp",
+                "csp"
             ];
 
             $costOfSoldData = array_filter($incomeStatement, function ($item) use ($validateCostOfSold, $sortAccounts) {
@@ -258,19 +261,44 @@ class FinancialStatements extends Controller
             $operationalExpenses = array_map($formatCurrency, $operationalExpensesData);
         }
         
-        $taxesOnProfitValue = $totalOperationalExpenses + ($financingRevenue - $financialExpenses);
-        $resultOfExercise = "R$ " . number_format($taxesOnProfitValue - $taxProfit, 2, ",", ".");
-        $taxProfit = "R$ " . number_format($taxProfit, 2, ",", ".");
-        $taxesOnProfit = "R$ " . number_format($taxesOnProfitValue, 2, ",", ".");
         $resultRevenueSalesValue = ($totalRevenueSale - $salesDeductions);
-        $resultRevenueSales = "R$ " . number_format($resultRevenueSalesValue, 2, ",", ".");
-        $grossProfit = "R$ " . number_format(($resultRevenueSalesValue - $costOfSold), 2, ",", ".");
+        $grossProfit = ($resultRevenueSalesValue - $costOfSold);
+        $totalOperationalExpenses = ($grossProfit - $totalOperationalExpenses);
+        $taxesOnProfitValue = $totalOperationalExpenses + ($financingRevenue - $financialExpenses);
+        $resultOfExercise = ($taxesOnProfitValue - $taxProfit);
+
+        // Receita bruta de vendas
         $totalRevenueSale = "R$ " . number_format($totalRevenueSale, 2, ",", ".");
+
+        // Deduções de vendas
         $salesDeductions = "R$ " . number_format($salesDeductions, 2, ",", ".");
+
+        // Receita líquida de vendas
+        $resultRevenueSales = "R$ " . number_format($resultRevenueSalesValue, 2, ",", ".");
+
+        // Custo das mercadorias vendidas
         $costOfSold = "R$ " . number_format($costOfSold, 2, ",", ".");
-        $totalOperationalExpenses = "R$ " . number_format($totalOperationalExpenses, 2, ",", ".");
+
+        // Lucro bruto
+        $grossProfit = "R$ " . number_format($grossProfit, 2, ",", ".");
+        
+        // Resultado operacional
+        $operatingResult = "R$ " . number_format($totalOperationalExpenses, 2, ",", ".");
+        
+        // Receitas financeiras
         $financingRevenue = "R$ " . number_format($financingRevenue, 2, ",", ".");
+        
+        // Despesas financeiras
         $financialExpenses = "R$ " . number_format($financialExpenses, 2, ",", ".");
+
+        // Resultado antes dos tributos
+        $taxesOnProfit = "R$ " . number_format($taxesOnProfitValue, 2, ",", ".");
+
+        // Impostos sobre o lucro
+        $taxProfit = "R$ " . number_format($taxProfit, 2, ",", ".");
+
+        // Resultado líquido do exercício
+        $resultOfExercise = "R$ " . number_format($resultOfExercise, 2, ",", ".");
 
         echo $this->view->render("admin/income-statement-report", [
             "userFullName" => showUserFullName(),
@@ -282,7 +310,7 @@ class FinancialStatements extends Controller
             "costOfSold" => $costOfSold,
             "grossProfit" => $grossProfit,
             "operationalExpenses" => $operationalExpenses,
-            "totalOperationalExpenses" => $totalOperationalExpenses,
+            "operatingResult" => $operatingResult,
             "financingRevenue" => $financingRevenue,
             "financialExpenses" => $financialExpenses,
             "taxesOnProfit" => $taxesOnProfit,

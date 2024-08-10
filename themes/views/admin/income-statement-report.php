@@ -109,7 +109,7 @@
                                         <?php endif ?>
                                         <tr>
                                             <td><strong>(=) Resultado Operacional</strong></td>
-                                            <td><strong><?= $totalOperationalExpenses ?></strong></td>
+                                            <td><strong><?= $operatingResult ?></strong></td>
                                         </tr>
                                         <tr>
                                             <td>-</td>
