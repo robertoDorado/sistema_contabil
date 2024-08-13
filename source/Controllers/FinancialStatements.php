@@ -81,9 +81,9 @@ class FinancialStatements extends Controller
         $financialExpensesData = [];
         $taxProfitData = [];
 
-        $sortAccounts = function ($item, $array) {
+        $sortAccounts = function ($item, $array, $referenceKey = "account_name") {
             foreach ($array as $account) {
-                if (preg_match("/{$account}/", strtolower(removeAccets($item->account_name)))) {
+                if (preg_match("/{$account}/", strtolower(removeAccets($item->$referenceKey)))) {
                     return $item;
                 }
             }
@@ -107,106 +107,97 @@ class FinancialStatements extends Controller
                 }
             });
 
-            $validateFinancingRevenue = [
-                "juros recebidos", 
-                "descontos obtidos", 
-                "rendimentos de aplicacoes financeiras", 
-                "dividendos",
-                "variacao cambial ativa",
-                "ganhos de capital sobre investimentos"
-            ];
-
-            $financingRevenueData = array_filter($revenueResponse, function ($item) use ($validateFinancingRevenue, $sortAccounts) {
-                return $sortAccounts($item, $validateFinancingRevenue);
+            $financingRevenueData = array_filter($revenueResponse, function ($item) use ($sortAccounts) {
+                return $sortAccounts($item, [
+                    "juros recebidos", 
+                    "descontos obtidos", 
+                    "rendimentos de aplicacoes financeiras", 
+                    "dividendos",
+                    "variacao cambial ativa",
+                    "ganhos de capital sobre investimentos"
+                ]);
             });
             
             $financingRevenue = array_reduce($financingRevenueData, $calculateTotalAccount, 0);
+            $totalRevenueSalesData = array_filter($revenueResponse, function ($item) use ($sortAccounts) {
+                return $sortAccounts($item, [
+                    "venda",
+                    "produto",
+                    "servico"
+                ]);
+            });
 
-            $validateRevenueSale = [
-                "venda",
-                "produto",
-                "servico"
-            ];
-
-            $totalRevenueSalesData = array_filter($revenueResponse, function ($item) use ($validateRevenueSale, $sortAccounts) {
-                return $sortAccounts($item, $validateRevenueSale);
+            $totalRevenueSalesData = array_filter($totalRevenueSalesData, function ($item) {
+                if (!preg_match("/RECEITA BRUTA DE VENDA DE PRODUTOS E SERVICOS/i", strtolower(removeAccets($item->account_name)))) {
+                    return $item;
+                }
             });
 
             $totalRevenueSale = array_reduce($totalRevenueSalesData, $calculateTotalAccount, 0);
-
-            $validateSalesDeduction = [
-                "devolucoes",
-                "devolucao",
-                "abatimento",
-                "desconto",
-                "icms",
-                "iss",
-                "pis",
-                "cofins",
-                "frete",
-                "ipi",
-                "inss sobre receita bruta"
-            ];
-
-            $salesDeductionsData = array_filter($incomeStatement, function ($item) use ($validateSalesDeduction, $sortAccounts) {
-                return $sortAccounts($item, $validateSalesDeduction);
+            $salesDeductionsData = array_filter($incomeStatement, function ($item) use ($sortAccounts) {
+                return $sortAccounts($item, [
+                    "devolucoes",
+                    "devolucao",
+                    "abatimento",
+                    "desconto",
+                    "icms",
+                    "iss",
+                    "pis",
+                    "cofins",
+                    "frete",
+                    "ipi",
+                    "inss sobre receita bruta"
+                ]);
             });
 
             $salesDeductions = array_reduce($salesDeductionsData, $calculateTotalAccount, 0);
+            $costOfSoldData = array_filter($incomeStatement, function ($item) use ($sortAccounts) {
+                return $sortAccounts($item, ["custo"]);
+            });
 
-            $validateCostOfSold = [
-                "custo das mercadorias vendidas",
-                "custo dos produtos vendidos",
-                "cpv",
-                "cmv",
-                "cpp",
-                "csp"
-            ];
-
-            $costOfSoldData = array_filter($incomeStatement, function ($item) use ($validateCostOfSold, $sortAccounts) {
-                return $sortAccounts($item, $validateCostOfSold);
+            $costOfSoldData = array_filter($costOfSoldData, function ($item) {
+                if (preg_match("/CUSTOS DAS VENDAS DOS PRODUTOS, MERCADORIAS E SERVICOS/i", strtolower(removeAccets($item->account_name)))) {
+                    return $item;
+                }
             });
 
             $costOfSold = array_reduce($costOfSoldData, $calculateTotalAccount, 0);
+            $operationalExpensesData = array_filter($incomeStatement, function ($item) use ($sortAccounts) {
+                return $sortAccounts($item, [
+                    "despesa",
+                    "inss sobre folha de pagamento"
+                ], "account_name_group");
+            });
 
-            $validateOperationalExpenses = [
-                "despesa",
-                "inss sobre folha de pagamento"
-            ];
-
-            $operationalExpensesData = array_filter($incomeStatement, function ($item) use ($validateOperationalExpenses, $sortAccounts) {
-                return $sortAccounts($item, $validateOperationalExpenses);
+            $operationalExpensesData = array_filter($operationalExpensesData, function ($item) {
+                if (preg_match("/DESPESAS ADMINISTRATIVAS/i", strtolower(removeAccets($item->account_name)))) {
+                    return $item;
+                }
             });
 
             $totalOperationalExpenses = array_reduce($operationalExpensesData, $calculateTotalAccount, 0);
-
-            $validateFinancialExpenses = [
-                "juros pagos",
-                "encargos financeiros",
-                "variacao cambial passiva",
-                "perdas com investimentos",
-                "provisao para perdas em investimentos"
-            ];
-
-            $financialExpensesData = array_filter($incomeStatement, function ($item) use ($validateFinancialExpenses, $sortAccounts) {
-                return $sortAccounts($item, $validateFinancialExpenses);
+            $financialExpensesData = array_filter($incomeStatement, function ($item) use ($sortAccounts) {
+                return $sortAccounts($item, [
+                    "juros pagos",
+                    "encargos financeiros",
+                    "variacao cambial passiva",
+                    "perdas com investimentos",
+                    "provisao para perdas em investimentos"
+                ]);
             });
 
             $financialExpenses = array_reduce($financialExpensesData, $calculateTotalAccount, 0);
-
-            $validateTaxProfit = [
-                "imposto de renda a pagar",
-                "provisao para imposto de renda",
-                "contribuicao social a pagar",
-                "provisao para contribuicao social",
-                "imposto de renda diferido",
-                "contribuicao social diferida",
-                "imposto sobre lucros retidos no exterior",
-                "tributos sobre o lucro a pagar"
-            ];
-
-            $taxProfitData = array_filter($incomeStatement, function ($item) use ($validateTaxProfit, $sortAccounts) {
-                return $sortAccounts($item, $validateTaxProfit);
+            $taxProfitData = array_filter($incomeStatement, function ($item) use ($sortAccounts) {
+                return $sortAccounts($item, [
+                    "imposto de renda a pagar",
+                    "provisao para imposto de renda",
+                    "contribuicao social a pagar",
+                    "provisao para contribuicao social",
+                    "imposto de renda diferido",
+                    "contribuicao social diferida",
+                    "imposto sobre lucros retidos no exterior",
+                    "tributos sobre o lucro a pagar"
+                ]);
             });
 
             $taxProfit = array_reduce($taxProfitData, $calculateTotalAccount, 0);

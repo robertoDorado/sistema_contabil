@@ -67,6 +67,7 @@ class BalanceSheetOverView extends Controller
             $balanceSheet = new BalanceSheet();
             $balanceSheetData = $balanceSheet->findAllBalanceSheetJoinChartOfAccountAndJoinChartOfAccountGroup(
                 [
+                    "account_type",
                     "account_value",
                     "deleted"
                 ],
@@ -98,53 +99,65 @@ class BalanceSheetOverView extends Controller
                 }, $balanceSheetData);
             }
 
-            $grouppingBalanceSheetDataByAccountNameGroup = function (array $validateData) use ($balanceSheetData) {
-                return array_reduce($balanceSheetData, function ($acc, $item) use ($validateData) {
-                    foreach ($validateData as $account) {
-                        if (preg_match("/({$account})/", strtolower(removeAccets($item["account_name_group"])))) {
-                            if (empty($acc[$item["account_name_group"]])) {
-                                $acc[$item["account_name_group"]] = $item;
-                                $acc[$item["account_name_group"]]["account_value"] = 0;
-                            }
-                            $acc[$item["account_name_group"]]["account_value"] += $item["account_value"];
-                        }
-                    }
-                    return $acc;
-                }, []);
-            };
+            $groupAccounting = array_reduce($balanceSheetData, function ($acc, $item) {
+                $acc[strtolower(removeAccets($item["account_name_group"]))][] = $item;
+                return $acc;
+            }, []);
 
-            $groupAccounting = $grouppingBalanceSheetDataByAccountNameGroup(
-                [
-                    "receita", 
-                    "custo",
-                    "despesa|depreciacao|amortizacao|imposto"
-                ]
-            );
-
-            $calculateGrupValue = function (array $validateData) use ($groupAccounting): int {
-                $data = array_filter($groupAccounting, function ($item) use ($validateData) {
+            $filterGroupAccount = function (array $validateData) use ($groupAccounting) {
+                return array_filter($groupAccounting, function ($item, $key) use ($validateData) {
                     foreach ($validateData as $account) {
-                        if (preg_match("/{$account}/", strtolower(removeAccets($item["account_name_group"])))) {
+                        if (preg_match("/{$account}/", strtolower(removeAccets($key)))) {
                             return $item;
                         }
                     }
-                });
-
-                return array_reduce($data, function ($acc, $item) {
-                    $acc += $item["account_value"];
-                    return $acc;
-                }, 0);
+                }, ARRAY_FILTER_USE_BOTH);
             };
 
-            $costAccountingValue = $calculateGrupValue(["custo"]);
-            $revenueAccountingValue = $calculateGrupValue(["receita"]);
-            $expensesAccountingValue = $calculateGrupValue([
+            $groupAccounting = $filterGroupAccount([
+                "custo",
+                "receita",
                 "despesa",
                 "depreciacao",
                 "amortizacao",
-                "imposto"
+                "imposto",
+                "retificadoras",
+                "retificadores",
+                "devolucao",
+                "devolucoes"
             ]);
 
+            $total = 0;
+            foreach ($groupAccounting as &$groupData) {
+                $groupData = array_map(function ($item) {
+                    if (preg_match("/receita/", strtolower(removeAccets($item["account_name_group"])))) {
+                        $item["account_value"] = empty($item["account_type"]) ? $item["account_value"] * -1 : $item["account_value"];
+                    }else {
+                        $item["account_value"] = !empty($item["account_type"]) ? $item["account_value"] * -1 : $item["account_value"];
+                    }
+                    return $item;
+                }, $groupData);
+
+                $groupData = array_reduce($groupData, function ($acc, $item) use (&$total) {
+                    $total += $item["account_value"];
+                    $acc["account_value"] = $total;
+                    return $acc;
+                }, []);
+
+                $total = 0;
+            }
+            
+            // Principais contas de apuração
+            $costAccountingValue = $groupAccounting["custo das vendas"]["account_value"] ?? 0;
+            $revenueAccountingValue = $groupAccounting["receitas de vendas de produtos e servicos"]["account_value"] ?? 0;
+            $expensesAccountingValue = $groupAccounting["despesas operacionais"]["account_value"] ?? 0;
+
+            // Outras contas
+            $incomeTax = $groupAccounting["imposto de renda e contribuicao social"]["account_value"] ?? 0;
+            $operatingIncome = $groupAccounting["receitas operacionais"]["account_value"] ?? 0;
+
+            $expensesAccountingValue += $incomeTax;
+            $revenueAccountingValue += $operatingIncome;
 
             $chartOfAccountParams = [
                 [
@@ -191,13 +204,13 @@ class BalanceSheetOverView extends Controller
                         return $item;
                     }
                 });
-    
+
                 if (empty($data)) {
                     http_response_code(500);
                     echo json_encode(["error" => "a conta {$accountName} não pertence ao {$accountNameGroup}"]);
                     die;
                 }
-    
+
                 return array_shift($data);
             };
 
@@ -224,7 +237,7 @@ class BalanceSheetOverView extends Controller
                 $balanceSheet = new BalanceSheet();
                 $response = $balanceSheet->persistData($balanceSheetParams);
                 $accountType = empty($balanceSheetParams["account_type"]) ? "Débito" : "Crédito";
-                
+
                 $chartOfAccount = new ChartOfAccount();
                 $chartOfAccountData = $chartOfAccount->findChartOfAccountById(["account_name"], $balanceSheetParams["id_chart_of_account"]);
 
@@ -237,20 +250,20 @@ class BalanceSheetOverView extends Controller
                     die;
                 }
             };
-            
+
             Connect::getInstance()->beginTransaction();
             if (!empty($revenueAccountingValue)) {
                 // D - Receita
                 $persistCloseAccounting($balanceSheetParams);
-    
+
                 $balanceSheetParams["uuid"] = Uuid::uuid4();
                 $balanceSheetParams["account_type"] = 1;
                 $balanceSheetParams["id_chart_of_account"] = $profitAccounting->id;
-    
+
                 // C - Lucro acumulado
                 $persistCloseAccounting($balanceSheetParams);
             }
-            
+
             if (!empty($costAccountingValue)) {
                 $balanceSheetParams["uuid"] = Uuid::uuid4();
                 $balanceSheetParams["account_type"] = 0;
@@ -259,7 +272,7 @@ class BalanceSheetOverView extends Controller
 
                 // D - Lucro cumulado
                 $persistCloseAccounting($balanceSheetParams);
-                
+
                 $balanceSheetParams["uuid"] = Uuid::uuid4();
                 $balanceSheetParams["account_type"] = 1;
                 $balanceSheetParams["id_chart_of_account"] = $costOfProductsSold->id;
@@ -276,7 +289,7 @@ class BalanceSheetOverView extends Controller
 
                 // D - Lucro acumulado
                 $persistCloseAccounting($balanceSheetParams);
-                
+
                 $balanceSheetParams["uuid"] = Uuid::uuid4();
                 $balanceSheetParams["account_type"] = 1;
                 $balanceSheetParams["id_chart_of_account"] = $expensesAdminitrativeAccounting->id;
@@ -286,11 +299,11 @@ class BalanceSheetOverView extends Controller
             }
 
             Connect::getInstance()->commit();
-            $calculationAccounting = $revenueAccountingValue - ($costAccountingValue + $expensesAccountingValue);
+            $accumulatedProfit = $revenueAccountingValue - ($costAccountingValue + $expensesAccountingValue);
             $profitAccounting->created_at = preg_replace("/^(\d{4})-(\d{2})-(\d{2})$/", "$3/$2/$1", $requestPost["date"][1]);
             $profitAccounting->uuid = $profitAccounting->getUuid();
-            $profitAccounting->account_value_formated = "R$ " . number_format($calculationAccounting, 2, ",", ".");
-            $profitAccounting->account_value = $calculationAccounting;
+            $profitAccounting->account_value_formated = "R$ " . number_format($accumulatedProfit, 2, ",", ".");
+            $profitAccounting->account_value = $accumulatedProfit;
 
             echo json_encode(
                 [
