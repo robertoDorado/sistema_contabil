@@ -153,6 +153,11 @@
                                             <p>DRE</p>
                                         </a>
                                     </li>
+                                    <li class="nav-item">
+                                        <a href="<?= url("/admin/balance-sheet/statement-of-value-added/report") ?>" class="nav-link">
+                                            <p>DVA</p>
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
                             <li class="nav-item">

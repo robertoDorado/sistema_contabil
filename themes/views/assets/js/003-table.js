@@ -1552,3 +1552,63 @@ const incomeStatement = dataTableConfig($("#incomeStatement"),
                 .appendTo("#widgets .col-md-6:eq(0)");
         }
     })
+const statementOfValueAdded = dataTableConfig($("#statementOfValueAdded"),
+    {
+        "searching": false,
+        "paging": false,
+        "pageLength": 100,
+        "ordering": false,
+        "language": {
+            "url": urlJson
+        },
+        "responsive": true,
+        "autoWidth": false,
+        "buttons": [
+            {
+                "extend": 'copyHtml5',
+                "title": 'Demonstração de valor adicionado'
+            },
+            {
+                "extend": 'excelHtml5',
+                "filename": "Demonstração de valor adicionado",
+                "title": "Demonstração de valor adicionado",
+                customizeData: function (xlsxData) {
+                    xlsxData.header = xlsxData.header.filter((data) => data != 'Editar' && data != 'Excluir')
+                }
+            },
+            {
+                "extend": 'csvHtml5',
+                "filename": "Demonstração de valor adicionado",
+                "title": "Demonstração de valor adicionado"
+            },
+            {
+                "extend": 'pdfHtml5',
+                "filename": "Demonstração de valor adicionado",
+                "title": 'Demonstração de valor adicionado',
+                customize: function (doc) {
+                    doc.content[1].table.widths = [
+                        '50%', '50%'
+                    ];
+
+                    var objLayout = {};
+                    objLayout['hLineWidth'] = function (i) { return 0.5; };
+                    objLayout['vLineWidth'] = function (i) { return 0.5; };
+                    objLayout['hLineColor'] = function (i) { return '#aaa'; };
+                    objLayout['vLineColor'] = function (i) { return '#aaa'; };
+                    objLayout['paddingLeft'] = function (i) { return 4; };
+                    objLayout['paddingRight'] = function (i) { return 4; };
+                    objLayout['paddingTop'] = function (i) { return 4; };
+                    objLayout['paddingBottom'] = function (i) { return 4; };
+                    objLayout['fillColor'] = function (i) { return null; };
+                    doc.content[1].layout = objLayout;
+                }
+            },
+            "colvis"
+        ],
+        "initComplete": function () {
+            this.api()
+                .buttons()
+                .container()
+                .appendTo("#widgets .col-md-6:eq(0)");
+        }
+    })

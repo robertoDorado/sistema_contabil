@@ -23,6 +23,41 @@ class FinancialStatements extends Controller
         parent::__construct();
     }
 
+    public function statementOfValueAdded()
+    {
+        $responseCompanyAndUser = initializeUserAndCompanyId();
+        $balanceSheet = new BalanceSheet();
+        $statementOfValueAdded = $balanceSheet->findAllBalanceSheetJoinChartOfAccountAndJoinChartOfAccountGroup(
+            [
+                "account_value"
+            ],
+            [
+                "account_name"
+            ],
+            [
+                "id"
+            ],
+            [
+                "id_user" => $responseCompanyAndUser["user_data"]->id,
+                "id_company" => $responseCompanyAndUser["company_id"]
+            ]
+        );
+
+        if (!empty($statementOfValueAdded)) {
+            $statementOfValueAdded = array_map(function($item) {
+                $item->account_value = "R$ " . number_format($item->account_value, 2, ",", ".");
+                $item->created_at = (new DateTime($item->created_at))->format("d/m/Y");
+                return $item;
+            }, $statementOfValueAdded);
+        }
+
+        echo $this->view->render("admin/statement-of-value-added", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => ["/balance-sheet/statement-of-value-added/report"],
+            "statementOfValueAdded" => $statementOfValueAdded
+        ]);
+    }
+
     public function incomeStatementReport()
     {
         $responseInitializaUserAndCompany = initializeUserAndCompanyId();
