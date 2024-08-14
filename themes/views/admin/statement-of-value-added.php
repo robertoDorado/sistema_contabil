@@ -38,21 +38,131 @@
                                 <table id="statementOfValueAdded" class="table table-bordered table-striped">
                                     <thead>
                                         <tr>
-                                            <th>Data</th>
                                             <th>Conta</th>
                                             <th>Saldo</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php if (!empty($statementOfValueAdded)) : ?>
-                                            <?php foreach($statementOfValueAdded as $value): ?>
+                                        <tr>
+                                            <td><strong>1. Receitas</strong></td>
+                                            <td>-</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>1.1 Receitas de vendas de produtos e serviços</strong></td>
+                                            <td>-</td>
+                                        </tr>
+                                        <?php if (!empty($statementOfValueAdded["receitas de vendas de produtos e servicos"])) : ?>
+                                            <?php foreach ($statementOfValueAdded["receitas de vendas de produtos e servicos"] as $value): ?>
                                                 <tr>
-                                                    <td><?= $value->created_at ?></td>
                                                     <td><?= $value->account_name ?></td>
-                                                    <td><?= $value->account_value ?></td>
+                                                    <td><?= $value->total_formated ?></td>
                                                 </tr>
                                             <?php endforeach ?>
                                         <?php endif ?>
+                                        <tr>
+                                            <td><strong>Total de receitas sobre produtos e serviços</strong></td>
+                                            <td><strong><?= $revenueTotal ?></strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>1.2 Receitas operacionais</strong></td>
+                                            <td>-</td>
+                                        </tr>
+                                        <?php if (!empty($statementOfValueAdded["receitas operacionais"])) : ?>
+                                            <?php foreach ($statementOfValueAdded["receitas operacionais"] as $value): ?>
+                                                <tr>
+                                                    <td><?= $value->account_name ?></td>
+                                                    <td><?= $value->total_formated ?></td>
+                                                </tr>
+                                            <?php endforeach ?>
+                                        <?php endif ?>
+                                        <tr>
+                                            <td><strong>Total de receitas operacionais</strong></td>
+                                            <td><strong><?= $operatingIncome ?></strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>1.3 Impostos e contribuição social</strong></td>
+                                            <td>-</td>
+                                        </tr>
+                                        <?php if (!empty($statementOfValueAdded["imposto de renda e contribuicao social"])) : ?>
+                                            <?php foreach ($statementOfValueAdded["imposto de renda e contribuicao social"] as $value): ?>
+                                                <tr>
+                                                    <td><?= $value->account_name ?></td>
+                                                    <td><?= $value->total_formated ?></td>
+                                                </tr>
+                                            <?php endforeach ?>
+                                        <?php endif ?>
+                                        <tr>
+                                            <td><strong>Total de impostos</strong></td>
+                                            <td><strong><?= $incomeTax ?></strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Receita líquida</strong></td>
+                                            <td><strong><?= $totalOperatingAndRevenue ?></strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>2. Insumos Adquiridos de Terceiros</strong></td>
+                                            <td>-</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>2.1 Despesas</strong></td>
+                                            <td>-</td>
+                                        </tr>
+                                        <?php if (!empty($statementOfValueAdded["despesas operacionais"])) : ?>
+                                            <?php foreach ($statementOfValueAdded["despesas operacionais"] as $value): ?>
+                                                <tr>
+                                                    <td><?= $value->account_name ?></td>
+                                                    <td><?= $value->total_formated ?></td>
+                                                </tr>
+                                            <?php endforeach ?>
+                                        <?php endif ?>
+                                        <tr>
+                                            <td><strong>Total em despesas</strong></td>
+                                            <td><strong><?= $expensesAccountingValue ?></strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>2.2 Custos</strong></td>
+                                            <td>-</td>
+                                        </tr>
+                                        <?php if (!empty($statementOfValueAdded["custo das vendas"])) : ?>
+                                            <?php foreach ($statementOfValueAdded["custo das vendas"] as $value): ?>
+                                                <tr>
+                                                    <td><?= $value->account_name ?></td>
+                                                    <td><?= $value->total_formated ?></td>
+                                                </tr>
+                                            <?php endforeach ?>
+                                        <?php endif ?>
+                                        <tr>
+                                            <td><strong>Total em custos</strong></td>
+                                            <td><strong><?= $costAccountingValue ?></strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Valor adicionado bruto</strong></td>
+                                            <td><strong><?= $addValueCostExpenseAndRevenue ?></strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>3. Retificações</strong></td>
+                                            <td>-</td>
+                                        </tr>
+                                        <?php if (!empty($statementOfValueAdded["ativo circulante"])) : ?>
+                                            <?php foreach ($statementOfValueAdded["ativo circulante"] as $value): ?>
+                                                <tr>
+                                                    <td><?= $value->account_name ?></td>
+                                                    <td><?= $value->total_formated ?></td>
+                                                </tr>
+                                            <?php endforeach ?>
+                                        <?php endif ?>
+                                        <?php if (!empty($statementOfValueAdded["ativo nao circulante"])) : ?>
+                                            <?php foreach ($statementOfValueAdded["ativo nao circulante"] as $value): ?>
+                                                <tr>
+                                                    <td><?= $value->account_name ?></td>
+                                                    <td><?= $value->total_formated ?></td>
+                                                </tr>
+                                            <?php endforeach ?>
+                                        <?php endif ?>
+                                        <tr>
+                                            <td><strong>Valor adicionado líquido</strong></td>
+                                            <td><strong><?= $addValueCostExpenseRevenueAndHolds ?></strong></td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>

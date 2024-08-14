@@ -100,7 +100,7 @@ class BalanceSheet
             $response = array_map(function ($item) {
                 return (array) $item->data();
             }, $response->fetch(true));
-        }else {
+        } else {
             $response = $response->fetch(true);
         }
 
@@ -139,11 +139,17 @@ class BalanceSheet
                 $columnsC,
                 "id_chart_of_account_group",
                 CONF_DB_NAME . ".chart_of_account"
-            )->between(
+            );
+
+        if (!empty($params["date"])) {
+            $this->balanceSheetReport = $this->balanceSheetReport->between(
                 "created_at",
                 CONF_DB_NAME . ".balance_sheet",
                 $params["date"]
             )->fetch(true);
+        } else {
+            $this->balanceSheetReport = $this->balanceSheetReport->fetch(true);
+        }
 
         if (empty($this->balanceSheetReport)) {
             return ["data" => [], "total" => 0];
@@ -180,11 +186,17 @@ class BalanceSheet
                 $columnsC,
                 "id_chart_of_account_group",
                 CONF_DB_NAME . ".chart_of_account"
-            )->between(
+            );
+
+        if (!empty($params["date"])) {
+            $this->balanceSheetReport = $this->balanceSheetReport->between(
                 "created_at",
                 CONF_DB_NAME . ".balance_sheet",
                 $params["date"]
             )->fetch(true);
+        } else {
+            $this->balanceSheetReport = $this->balanceSheetReport->fetch(true);
+        }
 
         if (empty($this->balanceSheetReport)) {
             return ["data" => [], "total" => 0];
@@ -221,11 +233,17 @@ class BalanceSheet
                 $columnsC,
                 "id_chart_of_account_group",
                 CONF_DB_NAME . ".chart_of_account"
-            )->between(
+            );
+
+        if (!empty($params["date"])) {
+            $this->balanceSheetReport = $this->balanceSheetReport->between(
                 "created_at",
                 CONF_DB_NAME . ".balance_sheet",
                 $params["date"]
             )->fetch(true);
+        } else {
+            $this->balanceSheetReport = $this->balanceSheetReport->fetch(true);
+        }
 
         if (empty($this->balanceSheetReport)) {
             return ["data" => [], "total" => 0];
@@ -262,11 +280,17 @@ class BalanceSheet
                 $columnsC,
                 "id_chart_of_account_group",
                 CONF_DB_NAME . ".chart_of_account"
-            )->between(
+            );
+
+        if (!empty($params["date"])) {
+            $this->balanceSheetReport = $this->balanceSheetReport->between(
                 "created_at",
                 CONF_DB_NAME . ".balance_sheet",
                 $params["date"]
             )->fetch(true);
+        } else {
+            $this->balanceSheetReport = $this->balanceSheetReport->fetch(true);
+        }
 
         if (empty($this->balanceSheetReport)) {
             return ["data" => [], "total" => 0];
@@ -294,7 +318,7 @@ class BalanceSheet
         $data = array_map(function ($item) use ($referenceName) {
             if (preg_match("/(ativo)/", $referenceName)) {
                 $item["account_value"] = empty($item["account_type"]) ? $item["account_value"] : $item["account_value"] * -1;
-            }else {
+            } else {
                 $item["account_value"] = empty($item["account_type"]) ? $item["account_value"] * -1 : $item["account_value"];
             }
             return $item;
@@ -351,11 +375,17 @@ class BalanceSheet
                 $columnsC,
                 "id_chart_of_account_group",
                 CONF_DB_NAME . ".chart_of_account"
-            )->between(
+            );
+
+        if (!empty($params["date"])) {
+            $this->balanceSheetReport = $this->balanceSheetReport->between(
                 "created_at",
                 CONF_DB_NAME . ".balance_sheet",
                 $params["date"]
             )->fetch(true);
+        } else {
+            $this->balanceSheetReport = $this->balanceSheetReport->fetch(true);
+        }
 
         if (empty($this->balanceSheetReport)) {
             return ["data" => [], "total" => 0];

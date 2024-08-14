@@ -29,15 +29,6 @@ class BalanceSheetOverView extends Controller
     public function balanceSheetReport()
     {
         $responseInitializeUserAndCompany = initializeUserAndCompanyId();
-        $dateTime = new DateTime();
-        $dateRange = !$this->getRequests()->has("daterange") ?
-            $dateTime->format("01/m/Y") . " - " . $dateTime->format("t/m/Y") : $this->getRequests()->get("daterange");
-
-        $dateRange = explode("-", $dateRange);
-        $dateRange = array_map(function ($date) {
-            return preg_replace("/^(\d{2})\/(\d{2})\/(\d{4})$/", "$3-$2-$1", trim($date));
-        }, $dateRange);
-
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
             verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $requestPost = $this->getRequests()->setRequiredFields(["closeAccounting", "date"])->getAllPostData();
@@ -332,13 +323,22 @@ class BalanceSheetOverView extends Controller
             [
                 "id_user" => $responseInitializeUserAndCompany["user_data"]->id,
                 "id_company" => $responseInitializeUserAndCompany["company_id"],
-                "deleted" => 0,
-                "date" => [
-                    "date_ini" => $dateRange[0],
-                    "date_end" => $dateRange[1]
-                ]
+                "deleted" => 0
             ]
         ];
+
+        $dateRange = $this->getRequests()->get("daterange");
+        if (!empty($dateRange)) {
+            $dates = explode("-", $dateRange);
+            $dates = array_map(function ($date) {
+                return preg_replace("/(\d{2})\/(\d{2})\/(\d{4})/", "$3-$2-$1", $date);
+            }, $dates);
+
+            $params[3]["date"] = [
+                "date_ini" => $dates[0],
+                "date_end" => $dates[1]
+            ];
+        }
 
         $balanceSheet = new BalanceSheet();
         $currentAssets = $balanceSheet->findAllCurrentAssets(...$params);
