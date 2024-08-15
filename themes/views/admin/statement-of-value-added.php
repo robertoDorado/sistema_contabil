@@ -64,23 +64,7 @@
                                             <td><strong><?= $revenueTotal ?></strong></td>
                                         </tr>
                                         <tr>
-                                            <td><strong>1.2 Receitas operacionais</strong></td>
-                                            <td>-</td>
-                                        </tr>
-                                        <?php if (!empty($statementOfValueAdded["receitas operacionais"])) : ?>
-                                            <?php foreach ($statementOfValueAdded["receitas operacionais"] as $value): ?>
-                                                <tr>
-                                                    <td><?= $value->account_name ?></td>
-                                                    <td><?= $value->total_formated ?></td>
-                                                </tr>
-                                            <?php endforeach ?>
-                                        <?php endif ?>
-                                        <tr>
-                                            <td><strong>Total de receitas operacionais</strong></td>
-                                            <td><strong><?= $operatingIncome ?></strong></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>1.3 Impostos e contribuição social</strong></td>
+                                            <td><strong>1.2 Impostos e contribuição social</strong></td>
                                             <td>-</td>
                                         </tr>
                                         <?php if (!empty($statementOfValueAdded["imposto de renda e contribuicao social"])) : ?>
@@ -163,6 +147,34 @@
                                             <td><strong>Valor adicionado líquido</strong></td>
                                             <td><strong><?= $addValueCostExpenseRevenueAndHolds ?></strong></td>
                                         </tr>
+                                        <tr>
+                                            <td><strong>4. Valor Adicionado Recebido em Transferência</strong></td>
+                                            <td>-</td>
+                                        </tr>
+                                        <?php if (!empty($statementOfValueAdded["receitas operacionais"])) : ?>
+                                            <?php foreach ($statementOfValueAdded["receitas operacionais"] as $value): ?>
+                                                <tr>
+                                                    <td><?= $value->account_name ?></td>
+                                                    <td><?= $value->total_formated ?></td>
+                                                </tr>
+                                            <?php endforeach ?>
+                                        <?php endif ?>
+                                        <tr>
+                                            <td><strong>Valor Adicionado Total a Distribuir</strong></td>
+                                            <td><strong><?= $addValueCostExpenseRevenueHoldsAndTransferValue ?></strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>5. Distribuição do Valor Adicionado</strong></td>
+                                            <td><strong>-</strong></td>
+                                        </tr>
+                                        <?php if (!empty($statementOfValueAdded["dva"])) : ?>
+                                            <?php foreach ($statementOfValueAdded["dva"] as $key => $value): ?>
+                                                <tr>
+                                                    <td><?= !empty($key) ? $key : "" ?></td>
+                                                    <td><?= !empty($value->total_formated) ? $value->total_formated : "R$ 0,00" ?></td>
+                                                </tr>
+                                            <?php endforeach ?>
+                                        <?php endif ?>
                                     </tbody>
                                 </table>
                             </div>

@@ -94,8 +94,11 @@ class FinancialStatements extends Controller
 
             $assetsHolds = [
                 "depreciacao",
+                "depreciacoes",
                 "amortizacao",
-                "exaustao"
+                "amortizacoes",
+                "exaustao",
+                "exaustoes"
             ];
 
             foreach ($statementOfValueAdded as $key => &$arrayValue) {
@@ -104,7 +107,7 @@ class FinancialStatements extends Controller
                     $item->account_value_formated = "R$ " . number_format($item->account_value, 2, ",", ".");
                     if ($isRevenue) {
                         $item->account_value = empty($item->account_type) ? $item->account_value * -1 : $item->account_value;
-                    }else {
+                    } else {
                         $item->account_value = !empty($item->account_type) ? $item->account_value * -1 : $item->account_value;
                     }
                     return $item;
@@ -129,10 +132,9 @@ class FinancialStatements extends Controller
             }
 
             $filterAssetsHold = function ($item) use ($assetsHolds) {
-                foreach ($assetsHolds as $value) {
-                    if (preg_match("/{$value}/", strtolower(removeAccets($item->account_name)))) {
-                        return $item;
-                    }
+                $assetsHolds = implode("|", $assetsHolds);
+                if (preg_match("/{$assetsHolds}/", strtolower(removeAccets($item->account_name)))) {
+                    return $item;
                 }
             };
 
@@ -142,6 +144,63 @@ class FinancialStatements extends Controller
 
             if (!empty($statementOfValueAdded["ativo nao circulante"])) {
                 $statementOfValueAdded["ativo nao circulante"] = array_filter($statementOfValueAdded["ativo nao circulante"], $filterAssetsHold);
+            }
+
+            /** Transferência de contas referente as retenções */
+            if (!empty($statementOfValueAdded["despesas operacionais"])) {
+                $tempOperationalExpenseHoldsData = array_filter($statementOfValueAdded["despesas operacionais"], $filterAssetsHold);
+                $tempData = array_reduce($tempOperationalExpenseHoldsData, function ($acc, $item) {
+                    $acc[] = $item->account_name;
+                    return $acc;
+                }, []);
+
+                $statementOfValueAdded["despesas operacionais"] = array_filter($statementOfValueAdded["despesas operacionais"], function ($item) use ($tempData) {
+                    if (!in_array($item->account_name, $tempData)) {
+                        return $item;
+                    }
+                });
+
+                $tempOperationalExpenseHoldsData = array_values($tempOperationalExpenseHoldsData);
+                array_push($statementOfValueAdded["ativo circulante"], ...$tempOperationalExpenseHoldsData);
+            }
+
+            $correctHoldingAmount = function ($item) {
+                $item->total = $item->total < 0 ? $item->total : $item->total * -1;
+                $item->total_formated = "R$ " . number_format($item->total, 2, ",", ".");
+                return $item;
+            };
+
+            if (!empty($statementOfValueAdded["ativo circulante"])) {
+                $statementOfValueAdded["ativo circulante"] = array_map($correctHoldingAmount, $statementOfValueAdded["ativo circulante"]);
+            }
+
+            if (!empty($statementOfValueAdded["ativo nao circulante"])) {
+                $statementOfValueAdded["ativo nao circulante"] = array_map($correctHoldingAmount, $statementOfValueAdded["ativo nao circulante"]);
+            }
+
+            $statementOfValueAdded["dva"] = [
+                "Pessoal (Salários, Benefícios, Encargos)" => new \stdClass(),
+                "Impostos, Taxas e Contribuições" => new \stdClass()
+            ];
+
+            $statementOfValueAdded["dva"]["Pessoal (Salários, Benefícios, Encargos)"]->total = 0;
+            $statementOfValueAdded["dva"]["Impostos, Taxas e Contribuições"]->total = 0;
+            foreach ($statementOfValueAdded as &$statementArray) {
+                foreach ($statementArray as $data) {
+                    if (!empty($data->account_name) && !empty($data->account_value) && !empty($data->total)) {
+                        if (preg_match("/salario|beneficio|pessoal|encargo/", strtolower(removeAccets($data->account_name)))) {
+                            $statementOfValueAdded["dva"]["Pessoal (Salários, Benefícios, Encargos)"]->account_name = $data->account_name;
+                            $statementOfValueAdded["dva"]["Pessoal (Salários, Benefícios, Encargos)"]->total += $data->account_value;
+                            $statementOfValueAdded["dva"]["Pessoal (Salários, Benefícios, Encargos)"]->total_formated = "R$ " . number_format($statementOfValueAdded["dva"]["Pessoal (Salários, Benefícios, Encargos)"]->total, 2, ",", ".");
+                        }
+
+                        if (preg_match("/imposto|taxa|contribuicao|contribuicoes/", strtolower(removeAccets($data->account_name)))) {
+                            $statementOfValueAdded["dva"]["Impostos, Taxas e Contribuições"]->account_name = $data->account_name;
+                            $statementOfValueAdded["dva"]["Impostos, Taxas e Contribuições"]->total += $data->account_value;
+                            $statementOfValueAdded["dva"]["Impostos, Taxas e Contribuições"]->total_formated = "R$ " . number_format($statementOfValueAdded["dva"]["Impostos, Taxas e Contribuições"]->total, 2, ",", ".");
+                        }
+                    }
+                }
             }
         }
 
@@ -174,10 +233,11 @@ class FinancialStatements extends Controller
         $totalHoldsCurrentAssets = $totalHoldsCurrentAssets < 0 ? $totalHoldsCurrentAssets * -1 : $totalHoldsCurrentAssets;
         $totalHoldsNonCurrentAssets = $totalHoldsNonCurrentAssets < 0 ? $totalHoldsNonCurrentAssets * -1 : $totalHoldsNonCurrentAssets;
 
-        $totalOperatingAndRevenue = $revenueTotal + $operatingIncome - $incomeTax;
+        $totalOperatingAndRevenue = $revenueTotal - $incomeTax;
         $totalHoldsAssets = $totalHoldsCurrentAssets + $totalHoldsNonCurrentAssets;
         $addValueCostExpenseAndRevenue = $totalOperatingAndRevenue - ($expensesAccountingValue + $costAccountingValue);
         $addValueCostExpenseRevenueAndHolds = $addValueCostExpenseAndRevenue - $totalHoldsAssets;
+        $addValueCostExpenseRevenueHoldsAndTransferValue = $addValueCostExpenseRevenueAndHolds + $operatingIncome;
 
         $revenueTotal = "R$ " . number_format($revenueTotal, 2, ",", ".");
         $operatingIncome = "R$ " . number_format($operatingIncome, 2, ",", ".");
@@ -187,6 +247,7 @@ class FinancialStatements extends Controller
         $totalOperatingAndRevenue = "R$ " . number_format($totalOperatingAndRevenue, 2, ",", ".");
         $incomeTax = "R$ " . number_format($incomeTax, 2, ",", ".");
         $addValueCostExpenseRevenueAndHolds = "R$ " . number_format($addValueCostExpenseRevenueAndHolds, 2, ",", ".");
+        $addValueCostExpenseRevenueHoldsAndTransferValue = "R$ " . number_format($addValueCostExpenseRevenueHoldsAndTransferValue, 2, ",", ".");
 
         echo $this->view->render("admin/statement-of-value-added", [
             "userFullName" => showUserFullName(),
@@ -199,7 +260,8 @@ class FinancialStatements extends Controller
             "operatingIncome" => $operatingIncome,
             "totalOperatingAndRevenue" => $totalOperatingAndRevenue,
             "incomeTax" => $incomeTax,
-            "addValueCostExpenseRevenueAndHolds" => $addValueCostExpenseRevenueAndHolds
+            "addValueCostExpenseRevenueAndHolds" => $addValueCostExpenseRevenueAndHolds,
+            "addValueCostExpenseRevenueHoldsAndTransferValue" => $addValueCostExpenseRevenueHoldsAndTransferValue
         ]);
     }
 
