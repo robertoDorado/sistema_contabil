@@ -463,6 +463,20 @@ class BalanceSheetOverView extends Controller
             ]
         );
 
+        $filterAccountData = [
+            "RECEITA BRUTA DE VENDA DE PRODUTOS E SERVIÇOS",
+            "CUSTOS DAS VENDAS DOS PRODUTOS, MERCADORIAS E SERVIÇOS",
+            "DESPESAS ADMINISTRATIVAS"
+        ];
+
+        if (!empty($chartOfAccountData)) {
+            $chartOfAccountData = array_filter($chartOfAccountData, function($item) use ($filterAccountData) {
+                if (!in_array($item->account_name, $filterAccountData)) {
+                    return $item;
+                }
+            });
+        }
+
         echo $this->view->render("admin/balance-sheet-form", [
             "userFullName" => showUserFullName(),
             "endpoints" => ["/admin/balance-sheet/balance-sheet-overview/form"],

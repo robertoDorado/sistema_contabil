@@ -61,7 +61,7 @@
                                         <?php endif ?>
                                         <tr>
                                             <td><strong>Total de receitas sobre produtos e serviços</strong></td>
-                                            <td><strong><?= $revenueTotal ?></strong></td>
+                                            <td><strong></strong></td>
                                         </tr>
                                         <tr>
                                             <td><strong>1.2 Impostos e contribuição social</strong></td>
@@ -77,11 +77,11 @@
                                         <?php endif ?>
                                         <tr>
                                             <td><strong>Total de impostos</strong></td>
-                                            <td><strong><?= $incomeTax ?></strong></td>
+                                            <td><strong>-</strong></td>
                                         </tr>
                                         <tr>
                                             <td><strong>Receita líquida</strong></td>
-                                            <td><strong><?= $totalOperatingAndRevenue ?></strong></td>
+                                            <td><strong>-</strong></td>
                                         </tr>
                                         <tr>
                                             <td><strong>2. Insumos Adquiridos de Terceiros</strong></td>
@@ -101,7 +101,7 @@
                                         <?php endif ?>
                                         <tr>
                                             <td><strong>Total em despesas</strong></td>
-                                            <td><strong><?= $expensesAccountingValue ?></strong></td>
+                                            <td><strong>-</strong></td>
                                         </tr>
                                         <tr>
                                             <td><strong>2.2 Custos</strong></td>
@@ -117,11 +117,11 @@
                                         <?php endif ?>
                                         <tr>
                                             <td><strong>Total em custos</strong></td>
-                                            <td><strong><?= $costAccountingValue ?></strong></td>
+                                            <td><strong>-</strong></td>
                                         </tr>
                                         <tr>
                                             <td><strong>Valor adicionado bruto</strong></td>
-                                            <td><strong><?= $addValueCostExpenseAndRevenue ?></strong></td>
+                                            <td><strong>-</strong></td>
                                         </tr>
                                         <tr>
                                             <td><strong>3. Retificações</strong></td>
@@ -145,7 +145,7 @@
                                         <?php endif ?>
                                         <tr>
                                             <td><strong>Valor adicionado líquido</strong></td>
-                                            <td><strong><?= $addValueCostExpenseRevenueAndHolds ?></strong></td>
+                                            <td><strong>-</strong></td>
                                         </tr>
                                         <tr>
                                             <td><strong>4. Valor Adicionado Recebido em Transferência</strong></td>
@@ -161,7 +161,7 @@
                                         <?php endif ?>
                                         <tr>
                                             <td><strong>Valor Adicionado Total a Distribuir</strong></td>
-                                            <td><strong><?= $addValueCostExpenseRevenueHoldsAndTransferValue ?></strong></td>
+                                            <td><strong>-</strong></td>
                                         </tr>
                                         <tr>
                                             <td><strong>5. Distribuição do Valor Adicionado</strong></td>
