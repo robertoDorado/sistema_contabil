@@ -59,15 +59,222 @@ class FinancialStatements extends Controller
             $params
         );
 
+        $formatCurrency = function ($value) {
+            return "R$ " . number_format($value, 2, ",", ".");
+        };
+
         if (!empty($statementOfValueAdded)) {
             $statementOfValueAdded = array_map(function ($item) {
                 return $item->data();
             }, $statementOfValueAdded);
+
+            $statementOfValueAdded = array_reduce($statementOfValueAdded, function ($acc, $item) {
+                $acc[strtolower(removeAccets($item->account_name_group))][] = $item;
+                return $acc;
+            }, []);
+
+            $validateResultAccounts = [
+                "ativo",
+                "passivo",
+                "patrimonio liquido"
+            ];
+
+            $validateResultAccounts = implode("|", $validateResultAccounts);
+            $statementOfValueAdded = array_filter($statementOfValueAdded, function ($item, $key) use ($validateResultAccounts) {
+                if (!preg_match("/{$validateResultAccounts}/", $key)) {
+                    return $item;
+                }
+            }, ARRAY_FILTER_USE_BOTH);
+
+            $validateHoldAccounts = [
+                "depreciacao",
+                "depreciacoes",
+                "amortizacao",
+                "amortizacoes",
+                "exaustao",
+                "exaustoes"
+            ];
+
+            $findCloseAccounts = [
+                "RECEITA BRUTA DE VENDA DE PRODUTOS E SERVIÇOS",
+                "CUSTOS DAS VENDAS DOS PRODUTOS, MERCADORIAS E SERVIÇOS",
+                "DESPESAS ADMINISTRATIVAS"
+            ];
+
+            $findCloseAccounts = array_map(function ($item) {
+                return strtolower(removeAccets($item));
+            }, $findCloseAccounts);
+
+            $newKeys = [
+                "retificacoes",
+                "dva"
+            ];
+
+            $validateFirstLineDva = [
+                "salario",
+                "encargo",
+                "decimo terceiro",
+                "13°",
+                "fgts",
+                "beneficios",
+                "ferias",
+                "plr",
+                "ordenado"
+            ];
+
+            $validateSecondLineDva = [
+                "imposto",
+                "contribuicao",
+                "contribuicoes",
+                "taxas"
+            ];
+
+            $validateThirdLineDva = [
+                "juros",
+                "emprestimo",
+                "financiamento",
+                "financeiro",
+                "financeira",
+                "capitais de terceiros"
+            ];
+
+            $validateFourthLineDva = [
+                "dividendo",
+                "juros sobre capital proprio",
+                "jcp",
+                "acionista"
+            ];
+
+            $validateHoldAccountsMatch = implode("|", $validateHoldAccounts);
+            $validateFirstLineDva = implode("|", $validateFirstLineDva);
+            $validateSecondLineDva = implode("|", $validateSecondLineDva);
+            $validateThirdLineDva = implode("|", $validateThirdLineDva);
+            $validateFourthLineDva = implode("|", $validateFourthLineDva);
+
+            foreach ($statementOfValueAdded as $key => &$groupArray) {
+                if (in_array($key, $newKeys)) {
+                    continue;
+                }
+
+                foreach ($groupArray as $data) {
+                    if (preg_match("/{$validateHoldAccountsMatch}/", strtolower(removeAccets($data->account_name)))) {
+                        $statementOfValueAdded["retificacoes"][] = $data;
+                    }
+
+                    if (preg_match("/{$validateFirstLineDva}/", strtolower(removeAccets($data->account_name)))) {
+                        $statementOfValueAdded["dva"]["Pessoal (Salários, Benefícios, Encargos)"][] = $data;
+                    }
+
+                    if (preg_match("/{$validateSecondLineDva}/", strtolower(removeAccets($data->account_name)))) {
+                        $statementOfValueAdded["dva"]["Impostos, Taxas e Contribuições"][] = $data;
+                    }
+
+                    if (preg_match("/{$validateThirdLineDva}/", strtolower(removeAccets($data->account_name)))) {
+                        $statementOfValueAdded["dva"]["Remuneração de Capitais de Terceiros"][] = $data;
+                    }
+
+                    if (preg_match("/{$validateFourthLineDva}/", strtolower(removeAccets($data->account_name)))) {
+                        $statementOfValueAdded["dva"]["Remuneração de Capitais Próprios (Dividendos)"][] = $data;
+                    }
+                }
+
+                $groupArray = array_map(function($item) {
+                    $item->account_value = empty($item->account_type) ? $item->account_value * -1 : $item->account_value;
+                    return $item;
+                }, $groupArray);
+
+                $groupArray = array_filter($groupArray, function ($item) use ($findCloseAccounts, $validateHoldAccountsMatch) {
+                    if (!in_array(strtolower(removeAccets($item->account_name)), $findCloseAccounts) && !preg_match("/{$validateHoldAccountsMatch}/", strtolower(removeAccets($item->account_name)))) {
+                        return $item;
+                    }
+                });
+            }
+
+            foreach ($statementOfValueAdded as $key => &$groupArray) {
+                if ($key === "dva") {
+                    continue;
+                }
+
+                $groupArray = array_reduce($groupArray, function($acc, $item) {
+                    if (!isset($acc[$item->account_name])) {
+                        $acc[$item->account_name] = $item;
+                        $acc[$item->account_name]->total = 0;
+                    }
+                    $acc[$item->account_name]->total += $item->account_value;
+                    return $acc;
+                }, []);
+            }
+
+            $total = 0;
+            foreach ($statementOfValueAdded["dva"] as &$groupArray) {
+                $groupArray = array_map(function($item) {
+                    $item->account_value = $item->account_value < 0 ? $item->account_value * -1 : $item->account_value;
+                    return $item;
+                }, $groupArray);
+                $groupArray = array_reduce($groupArray, function($acc, $item) use (&$total, $formatCurrency) {
+                    $total += $item->account_value;
+                    $acc->total = $total;
+                    $acc->total_formated = $formatCurrency($acc->total);
+                    return $acc;
+                }, new \stdClass());
+                $total = 0;
+            }
+        }
+
+        $sumValues = function ($acc, $item) {
+            $acc += $item->total;
+            return $acc;
+        };
+
+        $statementOfValueAdded["receitas de vendas de produtos e servicos"] = $statementOfValueAdded["receitas de vendas de produtos e servicos"] ?? [];
+        $statementOfValueAdded["imposto de renda e contribuicao social"] = $statementOfValueAdded["imposto de renda e contribuicao social"] ?? [];
+        $statementOfValueAdded["despesas operacionais"] = $statementOfValueAdded["despesas operacionais"] ?? [];
+        $statementOfValueAdded["custo das vendas"] = $statementOfValueAdded["custo das vendas"] ?? [];
+        $statementOfValueAdded["retificacoes"] = $statementOfValueAdded["retificacoes"] ?? [];
+        $statementOfValueAdded["receitas operacionais"] = $statementOfValueAdded["receitas operacionais"] ?? [];
+
+        $netIncome = array_reduce($statementOfValueAdded["receitas de vendas de produtos e servicos"], $sumValues, 0);
+        $taxValue = array_reduce($statementOfValueAdded["imposto de renda e contribuicao social"], $sumValues, 0);
+        $operationalExpensesValue = array_reduce($statementOfValueAdded["despesas operacionais"], $sumValues, 0);
+        $costOfSalesValue = array_reduce($statementOfValueAdded["custo das vendas"], $sumValues, 0);
+        $retificationsValue = array_reduce($statementOfValueAdded["retificacoes"], $sumValues, 0);
+        $operatingRevenue = array_reduce($statementOfValueAdded["receitas operacionais"], $sumValues, 0);
+        $profitRetention = array_reduce($statementOfValueAdded["dva"], $sumValues, 0);
+
+        $netIncome = $netIncome < 0 ? $netIncome * -1 : $netIncome;
+        $taxValue = $taxValue < 0 ? $taxValue * -1 : $taxValue;
+        $operationalExpensesValue = $operationalExpensesValue < 0 ? $operationalExpensesValue * -1 : $operationalExpensesValue;
+        $costOfSalesValue = $costOfSalesValue < 0 ? $costOfSalesValue * -1 : $costOfSalesValue;
+        $retificationsValue = $retificationsValue < 0 ? $retificationsValue * -1 : $retificationsValue;
+        $operatingRevenue = $operatingRevenue < 0 ? $operatingRevenue * -1 : $operatingRevenue;
+        $profitRetention = $profitRetention < 0 ? $profitRetention * -1 : $profitRetention;
+
+        $netIncome = $netIncome - $taxValue;
+        $grossAddValue = $netIncome - ($operationalExpensesValue + $costOfSalesValue);
+        $netAddedValue = $grossAddValue - $retificationsValue;
+        $totalAddValueDistributed = $netAddedValue + $operatingRevenue;
+        $profitRetention = $totalAddValueDistributed - $profitRetention;
+
+        foreach ($statementOfValueAdded as $key => &$groupArray) {
+            if ($key === "dva") {
+                continue;
+            }
+
+            $groupArray = array_map(function ($item) use ($formatCurrency) {
+                $item->total_formated = $formatCurrency($item->total);
+                return $item;
+            }, $groupArray);
         }
 
         echo $this->view->render("admin/statement-of-value-added", [
             "userFullName" => showUserFullName(),
-            "endpoints" => ["/balance-sheet/statement-of-value-added/report"]
+            "endpoints" => ["/balance-sheet/statement-of-value-added/report"],
+            "statementOfValueAdded" => $statementOfValueAdded,
+            "netIncome" => $formatCurrency($netIncome),
+            "grossAddValue" => $formatCurrency($grossAddValue),
+            "netAddedValue" => $formatCurrency($netAddedValue),
+            "totalAddValueDistributed" => $formatCurrency($totalAddValueDistributed),
+            "profitRetention" => $formatCurrency($profitRetention)
         ]);
     }
 
@@ -205,7 +412,7 @@ class FinancialStatements extends Controller
             });
 
             $costOfSoldData = array_filter($costOfSoldData, function ($item) {
-                if (!preg_match("/CUSTOS DAS VENDAS DOS PRODUTOS, MERCADORIAS E SERVICOS/i", strtolower(removeAccets($item->account_name)))) {
+                if (preg_match("/CUSTOS DAS VENDAS DOS PRODUTOS, MERCADORIAS E SERVICOS/i", strtolower(removeAccets($item->account_name)))) {
                     return $item;
                 }
             });
@@ -217,23 +424,6 @@ class FinancialStatements extends Controller
                     "inss sobre folha de pagamento"
                 ], "account_name_group");
             });
-            
-            $taxData = array_filter($incomeStatement, function($item) use ($sortAccounts) {
-                return $sortAccounts($item, [
-                    "imposto",
-                    "contribuicao",
-                    "contribuicoes",
-                    "tributo",
-                    "fiscal",
-                    "fiscais"
-                ], "account_name_group");
-            });
-
-            if (!empty($taxData)) {
-                foreach ($taxData as $value) {
-                    $operationalExpensesData[] = $value;
-                }
-            }
 
             $validateExpensesData = [
                 "DESPESAS ADMINISTRATIVAS",
@@ -248,7 +438,7 @@ class FinancialStatements extends Controller
                 "fiscal",
                 "fiscais"
             ];
-            
+
             $validateExpensesData = implode("|", $validateExpensesData);
             $operationalExpensesData = array_filter($operationalExpensesData, function ($item) use ($validateExpensesData) {
                 if (!preg_match("/{$validateExpensesData}/i", strtolower(removeAccets($item->account_name)))) {

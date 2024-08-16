@@ -1,14 +1,33 @@
 <?php
 $data = [
-    "values" => [
-        15,
-        10,
-        20
-    ]
+    "a" => [
+        "itemA",
+        "itemB",
+        "itemC",
+    ],
+    "b" => [
+        "itemA",
+        "itemB",
+        "itemCD",
+    ],
 ];
 
-$data["values"]  = $data["values"] ?? [];
-$value = array_filter($data["values"], function ($number) {
-    return $number == 15;
-});
-print_r($value);
+
+$data['c'] = [];
+foreach ($data as $key => &$items) {
+    if ($key === 'c') continue; // Ignora a chave 'c' já que estamos adicionando a ela
+
+    foreach ($items as $item) {
+        if (in_array($item, ['itemC', 'itemCD'])) {
+            $data['c'][] = $item;
+        }
+    }
+
+    $items = array_filter($items, function($item) {
+        if (!in_array($item, ['itemC', 'itemCD'])) {
+            return $item;
+        }
+    });
+}
+
+print_r($data);
