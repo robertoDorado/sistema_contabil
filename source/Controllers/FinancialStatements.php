@@ -97,7 +97,6 @@ class FinancialStatements extends Controller
 
             $findCloseAccounts = [
                 "RECEITA BRUTA DE VENDA DE PRODUTOS E SERVIÇOS",
-                "CUSTOS DAS VENDAS DOS PRODUTOS, MERCADORIAS E SERVIÇOS",
                 "DESPESAS ADMINISTRATIVAS"
             ];
 
@@ -188,6 +187,14 @@ class FinancialStatements extends Controller
                         return $item;
                     }
                 });
+
+                if ($key == "custo das vendas") {
+                    $groupArray = array_filter($groupArray, function ($item) {
+                        if (preg_match("/CUSTOS DAS VENDAS DOS PRODUTOS, MERCADORIAS E SERVICOS/i", strtolower(removeAccets($item->account_name)))) {
+                            return $item;
+                        }
+                    });
+                }
             }
 
             foreach ($statementOfValueAdded as $key => &$groupArray) {
