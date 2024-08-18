@@ -48,7 +48,8 @@ class FinancialStatements extends Controller
         $statementOfValueAdded = $balanceSheet->findAllBalanceSheetJoinChartOfAccountAndJoinChartOfAccountGroup(
             [
                 "account_value",
-                "account_type"
+                "account_type",
+                "deleted"
             ],
             [
                 "account_name"
@@ -64,6 +65,12 @@ class FinancialStatements extends Controller
         };
 
         if (!empty($statementOfValueAdded)) {
+            $statementOfValueAdded = array_filter($statementOfValueAdded, function ($item) {
+                if (empty($item->getDeleted())) {
+                    return $item;
+                }
+            });
+            
             $statementOfValueAdded = array_map(function ($item) {
                 return $item->data();
             }, $statementOfValueAdded);
