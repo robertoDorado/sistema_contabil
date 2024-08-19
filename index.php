@@ -179,6 +179,13 @@ $route->get("/cash-flow-explanatory-notes/backup", "CashFlowExplanatoryNotes::ca
 $route->post("/cash-flow-explanatory-notes/backup", "CashFlowExplanatoryNotes::cashFlowExplanatoryNotesBackup");
 
 /**
+ * Notas Explicativas do balanço patrimonial
+ */
+$route->get("/balance-sheet-explanatory-notes/report", "BalanceSheetExplanatoryNotes::balanceSheetExplanatoryNotesReport");
+$route->get("/balance-sheet-explanatory-notes/form", "BalanceSheetExplanatoryNotes::balanceSheetExplanatoryNotesForm");
+$route->post("/balance-sheet-explanatory-notes/form", "BalanceSheetExplanatoryNotes::balanceSheetExplanatoryNotesForm");
+
+/**
  * Histórico e Auditoria
  */
 $route->get("/history-audit/report", "HistoryAudit::historyAuditReport");
