@@ -192,6 +192,10 @@ class CashFlowExplanatoryNotes extends Controller
             false
         );
 
+        if (empty($cashFlowExplanatoryNotesData)) {
+            redirect($endpointReport);
+        }
+
         $entryType = empty($cashFlowExplanatoryNotesData->entry_type) ? "Débito" : "Crédito";
         echo $this->view->render("admin/cash-flow-explanatory-notes-form-update", [
             "userFullName" => showUserFullName(),

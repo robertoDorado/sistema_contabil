@@ -46,6 +46,46 @@ class BalanceSheetExplanatoryNotes
         return $this->data->$name ?? null;
     }
 
+    public function findBalanceSheetExplanatoryNotesByUuid(array $columns): ?ModelsBalanceSheetExplanatoryNotes
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        return $this->balanceSheetExplanatoryNotes->find(
+            "uuid=:uuid",
+            ":uuid=" . $this->getUuid() . "",
+            $columns
+        )->fetch();
+    }
+
+    public function findBalanceSheetExplanatoryNotesJoinDataByUuid(array $columnsEx, array $columnsBalance, array $columnsChart, User $user, int $companyId): ?ModelsBalanceSheetExplanatoryNotes
+    {
+        $columnsEx = empty($columnsEx) ? "*" : implode(", ", $columnsEx);
+        $columnsBalance = empty($columnsBalance) ? "*" : implode(", ", $columnsBalance);
+        $columnsChart = empty($columnsChart) ? "*" : implode(", ", $columnsChart);
+
+        $params = [
+            CONF_DB_NAME . ".balance_sheet",
+            "id",
+            "id_user=:id_user AND id_company=:id_company",
+            ":id_user=" . $user->getId() . "&:id_company=" . $companyId . "",
+            $columnsBalance,
+            "id_balance_sheet",
+            CONF_DB_NAME . ".balance_sheet_explanatory_notes"
+        ];
+
+        $this->balanceSheetExplanatoryNotes = $this->balanceSheetExplanatoryNotes->find(
+            "uuid=:uuid",
+            ":uuid=" . $this->getUuid() . "",
+            $columnsEx
+        )->join(...$params);
+
+        $params[0] = CONF_DB_NAME . ".chart_of_account";
+        $params[4] = $columnsChart;
+        $params[5] = "id_chart_of_account";
+        $params[6] = CONF_DB_NAME . ".balance_sheet";
+
+        return $this->balanceSheetExplanatoryNotes->join(...$params)->fetch();
+    }
+
     /** @var ModelsBalanceSheetExplanatoryNotes[] */
     public function findAllBalanceSheetExplanatoryNotes(array $columnsEx, array $columnsBalance, array $columnsChart, User $user, int $companyId): array
     {
@@ -75,7 +115,6 @@ class BalanceSheetExplanatoryNotes
         $params[6] = CONF_DB_NAME . ".balance_sheet";
 
         $response = $this->balanceSheetExplanatoryNotes->join(...$params)->fetch(true);
-
         if (empty($response)) {
             return [];
         }

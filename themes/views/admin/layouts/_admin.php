@@ -167,13 +167,18 @@
                                 </a>
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
+                                        <a href="<?= url("/admin/balance-sheet-explanatory-notes/form") ?>" class="nav-link">
+                                            <p>Adicionar nova nota</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
                                         <a href="<?= url("/admin/balance-sheet-explanatory-notes/report") ?>" class="nav-link">
                                             <p>Relatório de notas</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="<?= url("/admin/balance-sheet-explanatory-notes/form") ?>" class="nav-link">
-                                            <p>Adicionar nova nota</p>
+                                        <a href="<?= url("/admin/balance-sheet-explanatory-notes/form/backup") ?>" class="nav-link">
+                                            <p>Backup de notas</p>
                                         </a>
                                     </li>
                                 </ul>

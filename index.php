@@ -184,6 +184,11 @@ $route->post("/cash-flow-explanatory-notes/backup", "CashFlowExplanatoryNotes::c
 $route->get("/balance-sheet-explanatory-notes/report", "BalanceSheetExplanatoryNotes::balanceSheetExplanatoryNotesReport");
 $route->get("/balance-sheet-explanatory-notes/form", "BalanceSheetExplanatoryNotes::balanceSheetExplanatoryNotesForm");
 $route->post("/balance-sheet-explanatory-notes/form", "BalanceSheetExplanatoryNotes::balanceSheetExplanatoryNotesForm");
+$route->get("/balance-sheet-explanatory-notes/form/update/{uuid}", "BalanceSheetExplanatoryNotes::balanceSheetExplanatoryNotesUpdate");
+$route->post("/balance-sheet-explanatory-notes/form/update", "BalanceSheetExplanatoryNotes::balanceSheetExplanatoryNotesUpdate");
+$route->post("/balance-sheet-explanatory-notes/form/remove", "BalanceSheetExplanatoryNotes::balanceSheetExplanatoryNotesRemove");
+$route->get("/balance-sheet-explanatory-notes/form/backup", "BalanceSheetExplanatoryNotes::balanceSheetExplanatoryNotesBackup");
+$route->post("/balance-sheet-explanatory-notes/form/backup", "BalanceSheetExplanatoryNotes::balanceSheetExplanatoryNotesBackup");
 
 /**
  * Histórico e Auditoria
