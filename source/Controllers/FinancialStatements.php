@@ -64,175 +64,174 @@ class FinancialStatements extends Controller
             return "R$ " . number_format($value, 2, ",", ".");
         };
 
-        if (!empty($statementOfValueAdded)) {
-            $statementOfValueAdded = array_filter($statementOfValueAdded, function ($item) {
-                if (empty($item->getDeleted())) {
+        $statementOfValueAdded = array_filter($statementOfValueAdded, function ($item) {
+            if (empty($item->getDeleted())) {
+                return $item;
+            }
+        });
+        
+        $statementOfValueAdded = array_map(function ($item) {
+            return $item->data();
+        }, $statementOfValueAdded);
+
+        $statementOfValueAdded = array_reduce($statementOfValueAdded, function ($acc, $item) {
+            $acc[strtolower(removeAccets($item->account_name_group))][] = $item;
+            return $acc;
+        }, []);
+
+        $validateResultAccounts = [
+            "ativo",
+            "passivo",
+            "patrimonio liquido"
+        ];
+
+        $validateResultAccounts = implode("|", $validateResultAccounts);
+        $statementOfValueAdded = array_filter($statementOfValueAdded, function ($item, $key) use ($validateResultAccounts) {
+            if (!preg_match("/{$validateResultAccounts}/", $key)) {
+                return $item;
+            }
+        }, ARRAY_FILTER_USE_BOTH);
+
+        $validateHoldAccounts = [
+            "depreciacao",
+            "depreciacoes",
+            "amortizacao",
+            "amortizacoes",
+            "exaustao",
+            "exaustoes"
+        ];
+
+        $findCloseAccounts = [
+            "RECEITA BRUTA DE VENDA DE PRODUTOS E SERVIÇOS",
+            "DESPESAS ADMINISTRATIVAS"
+        ];
+
+        $findCloseAccounts = array_map(function ($item) {
+            return strtolower(removeAccets($item));
+        }, $findCloseAccounts);
+
+        $newKeys = [
+            "retificacoes",
+            "dva"
+        ];
+
+        $validateFirstLineDva = [
+            "salario",
+            "encargo",
+            "decimo terceiro",
+            "13°",
+            "fgts",
+            "beneficios",
+            "ferias",
+            "plr",
+            "ordenado"
+        ];
+
+        $validateSecondLineDva = [
+            "imposto",
+            "contribuicao",
+            "contribuicoes",
+            "taxas"
+        ];
+
+        $validateThirdLineDva = [
+            "juros",
+            "emprestimo",
+            "financiamento",
+            "financeiro",
+            "financeira",
+            "capitais de terceiros"
+        ];
+
+        $validateFourthLineDva = [
+            "dividendo",
+            "juros sobre capital proprio",
+            "jcp",
+            "acionista"
+        ];
+
+        $validateHoldAccountsMatch = implode("|", $validateHoldAccounts);
+        $validateFirstLineDva = implode("|", $validateFirstLineDva);
+        $validateSecondLineDva = implode("|", $validateSecondLineDva);
+        $validateThirdLineDva = implode("|", $validateThirdLineDva);
+        $validateFourthLineDva = implode("|", $validateFourthLineDva);
+        $statementOfValueAdded["dva"] = [];
+
+        foreach ($statementOfValueAdded as $key => &$groupArray) {
+            if (in_array($key, $newKeys)) {
+                continue;
+            }
+
+            foreach ($groupArray as $data) {
+                if (preg_match("/{$validateHoldAccountsMatch}/", strtolower(removeAccets($data->account_name)))) {
+                    $statementOfValueAdded["retificacoes"][] = $data;
+                }
+
+                if (preg_match("/{$validateFirstLineDva}/", strtolower(removeAccets($data->account_name)))) {
+                    $statementOfValueAdded["dva"]["Pessoal (Salários, Benefícios, Encargos)"][] = $data;
+                }
+
+                if (preg_match("/{$validateSecondLineDva}/", strtolower(removeAccets($data->account_name)))) {
+                    $statementOfValueAdded["dva"]["Impostos, Taxas e Contribuições"][] = $data;
+                }
+
+                if (preg_match("/{$validateThirdLineDva}/", strtolower(removeAccets($data->account_name)))) {
+                    $statementOfValueAdded["dva"]["Remuneração de Capitais de Terceiros"][] = $data;
+                }
+
+                if (preg_match("/{$validateFourthLineDva}/", strtolower(removeAccets($data->account_name)))) {
+                    $statementOfValueAdded["dva"]["Remuneração de Capitais Próprios (Dividendos)"][] = $data;
+                }
+            }
+
+            $groupArray = array_map(function($item) {
+                $item->account_value = empty($item->account_type) ? $item->account_value * -1 : $item->account_value;
+                return $item;
+            }, $groupArray);
+
+            $groupArray = array_filter($groupArray, function ($item) use ($findCloseAccounts, $validateHoldAccountsMatch) {
+                if (!in_array(strtolower(removeAccets($item->account_name)), $findCloseAccounts) && !preg_match("/{$validateHoldAccountsMatch}/", strtolower(removeAccets($item->account_name)))) {
                     return $item;
                 }
             });
-            
-            $statementOfValueAdded = array_map(function ($item) {
-                return $item->data();
-            }, $statementOfValueAdded);
 
-            $statementOfValueAdded = array_reduce($statementOfValueAdded, function ($acc, $item) {
-                $acc[strtolower(removeAccets($item->account_name_group))][] = $item;
-                return $acc;
-            }, []);
-
-            $validateResultAccounts = [
-                "ativo",
-                "passivo",
-                "patrimonio liquido"
-            ];
-
-            $validateResultAccounts = implode("|", $validateResultAccounts);
-            $statementOfValueAdded = array_filter($statementOfValueAdded, function ($item, $key) use ($validateResultAccounts) {
-                if (!preg_match("/{$validateResultAccounts}/", $key)) {
-                    return $item;
-                }
-            }, ARRAY_FILTER_USE_BOTH);
-
-            $validateHoldAccounts = [
-                "depreciacao",
-                "depreciacoes",
-                "amortizacao",
-                "amortizacoes",
-                "exaustao",
-                "exaustoes"
-            ];
-
-            $findCloseAccounts = [
-                "RECEITA BRUTA DE VENDA DE PRODUTOS E SERVIÇOS",
-                "DESPESAS ADMINISTRATIVAS"
-            ];
-
-            $findCloseAccounts = array_map(function ($item) {
-                return strtolower(removeAccets($item));
-            }, $findCloseAccounts);
-
-            $newKeys = [
-                "retificacoes",
-                "dva"
-            ];
-
-            $validateFirstLineDva = [
-                "salario",
-                "encargo",
-                "decimo terceiro",
-                "13°",
-                "fgts",
-                "beneficios",
-                "ferias",
-                "plr",
-                "ordenado"
-            ];
-
-            $validateSecondLineDva = [
-                "imposto",
-                "contribuicao",
-                "contribuicoes",
-                "taxas"
-            ];
-
-            $validateThirdLineDva = [
-                "juros",
-                "emprestimo",
-                "financiamento",
-                "financeiro",
-                "financeira",
-                "capitais de terceiros"
-            ];
-
-            $validateFourthLineDva = [
-                "dividendo",
-                "juros sobre capital proprio",
-                "jcp",
-                "acionista"
-            ];
-
-            $validateHoldAccountsMatch = implode("|", $validateHoldAccounts);
-            $validateFirstLineDva = implode("|", $validateFirstLineDva);
-            $validateSecondLineDva = implode("|", $validateSecondLineDva);
-            $validateThirdLineDva = implode("|", $validateThirdLineDva);
-            $validateFourthLineDva = implode("|", $validateFourthLineDva);
-
-            foreach ($statementOfValueAdded as $key => &$groupArray) {
-                if (in_array($key, $newKeys)) {
-                    continue;
-                }
-
-                foreach ($groupArray as $data) {
-                    if (preg_match("/{$validateHoldAccountsMatch}/", strtolower(removeAccets($data->account_name)))) {
-                        $statementOfValueAdded["retificacoes"][] = $data;
-                    }
-
-                    if (preg_match("/{$validateFirstLineDva}/", strtolower(removeAccets($data->account_name)))) {
-                        $statementOfValueAdded["dva"]["Pessoal (Salários, Benefícios, Encargos)"][] = $data;
-                    }
-
-                    if (preg_match("/{$validateSecondLineDva}/", strtolower(removeAccets($data->account_name)))) {
-                        $statementOfValueAdded["dva"]["Impostos, Taxas e Contribuições"][] = $data;
-                    }
-
-                    if (preg_match("/{$validateThirdLineDva}/", strtolower(removeAccets($data->account_name)))) {
-                        $statementOfValueAdded["dva"]["Remuneração de Capitais de Terceiros"][] = $data;
-                    }
-
-                    if (preg_match("/{$validateFourthLineDva}/", strtolower(removeAccets($data->account_name)))) {
-                        $statementOfValueAdded["dva"]["Remuneração de Capitais Próprios (Dividendos)"][] = $data;
-                    }
-                }
-
-                $groupArray = array_map(function($item) {
-                    $item->account_value = empty($item->account_type) ? $item->account_value * -1 : $item->account_value;
-                    return $item;
-                }, $groupArray);
-
-                $groupArray = array_filter($groupArray, function ($item) use ($findCloseAccounts, $validateHoldAccountsMatch) {
-                    if (!in_array(strtolower(removeAccets($item->account_name)), $findCloseAccounts) && !preg_match("/{$validateHoldAccountsMatch}/", strtolower(removeAccets($item->account_name)))) {
+            if ($key == "custo das vendas") {
+                $groupArray = array_filter($groupArray, function ($item) {
+                    if (preg_match("/CUSTOS DAS VENDAS DOS PRODUTOS, MERCADORIAS E SERVICOS/i", strtolower(removeAccets($item->account_name)))) {
                         return $item;
                     }
                 });
+            }
+        }
 
-                if ($key == "custo das vendas") {
-                    $groupArray = array_filter($groupArray, function ($item) {
-                        if (preg_match("/CUSTOS DAS VENDAS DOS PRODUTOS, MERCADORIAS E SERVICOS/i", strtolower(removeAccets($item->account_name)))) {
-                            return $item;
-                        }
-                    });
-                }
+        foreach ($statementOfValueAdded as $key => &$groupArray) {
+            if ($key === "dva") {
+                continue;
             }
 
-            foreach ($statementOfValueAdded as $key => &$groupArray) {
-                if ($key === "dva") {
-                    continue;
+            $groupArray = array_reduce($groupArray, function($acc, $item) {
+                if (!isset($acc[$item->account_name])) {
+                    $acc[$item->account_name] = $item;
+                    $acc[$item->account_name]->total = 0;
                 }
+                $acc[$item->account_name]->total += $item->account_value;
+                return $acc;
+            }, []);
+        }
 
-                $groupArray = array_reduce($groupArray, function($acc, $item) {
-                    if (!isset($acc[$item->account_name])) {
-                        $acc[$item->account_name] = $item;
-                        $acc[$item->account_name]->total = 0;
-                    }
-                    $acc[$item->account_name]->total += $item->account_value;
-                    return $acc;
-                }, []);
-            }
-
+        $total = 0;
+        foreach ($statementOfValueAdded["dva"] as &$groupArray) {
+            $groupArray = array_map(function($item) {
+                $item->account_value = $item->account_value < 0 ? $item->account_value * -1 : $item->account_value;
+                return $item;
+            }, $groupArray);
+            $groupArray = array_reduce($groupArray, function($acc, $item) use (&$total, $formatCurrency) {
+                $total += $item->account_value;
+                $acc->total = $total;
+                $acc->total_formated = $formatCurrency($acc->total);
+                return $acc;
+            }, new \stdClass());
             $total = 0;
-            foreach ($statementOfValueAdded["dva"] as &$groupArray) {
-                $groupArray = array_map(function($item) {
-                    $item->account_value = $item->account_value < 0 ? $item->account_value * -1 : $item->account_value;
-                    return $item;
-                }, $groupArray);
-                $groupArray = array_reduce($groupArray, function($acc, $item) use (&$total, $formatCurrency) {
-                    $total += $item->account_value;
-                    $acc->total = $total;
-                    $acc->total_formated = $formatCurrency($acc->total);
-                    return $acc;
-                }, new \stdClass());
-                $total = 0;
-            }
         }
 
         $sumValues = function ($acc, $item) {
