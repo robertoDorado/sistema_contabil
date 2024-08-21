@@ -106,24 +106,6 @@
                             </li>
                             <li class="nav-item">
                                 <a href="#" class="nav-link">
-                                    <p>Conciliação bancária</p>
-                                    <i class="right fas fa-angle-left"></i>
-                                </a>
-                                <ul class="nav nav-treeview">
-                                    <li class="nav-item">
-                                        <a href="#" class="nav-link">
-                                            <p>Conciliação automática</p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="#" class="nav-link">
-                                            <p>Conciliação manual</p>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
                                     <p>Relatórios contábeis</p>
                                     <i class="right fas fa-angle-left"></i>
                                 </a>
@@ -179,24 +161,6 @@
                                     <li class="nav-item">
                                         <a href="<?= url("/admin/balance-sheet-explanatory-notes/form/backup") ?>" class="nav-link">
                                             <p>Backup de notas</p>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <p>Auditoria e Históricos</p>
-                                    <i class="right fas fa-angle-left"></i>
-                                </a>
-                                <ul class="nav nav-treeview">
-                                    <li class="nav-item">
-                                        <a href="#" class="nav-link">
-                                            <p>Registros de auditoria</p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="#" class="nav-link">
-                                            <p>Relatórios de auditoria</p>
                                         </a>
                                     </li>
                                 </ul>
@@ -381,24 +345,6 @@
                                     </li>
                                 </ul>
                             </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <p>Auditoria e Históricos</p>
-                                    <i class="right fas fa-angle-left"></i>
-                                </a>
-                                <ul class="nav nav-treeview">
-                                    <li class="nav-item">
-                                        <a href="<?= url("/admin/history-audit/report") ?>" class="nav-link">
-                                            <p>Relatório da auditoria</p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="<?= url("/admin/history-audit/backup") ?>" class="nav-link">
-                                            <p>Backup da auditoria</p>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
                         </ul>
                     </li>
                     <li class="nav-item">
@@ -429,6 +375,27 @@
                                     </a>
                                 </li>
                             <?php endif ?>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-history"></i>
+                            <p>
+                                Auditoria e Históricos
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="<?= url("/admin/history-audit/report") ?>" class="nav-link">
+                                    <p>Relatório da auditoria</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?= url("/admin/history-audit/backup") ?>" class="nav-link">
+                                    <p>Backup da auditoria</p>
+                                </a>
+                            </li>
                         </ul>
                     </li>
                 </ul>

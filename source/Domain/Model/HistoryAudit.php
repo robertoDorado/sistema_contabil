@@ -53,15 +53,15 @@ class HistoryAudit
     }
 
     /** @var ModelsHistoryAudit[] */
-    public function findAllHistoryAndAuditJoinReportSystem(array $columnsH, array $columnsR, User $user, int $companyId, bool $deleted): array
+    public function findAllHistoryAndAuditJoinReportSystem(array $columnsH, array $columnsR, array $params): array
     {
         $columnsH = empty($columnsH) ? "*" : implode(", ", $columnsH);
         $columnsR = empty($columnsR) ? "*" : implode(", ", $columnsR);
-        $deleted = !$deleted ? 0 : 1;
+        $deleted = !$params["deleted"] ? 0 : 1;
 
         $response = $this->historyAudit->find(
             "id_user=:id_user AND id_company=:id_company AND deleted=:deleted",
-            ":id_user=" . $user->getId() . "&:id_company=" . $companyId . "&:deleted=" . $deleted . "",
+            ":id_user=" . $params["user"]->getId() . "&:id_company=" . $params["company_id"] . "&:deleted=" . $deleted . "",
             $columnsH
         )->join(
             CONF_DB_NAME . ".report_system",
@@ -71,13 +71,17 @@ class HistoryAudit
             $columnsR,
             "id_report",
             CONF_DB_NAME . ".history_audit"
-        )->fetch(true);
+        );
 
-        if(empty($response)) {
+        if (!empty($params["date"])) {
+            $response = $response->between("created_at", CONF_DB_NAME . ".history_audit", $params["date"]);
+        }
+
+        if(empty($response->fetch(true))) {
             return [];
         }
 
-        return $response;
+        return $response->fetch(true);
     }
 
     public function getId(): int

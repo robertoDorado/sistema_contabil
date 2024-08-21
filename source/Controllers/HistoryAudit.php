@@ -32,7 +32,7 @@ class HistoryAudit extends Controller
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
             verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $requestPost = $this->getRequests()->setRequiredFields(["uuid", "action"])->getAllPostData();
-            
+
             $historyAudit->setUuid($requestPost["uuid"]);
             $historyAuditData = $historyAudit->findHistoryAndAuditByUuid(["id", "deleted"]);
 
@@ -43,14 +43,14 @@ class HistoryAudit extends Controller
             $response->status = false;
 
             $verifyAction = [
-                "restore" => function(Model $model) use ($response) {
+                "restore" => function (Model $model) use ($response) {
                     $model->setRequiredFields(["deleted"]);
                     $model->deleted = 0;
                     $response->label = "restaurado";
                     $response->status = $model->save();
                 },
-                
-                "delete" => function(Model $model) use ($response) {
+
+                "delete" => function (Model $model) use ($response) {
                     $model->setRequiredFields(["deleted"]);
                     $response->label = "excluído";
                     $response->status = $model->destroy();
@@ -74,9 +74,11 @@ class HistoryAudit extends Controller
         $historyAuditData = $historyAudit->findAllHistoryAndAuditJoinReportSystem(
             ["uuid", "history_transaction", "transaction_value", "created_at"],
             ["report_name"],
-            $responseUserAndCompany["user"],
-            $responseUserAndCompany["company_id"],
-            true
+            [
+                "user" => $responseUserAndCompany["user"],
+                "company_id" => $responseUserAndCompany["company_id"],
+                "deleted" => false
+            ]
         );
 
         if (!empty($historyAuditData)) {
@@ -101,7 +103,7 @@ class HistoryAudit extends Controller
         verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
         $requestPost = $this->getRequests()->setRequiredFields(["uuid"])->getAllPostData();
         $historyAudit = new ModelHistoryAudit();
-        
+
         $historyAudit->setUuid($requestPost["uuid"]);
         $historyAuditData = $historyAudit->findHistoryAndAuditByUuid(["deleted", "id"]);
 
@@ -126,13 +128,30 @@ class HistoryAudit extends Controller
     public function historyAuditReport()
     {
         $responseUserAndCompany = initializeUserAndCompanyId();
+        $dateRange = $this->getRequests()->get("daterange");
+        $params = [
+            "user" => $responseUserAndCompany["user"],
+            "company_id" => $responseUserAndCompany["company_id"],
+            "deleted" => false
+        ];
+
+        if (!empty($dateRange)) {
+            $dates = explode("-", $dateRange);
+            $dates = array_map(function($date) {
+                return preg_replace("/(\d{2})\/(\d{2})\/(\d{4})/", "$3-$2-$1", $date);
+            }, $dates);
+
+            $params["date"] = [
+                "date_ini" => $dates[0],
+                "date_end" => $dates[1]
+            ];
+        }
+
         $historyAudit = new ModelHistoryAudit();
         $historyAuditData = $historyAudit->findAllHistoryAndAuditJoinReportSystem(
             ["uuid", "history_transaction", "transaction_value", "created_at"],
             ["report_name"],
-            $responseUserAndCompany["user"],
-            $responseUserAndCompany["company_id"],
-            false
+            $params
         );
 
         if (!empty($historyAuditData)) {

@@ -9,6 +9,7 @@ use Source\Core\Controller;
 use Source\Domain\Model\BalanceSheet;
 use Source\Domain\Model\ChartOfAccount;
 use Source\Domain\Model\ChartOfAccountGroup;
+use Source\Domain\Model\HistoryAudit;
 
 /**
  * BalanceSheetOverview Controllers
@@ -123,7 +124,7 @@ class BalanceSheetOverView extends Controller
                 $groupData = array_map(function ($item) {
                     if (preg_match("/receita/", strtolower(removeAccets($item["account_name_group"])))) {
                         $item["account_value"] = empty($item["account_type"]) ? $item["account_value"] * -1 : $item["account_value"];
-                    }else {
+                    } else {
                         $item["account_value"] = !empty($item["account_type"]) ? $item["account_value"] * -1 : $item["account_value"];
                     }
                     return $item;
@@ -137,7 +138,7 @@ class BalanceSheetOverView extends Controller
 
                 $total = 0;
             }
-            
+
             // Principais contas de apuração
             $costAccountingValue = $groupAccounting["custo das vendas"]["account_value"] ?? 0;
             $revenueAccountingValue = $groupAccounting["receitas de vendas de produtos e servicos"]["account_value"] ?? 0;
@@ -287,6 +288,24 @@ class BalanceSheetOverView extends Controller
 
                 // C - Despesas administrativas
                 $persistCloseAccounting($balanceSheetParams);
+            }
+
+            $historyAudit = new HistoryAudit();
+            $historyResponse = $historyAudit->persistData([
+                "uuid" => Uuid::uuid4(),
+                "id_company" => $responseInitializeUserAndCompany["company_id"],
+                "id_user" => $responseInitializeUserAndCompany["user"],
+                "id_report" => 1,
+                "history_transaction" => "Encerramento contábil no mês de " . monthsInPortuguese()[$dateTime->format("n")] . "/" . $dateTime->format("Y") . "",
+                "transaction_value" => 0,
+                "created_at" => date("Y-m-d H:i:s"),
+                "deleted" => 0
+            ]);
+
+            if (empty($historyResponse)) {
+                http_response_code(500);
+                echo $historyResponse->message->json();
+                die;
             }
 
             Connect::getInstance()->commit();
@@ -445,6 +464,35 @@ class BalanceSheetOverView extends Controller
                 $errorMessage($balanceSheet->message->json());
             }
 
+            $date = preg_replace("/^(\d{4})-(\d{2})-(\d{2})$/", "$3/$2/$1", $requestPost["createdAt"]);
+            $currencyValue = "R$ " . number_format($requestPost["accountValue"], 2, ",", ".");
+            $accountType = empty($requestPost["accountType"]) ? "Débito" : "Crédito";
+
+            $data = [
+                "account_type" => $accountType,
+                "account_value" => $currencyValue,
+                "history_account" => $requestPost["accountHistory"],
+                "created_at" => $date,
+            ];
+
+            $historyAudit = new HistoryAudit();
+            $historyResponse = $historyAudit->persistData([
+                "uuid" => Uuid::uuid4(),
+                "id_company" => $responseInitializeUserAndCompany["company_id"],
+                "id_user" => $responseInitializeUserAndCompany["user"],
+                "id_report" => 1,
+                "history_transaction" => "Novo lançamento contábil: " . json_encode($data) . "",
+                "transaction_value" => 0,
+                "created_at" => date("Y-m-d H:i:s"),
+                "deleted" => 0
+            ]);
+
+            if (empty($historyResponse)) {
+                http_response_code(500);
+                echo $historyResponse->message->json();
+                die;
+            }
+
             echo json_encode(["success" => "registro criado com sucesso"]);
             die;
         }
@@ -470,7 +518,7 @@ class BalanceSheetOverView extends Controller
         ];
 
         if (!empty($chartOfAccountData)) {
-            $chartOfAccountData = array_filter($chartOfAccountData, function($item) use ($filterAccountData) {
+            $chartOfAccountData = array_filter($chartOfAccountData, function ($item) use ($filterAccountData) {
                 if (!in_array($item->account_name, $filterAccountData)) {
                     return $item;
                 }

@@ -12,6 +12,7 @@ use Source\Core\Model;
 use Source\Domain\Model\ChartOfAccount;
 use Source\Domain\Model\ChartOfAccountGroup;
 use Source\Domain\Model\ChartOfAccountModel;
+use Source\Domain\Model\HistoryAudit;
 use Source\Support\Message;
 
 /**
@@ -32,13 +33,14 @@ class BalanceSheet extends Controller
 
     public function chartOfAccountGroupBackup()
     {
+        $responseInitializeUserAndCompany = initializeUserAndCompanyId();
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
             verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $requestPost = $this->getRequests()->setRequiredFields(["uuid", "action"])->getAllPostData();
 
             $chartOfAccountGroup = new ChartOfAccountGroup();
             $chartOfAccountGroup->setUuid($requestPost["uuid"]);
-            $chartOfAccountGroupData = $chartOfAccountGroup->findChartOfAccountGroupByUuid(["id"]);
+            $chartOfAccountGroupData = $chartOfAccountGroup->findChartOfAccountGroupByUuid(["id", "account_name"]);
 
             if (empty($chartOfAccountGroupData)) {
                 http_response_code(500);
@@ -57,13 +59,13 @@ class BalanceSheet extends Controller
                     $model->deleted = 0;
 
                     $response->error = !$model->save() ? true : false;
-                    $response->error ? $response->message->error("erro ao tentar restaurar o registro") :
-                        $response->message->success("registro restaurado com sucesso");
+                    $response->error ? $response->message->error("erro ao tentar restaurar o registro") : $response->message->success("registro restaurado com sucesso");
+                    $response->verb = "Restauração";
                 },
                 "delete" => function (Model $model) use ($response) {
                     $response->error = !$model->destroy() ? true : false;
-                    $response->error ? $response->message->error("erro ao tentar excluir o registro") :
-                        $response->message->success("registro excluído com sucesso");
+                    $response->error ? $response->message->error("erro ao tentar excluir o registro") : $response->message->success("registro excluído com sucesso");
+                    $response->verb = "Exclusão permanente";
                 },
             ];
 
@@ -77,11 +79,28 @@ class BalanceSheet extends Controller
                 die;
             }
 
+            $historyAudit = new HistoryAudit();
+            $historyResponse = $historyAudit->persistData([
+                "uuid" => Uuid::uuid4(),
+                "id_company" => $responseInitializeUserAndCompany["company_id"],
+                "id_user" => $responseInitializeUserAndCompany["user"],
+                "id_report" => 1,
+                "history_transaction" => "{$response->verb} do grupo plano de contas, conta: {$chartOfAccountGroupData->account_name}",
+                "transaction_value" => 0,
+                "created_at" => date("Y-m-d H:i:s"),
+                "deleted" => 0,
+            ]);
+
+            if (empty($historyResponse)) {
+                http_response_code(500);
+                echo $historyResponse->message->json();
+                die;
+            }
+
             echo $response->message->json();
             die;
         }
 
-        $responseInitializeUserAndCompany = initializeUserAndCompanyId();
         $chartOfAccountGroup = new ChartOfAccountGroup();
         $chartOfAccountGroupData = $chartOfAccountGroup->findAllChartOfAccountGroup(
             [
@@ -105,8 +124,19 @@ class BalanceSheet extends Controller
 
     public function chartOfAccountGroupDelete()
     {
+        $responseInitializeUserAndCompany = initializeUserAndCompanyId();
         verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
         $requestPost = $this->getRequests()->setRequiredFields(["uuid"])->getAllPostData();
+
+        $chartOfAccountGroup = new ChartOfAccountGroup();
+        $chartOfAccountGroup->setUuid($requestPost["uuid"]);
+        $chartOfAccountGroupData = $chartOfAccountGroup->findChartOfAccountGroupByUuid(["account_name"]);
+
+        if (empty($chartOfAccountGroupData)) {
+            http_response_code(500);
+            echo json_encode(["error" => "registro inexistente"]);
+            die;
+        }
 
         $chartOfAccountGroup = new ChartOfAccountGroup();
         $response = $chartOfAccountGroup->updateChartOfAccountGroupByUuid([
@@ -120,11 +150,30 @@ class BalanceSheet extends Controller
             die;
         }
 
+        $historyAudit = new HistoryAudit();
+        $historyResponse = $historyAudit->persistData([
+            "uuid" => Uuid::uuid4(),
+            "id_company" => $responseInitializeUserAndCompany["company_id"],
+            "id_user" => $responseInitializeUserAndCompany["user"],
+            "id_report" => 1,
+            "history_transaction" => "Exclusão do grupo plano de contas, conta: {$chartOfAccountGroupData->account_name}",
+            "transaction_value" => 0,
+            "created_at" => date("Y-m-d H:i:s"),
+            "deleted" => 0,
+        ]);
+
+        if (empty($historyResponse)) {
+            http_response_code(500);
+            echo $historyResponse->message->json();
+            die;
+        }
+
         echo json_encode(["success" => "grupo plano de contas removido com sucesso"]);
     }
 
     public function chartOfAccountGroupUpdate(array $data)
     {
+        $responseInitializeUserAndCompany = initializeUserAndCompanyId();
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
             verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $requestPost = $this->getRequests()->setRequiredFields(
@@ -136,10 +185,19 @@ class BalanceSheet extends Controller
                 ]
             )->getAllPostData();
 
-            $responseInitializeUserAndCompany = initializeUserAndCompanyId();
             if (empty($responseInitializeUserAndCompany["company_id"])) {
                 http_response_code(500);
                 echo json_encode(["error" => "selecione uma empresa antes de atualizar uma categoria de contas"]);
+                die;
+            }
+
+            $chartOfAccountGroup = new ChartOfAccountGroup();
+            $chartOfAccountGroup->setUuid($requestPost["uuid"]);
+            $chartOfAccountGroupData = $chartOfAccountGroup->findChartOfAccountGroupByUuid(["account_name", "account_number"]);
+
+            if (empty($chartOfAccountGroupData)) {
+                http_response_code(500);
+                echo json_encode(["error" => "registro inexistente"]);
                 die;
             }
 
@@ -153,6 +211,34 @@ class BalanceSheet extends Controller
             if (!$response) {
                 http_response_code(500);
                 echo $chartOfAccountGroup->message->json();
+                die;
+            }
+
+            $fromData = [
+                "account_name" => $chartOfAccountGroupData->account_name,
+                "account_number" => $chartOfAccountGroupData->account_number
+            ];
+
+            $toData = [
+                "account_name" => $requestPost["accountName"],
+                "account_number" => $requestPost["accountNumber"]
+            ];
+
+            $historyAudit = new HistoryAudit();
+            $historyResponse = $historyAudit->persistData([
+                "uuid" => Uuid::uuid4(),
+                "id_company" => $responseInitializeUserAndCompany["company_id"],
+                "id_user" => $responseInitializeUserAndCompany["user"],
+                "id_report" => 1,
+                "history_transaction" => "Alteração do grupo plano de contas, de " . json_encode($fromData) . " para " . json_encode($toData) . "",
+                "transaction_value" => 0,
+                "created_at" => date("Y-m-d H:i:s"),
+                "deleted" => 0,
+            ]);
+
+            if (empty($historyResponse)) {
+                http_response_code(500);
+                echo $historyResponse->message->json();
                 die;
             }
 
@@ -191,6 +277,7 @@ class BalanceSheet extends Controller
 
     public function chartOfAccountGroupForm()
     {
+        $responseInitializeUserAndCompany = initializeUserAndCompanyId();
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
             verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $requestPost = $this->getRequests()->setRequiredFields(
@@ -201,7 +288,6 @@ class BalanceSheet extends Controller
                 ]
             )->getAllPostData();
 
-            $responseInitializeUserAndCompany = initializeUserAndCompanyId();
             if (empty($responseInitializeUserAndCompany["company_id"])) {
                 http_response_code(500);
                 echo json_encode(["error" => "selecione uma empresa antes de criar uma categoria de contas"]);
@@ -243,6 +329,29 @@ class BalanceSheet extends Controller
                 die;
             }
 
+            $data = [
+                "account_name" => $requestPost["accountName"],
+                "account_number" => $requestPost["accountNumber"],
+            ];
+
+            $historyAudit = new HistoryAudit();
+            $historyResponse = $historyAudit->persistData([
+                "uuid" => Uuid::uuid4(),
+                "id_company" => $responseInitializeUserAndCompany["company_id"],
+                "id_user" => $responseInitializeUserAndCompany["user"],
+                "id_report" => 1,
+                "history_transaction" => "Novo grupo plano de contas: " . json_encode($data) . "",
+                "transaction_value" => 0,
+                "created_at" => date("Y-m-d H:i:s"),
+                "deleted" => 0,
+            ]);
+
+            if (empty($historyResponse)) {
+                http_response_code(500);
+                echo $historyResponse->message->json();
+                die;
+            }
+
             echo json_encode(["success" => "categoria de contas criada com sucesso"]);
             die;
         }
@@ -279,13 +388,14 @@ class BalanceSheet extends Controller
 
     public function chartOfAccountBackup()
     {
+        $responseUserAndCompany = initializeUserAndCompanyId();
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
             verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $requestPost = $this->getRequests()->setRequiredFields(["uuid", "action"])->getAllPostData();
             $chartOfAccount = new ChartOfAccount();
 
             $chartOfAccount->setUuid($requestPost["uuid"]);
-            $chartOfAccountData = $chartOfAccount->findChartOfAccountByUuid(["id"]);
+            $chartOfAccountData = $chartOfAccount->findChartOfAccountByUuid(["id", "account_name"]);
 
             if (!empty($chartOfAccountData)) {
                 $chartOfAccountData->setRequiredFields(["deleted"]);
@@ -302,6 +412,7 @@ class BalanceSheet extends Controller
                     if ($model->save()) {
                         $response->error = false;
                         $response->message->success("registro restaurado com sucesso");
+                        $response->verb = "Restauração";
                     }
                 },
 
@@ -309,6 +420,7 @@ class BalanceSheet extends Controller
                     if ($model->destroy()) {
                         $response->error = false;
                         $response->message->success("registro removido com sucesso");
+                        $response->verb = "Exclusão permanente";
                     }
                 }
             ];
@@ -320,6 +432,24 @@ class BalanceSheet extends Controller
             if ($response->error) {
                 http_response_code(500);
                 echo $response->message->json();
+                die;
+            }
+
+            $historyAudit = new HistoryAudit();
+            $historyResponse = $historyAudit->persistData([
+                "uuid" => Uuid::uuid4(),
+                "id_company" => $responseUserAndCompany["company_id"],
+                "id_user" => $responseUserAndCompany["user"],
+                "id_report" => 1,
+                "history_transaction" => "{$response->verb} do plano de contas, conta: {$chartOfAccountData->account_name}",
+                "transaction_value" => 0,
+                "created_at" => date("Y-m-d H:i:s"),
+                "deleted" => 0,
+            ]);
+
+            if (empty($historyResponse)) {
+                http_response_code(500);
+                echo $historyResponse->message->json();
                 die;
             }
 
@@ -493,6 +623,24 @@ class BalanceSheet extends Controller
                     Connect::getInstance()->rollBack();
                     die;
                 }
+
+                $historyAudit = new HistoryAudit();
+                $historyResponse = $historyAudit->persistData([
+                    "uuid" => Uuid::uuid4(),
+                    "id_company" => $responseUserAndCompany["company_id"],
+                    "id_user" => $responseUserAndCompany["user"],
+                    "id_report" => 1,
+                    "history_transaction" => "Importação do plano de contas, conta: {$arrayB[0]}",
+                    "transaction_value" => 0,
+                    "created_at" => date("Y-m-d H:i:s"),
+                    "deleted" => 0,
+                ]);
+
+                if (empty($historyResponse)) {
+                    http_response_code(500);
+                    echo $historyResponse->message->json();
+                    die;
+                }
             }
         }
 
@@ -533,8 +681,19 @@ class BalanceSheet extends Controller
 
     public function chartOfAccountFormDelete()
     {
+        $responseUserAndCompany = initializeUserAndCompanyId();
         verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
         $requestPost = $this->getRequests()->setRequiredFields(["uuid"])->getAllPostData();
+
+        $chartOfAccount = new ChartOfAccount();
+        $chartOfAccount->setUuid($requestPost["uuid"]);
+        $chartOfAccountData = $chartOfAccount->findChartOfAccountByUuid(["account_name"]);
+
+        if (empty($chartOfAccountData)) {
+            http_response_code(500);
+            echo json_encode(["error" => "registro inexistente"]);
+            die;
+        }
 
         $chartOfAccount = new ChartOfAccount();
         $response = $chartOfAccount->updateChartOfAccountByUuid([
@@ -545,6 +704,24 @@ class BalanceSheet extends Controller
         if (!$response) {
             http_response_code(500);
             echo $chartOfAccount->message->json();
+            die;
+        }
+
+        $historyAudit = new HistoryAudit();
+        $historyResponse = $historyAudit->persistData([
+            "uuid" => Uuid::uuid4(),
+            "id_company" => $responseUserAndCompany["company_id"],
+            "id_user" => $responseUserAndCompany["user"],
+            "id_report" => 1,
+            "history_transaction" => "Exclusão do plano de contas, conta: {$chartOfAccountData->account_name}",
+            "transaction_value" => 0,
+            "created_at" => date("Y-m-d H:i:s"),
+            "deleted" => 0,
+        ]);
+
+        if (empty($historyResponse)) {
+            http_response_code(500);
+            echo $historyResponse->message->json();
             die;
         }
 
@@ -566,11 +743,31 @@ class BalanceSheet extends Controller
 
             $chartOfAccountGroup = new ChartOfAccountGroup();
             $chartOfAccountGroup->setUuid($requestPost["chartOfAccountGroupSelect"]);
-            $chartOfAccountGroupData = $chartOfAccountGroup->findChartOfAccountGroupByUuid(["id"]);
+            $chartOfAccountGroupData = $chartOfAccountGroup->findChartOfAccountGroupByUuid(["id", "account_name"]);
 
             if (empty($chartOfAccountGroupData)) {
                 http_response_code(500);
                 echo json_encode(["error" => "grupo de contas inexistente"]);
+                die;
+            }
+
+            $chartOfAccount = new ChartOfAccount();
+            $chartOfAccount->setUuid($requestPost["uuid"]);
+            $chartOfAccountData = $chartOfAccount->findChartOfAccountByUuid(
+                [
+                    "account_name",
+                    "id_chart_of_account_group",
+                    "account_number"
+                ]
+            );
+
+            $oldChartOfAccountGroup = new ChartOfAccountGroup();
+            $oldChartOfAccountGroup->setId($chartOfAccountData->id_chart_of_account_group);
+            $oldChartOfAccountGroupData = $oldChartOfAccountGroup->findChartOfAccountGroupById(["account_name"]);
+
+            if (empty($oldChartOfAccountGroup)) {
+                http_response_code(500);
+                echo json_encode(["error" => "grupo de contas anterior inexistente"]);
                 die;
             }
 
@@ -585,6 +782,36 @@ class BalanceSheet extends Controller
             if (!$response) {
                 http_response_code(500);
                 echo $chartOfAccount->message->json();
+                die;
+            }
+
+            $fromData = [
+                "account_name" => $chartOfAccountData->account_name,
+                "account_number" => $chartOfAccountData->account_number,
+                "account_group" => $oldChartOfAccountGroupData->account_name
+            ];
+
+            $toData = [
+                "account_name" => $requestPost["accountName"],
+                "account_number" => $requestPost["accountValue"],
+                "account_group" => $chartOfAccountGroupData->account_name
+            ];
+
+            $historyAudit = new HistoryAudit();
+            $historyResponse = $historyAudit->persistData([
+                "uuid" => Uuid::uuid4(),
+                "id_company" => $responseInitializeUserAndCompany["company_id"],
+                "id_user" => $responseInitializeUserAndCompany["user"],
+                "id_report" => 1,
+                "history_transaction" => "Atualização do plano de contas, de " . json_encode($fromData) . " para " . json_encode($toData) . "",
+                "transaction_value" => 0,
+                "created_at" => date("Y-m-d H:i:s"),
+                "deleted" => 0
+            ]);
+
+            if (empty($historyResponse)) {
+                http_response_code(500);
+                echo $historyResponse->message->json();
                 die;
             }
 
@@ -723,6 +950,30 @@ class BalanceSheet extends Controller
             if (empty($chartOfAccountData)) {
                 http_response_code(500);
                 echo json_encode(["error" => "Erro ao tentar encontrar o registro"]);
+                die;
+            }
+
+            $data = [
+                "account_number" => $requestPost["accountValue"],
+                "account_name" => $requestPost["accountName"],
+                "account_group" => $chartOfAccountGroupData->account_name
+            ];
+
+            $historyAudit = new HistoryAudit();
+            $historyResponse = $historyAudit->persistData([
+                "uuid" => Uuid::uuid4(),
+                "id_company" => $responseInitializeUserAndCompany["company_id"],
+                "id_user" => $responseInitializeUserAndCompany["user"],
+                "id_report" => 1,
+                "history_transaction" => "Nova conta no plano de contas: " . json_encode($data) . "",
+                "transaction_value" => 0,
+                "created_at" => date("Y-m-d H:i:s"),
+                "deleted" => 0
+            ]);
+
+            if (empty($historyResponse)) {
+                http_response_code(500);
+                echo $historyResponse->message->json();
                 die;
             }
 

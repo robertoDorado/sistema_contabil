@@ -22,6 +22,11 @@
     <div class="content">
         <div class="container-fluid">
             <div class="row">
+                <div class="col-md-6 mb-5">
+                    <?= $v->insert("admin/layouts/_daterange_input") ?>
+                </div>
+            </div>
+            <div class="row">
                 <div class="col">
                     <div class="card">
                         <div class="card-header">

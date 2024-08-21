@@ -45,6 +45,12 @@ class ChartOfAccountGroup
         return $this->data->$name ?? null;
     }
 
+    public function findChartOfAccountGroupById(array $columns): ?ModelsChartOfAccountGroup
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        return $this->chartOfAccountGroup->findById($this->getId(), $columns);
+    }
+
     public function findChartOfAccountGroupByAccountNumber(array $columns, array $params): ?ModelsChartOfAccountGroup
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);

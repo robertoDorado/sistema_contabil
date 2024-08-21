@@ -940,10 +940,6 @@ const historyAuditBackup = dataTableConfig($("#historyAuditBackup"),
             {
                 "targets": [0],
                 "visible": false,
-            },
-            {
-                "width": "12%",
-                "targets": [3]
             }
         ],
         "language": {
