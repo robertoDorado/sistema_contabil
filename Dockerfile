@@ -2,8 +2,8 @@
 FROM php:7.4-apache
 
 # Instalação das dependências necessárias
-RUN apt-get update \
-    && apt-get install -y \
+RUN apt-get update && apt-get install -y \
+    libxml2-dev \
     unzip \
     libfreetype6-dev \
     libjpeg62-turbo-dev \
@@ -14,7 +14,7 @@ RUN apt-get update \
     update-ca-certificates \
     curl \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) gd zip pdo pdo_mysql mysqli \
+    && docker-php-ext-install -j$(nproc) gd zip pdo pdo_mysql mysqli soap \
     && rm -rf /var/lib/apt/lists/*
 
 # Baixe e instale o stripe-cli
