@@ -247,6 +247,12 @@ $route->get("/balance-sheet/general-ledge/report", "FinancialStatements::general
 $route->get("/balance-sheet/income-statement/report", "FinancialStatements::incomeStatementReport");
 $route->get("/balance-sheet/statement-of-value-added/report", "FinancialStatements::statementOfValueAdded");
 
+/**
+ * Nota Fiscal
+ */
+$route->get("/invoice/form", "Invoice::invoiceReport");
+$route->post("/invoice/form", "Invoice::invoiceReport");
+
 /** 
  * Assinatura do cliente
  */

@@ -320,5 +320,7 @@ try {
     }
 } catch (Exception $th) {
     echo $th->getMessage() . PHP_EOL;
-    print_r($make->getErrors());
+    if (!empty($make)) {
+        print_r($make->getErrors());
+    }
 }

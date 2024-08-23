@@ -29,7 +29,6 @@ class CompanyTest extends TestCase
     public function testExceptionGetId()
     {
         $this->company = new Company();
-        $this->company->setId(0);
         $this->expectException(Exception::class);
         $this->expectExceptionMessage("id não atribuido");
         $this->company->getId();

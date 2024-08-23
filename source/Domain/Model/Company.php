@@ -146,7 +146,7 @@ class Company
 
     public function getId(): int
     {
-        if (empty($this->id)) {
+        if (!isset($this->id)) {
             throw new Exception("id não atribuido");
         }
         return $this->id;
