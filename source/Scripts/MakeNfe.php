@@ -45,10 +45,10 @@ try {
     $std->indPag = 0; //NÃO EXISTE MAIS NA VERSÃO 4.00
     $std->mod = 55;
     $std->serie = 1;
-    $std->nNF = 2;
-    $std->dhEmi = '2015-02-19T13:48:00-02:00';
+    $std->nNF = '444444444';
+    $std->dhEmi = '2015-02-19T13:48:00-00:00';
     $std->dhSaiEnt = null;
-    $std->tpNF = 1;
+    $std->tpNF = $config["tpNF"];
     $std->idDest = 1;
     $std->cMunFG = 3518800;
     $std->tpImp = 1;

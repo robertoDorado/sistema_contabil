@@ -8,3 +8,4 @@ coverage
 .phpunit.result.cache
 ssl
 apache-config
+source/Scripts/config/

@@ -25,45 +25,93 @@ class Invoice
     /**
      * Invoice constructor
      */
-    public function __construct(array $configData)
+    public function __construct(array $configData = [])
     {
-        $this->configData = [
-            "atualizacao" => "2016-11-03 18:01:21",
-            "tpAmb" => (int) $configData["tpAmb"],
-            "razaosocial" => $configData["companyName"],
-            "cnpj" => $configData["companyDocument"],
-            "siglaUF" => $configData["companyState"],
-            "certPfx" => $configData["certPfx"],
-            "certPassword" => $configData["certPassword"],
-            "schemes" => "PL_009_V4",
-            "versao" => '4.00',
-            "tokenIBPT" => "AAAAAAA",
-            "CSC" => "GPB0JBWLUR6HWFTVEAS6RJ69GPCROFPBBB8G",
-            "CSCid" => "000001",
-            "proxyConf" => [
-                "proxyIp" => "",
-                "proxyPort" => "",
-                "proxyUser" => "",
-                "proxyPass" => ""
-            ]
-        ];
+        if (!empty($configData)) {
+            $this->configData = [
+                "atualizacao" => "2016-11-03 18:01:21",
+                "tpAmb" => (int) $configData["tpAmb"],
+                "razaosocial" => $configData["companyName"],
+                "cnpj" => $configData["companyDocument"],
+                "siglaUF" => $configData["companyState"],
+                "certPfx" => $configData["certPfx"],
+                "certPassword" => $configData["certPassword"],
+                "schemes" => "PL_009_V4",
+                "versao" => '4.00',
+                "tokenIBPT" => "AAAAAAA",
+                "CSC" => "GPB0JBWLUR6HWFTVEAS6RJ69GPCROFPBBB8G",
+                "CSCid" => "000001",
+                "proxyConf" => [
+                    "proxyIp" => "",
+                    "proxyPort" => "",
+                    "proxyUser" => "",
+                    "proxyPass" => ""
+                ]
+            ];
+        }
     }
 
-    public function invoiceIdentification()
+    public function requestMunicipality(): array
+    {
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://servicodados.ibge.gov.br/api/v1/localidades/municipios',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+        ));
+
+        $response = curl_exec($curl);
+        if (!$response) {
+            return [];
+        }
+
+        curl_close($curl);
+        return json_decode($response, true);
+    }
+
+    public function requestStateCode(): array
+    {
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://servicodados.ibge.gov.br/api/v1/localidades/estados',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+        ));
+
+        $response = curl_exec($curl);
+        if (!$response) {
+            return [];
+        }
+
+        curl_close($curl);
+        return json_decode($response, true);
+    }
+
+    public function invoiceIdentification(array $config): Invoice
     {
         $std = new \stdClass();
-        $std->cUF = 35;
-        $std->cNF = '80070008';
-        $std->natOp = 'Venda de Mercadorias';
-        $std->indPag = 0; //NÃO EXISTE MAIS NA VERSÃO 4.00
-        $std->mod = 55;
-        $std->serie = 1;
-        $std->nNF = 2;
-        $std->dhEmi = '2015-02-19T13:48:00-02:00';
-        $std->dhSaiEnt = null;
-        $std->tpNF = 1;
-        $std->idDest = 1;
-        $std->cMunFG = 3518800;
+        $std->cUF = $config["cUF"];
+        $std->cNF = $config["cNF"];
+        $std->natOp = $config["natOp"];
+        $std->mod = $config["mod"];
+        $std->serie = $config["serie"];
+        $std->nNF = $config["nNF"];
+        $std->dhEmi = $config["dhEmi"];
+        $std->dhSaiEnt = $config["dhSaiEnt"];
+        $std->tpNF = $config["tpNF"];
+        $std->idDest = $config["idDest"];
+        $std->cMunFG = $config["cMunFG"];
         $std->tpImp = 1;
         $std->tpEmis = 1;
         $std->cDV = 2;
@@ -77,9 +125,10 @@ class Invoice
         $std->dhCont = null;
         $std->xJust = null;
         $this->make->tagide($std);
+        return $this;
     }
 
-    public function makeInvoice()
+    public function makeInvoice(): Invoice
     {
         $this->make = new Make();
         $std = new \stdClass();
@@ -106,8 +155,10 @@ class Invoice
             }
 
             return true;
-        } catch (Exception $th) {
-            throw new Exception($th->getMessage());
+        } catch (Exception $_) {
+            http_response_code(500);
+            echo json_encode(["error" => "certficado inválido"]);
+            die;
         }
     }
 }
