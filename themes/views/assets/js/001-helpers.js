@@ -1,4 +1,27 @@
 const modal = document.getElementById("loadingModal");
+function customMatcher(params, data) {
+    // Se não há termo de busca, retorne todos os dados
+    if ($.trim(params.term) === '') {
+        return data;
+    }
+
+    // Converta para minúsculas para fazer uma busca case-insensitive
+    if (typeof data.text === 'undefined') {
+        return null;
+    }
+
+    var term = params.term.toLowerCase();
+    var text = data.text.toLowerCase();
+
+    // Verifique se o termo de busca está contido no texto
+    if (text.indexOf(term) > -1) {
+        return data;
+    }
+
+    // Retorne null se não houver correspondência
+    return null;
+}
+
 function companyMaskForm() {
     return {
         cnpj: function (value) {
@@ -8,6 +31,14 @@ function companyMaskForm() {
                 .replace(/(\d{3})(\d)/, "$1/$2")
                 .replace(/(\d{4})(\d)/, "$1-$2")
                 .replace(/(-\d{2})\d+?$/, "$1")
+        },
+
+        cpf: function (value) {
+            return value.replace(/\D/g, "")
+            .replace(/(\d{3})(\d)/, "$1.$2")
+            .replace(/(\d{3})(\d)/, "$1.$2")
+            .replace(/(\d{3})(\d)/, "$1-$2")
+            .replace(/(-\d{2})\d+?$/, "$1")
         },
 
         cep: function (value) {
@@ -62,6 +93,10 @@ function companyMaskForm() {
         invoiceNumber: function (value) {
             return value.replace(/\D/g, "")
             .replace(/(\d{9})\d+?$/, "$1")
+        },
+
+        CNAE: function (value) {
+            return value.replace(/\D/g, "")
         }
     }
 }

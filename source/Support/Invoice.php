@@ -22,6 +22,9 @@ class Invoice
     /** @var Make */
     private Make $make;
 
+    /** @var object Data */
+    private object $data;
+
     /**
      * Invoice constructor
      */
@@ -48,7 +51,66 @@ class Invoice
                     "proxyPass" => ""
                 ]
             ];
+
+            $this->data = new \stdClass();
         }
+    }
+
+    public function __set($name, $value)
+    {
+        $this->data->$name = $value;
+    }
+
+    public function __get($name)
+    {
+        return $this->data->$name ?? null;
+    }
+
+    public function recipientAddress(array $config)
+    {
+        $this->std = new \stdClass();
+        $this->std->xNome = $config["xNome"];
+        $this->std->indIEDest = $config["indIEDest"];
+        $this->std->IE = $config["IE"];
+        $this->std->ISUF = $config["ISUF"];
+        $this->std->IM = $config["IM"];
+        $this->std->email = $config["email"];
+        $this->std->CNPJ = $config["CNPJ"];
+        $this->std->CPF = $config["CPF"];
+        $this->std->idEstrangeiro = $config["idEstrangeiro"];
+        $this->make->tagdest($this->std);
+        return $this;
+    }
+
+    public function issuerAddressData(array $config)
+    {
+        $this->std = new \stdClass();
+        $this->std->xLgr = $config["xLgr"];
+        $this->std->nro = $config["nro"];
+        $this->std->xCpl = $config["xCpl"];
+        $this->std->xBairro = $config["xBairro"];
+        $this->std->cMun = $config["cMun"];
+        $this->std->xMun = $config["xMun"];
+        $this->std->UF = $config["UF"];
+        $this->std->CEP = $config["CEP"];
+        $this->std->cPais = $config["cPais"];
+        $this->std->xPais = $config["xPais"];
+        $this->std->fone = $config["fone"];
+        $this->make->tagenderEmit($this->std);
+        return $this;
+    }
+
+    public function issuerData(array $config)
+    {
+        $this->std = new \stdClass();
+        $this->std->xNome = $config["xNome"];
+        $this->std->xFant = $config["xFant"];
+        $this->std->IE = $config["IE"];
+        $this->std->CNAE = $config["CNAE"];
+        $this->std->CRT = $config["CRT"];
+        $this->std->CNPJ = $config["CNPJ"];
+        $this->make->tagemit($this->std);
+        return $this;
     }
 
     public function requestMunicipality(): array
@@ -100,31 +162,30 @@ class Invoice
 
     public function invoiceIdentification(array $config): Invoice
     {
-        $std = new \stdClass();
-        $std->cUF = $config["cUF"];
-        $std->cNF = $config["cNF"];
-        $std->natOp = $config["natOp"];
-        $std->mod = $config["mod"];
-        $std->serie = $config["serie"];
-        $std->nNF = $config["nNF"];
-        $std->dhEmi = $config["dhEmi"];
-        $std->dhSaiEnt = $config["dhSaiEnt"];
-        $std->tpNF = $config["tpNF"];
-        $std->idDest = $config["idDest"];
-        $std->cMunFG = $config["cMunFG"];
-        $std->tpImp = 1;
-        $std->tpEmis = 1;
-        $std->cDV = 2;
-        $std->tpAmb = 2;
-        $std->finNFe = 1;
-        $std->indFinal = 0;
-        $std->indPres = 0;
-        $std->indIntermed = null;
-        $std->procEmi = 0;
-        $std->verProc = '3.10.31';
-        $std->dhCont = null;
-        $std->xJust = null;
-        $this->make->tagide($std);
+        $this->std = new \stdClass();
+        $this->std->cUF = $config["cUF"];
+        $this->std->cNF = $config["cNF"];
+        $this->std->natOp = $config["natOp"];
+        $this->std->mod = $config["mod"];
+        $this->std->serie = $config["serie"];
+        $this->std->nNF = $config["nNF"];
+        $this->std->dhEmi = $config["dhEmi"];
+        $this->std->dhSaiEnt = $config["dhSaiEnt"];
+        $this->std->tpNF = $config["tpNF"];
+        $this->std->idDest = $config["idDest"];
+        $this->std->cMunFG = $config["cMunFG"];
+        $this->std->tpImp = $config["tpImp"];
+        $this->std->tpEmis = $config["tpEmis"];
+        $this->std->tpAmb = $this->configData["tpAmb"];
+        $this->std->finNFe = $config["finNFe"];
+        $this->std->indFinal = $config["indFinal"];
+        $this->std->indPres = $config["indPres"];
+        $this->std->indIntermed = null;
+        $this->std->procEmi = 0;
+        $this->std->verProc = '3.10.31';
+        $this->std->dhCont = null;
+        $this->std->xJust = null;
+        $this->make->tagide($this->std);
         return $this;
     }
 

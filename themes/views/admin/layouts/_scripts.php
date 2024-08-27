@@ -59,6 +59,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
     <!-- Bootstrap 4 -->
     <script src="<?= url(CONF_ADMIN_PATH . "/plugins/bootstrap/js/bootstrap.bundle.min.js") ?>"></script>
+    <!-- Form Bootstrap Wizard -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery-bootstrap-wizard@1.4.2/jquery.bootstrap.wizard.min.js"></script>
     <!-- AdminLTE App -->
     <script src="<?= url(CONF_ADMIN_PATH . "/dist/js/adminlte.min.js") ?>"></script>
     <!-- DataTables -->

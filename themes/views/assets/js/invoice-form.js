@@ -2,8 +2,38 @@ if (window.location.pathname == "/admin/invoice/form") {
     const invoiceForm = document.getElementById("invoiceForm")
     const pfxFile = document.querySelector("[name='pfxFile']")
     const verifyExtensionFile = ["pfx"]
+    const recipientDocumentType = document.getElementById("recipientDocumentType")
+    const recipientDocument = document.getElementById("recipientDocument")
     let fieldsRequired = Array.from(document.querySelectorAll("input,select"))
+
+    $('#form-wizard').bootstrapWizard({
+        'tabClass': 'nav nav-pills',
+        'nextSelector': '.wizard .next',
+        'previousSelector': '.wizard .previous'
+    })
+    fetch(window.location.origin + '/admin/invoice/municipality.json').then(data => data.json()).then(function (response) {
+    })
     $("#municipalityInvoice").select2()
+    document.querySelector(".select2.select2-container.select2-container--default").style.width = "100%"
+
+    dataTransferRecipientDocumentType = {
+        type: null
+    }
+    recipientDocumentType.addEventListener("change", function () {
+        const validateDocumentType = {
+            '1': 'cpf',
+            '2': 'cnpj'
+        }
+        dataTransferRecipientDocumentType.type = validateDocumentType[this.value]
+        recipientDocument.dataset.mask = validateDocumentType[this.value]
+    })
+
+    const mask = companyMaskForm()
+    recipientDocument.addEventListener("input", function () {
+        if (typeof mask[dataTransferRecipientDocumentType.type] == "function") {
+            this.value = mask[dataTransferRecipientDocumentType.type](this.value)
+        }
+    })
 
     const companyZipcode = document.querySelector("[name='companyZipcode']")
     companyZipcode.addEventListener("input", function () {
@@ -21,16 +51,15 @@ if (window.location.pathname == "/admin/invoice/form") {
         }
     })
 
-    const mask = companyMaskForm()
-    fieldsRequired.forEach(function(element) {
-        element.addEventListener("input", function() {
+    fieldsRequired.forEach(function (element) {
+        element.addEventListener("input", function () {
             if (this.dataset.mask) {
                 this.value = mask[this.dataset.mask](this.value)
             }
         })
     })
 
-    pfxFile.addEventListener("change", function() {
+    pfxFile.addEventListener("change", function () {
         const extensionName = extensionFileName(this.value)
 
         if (verifyExtensionFile.indexOf(extensionName) == -1) {
@@ -45,11 +74,12 @@ if (window.location.pathname == "/admin/invoice/form") {
 
     invoiceForm.addEventListener("submit", function (event) {
         event.preventDefault()
+        let fieldsRequired = Array.from(document.querySelectorAll("input,select"))
         fieldsRequired = fieldsRequired.filter((element) => !element.dataset.notrequired)
-        fieldsRequired = fieldsRequired.filter((element) => !element.value)
+        fieldsRequired = fieldsRequired.filter((element) => element.value == '')
 
         if (fieldsRequired.length > 0) {
-            fieldsRequired.forEach(function(element) {
+            fieldsRequired.forEach(function (element) {
                 if (element.dataset.name) {
                     toastr.error(`O campo ${element.dataset.name} não pode estar vazio`)
                 }
@@ -67,7 +97,7 @@ if (window.location.pathname == "/admin/invoice/form") {
         fetch(window.location.origin + "/admin/invoice/form", {
             method: "POST",
             body: form
-        }).then(response => response.json()).then(function(response) {
+        }).then(response => response.json()).then(function (response) {
             btnSubmit.removeAttribute("disabled")
             btnSubmit.innerHTML = "Emitir Nota Fiscal"
             let message = ""
@@ -78,7 +108,7 @@ if (window.location.pathname == "/admin/invoice/form") {
                 toastr.error(message)
                 throw new Error(message)
             }
-            
+
             if (response.success) {
                 message = response.success
                 message = message.charAt(0).toUpperCase() + message.slice(1)

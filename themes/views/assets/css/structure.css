@@ -31,54 +31,69 @@
     font-size: 1.5rem;
 }
 
-#selectCompanySession + .select2.select2-container.select2-container--default > .selection > .select2-selection.select2-selection--single .select2-selection__rendered {
+#selectCompanySession+.select2.select2-container.select2-container--default>.selection>.select2-selection.select2-selection--single .select2-selection__rendered {
     margin-top: -0.5rem !important;
 }
-#accountGroup + .select2.select2-container.select2-container--default > .selection > .select2-selection.select2-selection--single .select2-selection__rendered {
+
+#accountGroup+.select2.select2-container.select2-container--default>.selection>.select2-selection.select2-selection--single .select2-selection__rendered {
     margin-top: -0.5rem !important;
 }
-#chartOfAccountGroupSelect + .select2.select2-container.select2-container--default > .selection > .select2-selection.select2-selection--single .select2-selection__rendered {
+
+#chartOfAccountGroupSelect+.select2.select2-container.select2-container--default>.selection>.select2-selection.select2-selection--single .select2-selection__rendered {
     margin-top: -0.5rem !important;
 }
-#chartOfAccountSelect + .select2.select2-container.select2-container--default > .selection > .select2-selection.select2-selection--single .select2-selection__rendered {
+
+#chartOfAccountSelect+.select2.select2-container.select2-container--default>.selection>.select2-selection.select2-selection--single .select2-selection__rendered {
     margin-top: -0.5rem !important;
 }
-#municipalityInvoice + .select2.select2-container.select2-container--default > .selection > .select2-selection.select2-selection--single .select2-selection__rendered {
+
+#municipalityInvoice+.select2.select2-container.select2-container--default>.selection>.select2-selection.select2-selection--single .select2-selection__rendered {
     margin-top: -0.5rem !important;
 }
-#cashFlowSelectMultiple + .select2.select2-container.select2-container--default > .selection > .select2-selection.select2-selection--multiple > .select2-selection__rendered > .select2-selection__choice {
+
+#cashFlowSelectMultiple+.select2.select2-container.select2-container--default>.selection>.select2-selection.select2-selection--multiple>.select2-selection__rendered>.select2-selection__choice {
     color: #000;
 }
-#selectChartOfAccountMultiple + .select2.select2-container.select2-container--default > .selection > .select2-selection.select2-selection--multiple > .select2-selection__rendered > .select2-selection__choice {
+
+#selectChartOfAccountMultiple+.select2.select2-container.select2-container--default>.selection>.select2-selection.select2-selection--multiple>.select2-selection__rendered>.select2-selection__choice {
     color: #000;
 }
-#balanceSheetSelectMultiple + .select2.select2-container.select2-container--default > .selection > .select2-selection.select2-selection--multiple > .select2-selection__rendered > .select2-selection__choice {
+
+#balanceSheetSelectMultiple+.select2.select2-container.select2-container--default>.selection>.select2-selection.select2-selection--multiple>.select2-selection__rendered>.select2-selection__choice {
     color: #000;
 }
-#toast-container > .toast.toast-warning > .toast-close-button {
+
+#toast-container>.toast.toast-warning>.toast-close-button {
     color: #000;
 }
-#toast-container > .toast.toast-warning {
+
+#toast-container>.toast.toast-warning {
     color: #000;
 }
 
 .modal {
-    display: none; /* Hidden by default */
+    display: none;
+    /* Hidden by default */
     position: fixed;
-    z-index: 10000; /* Sit on top */
+    z-index: 10000;
+    /* Sit on top */
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(255, 255, 255, 0.8); /* White background with opacity */
+    overflow: auto;
+    /* Enable scroll if needed */
+    background-color: rgba(255, 255, 255, 0.8);
+    /* White background with opacity */
     justify-content: center;
     align-items: center;
 }
 
 .spinner {
-    border: 16px solid #f3f3f3; /* Light grey */
-    border-top: 16px solid #3498db; /* Blue */
+    border: 16px solid #f3f3f3;
+    /* Light grey */
+    border-top: 16px solid #3498db;
+    /* Blue */
     border-radius: 50%;
     width: 120px;
     height: 120px;
@@ -89,7 +104,20 @@
     margin: 1rem 0;
 }
 
+.container-page-wizard {
+    display: flex;
+    flex-direction: row;
+    list-style: none;
+    gap: 1rem;
+    padding: 0;
+}
+
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }

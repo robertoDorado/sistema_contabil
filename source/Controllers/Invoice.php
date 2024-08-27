@@ -3,6 +3,7 @@
 namespace Source\Controllers;
 
 use DateTime;
+use Exception;
 use Source\Core\Controller;
 use Source\Domain\Model\Company;
 use Source\Support\Invoice as SupportInvoice;
@@ -36,7 +37,6 @@ class Invoice extends Controller
                     "companyAddress",
                     "companyAddressNumber",
                     "companyNeighborhood",
-                    "companyCity",
                     "companyState",
                     "natureOperation",
                     "invoiceNumber",
@@ -45,7 +45,18 @@ class Invoice extends Controller
                     "environment",
                     "invoiceType",
                     "idInvoiceOperation",
-                    "municipalityInvoice"
+                    "municipalityInvoice",
+                    "purposeOfIssuance",
+                    "finalConsumer",
+                    "buyersPresence",
+                    "companyTaxRegime",
+                    "fantasyName",
+                    "companyComplement",
+                    "recipientName",
+                    "recipientStateRegistrationIndicator",
+                    "recipientEmail",
+                    "recipientDocumentType",
+                    "recipientDocument"
                 ]
             )->getAllPostData();
             $requestFile = $this->getRequestFiles()->getAllFiles();
@@ -70,7 +81,7 @@ class Invoice extends Controller
                 die;
             }
 
-            if (!preg_match("/^\d+$/", $requestPost["municipalityInvoice"])) {
+            if (!preg_match("/\d+-\w/i", $requestPost["municipalityInvoice"])) {
                 $message(["error" => "código do município inválido"], 500);
                 die;
             }
@@ -103,9 +114,84 @@ class Invoice extends Controller
                 die;
             }
 
-            $requestPost["companyDocument"] = preg_replace("/[^\d]+/", "", $requestPost["companyDocument"]);
-            $certificate = $requestFile["pfxFile"]["tmp_name"];
+            $validatePurposeOfIssuance = ['1', '2', '3', '4'];
+            if (!in_array($requestPost["purposeOfIssuance"], $validatePurposeOfIssuance)) {
+                $message(["error" => "finalidade da emissão inválida"], 500);
+                die;
+            }
 
+            $validateFinalConsumer = ['0', '1'];
+            if (!in_array($requestPost["finalConsumer"], $validateFinalConsumer)) {
+                $message(["error" => "consumidor final inválido"], 500);
+                die;
+            }
+
+            $validateBuyersPresence = ['0', '1', '2', '3', '4', '9'];
+            if (!in_array($requestPost["buyersPresence"], $validateBuyersPresence)) {
+                $message(["error" => "presença do consumidor inválido"], 500);
+                die;
+            }
+
+            $validateCompanyTaxRegime = ['1', '2', '3'];
+            if (!in_array($requestPost["companyTaxRegime"], $validateCompanyTaxRegime)) {
+                $message(["error" => "regime tributário da empresa inválido"], 500);
+                die;
+            }
+
+            $validateRecipientDocumentType = ['1', '2'];
+            if (!in_array($requestPost["recipientDocumentType"], $validateRecipientDocumentType)) {
+                $message(["error" => "tipo de documento do destinatário é inválido"], 500);
+                die;
+            }
+
+            $recipientStateRegistrationIndicator = ['1', '2', '9'];
+            if (!in_array($requestPost["recipientStateRegistrationIndicator"], $recipientStateRegistrationIndicator)) {
+                $message(["error" => "indicador de inscrição estadual do destinatário é inválido"], 500);
+                die;
+            }
+
+            if (!empty($requestPost["cnaeInformation"])) {
+                if (!preg_match("/^\d+$/", $requestPost["cnaeInformation"])) {
+                    $message(["error" => "campo CNAE inválido"], 500);
+                    die;
+                }
+            }
+
+            $requestPost["municipalityInvoice"] = explode("-", $requestPost["municipalityInvoice"]);
+            $municipalityCode = $requestPost["municipalityInvoice"][0];
+            $municipalityName = $requestPost["municipalityInvoice"][1];
+
+            $requestPost["companyDocument"] = preg_replace("/[^\d]+/", "", $requestPost["companyDocument"]);
+            $requestPost["recipientDocument"] = preg_replace("/[^\d]+/", "", $requestPost["recipientDocument"]);
+            $requestPost["recipientStateRegistration"] = preg_replace("/[^\d]+/", "", $requestPost["recipientStateRegistration"]);
+            $requestPost["stateRegistration"] = preg_replace("/[^\d]+/", "", $requestPost["stateRegistration"]);
+
+            $recipientAddress = [
+                "xNome" => $requestPost["recipientName"],
+                "indIEDest" => $requestPost["recipientStateRegistrationIndicator"],
+                "IE" => $requestPost["recipientStateRegistration"],
+                "ISUF" => null,
+                "IM" => null,
+                "email" => $requestPost["recipientEmail"],
+                "idEstrangeiro" => null
+            ];
+
+            $validateRecipientDocument = [
+                "1" => function(string $value) use (&$recipientAddress) {
+                    $recipientAddress["CPF"] = $value;
+                    $recipientAddress["CNPJ"] = null;
+                },
+                "2" => function(string $value) use (&$recipientAddress) {
+                    $recipientAddress["CNPJ"] = $value;
+                    $recipientAddress["CPF"] = null;
+                }
+            ];
+
+            if (!empty($validateRecipientDocument[$requestPost["recipientDocumentType"]])) {
+                $validateRecipientDocument[$requestPost["recipientDocumentType"]]($requestPost["recipientDocument"]);
+            }
+
+            $certificate = $requestFile["pfxFile"]["tmp_name"];
             $invoice = new SupportInvoice([
                 "tpAmb" => $requestPost["environment"],
                 "companyName" => $requestPost["companyName"],
@@ -123,7 +209,7 @@ class Invoice extends Controller
             }
 
             $requestPost["companyState"] = array_reduce($requestStateCode, function ($acc, $item) use ($requestPost) {
-                if ($item["sigla"] == $requestPost["companyState"]) {
+                if (strtolower($item["sigla"]) == strtolower($requestPost["companyState"])) {
                     $acc = $item;
                 }
                 return $acc;
@@ -137,7 +223,7 @@ class Invoice extends Controller
 
             $invoice->isValidCertPfx();
             $dateTime = new DateTime();
-
+            
             $invoice->makeInvoice()->invoiceIdentification([
                 "cUF" => $requestPost["companyState"]["id"],
                 "cNF" => str_pad(mt_rand(0, 99999999), 8, '0', STR_PAD_LEFT),
@@ -149,8 +235,32 @@ class Invoice extends Controller
                 "dhSaiEnt" => null,
                 "tpNF" => $requestPost["invoiceType"],
                 "idDest" => $requestPost["idInvoiceOperation"],
-                "cMunFG" => $requestPost["municipalityInvoice"]
-            ]);
+                "cMunFG" => $municipalityCode,
+                "tpImp" => 1,
+                "tpEmis" => 1,
+                "finNFe" => $requestPost["purposeOfIssuance"],
+                "indFinal" => $requestPost["finalConsumer"],
+                "indPres" => $requestPost["buyersPresence"]
+            ])->issuerData([
+                "xNome" => $requestPost["companyName"],
+                "xFant" => $requestPost["fantasyName"],
+                "IE" => $requestPost["stateRegistration"],
+                "CNAE" => $requestPost["cnaeInformation"],
+                "CRT" => $requestPost["companyTaxRegime"],
+                "CNPJ" => $requestPost["companyDocument"]
+            ])->issuerAddressData([
+                "xLgr" => $requestPost["companyAddress"],
+                "nro" => $requestPost["companyAddressNumber"],
+                "xCpl" => $requestPost["companyComplement"],
+                "xBairro" => $requestPost["companyNeighborhood"],
+                "cMun" => $municipalityCode,
+                "xMun" => $municipalityName,
+                "UF" => $requestPost["companyState"]["sigla"],
+                "CEP" => $requestPost["companyZipcode"],
+                "cPais" => 1058,
+                "xPais" => "Brasil",
+                "fone" => $requestPost["companyPhone"] ?? null,
+            ])->recipientAddress($recipientAddress);
 
             echo json_encode(["success" => "nota fiscal válida"]);
             die;
@@ -165,7 +275,7 @@ class Invoice extends Controller
                     $item["microrregiao"]["mesorregiao"]["nome"] . "/" .
                     $item["microrregiao"]["mesorregiao"]["UF"]["nome"] . "/" .
                     $item["microrregiao"]["mesorregiao"]["UF"]["sigla"],
-                "id" => $item["id"],
+                "id" => $item["id"] . "-" . $item["nome"],
             ];
             return $acc;
         }, []);

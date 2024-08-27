@@ -63,7 +63,7 @@
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
                                 <a href="<?= url("/admin/invoice/form") ?>" class="nav-link">
-                                    <p>Emissão de nota fiscal</p>
+                                    <p>Emissão de NF-e</p>
                                 </a>
                             </li>
                         </ul>

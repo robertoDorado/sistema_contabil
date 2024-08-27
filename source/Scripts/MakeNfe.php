@@ -48,12 +48,12 @@ try {
     $std->nNF = '444444444';
     $std->dhEmi = '2015-02-19T13:48:00-00:00';
     $std->dhSaiEnt = null;
-    $std->tpNF = $config["tpNF"];
+    $std->tpNF = 0;
     $std->idDest = 1;
     $std->cMunFG = 3518800;
     $std->tpImp = 1;
     $std->tpEmis = 1;
-    $std->cDV = 2;
+    // $std->cDV = 2;
     $std->tpAmb = 2;
     $std->finNFe = 1;
     $std->indFinal = 0;
@@ -73,16 +73,18 @@ try {
     $std->IE = '12345678000195';
     $std->IEST = null;
     $std->IM = null;
-    $std->CNAE = '123456789';
+    $std->CNAE = '';
     $std->CRT = 1;
     $std->CNPJ = '95352076000192'; //indicar apenas um CNPJ ou CPF
     $std->CPF = null; //indicar apenas um CNPJ ou CPF
 
     // Node com os dados do emitente
     $make->tagemit($std);
-
-    $std->xLgr = "Rua Cerata Donzeli Bongiovani";
-    $std->nro = 861;
+    
+    //code...
+    $std = new stdClass();
+    $std->xLgr = "Rua Cerata Donzeli Bongiovani teste";
+    $std->nro = 869;
     $std->xCpl = "Empresa";
     $std->xBairro = "Jardim Novo Bongiovani";
     $std->cMun = 1234567;
@@ -92,7 +94,6 @@ try {
     $std->cPais = 1058;
     $std->xPais = "Brasil";
     $std->fone = "1838280907";
-
     // Node com o endereço do emitente
     $make->tagenderEmit($std);
 
