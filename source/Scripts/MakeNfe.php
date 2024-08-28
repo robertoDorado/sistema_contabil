@@ -85,7 +85,7 @@ try {
     $std = new stdClass();
     $std->xLgr = "Rua Cerata Donzeli Bongiovani teste";
     $std->nro = 869;
-    $std->xCpl = "Empresa";
+    $std->xCpl = null;
     $std->xBairro = "Jardim Novo Bongiovani";
     $std->cMun = 1234567;
     $std->xMun = "São Paulo";
@@ -114,7 +114,7 @@ try {
     $std = new stdClass();
     $std->xLgr = "Rua Nove de Junho";
     $std->nro = 968;
-    $std->xCpl = "Empresa";
+    $std->xCpl = null;
     $std->xBairro = "Vila Anchieta";
     $std->cMun = 1234567;
     $std->xMun = "São Paulo";
@@ -202,17 +202,16 @@ try {
 
     $std = new stdClass();
     $std->item = 1; //item da NFe
-    $std->vTotTrib = 47.85;
+    $std->vTotTrib = null;
 
     // Node inicial dos Tributos incidentes no Produto ou Serviço do item da NFe
     $make->tagimposto($std);
 
     $std = new stdClass();
-    $std->detPag = new \stdClass();
-    $std->detPag->indPag = '0';
-    $std->detPag->tPag = '01';
-    $std->detPag->vPag = '200.75';
-    // $std->detPag->vTroco = null; //incluso no layout 4.00, obrigatório informar para NFCe (65)
+    $std->indPag = null;
+    $std->tPag = null;
+    $std->vPag = null;
+    $std->vTroco = null; //incluso no layout 4.00, obrigatório informar para NFCe (65)
 
     // Node referente as formas de pagamento OBRIGATÓRIO para NFCe a partir do layout 3.10
     //  e também obrigatório para NFe (modelo 55) a partir do layout 4.00

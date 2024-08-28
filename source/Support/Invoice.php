@@ -66,101 +66,129 @@ class Invoice
         return $this->data->$name ?? null;
     }
 
+    public function paymentMethodInformation(array $config)
+    {
+        $this->data->std = new \stdClass();
+        $this->data->std->indPag = $config["indPag"];
+        $this->data->std->tPag = $config["tPag"];
+        $this->data->std->vPag = $config["vPag"];
+        $this->data->std->vTroco = $config["vTroco"];
+        $this->make->tagpag($this->data->std);
+        return $this;
+    }
+
+    public function declareTaxData(array $config)
+    {
+        $this->data->std = new \stdClass();
+        $this->data->std->item = $config["item"];
+        $this->data->std->vTotTrib = $config["vTotTrib"];
+        $this->make->tagimposto($this->data->std);
+        return $this;
+    }
+
+    public function shippingMethod(array $config)
+    {
+        $this->data->std = new \stdClass();
+        $this->data->std->modFrete = $config["modFrete"];
+        $this->make->tagtransp($this->data->std);
+        return $this;
+    }
+
     public function productOrServiceData(array $config)
     {
-        $this->std = new \stdClass();
-        $this->std->item = $config["item"];
-        $this->std->cProd = $config["cProd"];
-        $this->std->cEAN = $config["cEAN"];
-        $this->std->cBarra = $config["cBarra"];
-        $this->std->xProd = $config["xProd"];
-        $this->std->NCM = $config["NCM"];
-        $this->std->cBenef = $config["cBenef"];
-        $this->std->EXTIPI = $config["EXTIPI"];
-        $this->std->CFOP = $config["CFOP"];
-        $this->std->uCom = $config["uCom"];
-        $this->std->qCom = $config["qCom"];
-        $this->std->vUnCom = $config["vUnCom"];
-        $this->std->vProd = $config["VProd"];
-        $this->std->cEANTrib = $config["cEANTrib"];
-        $this->std->cBarraTrib = $config["cBarraTrib"];
-        $this->std->uTrib = $config["uTrib"];
-        $this->std->qTrib = $config["qTrib"];
-        $this->std->vUnTrib = $config["vUnTrib"];
-        $this->std->vFrete = $config["vFrete"];
-        $this->std->vSeg = $config["vSeg"];
-        $this->std->vDesc = $config["vDesc"];
-        $this->std->vOutro = $config["vOutro"];
-        $this->std->indTot = $config["indTot"];
-        $this->std->xPed = $config["xPed"];
-        $this->std->nItemPed = $config["nItemPed"];
-        $this->std->nFCI = $config["nFCI"];
-        $this->make->tagprod($this->std);
+        $this->data->std = new \stdClass();
+        $this->data->std->item = $config["item"];
+        $this->data->std->cProd = $config["cProd"];
+        $this->data->std->cEAN = $config["cEAN"];
+        $this->data->std->cBarra = $config["cBarra"];
+        $this->data->std->xProd = $config["xProd"];
+        $this->data->std->NCM = $config["NCM"];
+        $this->data->std->cBenef = $config["cBenef"];
+        $this->data->std->EXTIPI = $config["EXTIPI"];
+        $this->data->std->CFOP = $config["CFOP"];
+        $this->data->std->uCom = $config["uCom"];
+        $this->data->std->qCom = $config["qCom"];
+        $this->data->std->vUnCom = $config["vUnCom"];
+        $this->data->std->vProd = $config["VProd"];
+        $this->data->std->cEANTrib = $config["cEANTrib"];
+        $this->data->std->cBarraTrib = $config["cBarraTrib"];
+        $this->data->std->uTrib = $config["uTrib"];
+        $this->data->std->qTrib = $config["qTrib"];
+        $this->data->std->vUnTrib = $config["vUnTrib"];
+        $this->data->std->vFrete = $config["vFrete"];
+        $this->data->std->vSeg = $config["vSeg"];
+        $this->data->std->vDesc = $config["vDesc"];
+        $this->data->std->vOutro = $config["vOutro"];
+        $this->data->std->indTot = $config["indTot"];
+        $this->data->std->xPed = $config["xPed"];
+        $this->data->std->nItemPed = $config["nItemPed"];
+        $this->data->std->nFCI = $config["nFCI"];
+        $this->make->tagprod($this->data->std);
         return $this;
     }
 
     public function recipientAddressData(array $config)
     {
-        $this->std = new \stdClass();
-        $this->std->xLgr = $config["xLgr"];
-        $this->std->nro = $config["nro"];
-        $this->std->xCpl = $config["xCpl"];
-        $this->std->xBairro = $config["xBairro"];
-        $this->std->cMun = $config["cMun"];
-        $this->std->xMun = $config["xMun"];
-        $this->std->UF = $config["UF"];
-        $this->std->CEP = $config["CEP"];
-        $this->std->cPais = $config["cPais"];
-        $this->std->xPais = $config["xPais"];
-        $this->std->fone = $config["fone"];
-        $this->make->tagenderDest($this->std);
+        $this->data->std = new \stdClass();
+        $this->data->std->xLgr = $config["xLgr"];
+        $this->data->std->nro = $config["nro"];
+        $this->data->std->xCpl = $config["xCpl"];
+        $this->data->std->xBairro = $config["xBairro"];
+        $this->data->std->cMun = $config["cMun"];
+        $this->data->std->xMun = $config["xMun"];
+        $this->data->std->UF = $config["UF"];
+        $this->data->std->CEP = $config["CEP"];
+        $this->data->std->cPais = $config["cPais"];
+        $this->data->std->xPais = $config["xPais"];
+        $this->data->std->fone = $config["fone"];
+        $this->make->tagenderDest($this->data->std);
         return $this;
     }
 
     public function recipientData(array $config)
     {
-        $this->std = new \stdClass();
-        $this->std->xNome = $config["xNome"];
-        $this->std->indIEDest = $config["indIEDest"];
-        $this->std->IE = $config["IE"];
-        $this->std->ISUF = $config["ISUF"];
-        $this->std->IM = $config["IM"];
-        $this->std->email = $config["email"];
-        $this->std->CNPJ = $config["CNPJ"];
-        $this->std->CPF = $config["CPF"];
-        $this->std->idEstrangeiro = $config["idEstrangeiro"];
-        $this->make->tagdest($this->std);
+        $this->data->std = new \stdClass();
+        $this->data->std->xNome = $config["xNome"];
+        $this->data->std->indIEDest = $config["indIEDest"];
+        $this->data->std->IE = $config["IE"];
+        $this->data->std->ISUF = $config["ISUF"];
+        $this->data->std->IM = $config["IM"];
+        $this->data->std->email = $config["email"];
+        $this->data->std->CNPJ = $config["CNPJ"];
+        $this->data->std->CPF = $config["CPF"];
+        $this->data->std->idEstrangeiro = $config["idEstrangeiro"];
+        $this->make->tagdest($this->data->std);
         return $this;
     }
 
     public function issuerAddressData(array $config)
     {
-        $this->std = new \stdClass();
-        $this->std->xLgr = $config["xLgr"];
-        $this->std->nro = $config["nro"];
-        $this->std->xCpl = $config["xCpl"];
-        $this->std->xBairro = $config["xBairro"];
-        $this->std->cMun = $config["cMun"];
-        $this->std->xMun = $config["xMun"];
-        $this->std->UF = $config["UF"];
-        $this->std->CEP = $config["CEP"];
-        $this->std->cPais = $config["cPais"];
-        $this->std->xPais = $config["xPais"];
-        $this->std->fone = $config["fone"];
-        $this->make->tagenderEmit($this->std);
+        $this->data->std = new \stdClass();
+        $this->data->std->xLgr = $config["xLgr"];
+        $this->data->std->nro = $config["nro"];
+        $this->data->std->xCpl = $config["xCpl"];
+        $this->data->std->xBairro = $config["xBairro"];
+        $this->data->std->cMun = $config["cMun"];
+        $this->data->std->xMun = $config["xMun"];
+        $this->data->std->UF = $config["UF"];
+        $this->data->std->CEP = $config["CEP"];
+        $this->data->std->cPais = $config["cPais"];
+        $this->data->std->xPais = $config["xPais"];
+        $this->data->std->fone = $config["fone"];
+        $this->make->tagenderEmit($this->data->std);
         return $this;
     }
 
     public function issuerData(array $config)
     {
-        $this->std = new \stdClass();
-        $this->std->xNome = $config["xNome"];
-        $this->std->xFant = $config["xFant"];
-        $this->std->IE = $config["IE"];
-        $this->std->CNAE = $config["CNAE"];
-        $this->std->CRT = $config["CRT"];
-        $this->std->CNPJ = $config["CNPJ"];
-        $this->make->tagemit($this->std);
+        $this->data->std = new \stdClass();
+        $this->data->std->xNome = $config["xNome"];
+        $this->data->std->xFant = $config["xFant"];
+        $this->data->std->IE = $config["IE"];
+        $this->data->std->CNAE = $config["CNAE"];
+        $this->data->std->CRT = $config["CRT"];
+        $this->data->std->CNPJ = $config["CNPJ"];
+        $this->make->tagemit($this->data->std);
         return $this;
     }
 
@@ -213,30 +241,30 @@ class Invoice
 
     public function invoiceIdentification(array $config): Invoice
     {
-        $this->std = new \stdClass();
-        $this->std->cUF = $config["cUF"];
-        $this->std->cNF = $config["cNF"];
-        $this->std->natOp = $config["natOp"];
-        $this->std->mod = $config["mod"];
-        $this->std->serie = $config["serie"];
-        $this->std->nNF = $config["nNF"];
-        $this->std->dhEmi = $config["dhEmi"];
-        $this->std->dhSaiEnt = $config["dhSaiEnt"];
-        $this->std->tpNF = $config["tpNF"];
-        $this->std->idDest = $config["idDest"];
-        $this->std->cMunFG = $config["cMunFG"];
-        $this->std->tpImp = $config["tpImp"];
-        $this->std->tpEmis = $config["tpEmis"];
-        $this->std->tpAmb = $this->configData["tpAmb"];
-        $this->std->finNFe = $config["finNFe"];
-        $this->std->indFinal = $config["indFinal"];
-        $this->std->indPres = $config["indPres"];
-        $this->std->indIntermed = null;
-        $this->std->procEmi = 0;
-        $this->std->verProc = '3.10.31';
-        $this->std->dhCont = null;
-        $this->std->xJust = null;
-        $this->make->tagide($this->std);
+        $this->data->std = new \stdClass();
+        $this->data->std->cUF = $config["cUF"];
+        $this->data->std->cNF = $config["cNF"];
+        $this->data->std->natOp = $config["natOp"];
+        $this->data->std->mod = $config["mod"];
+        $this->data->std->serie = $config["serie"];
+        $this->data->std->nNF = $config["nNF"];
+        $this->data->std->dhEmi = $config["dhEmi"];
+        $this->data->std->dhSaiEnt = $config["dhSaiEnt"];
+        $this->data->std->tpNF = $config["tpNF"];
+        $this->data->std->idDest = $config["idDest"];
+        $this->data->std->cMunFG = $config["cMunFG"];
+        $this->data->std->tpImp = $config["tpImp"];
+        $this->data->std->tpEmis = $config["tpEmis"];
+        $this->data->std->tpAmb = $this->configData["tpAmb"];
+        $this->data->std->finNFe = $config["finNFe"];
+        $this->data->std->indFinal = $config["indFinal"];
+        $this->data->std->indPres = $config["indPres"];
+        $this->data->std->indIntermed = null;
+        $this->data->std->procEmi = 0;
+        $this->data->std->verProc = '3.10.31';
+        $this->data->std->dhCont = null;
+        $this->data->std->xJust = null;
+        $this->make->tagide($this->data->std);
         return $this;
     }
 

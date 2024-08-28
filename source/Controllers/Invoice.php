@@ -31,40 +31,52 @@ class Invoice extends Controller
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
             $requestPost = $this->getRequests()->setRequiredFields(
                 [
-                    "companyName",
-                    "companyDocument",
-                    "stateRegistration",
-                    "companyZipcode",
-                    "companyAddress",
-                    "companyAddressNumber",
-                    "companyNeighborhood",
-                    "companyState",
-                    "natureOperation",
-                    "invoiceNumber",
-                    "invoiceSeries",
-                    "certPassword",
-                    "environment",
-                    "invoiceType",
-                    "idInvoiceOperation",
-                    "municipalityInvoice",
-                    "purposeOfIssuance",
-                    "finalConsumer",
-                    "buyersPresence",
-                    "companyTaxRegime",
-                    "fantasyName",
-                    "companyComplement",
-                    "recipientZipcode",
-                    "recipientName",
-                    "recipientStateRegistrationIndicator",
-                    "recipientEmail",
-                    "recipientDocumentType",
-                    "recipientDocument",
-                    "recipientAddress",
-                    "recipientAddressNumber",
-                    "recipientComplement",
-                    "recipientNeighborhood",
-                    "recipientMunicipality",
-                    "recipientState"
+                    'natureOperation',
+                    'invoiceNumber',
+                    'invoiceSeries',
+                    'invoiceType',
+                    'idInvoiceOperation',
+                    'purposeOfIssuance',
+                    'finalConsumer',
+                    'buyersPresence',
+                    'pfxFile',
+                    'certPassword',
+                    'environment',
+                    'companyName',
+                    'csrfToken',
+                    'fantasyName',
+                    'companyDocument',
+                    'stateRegistration',
+                    'companyTaxRegime',
+                    'companyZipcode',
+                    'companyAddress',
+                    'companyAddressNumber',
+                    'companyNeighborhood',
+                    'companyState',
+                    'municipalityInvoice',
+                    'recipientName',
+                    'recipientStateRegistrationIndicator',
+                    'recipientEmail',
+                    'recipientDocumentType',
+                    'recipientDocument',
+                    'recipientZipcode',
+                    'recipientAddress',
+                    'recipientAddressNumber',
+                    'recipientNeighborhood',
+                    'recipientMunicipality',
+                    'recipientState',
+                    'recipientPhone',
+                    'productItem',
+                    'productDescription',
+                    'productComercialUnit',
+                    'qttyProduct',
+                    'productValueUnit',
+                    'productTotalValue',
+                    'productTaxUnit',
+                    'qttyProuctTax',
+                    'taxUnitValue',
+                    'productNcmCode',
+                    'productCodeCfop'
                 ]
             )->getAllPostData();
             $requestFile = $this->getRequestFiles()->getAllFiles();
@@ -158,6 +170,18 @@ class Invoice extends Controller
                 die;
             }
 
+            $validateShippingMethod = ['0', '1', '2', '3', '4', '9'];
+            if (!in_array($requestPost["shippingMethod"], $validateShippingMethod)) {
+                $message(["error" => "modalidade de frete inválido"], 500);
+                die;
+            }
+
+            $validateCodeMethodPayment = ["01", "02", "03", "04", "05", "10", "11", "12", "13", "15", "90", "99"];
+            if (!in_array($requestPost["codeMethodPayment"], $validateCodeMethodPayment)) {
+                $message(["error" => "código da forma de pagamento inválido"], 500);
+                die;
+            }
+
             if (!empty($requestPost["cnaeInformation"])) {
                 if (!preg_match("/^\d+$/", $requestPost["cnaeInformation"])) {
                     $message(["error" => "campo CNAE inválido"], 500);
@@ -173,20 +197,35 @@ class Invoice extends Controller
             $recipientMunicipalityCode = $requestPost["recipientMunicipality"][0];
             $recipientMunicipalityName = $requestPost["recipientMunicipality"][1];
 
-            $requestPost["companyDocument"] = preg_replace("/[^\d]+/", "", $requestPost["companyDocument"]);
-            $requestPost["recipientDocument"] = preg_replace("/[^\d]+/", "", $requestPost["recipientDocument"]);
-            $requestPost["recipientStateRegistration"] = preg_replace("/[^\d]+/", "", $requestPost["recipientStateRegistration"]);
-            $requestPost["stateRegistration"] = preg_replace("/[^\d]+/", "", $requestPost["stateRegistration"]);
-            $requestPost["companyPhone"] = preg_replace("/[^\d]+/", "", $requestPost["companyPhone"]);
-            $requestPost["recipientPhone"] = preg_replace("/[^\d]+/", "", $requestPost["recipientPhone"]);
+            $validateCleanValue = [
+                "companyDocument",
+                "recipientDocument",
+                "recipientStateRegistration",
+                "stateRegistration",
+                "companyPhone",
+                "recipientPhone",
+            ];
 
-            $requestPost["productValueUnit"] = convertCurrencyRealToFloat($requestPost["productValueUnit"]);
-            $requestPost["productTotalValue"] = convertCurrencyRealToFloat($requestPost["productTotalValue"]);
-            $requestPost["taxUnitValue"] = convertCurrencyRealToFloat($requestPost["taxUnitValue"]);
-            $requestPost["productShippingValue"] = convertCurrencyRealToFloat($requestPost["productShippingValue"]);
-            $requestPost["productInsuranceValue"] = convertCurrencyRealToFloat($requestPost["productInsuranceValue"]);
-            $requestPost["productDiscountAmount"] = convertCurrencyRealToFloat($requestPost["productDiscountAmount"]);
-            $requestPost["productValueOtherExpenses"] = convertCurrencyRealToFloat($requestPost["productValueOtherExpenses"]);
+            foreach ($validateCleanValue as $key) {
+                $requestPost[$key] = preg_replace("/[^\d]+/", "", $requestPost[$key]);
+            }
+
+            $validateConvertCurrencyRealToFloat = [
+                "productValueUnit",
+                "productTotalValue",
+                "taxUnitValue",
+                "productShippingValue",
+                "productInsuranceValue",
+                "productDiscountAmount",
+                "productValueOtherExpenses",
+                "totalTaxValue",
+                "paymentTotalValue",
+                "changeMoney"
+            ];
+
+            foreach ($validateConvertCurrencyRealToFloat as $key) {
+                $requestPost[$key] = convertCurrencyRealToFloat($requestPost[$key]);
+            }
 
             $recipientData = [
                 "xNome" => $requestPost["recipientName"],
@@ -322,6 +361,16 @@ class Invoice extends Controller
                     "xPed" => $requestPost["productOrderNumber"] ?? null,
                     "nItemPed" => $requestPost["productItemNumberBuyOrder"] ?? null,
                     "nFCI" => $requestPost["fciNumber"] ?? null
+                ])->shippingMethod([
+                    "modFrete" => $requestPost["shippingMethod"]
+                ])->declareTaxData([
+                    "item" => $requestPost["productItem"],
+                    "vTotTrib" => $requestPost["totalTaxValue"] ?? null
+                ])->paymentMethodInformation([
+                    "indPag" => $requestPost["indicatorPaymentMethod"] ?? null,
+                    "tPag" => $requestPost["codeMethodPayment"] ?? null,
+                    "vPag" => $requestPost["paymentTotalValue"] ?? null,
+                    "vTroco" => $requestPost["changeMoney"] ?? null
                 ]);
 
             echo json_encode(["success" => "nota fiscal válida"]);

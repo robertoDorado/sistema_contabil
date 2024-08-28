@@ -33,8 +33,11 @@
                                 <li class="nav-item"><a class="nav-link" href="#step3" data-toggle="tab">Endereço do emitente</a></li>
                                 <li class="nav-item"><a class="nav-link" href="#step4" data-toggle="tab">Identificação do destinatário</a></li>
                                 <li class="nav-item"><a class="nav-link" href="#step5" data-toggle="tab">Endereço do destinatário</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#step6" data-toggle="tab">Dados do produto ou serviço</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#step7" data-toggle="tab">Confirmação</a></li>
+                                <li class="nav-item"><a class="nav-link" href="#step6" data-toggle="tab">Dados do produto</a></li>
+                                <li class="nav-item"><a class="nav-link" href="#step7" data-toggle="tab">Validações fiscais</a></li>
+                                <li class="nav-item"><a class="nav-link" href="#step8" data-toggle="tab">Informações sobre importação, frete e seguro</a></li>
+                                <li class="nav-item"><a class="nav-link" href="#step9" data-toggle="tab">Informações sobre forma de pagamento</a></li>
+                                <li class="nav-item"><a class="nav-link" href="#step10" data-toggle="tab">Confirmação</a></li>
                             </ul>
                             <form id="invoiceForm">
                                 <div class="card-body">
@@ -167,7 +170,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <label for="companyComplement">Complemento</label>
-                                                <input type="text" data-name="Complemento" class="form-control" name="companyComplement" id="companyComplement">
+                                                <input type="text" data-notrequired="true" data-name="Complemento" class="form-control" name="companyComplement" id="companyComplement">
                                             </div>
                                             <div class="form-group">
                                                 <label for="companyAddressNumber">Número</label>
@@ -183,7 +186,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <label for="companyContactType">Tipo de Contato</label>
-                                                <select name="companyContactType" data-name="Tipo de Contato" id="companyContactType" class="form-control">
+                                                <select name="companyContactType" data-notrequired="true" data-name="Tipo de Contato" id="companyContactType" class="form-control">
                                                     <option value="1">Telefone</option>
                                                     <option value="2">Celular</option>
                                                 </select>
@@ -255,7 +258,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <label for="recipientComplement">Complemento</label>
-                                                <input type="text" data-name="Complemento" class="form-control" name="recipientComplement" id="recipientComplement">
+                                                <input type="text" data-notrequired="true" data-name="Complemento" class="form-control" name="recipientComplement" id="recipientComplement">
                                             </div>
                                             <div class="form-group">
                                                 <label for="recipientNeighborhood">Bairro</label>
@@ -278,7 +281,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <label for="recipientContactType">Tipo de Contato</label>
-                                                <select name="recipientContactType" data-name="Tipo de Contato" id="recipientContactType" class="form-control">
+                                                <select name="recipientContactType" data-notrequired="true" data-name="Tipo de Contato" id="recipientContactType" class="form-control">
                                                     <option value="1">Telefone</option>
                                                     <option value="2">Celular</option>
                                                 </select>
@@ -289,7 +292,7 @@
                                             </div>
                                         </div>
                                         <div class="tab-pane" id="step6">
-                                            <h3>Dados do produto ou serviço</h3>
+                                            <h3>Dados do produto</h3>
                                             <div class="form-group">
                                                 <label for="productItem">Número do item sequencial</label>
                                                 <input type="text" data-mask="number" data-name="Número do item sequencial" class="form-control" name="productItem" id="productItem">
@@ -304,27 +307,11 @@
                                             </div>
                                             <div class="form-group">
                                                 <label for="additionalBarCodeProduct">Código de barras adicional do produto</label>
-                                                <input type="text"  data-notrequired="true" data-name="Código de barras adicional do produto" class="form-control" name="additionalBarCodeProduct" id="additionalBarCodeProduct">
+                                                <input type="text" data-notrequired="true" data-name="Código de barras adicional do produto" class="form-control" name="additionalBarCodeProduct" id="additionalBarCodeProduct">
                                             </div>
                                             <div class="form-group">
                                                 <label for="productDescription">Descrição do produto</label>
                                                 <input type="text" data-name="Descrição do produto" class="form-control" name="productDescription" id="productDescription">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="productNcmCode">Código NCM (Nomenclatura Comum do Mercosul)</label>
-                                                <input type="text" data-mask="number" data-name="Código NCM (Nomenclatura Comum do Mercosul)" class="form-control" name="productNcmCode" id="productNcmCode">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="productCodeBenef">Código de benefício fiscal</label>
-                                                <input type="text" data-notrequired="true" data-mask="number" data-name="Código de benefício fiscal" class="form-control" name="productCodeBenef" id="productCodeBenef">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="productCodeTipi">Código TIPI - identificador de exceções na tabela de incidência do imposto sobre produtos industrializados (TIPI)</label>
-                                                <input type="text" data-notrequired="true" data-mask="number" data-name="Código TIPI" class="form-control" name="productCodeTipi" id="productCodeTipi">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="productCodeCfop">Código Fiscal de Operações e Prestações</label>
-                                                <input type="text" data-mask="number" data-name="Código Fiscal de Operações e Prestações" class="form-control" name="productCodeCfop" id="productCodeCfop">
                                             </div>
                                             <div class="form-group">
                                                 <label for="productComercialUnit">Unidade comercial</label>
@@ -343,34 +330,6 @@
                                                 <input type="text" data-mask="number" data-name="Valor total do produto" class="form-control" name="productTotalValue" id="productTotalValue">
                                             </div>
                                             <div class="form-group">
-                                                <label for="barCodeProductTrib">Código de barras do produto tributado (GTIN)</label>
-                                                <input type="text" data-notrequired="true" data-name="Código de barras do produto tributado (GTIN)" class="form-control" name="barCodeProductTrib" id="barCodeProductTrib">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="additionalBarCodeProductTrib">Código de barras adicional para o produto tributado</label>
-                                                <input type="text" data-notrequired="true" data-name="Código de barras adicional para o produto tributado" class="form-control" name="additionalBarCodeProductTrib" id="additionalBarCodeProductTrib">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="productTaxUnit">Unidade de tributação</label>
-                                                <input type="text" data-name="Unidade de tributação" class="form-control" name="productTaxUnit" id="productTaxUnit">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="qttyProuctTax">Quantidade tributável</label>
-                                                <input type="text" data-mask="number" data-name="Quantidade tributável" class="form-control" name="qttyProuctTax" id="qttyProuctTax">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="taxUnitValue">Valor unitário tributável</label>
-                                                <input type="text" data-mask="number" data-name="Valor unitário tributável" class="form-control" name="taxUnitValue" id="taxUnitValue">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="productShippingValue">Valor do frete</label>
-                                                <input type="text" data-notrequired="true" data-mask="number" data-name="Valor do frete" class="form-control" name="productShippingValue" id="productShippingValue">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="productInsuranceValue">Valor do seguro</label>
-                                                <input type="text" data-notrequired="true" data-mask="number" data-name="Valor do seguro" class="form-control" name="productInsuranceValue" id="productInsuranceValue">
-                                            </div>
-                                            <div class="form-group">
                                                 <label for="productDiscountAmount">Valor do desconto</label>
                                                 <input type="text" data-notrequired="true" data-mask="number" data-name="Valor do desconto" class="form-control" name="productDiscountAmount" id="productDiscountAmount">
                                             </div>
@@ -386,12 +345,116 @@
                                                 <label for="productItemNumberBuyOrder">Número do item do pedido de compra</label>
                                                 <input type="text" data-mask="number" data-notrequired="true" data-name="Número do item do pedido de compra" class="form-control" name="productItemNumberBuyOrder" id="productItemNumberBuyOrder">
                                             </div>
+                                        </div>
+                                        <div class="tab-pane" id="step7">
+                                            <h3>Validações fiscais</h3>
+                                            <div class="form-group">
+                                                <label for="totalTaxValue">Valor total dos tributos</label>
+                                                <input type="text" data-notrequired="true" data-name="Valor total dos tributos" class="form-control" name="totalTaxValue" id="totalTaxValue">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="productTaxUnit">Unidade de tributação</label>
+                                                <input type="text" data-name="Unidade de tributação" class="form-control" name="productTaxUnit" id="productTaxUnit">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="qttyProuctTax">Quantidade tributável</label>
+                                                <input type="text" data-mask="number" data-name="Quantidade tributável" class="form-control" name="qttyProuctTax" id="qttyProuctTax">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="taxUnitValue">Valor unitário tributável</label>
+                                                <input type="text" data-mask="number" data-name="Valor unitário tributável" class="form-control" name="taxUnitValue" id="taxUnitValue">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="productCodeBenef">Código de benefício fiscal</label>
+                                                <input type="text" data-notrequired="true" data-mask="number" data-name="Código de benefício fiscal" class="form-control" name="productCodeBenef" id="productCodeBenef">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="barCodeProductTrib">Código de barras do produto tributado (GTIN)</label>
+                                                <input type="text" data-notrequired="true" data-name="Código de barras do produto tributado (GTIN)" class="form-control" name="barCodeProductTrib" id="barCodeProductTrib">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="productNcmCode">Código NCM (Nomenclatura Comum do Mercosul)</label>
+                                                <input type="text" data-mask="number" data-name="Código NCM (Nomenclatura Comum do Mercosul)" class="form-control" name="productNcmCode" id="productNcmCode">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="productCodeTipi">Código TIPI - identificador de exceções na tabela de incidência do imposto sobre produtos industrializados (TIPI)</label>
+                                                <input type="text" data-notrequired="true" data-mask="number" data-name="Código TIPI" class="form-control" name="productCodeTipi" id="productCodeTipi">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="productCodeCfop">Código Fiscal de Operações e Prestações</label>
+                                                <input type="text" data-mask="number" data-name="Código Fiscal de Operações e Prestações" class="form-control" name="productCodeCfop" id="productCodeCfop">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="additionalBarCodeProductTrib">Código de barras adicional para o produto tributado</label>
+                                                <input type="text" data-notrequired="true" data-name="Código de barras adicional para o produto tributado" class="form-control" name="additionalBarCodeProductTrib" id="additionalBarCodeProductTrib">
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane" id="step8">
+                                            <h3>Informações sobre importação, frete e seguro</h3>
+                                            <div class="form-group">
+                                                <label for="shippingMethod">Modalidade do frete</label>
+                                                <select name="shippingMethod" data-notrequired="true" data-name="Modalidade do frete" id="shippingMethod" class="form-control">
+                                                    <option value="" disabled selected>Selecione a modalidade do frete</option>
+                                                    <option value="0">Contratação do Frete por Conta do Remetente (CIF)</option>
+                                                    <option value="1">Contratação do Frete por Conta do Destinatário (FOB)</option>
+                                                    <option value="2">Contratação do Frete por Conta de Terceiros</option>
+                                                    <option value="3">Transporte Próprio por Conta do Remetente</option>
+                                                    <option value="4">Transporte Próprio por Conta do Destinatário</option>
+                                                    <option value="9">Sem Ocorrência de Transporte</option>
+                                                </select>
+                                            </div>
                                             <div class="form-group">
                                                 <label for="fciNumber">Número do FCI (Ficha de Conteúdo de Importação)</label>
                                                 <input type="text" data-notrequired="true" data-name="Número do FCI (Ficha de Conteúdo de Importação)" class="form-control" name="fciNumber" id="fciNumber">
                                             </div>
+                                            <div class="form-group">
+                                                <label for="productShippingValue">Valor do frete</label>
+                                                <input type="text" data-notrequired="true" data-mask="number" data-name="Valor do frete" class="form-control" name="productShippingValue" id="productShippingValue">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="productInsuranceValue">Valor do seguro</label>
+                                                <input type="text" data-notrequired="true" data-mask="number" data-name="Valor do seguro" class="form-control" name="productInsuranceValue" id="productInsuranceValue">
+                                            </div>
                                         </div>
-                                        <div class="tab-pane" id="step7">
+                                        <div class="tab-pane" id="step9">
+                                            <h3>Informações sobre forma de pagamento</h3>
+                                            <div class="form-group">
+                                                <label for="indicatorPaymentMethod">Indicador da forma de pagamento</label>
+                                                <select data-notrequired="true" name="indicatorPaymentMethod" data-name="Indicador da forma de pagamento" id="indicatorPaymentMethod" class="form-control">
+                                                    <option value="" disabled selected>Selecione o indicador da forma de pagamento</option>
+                                                    <option value="0">Pagamento à vista</option>
+                                                    <option value="1">Pagamento a prazo</option>
+                                                    <option value="2">Outros</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="codeMethodPayment">Código da forma de pagamento</label>
+                                                <select data-notrequired="true" name="codeMethodPayment" data-name="Código da forma de pagamento" id="codeMethodPayment" class="form-control">
+                                                    <option value="" disabled selected>Selecione a forma de pagamento</option>
+                                                    <option value="01">Dinheiro</option>
+                                                    <option value="02">Cheque</option>
+                                                    <option value="03">Cartão de crédito</option>
+                                                    <option value="04">Catão de débito</option>
+                                                    <option value="05">Crédito loja</option>
+                                                    <option value="10">Vale alimentação</option>
+                                                    <option value="11">Vale refeição</option>
+                                                    <option value="12">Vale presente</option>
+                                                    <option value="13">Vale combustível</option>
+                                                    <option value="15">Boleto bancário</option>
+                                                    <option value="90">Sem pagamento</option>
+                                                    <option value="99">Outros</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="paymentTotalValue">Valor do pagamento</label>
+                                                <input type="text" data-notrequired="true" data-mask="number" data-name="Valor do pagamento" class="form-control" name="paymentTotalValue" id="paymentTotalValue">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="changeMoney">Valor do troco</label>
+                                                <input type="text" data-notrequired="true" data-mask="number" data-name="Valor do troco" class="form-control" name="changeMoney" id="changeMoney">
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane" id="step10">
                                             <h3>Confirmação</h3>
                                             <p>Revise as informações antes de emitir a nota fiscal.</p>
                                             <div class="card-footer">

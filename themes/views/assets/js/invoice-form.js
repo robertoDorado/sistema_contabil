@@ -8,13 +8,23 @@ if (window.location.pathname == "/admin/invoice/form") {
     const companyPhone = document.getElementById("companyPhone")
     const recipientContactType = document.getElementById("recipientContactType")
     const recipientPhone = document.getElementById("recipientPhone")
-    let fieldsRequired = Array.from(document.querySelectorAll("input,select"))
+    let fieldsRequired = Array.from(invoiceForm.querySelectorAll("input,select"))
 
-    $("#productValueUnit,#productTotalValue,#taxUnitValue,#productShippingValue,#productInsuranceValue,#productDiscountAmount,#productValueOtherExpenses").maskMoney(
+    $(`#productValueUnit,
+        #productTotalValue,
+        #taxUnitValue,
+        #productShippingValue,
+        #productInsuranceValue,
+        #productDiscountAmount,
+        #productValueOtherExpenses,
+        #totalTaxValue,
+        #paymentTotalValue,
+        #changeMoney
+    `).maskMoney(
         {
-            allowNegative: false, 
-            thousands:'.', 
-            decimal:',', 
+            allowNegative: false,
+            thousands: '.',
+            decimal: ',',
             affixesStay: false
         }
     )
@@ -25,8 +35,7 @@ if (window.location.pathname == "/admin/invoice/form") {
         'previousSelector': '.wizard .previous'
     })
 
-    $("#municipalityInvoice").select2()
-    $("#recipientMunicipality").select2()
+    $("#municipalityInvoice,#recipientMunicipality,#codeMethodPayment").select2()
     document.querySelectorAll(".select2.select2-container.select2-container--default").forEach(function (element) {
         element.style.width = "100%"
     })
@@ -111,6 +120,23 @@ if (window.location.pathname == "/admin/invoice/form") {
         })
     })
 
+    const configViewFieldsRequired = fieldsRequired.filter((element) => !element.dataset.notrequired)
+    const labelFieldsName = configViewFieldsRequired.map(function(element) {
+        if (element.previousElementSibling) {
+            return element.previousElementSibling.innerHTML
+        }else {
+            return element.parentElement.parentElement.previousElementSibling.innerHTML
+        }
+    })
+
+    configViewFieldsRequired.forEach(function(element, index) {
+        if (element.previousElementSibling) {
+            element.previousElementSibling.innerHTML = `* ${labelFieldsName[index]}`
+        }else {
+            element.parentElement.parentElement.previousElementSibling.innerHTML = `* ${labelFieldsName[index]}`
+        }
+    })
+
     fieldsRequired.forEach(function (element) {
         element.addEventListener("input", function () {
             if (this.dataset.mask) {
@@ -134,9 +160,9 @@ if (window.location.pathname == "/admin/invoice/form") {
 
     invoiceForm.addEventListener("submit", function (event) {
         event.preventDefault()
-        let fieldsRequired = Array.from(document.querySelectorAll("input,select"))
+        let fieldsRequired = Array.from(this.querySelectorAll("input,select"))
         fieldsRequired = fieldsRequired.filter((element) => !element.dataset.notrequired)
-        fieldsRequired = fieldsRequired.filter((element) => element.value == '')
+        fieldsRequired = fieldsRequired.filter((element) => !element.value)
 
         if (fieldsRequired.length > 0) {
             fieldsRequired.forEach(function (element) {
@@ -147,7 +173,7 @@ if (window.location.pathname == "/admin/invoice/form") {
 
             let fieldsName = fieldsRequired.map((element) => element.dataset.name)
             fieldsName = fieldsName.join(", ")
-            throw new Error(`campos ${fieldsName} obrigatórios`)
+            throw new Error(`campos obrigatórios ${fieldsName}, Total: ${fieldsRequired.length}`)
         }
 
         const btnSubmit = this.querySelector("[type='submit']")
