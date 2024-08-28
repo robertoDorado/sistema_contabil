@@ -4,6 +4,7 @@ namespace Source\Controllers;
 
 use DateTime;
 use Exception;
+use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Controller;
 use Source\Domain\Model\Company;
 use Source\Support\Invoice as SupportInvoice;
@@ -52,11 +53,18 @@ class Invoice extends Controller
                     "companyTaxRegime",
                     "fantasyName",
                     "companyComplement",
+                    "recipientZipcode",
                     "recipientName",
                     "recipientStateRegistrationIndicator",
                     "recipientEmail",
                     "recipientDocumentType",
-                    "recipientDocument"
+                    "recipientDocument",
+                    "recipientAddress",
+                    "recipientAddressNumber",
+                    "recipientComplement",
+                    "recipientNeighborhood",
+                    "recipientMunicipality",
+                    "recipientState"
                 ]
             )->getAllPostData();
             $requestFile = $this->getRequestFiles()->getAllFiles();
@@ -161,12 +169,26 @@ class Invoice extends Controller
             $municipalityCode = $requestPost["municipalityInvoice"][0];
             $municipalityName = $requestPost["municipalityInvoice"][1];
 
+            $requestPost["recipientMunicipality"] = explode("-", $requestPost["recipientMunicipality"]);
+            $recipientMunicipalityCode = $requestPost["recipientMunicipality"][0];
+            $recipientMunicipalityName = $requestPost["recipientMunicipality"][1];
+
             $requestPost["companyDocument"] = preg_replace("/[^\d]+/", "", $requestPost["companyDocument"]);
             $requestPost["recipientDocument"] = preg_replace("/[^\d]+/", "", $requestPost["recipientDocument"]);
             $requestPost["recipientStateRegistration"] = preg_replace("/[^\d]+/", "", $requestPost["recipientStateRegistration"]);
             $requestPost["stateRegistration"] = preg_replace("/[^\d]+/", "", $requestPost["stateRegistration"]);
+            $requestPost["companyPhone"] = preg_replace("/[^\d]+/", "", $requestPost["companyPhone"]);
+            $requestPost["recipientPhone"] = preg_replace("/[^\d]+/", "", $requestPost["recipientPhone"]);
 
-            $recipientAddress = [
+            $requestPost["productValueUnit"] = convertCurrencyRealToFloat($requestPost["productValueUnit"]);
+            $requestPost["productTotalValue"] = convertCurrencyRealToFloat($requestPost["productTotalValue"]);
+            $requestPost["taxUnitValue"] = convertCurrencyRealToFloat($requestPost["taxUnitValue"]);
+            $requestPost["productShippingValue"] = convertCurrencyRealToFloat($requestPost["productShippingValue"]);
+            $requestPost["productInsuranceValue"] = convertCurrencyRealToFloat($requestPost["productInsuranceValue"]);
+            $requestPost["productDiscountAmount"] = convertCurrencyRealToFloat($requestPost["productDiscountAmount"]);
+            $requestPost["productValueOtherExpenses"] = convertCurrencyRealToFloat($requestPost["productValueOtherExpenses"]);
+
+            $recipientData = [
                 "xNome" => $requestPost["recipientName"],
                 "indIEDest" => $requestPost["recipientStateRegistrationIndicator"],
                 "IE" => $requestPost["recipientStateRegistration"],
@@ -177,13 +199,13 @@ class Invoice extends Controller
             ];
 
             $validateRecipientDocument = [
-                "1" => function(string $value) use (&$recipientAddress) {
-                    $recipientAddress["CPF"] = $value;
-                    $recipientAddress["CNPJ"] = null;
+                "1" => function (string $value) use (&$recipientData) {
+                    $recipientData["CPF"] = $value;
+                    $recipientData["CNPJ"] = null;
                 },
-                "2" => function(string $value) use (&$recipientAddress) {
-                    $recipientAddress["CNPJ"] = $value;
-                    $recipientAddress["CPF"] = null;
+                "2" => function (string $value) use (&$recipientData) {
+                    $recipientData["CNPJ"] = $value;
+                    $recipientData["CPF"] = null;
                 }
             ];
 
@@ -223,7 +245,7 @@ class Invoice extends Controller
 
             $invoice->isValidCertPfx();
             $dateTime = new DateTime();
-            
+
             $invoice->makeInvoice()->invoiceIdentification([
                 "cUF" => $requestPost["companyState"]["id"],
                 "cNF" => str_pad(mt_rand(0, 99999999), 8, '0', STR_PAD_LEFT),
@@ -260,7 +282,47 @@ class Invoice extends Controller
                 "cPais" => 1058,
                 "xPais" => "Brasil",
                 "fone" => $requestPost["companyPhone"] ?? null,
-            ])->recipientAddress($recipientAddress);
+            ])->recipientData($recipientData)
+                ->recipientAddressData([
+                    "xLgr" => $requestPost["recipientAddress"],
+                    "nro" => $requestPost["recipientAddressNumber"],
+                    "xCpl" => $requestPost["recipientComplement"],
+                    "xBairro" => $requestPost["recipientNeighborhood"],
+                    "cMun" => $recipientMunicipalityCode,
+                    "xMun" => $recipientMunicipalityName,
+                    "UF" => $requestPost["recipientState"],
+                    "CEP" => $requestPost["recipientZipcode"],
+                    "cPais" => 1058,
+                    "xPais" => "Brasil",
+                    "fone" => $requestPost["recipientPhone"] ?? null
+                ])->productOrServiceData([
+                    "item" => $requestPost["productItem"],
+                    "cProd" => $requestPost["productCode"] ?? Uuid::uuid4()->toString(),
+                    "cEAN" => $requestPost["barCodeProduct"] ?? null,
+                    "cBarra" => $requestPost["additionalBarCodeProduct"] ?? null,
+                    "xProd" => $requestPost["productDescription"],
+                    "NCM" => $requestPost["productNcmCode"],
+                    "cBenef" => $requestPost["productCodeBenef"] ?? null,
+                    "EXTIPI" => $requestPost["productCodeTipi"] ?? null,
+                    "CFOP" => $requestPost["productCodeCfop"],
+                    "uCom" => $requestPost["productComercialUnit"],
+                    "qCom" => $requestPost["qttyProduct"],
+                    "vUnCom" => $requestPost["productValueUnit"],
+                    "vProd" => $requestPost["productTotalValue"],
+                    "cEANTrib" => $requestPost["barCodeProductTrib"] ?? null,
+                    "cBarraTrib" => $requestPost["additionalBarCodeProductTrib"] ?? null,
+                    "uTrib" => $requestPost["productTaxUnit"],
+                    "qTrib" => $requestPost["qttyProuctTax"],
+                    "vUnTrib" => $requestPost["taxUnitValue"],
+                    "vFrete" => $requestPost["productShippingValue"] ?? null,
+                    "vSeg" => $requestPost["productInsuranceValue"] ?? null,
+                    "vDesc" => $requestPost["productDiscountAmount"] ?? null,
+                    "vOutro" => $requestPost["productValueOtherExpenses"] ?? null,
+                    "indTot" => 1,
+                    "xPed" => $requestPost["productOrderNumber"] ?? null,
+                    "nItemPed" => $requestPost["productItemNumberBuyOrder"] ?? null,
+                    "nFCI" => $requestPost["fciNumber"] ?? null
+                ]);
 
             echo json_encode(["success" => "nota fiscal válida"]);
             die;

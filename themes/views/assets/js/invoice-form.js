@@ -4,51 +4,111 @@ if (window.location.pathname == "/admin/invoice/form") {
     const verifyExtensionFile = ["pfx"]
     const recipientDocumentType = document.getElementById("recipientDocumentType")
     const recipientDocument = document.getElementById("recipientDocument")
+    const companyContactType = document.getElementById("companyContactType")
+    const companyPhone = document.getElementById("companyPhone")
+    const recipientContactType = document.getElementById("recipientContactType")
+    const recipientPhone = document.getElementById("recipientPhone")
     let fieldsRequired = Array.from(document.querySelectorAll("input,select"))
+
+    $("#productValueUnit,#productTotalValue,#taxUnitValue,#productShippingValue,#productInsuranceValue,#productDiscountAmount,#productValueOtherExpenses").maskMoney(
+        {
+            allowNegative: false, 
+            thousands:'.', 
+            decimal:',', 
+            affixesStay: false
+        }
+    )
 
     $('#form-wizard').bootstrapWizard({
         'tabClass': 'nav nav-pills',
         'nextSelector': '.wizard .next',
         'previousSelector': '.wizard .previous'
     })
-    fetch(window.location.origin + '/admin/invoice/municipality.json').then(data => data.json()).then(function (response) {
-    })
-    $("#municipalityInvoice").select2()
-    document.querySelector(".select2.select2-container.select2-container--default").style.width = "100%"
 
-    dataTransferRecipientDocumentType = {
-        type: null
+    $("#municipalityInvoice").select2()
+    $("#recipientMunicipality").select2()
+    document.querySelectorAll(".select2.select2-container.select2-container--default").forEach(function (element) {
+        element.style.width = "100%"
+    })
+
+    const dataTransfer = {
+        documentType: null,
+        phoneType: null
     }
+
     recipientDocumentType.addEventListener("change", function () {
         const validateDocumentType = {
             '1': 'cpf',
             '2': 'cnpj'
         }
-        dataTransferRecipientDocumentType.type = validateDocumentType[this.value]
+        dataTransfer.documentType = validateDocumentType[this.value]
         recipientDocument.dataset.mask = validateDocumentType[this.value]
+    })
+
+    companyContactType.addEventListener("change", function () {
+        const validateContactType = {
+            '1': 'phone',
+            '2': 'cellPhone'
+        }
+        dataTransfer.phoneType = validateContactType[this.value]
+        companyPhone.dataset.mask = validateContactType[this.value]
+    })
+
+    recipientContactType.addEventListener("change", function () {
+        const validateContactType = {
+            '1': 'phone',
+            '2': 'cellPhone'
+        }
+        dataTransfer.phoneType = validateContactType[this.value]
+        recipientPhone.dataset.mask = validateContactType[this.value]
     })
 
     const mask = companyMaskForm()
     recipientDocument.addEventListener("input", function () {
-        if (typeof mask[dataTransferRecipientDocumentType.type] == "function") {
-            this.value = mask[dataTransferRecipientDocumentType.type](this.value)
+        if (typeof mask[dataTransfer.documentType] == "function") {
+            this.value = mask[dataTransfer.documentType](this.value)
         }
     })
 
-    const companyZipcode = document.querySelector("[name='companyZipcode']")
-    companyZipcode.addEventListener("input", function () {
-        const searchField = this.value.replace(/\D/g, "").replace(/(\d{5})(\d)/, "$1$2")
-        if (searchField.length >= 8) {
-            fetch(`https://brasilapi.com.br/api/cep/v1/${searchField}`)
-                .then(data => data.json()).then(function (response) {
-                    if (response.cep) {
-                        document.querySelector("[name='companyAddress']").value = response.street
-                        document.querySelector("[name='companyNeighborhood']").value = response.neighborhood
-                        document.querySelector("[name='companyCity']").value = response.city
-                        document.querySelector("[name='companyState']").value = response.state
-                    }
-                })
+    companyPhone.addEventListener("input", function () {
+        if (typeof mask[dataTransfer.phoneType] == "function") {
+            this.value = mask[dataTransfer.phoneType](this.value)
         }
+    })
+
+    recipientPhone.addEventListener("input", function () {
+        if (typeof mask[dataTransfer.phoneType] == "function") {
+            this.value = mask[dataTransfer.phoneType](this.value)
+        }
+    })
+
+    const zipcodeData = document.querySelectorAll("#companyZipcode,#recipientZipcode")
+    zipcodeData.forEach(function (element) {
+        element.addEventListener("input", function () {
+            const searchField = this.value.replace(/\D/g, "").replace(/(\d{5})(\d)/, "$1$2")
+            if (searchField.length >= 8) {
+                fetch(`https://brasilapi.com.br/api/cep/v1/${searchField}`)
+                    .then(data => data.json()).then(function (response) {
+                        const verifyAddressType = {
+                            "issuer": function (response) {
+                                document.querySelector("[name='companyAddress']").value = response.street
+                                document.querySelector("[name='companyNeighborhood']").value = response.neighborhood
+                                document.querySelector("[name='companyState']").value = response.state
+                            },
+                            "recipient": function (response) {
+                                document.querySelector("[name='recipientAddress']").value = response.street
+                                document.querySelector("[name='recipientNeighborhood']").value = response.neighborhood
+                                document.querySelector("[name='recipientState']").value = response.state
+                            },
+                        }
+                        if (response.cep) {
+                            if (typeof verifyAddressType[element.dataset.addresstype] == "function") {
+                                verifyAddressType[element.dataset.addresstype](response)
+                            }
+                        }
+                    })
+            }
+        })
     })
 
     fieldsRequired.forEach(function (element) {

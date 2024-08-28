@@ -66,7 +66,58 @@ class Invoice
         return $this->data->$name ?? null;
     }
 
-    public function recipientAddress(array $config)
+    public function productOrServiceData(array $config)
+    {
+        $this->std = new \stdClass();
+        $this->std->item = $config["item"];
+        $this->std->cProd = $config["cProd"];
+        $this->std->cEAN = $config["cEAN"];
+        $this->std->cBarra = $config["cBarra"];
+        $this->std->xProd = $config["xProd"];
+        $this->std->NCM = $config["NCM"];
+        $this->std->cBenef = $config["cBenef"];
+        $this->std->EXTIPI = $config["EXTIPI"];
+        $this->std->CFOP = $config["CFOP"];
+        $this->std->uCom = $config["uCom"];
+        $this->std->qCom = $config["qCom"];
+        $this->std->vUnCom = $config["vUnCom"];
+        $this->std->vProd = $config["VProd"];
+        $this->std->cEANTrib = $config["cEANTrib"];
+        $this->std->cBarraTrib = $config["cBarraTrib"];
+        $this->std->uTrib = $config["uTrib"];
+        $this->std->qTrib = $config["qTrib"];
+        $this->std->vUnTrib = $config["vUnTrib"];
+        $this->std->vFrete = $config["vFrete"];
+        $this->std->vSeg = $config["vSeg"];
+        $this->std->vDesc = $config["vDesc"];
+        $this->std->vOutro = $config["vOutro"];
+        $this->std->indTot = $config["indTot"];
+        $this->std->xPed = $config["xPed"];
+        $this->std->nItemPed = $config["nItemPed"];
+        $this->std->nFCI = $config["nFCI"];
+        $this->make->tagprod($this->std);
+        return $this;
+    }
+
+    public function recipientAddressData(array $config)
+    {
+        $this->std = new \stdClass();
+        $this->std->xLgr = $config["xLgr"];
+        $this->std->nro = $config["nro"];
+        $this->std->xCpl = $config["xCpl"];
+        $this->std->xBairro = $config["xBairro"];
+        $this->std->cMun = $config["cMun"];
+        $this->std->xMun = $config["xMun"];
+        $this->std->UF = $config["UF"];
+        $this->std->CEP = $config["CEP"];
+        $this->std->cPais = $config["cPais"];
+        $this->std->xPais = $config["xPais"];
+        $this->std->fone = $config["fone"];
+        $this->make->tagenderDest($this->std);
+        return $this;
+    }
+
+    public function recipientData(array $config)
     {
         $this->std = new \stdClass();
         $this->std->xNome = $config["xNome"];

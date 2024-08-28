@@ -93,7 +93,7 @@ try {
     $std->CEP = "19026675";
     $std->cPais = 1058;
     $std->xPais = "Brasil";
-    $std->fone = "1838280907";
+    $std->fone = null;
     // Node com o endereço do emitente
     $make->tagenderEmit($std);
 
@@ -122,7 +122,7 @@ try {
     $std->CEP = "15050210";
     $std->cPais = 1058;
     $std->xPais = "Brasil";
-    $std->fone = "1737079892";
+    $std->fone = null;
 
     // Node de endereço do destinatário
     $make->tagenderDest($std);
@@ -137,7 +137,7 @@ try {
     $std->cBenef = null;
     $std->EXTIPI = null;
     $std->CFOP = 5102;
-    $std->uCom = 77;
+    $std->uCom = "77T";
     $std->qCom = 1;
     $std->vUnCom = 200.75;
     $std->vProd = 200.75;
@@ -145,14 +145,14 @@ try {
     $std->cBarraTrib = null;
     $std->uTrib = 1;
     $std->qTrib = 1;
-    $std->vUnTrib = 0;
+    $std->vUnTrib = 4.75;
     $std->vFrete = null;
-    $std->vSeg = null;
+    $std->vSeg = 2.75;
     $std->vDesc = null;
     $std->vOutro = null;
     $std->indTot = 1;
-    $std->xPed = null;
-    $std->nItemPed = null;
+    $std->xPed = 'Xh78';
+    $std->nItemPed = 45;
     $std->nFCI = null;
 
     // Node de dados do produto/serviço
