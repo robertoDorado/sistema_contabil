@@ -45,6 +45,50 @@ class Invoice
         return $this->data->$name ?? null;
     }
 
+    public function findInvoiceByUuid(array $columns): ?ModelsInvoice
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        return $this->invoice->find("uuid=:uuid", ":uuid=" . $this->getUuid() . "", $columns)->fetch();
+    }
+
+    /** @var ModelsInvoice[] */
+    public function findAllInvoiceJoinCompany(array $data, array $columnsInvoice, array $columnsCompany): array
+    {
+        $columnsInvoice = empty($columnsInvoice) ? "*" : implode(", ", $columnsInvoice);
+        $columnsCompany = empty($columnsCompany) ? "*" : implode(", ", $columnsCompany);
+
+        $response = $this->invoice->find(
+            "id_user=:id_user AND id_company=:id_company", 
+            ":id_company=" . $data["id_company"] . "&:id_user=" . $data["id_user"] . "",
+            $columnsInvoice
+        )->join(
+            CONF_DB_NAME . ".company",
+            "id",
+            null,
+            null,
+            $columnsCompany,
+            "id_company",
+            CONF_DB_NAME . ".invoice"
+        );
+
+        if (!empty($data["date"])) {
+            $response = $response->between(
+                "created_at",
+                CONF_DB_NAME . ".invoice",
+                [
+                    "date_ini" => $data["date"]["date_ini"],
+                    "date_end" => $data["date"]["date_end"]
+                ]
+            );
+        }
+
+        if (empty($response->fetch(true))) {
+            return [];
+        }
+
+        return $response->fetch(true);
+    }
+
     public function getUuid(): string
     {
         return $this->uuid;

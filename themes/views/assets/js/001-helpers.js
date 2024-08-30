@@ -1,4 +1,15 @@
 const modal = document.getElementById("loadingModal");
+function downloadRequestPost(response, fileName) {
+    const url = window.URL.createObjectURL(response)
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+
 function companyMaskForm() {
     return {
         cnpj: function (value) {
@@ -12,10 +23,10 @@ function companyMaskForm() {
 
         cpf: function (value) {
             return value.replace(/\D/g, "")
-            .replace(/(\d{3})(\d)/, "$1.$2")
-            .replace(/(\d{3})(\d)/, "$1.$2")
-            .replace(/(\d{3})(\d)/, "$1-$2")
-            .replace(/(-\d{2})\d+?$/, "$1")
+                .replace(/(\d{3})(\d)/, "$1.$2")
+                .replace(/(\d{3})(\d)/, "$1.$2")
+                .replace(/(\d{3})(\d)/, "$1-$2")
+                .replace(/(-\d{2})\d+?$/, "$1")
         },
 
         cep: function (value) {
@@ -64,16 +75,21 @@ function companyMaskForm() {
 
         invoiceSeries: function (value) {
             return value.replace(/\D/g, "")
-            .replace(/(\d{3})\d+?$/, "$1")
+                .replace(/(\d{3})\d+?$/, "$1")
         },
 
         invoiceNumber: function (value) {
             return value.replace(/\D/g, "")
-            .replace(/(\d{9})\d+?$/, "$1")
+                .replace(/(\d{9})\d+?$/, "$1")
         },
 
         CNAE: function (value) {
             return value.replace(/\D/g, "")
+        },
+
+        cfop: function (value) {
+            return value.replace(/\D/g, "")
+                .replace(/(\d{4})\d+?$/, "$1")
         }
     }
 }

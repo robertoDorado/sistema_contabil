@@ -250,8 +250,15 @@ $route->get("/balance-sheet/statement-of-value-added/report", "FinancialStatemen
 /**
  * Nota Fiscal
  */
-$route->get("/invoice/form", "Invoice::invoiceReport");
-$route->post("/invoice/form", "Invoice::invoiceReport");
+$route->get("/invoice/form", "Invoice::invoiceForm");
+$route->post("/invoice/form", "Invoice::invoiceForm");
+$route->get("/invoice/report", "Invoice::invoiceReport");
+$route->post("/invoice/emission/danfe", "Invoice::invoiceEmissionDanfe");
+$route->get("/invoice/cancel/nfe/{uuid}", "Invoice::invoiceCancelNfe");
+$route->post("/invoice/cancel/nfe", "Invoice::invoiceCancelNfe");
+$route->post("/invoice/remove", "Invoice::invoiceRemove");
+$route->get("/invoice/backup", "Invoice::invoiceBackup");
+$route->post("/invoice/backup", "Invoice::invoiceBackup");
 
 /** 
  * Assinatura do cliente

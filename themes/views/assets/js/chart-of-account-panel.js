@@ -20,14 +20,7 @@ if (verifyChartOfAccountPathname.indexOf(chartOfAccountPathName) != -1) {
             fetch(window.location.origin + "/admin/balance-sheet/export-model-chart-of-account", {
                 method: "POST"
             }).then(response => response.blob()).then(function (response) {
-                const url = window.URL.createObjectURL(response)
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                a.download = 'modelo-plano-de-contas.xlsx';
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
+                downloadRequestPost(response, 'modelo-plano-de-contas.xlsx')
                 btnExport.removeAttribute("disabled")
                 btnExport.innerHTML = "Exportar modelo de plano de contas"
             })

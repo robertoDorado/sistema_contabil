@@ -74,6 +74,23 @@ class Invoice
         return $this->make;
     }
 
+    public function cancelInvoice(string $accessKey, string $justification, string $protocolNumber): array
+    {
+        $response = $this->tools->sefazCancela($accessKey, $justification, $protocolNumber);
+        $standardize = new Standardize($response);
+        
+        $std = $standardize->toStd();
+        return $std->cStat == '101' ? [
+            "status" => $std->cStat,
+            "success" => "nota cancelada com sucesso",
+            "message" => $std->xMotivo
+        ] : [
+            "status" => $std->cStat,
+            "error" => "erro ao tentar cancelar a nota",
+            "message" => $std->xMotivo
+        ] ;
+    }
+
     public function sendNfeToSefaz(): array
     {
         $xml = $this->make->getXML();

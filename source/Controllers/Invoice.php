@@ -4,12 +4,14 @@ namespace Source\Controllers;
 
 use DateTime;
 use Exception;
+use NFePHP\DA\NFe\Danfe;
 use Ramsey\Uuid\Nonstandard\Uuid;
-use Ramsey\Uuid\Uuid as UuidUuid;
 use Source\Core\Controller;
+use Source\Core\Model;
 use Source\Domain\Model\Company;
 use Source\Domain\Model\Invoice as ModelInvoice;
 use Source\Support\Invoice as SupportInvoice;
+use Source\Support\Message;
 
 /**
  * Invoice Controllers
@@ -27,13 +29,281 @@ class Invoice extends Controller
         parent::__construct();
     }
 
+    public function invoiceBackup()
+    {
+        $responseInitializaUserAndCompany = initializeUserAndCompanyId();
+        if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            $requestPost = $this->getRequests()->setRequiredFields([
+                "uuid",
+                "action"
+            ])->getAllPostData();
+
+            $invoice = new ModelInvoice();
+            $invoice->setUuid($requestPost["uuid"]);
+            $invoiceData = $invoice->findInvoiceByUuid(["id", "deleted"]);
+
+            if (empty($invoiceData)) {
+                http_response_code(500);
+                echo json_encode(["error" => "registro não encontrado"]);
+                die;
+            }
+
+            $invoiceData->setRequiredFields(["deleted"]);
+            $response = new \stdClass();
+            $response->message = new Message();
+            $response->success = true;
+
+            $validateAction = [
+                "restore" => function(Model $model) use (&$response) {
+                    $model->deleted = 0;
+                    $response->message->success("registro restaurado com sucesso");
+                    if (!$model->save()) {
+                        $response->message->error("erro ao tentar restaurar o registro");
+                        $response->success = false;
+                    }
+                },
+
+                "delete" => function(Model $model) use (&$response) {
+                    $response->message->success("registro excluido com sucesso");
+                    if (!$model->destroy()) {
+                        $response->message->error("erro ao tentar excluir o registro");
+                        $response->success = false;
+                    }
+                }
+            ];
+
+            if (!empty($validateAction[$requestPost["action"]])) {
+                $validateAction[$requestPost["action"]]($invoiceData);
+            }
+
+            if (!$response->success) {
+                http_response_code(500);
+                echo $response->message->json();
+                die;
+            }
+
+            echo $response->message->json();
+            die;
+        }
+
+        $modelInvoice = new ModelInvoice();
+        $invoiceReportData = $modelInvoice->findAllInvoiceJoinCompany(
+            [
+                "id_user" => $responseInitializaUserAndCompany["user_data"]->id,
+                "id_company" => $responseInitializaUserAndCompany["company_id"]
+            ],
+            [
+                "xml",
+                "protocol_number",
+                "access_key",
+                "created_at",
+                "uuid",
+                "deleted"
+            ],
+            [
+                "company_name"
+            ]
+        );
+
+        $invoiceReportData = array_filter($invoiceReportData, function ($item) {
+            return !empty($item->getDeleted());
+        });
+
+        $invoiceReportData = array_map(function ($item) {
+            $item->created_at = (new DateTime($item->created_at))->format("d/m/Y");
+            return $item;
+        }, $invoiceReportData);
+
+        echo $this->view->render("admin/invoice-backup", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => ["/admin/invoice/backup"],
+            "invoiceReportData" => $invoiceReportData
+        ]);
+    }
+
+    public function invoiceRemove()
+    {
+        $uuid = $this->getRequests()->getPost("uuid");
+        $invoice = new ModelInvoice();
+        $invoice->setUuid($uuid);
+        $invoiceData = $invoice->findInvoiceByUuid(["deleted", "id"]);
+
+        if (empty($invoiceData)) {
+            http_response_code(500);
+            echo json_encode(["error" => "registro não encontrado"]);
+            die;
+        }
+
+        $invoiceData->setRequiredFields(["deleted"]);
+        $invoiceData->deleted = 1;
+        if (!$invoiceData->save()) {
+            http_response_code(500);
+            echo json_encode(["error" => "erro ao tentar excluir o registro"]);
+            die;
+        }
+
+        echo json_encode(["success" => "nota excluida com sucesso"]);
+    }
+
+    public function invoiceCancelNfe(array $data)
+    {
+        $responseInitializaUserAndCompany = initializeUserAndCompanyId();
+        if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            $requestPost = $this->getRequests()->setRequiredFields([
+                'reasonOfCancellation',
+                'csrfToken',
+                'certPassword',
+                'environment',
+                'uuid'
+            ])->getAllPostData();
+            $requestFile = $this->getRequestFiles()->getAllFiles();
+
+            if (empty($responseInitializaUserAndCompany["company_id"])) {
+                http_response_code(500);
+                echo json_encode(["error" => "selecione uma empresa antes de cancelar uma nota fiscal"]);
+                die;
+            }
+
+            $validateEnvironment = ["1", "2"];
+            if (!in_array($requestPost["environment"], $validateEnvironment)) {
+                http_response_code(500);
+                echo json_encode(["error" => "ambiente inválido"]);
+                die;
+            }
+
+            $company = new Company();
+            $company->setId($responseInitializaUserAndCompany["company_id"]);
+            $companyData = $company->findCompanyById(["company_name", "company_document", "company_state"]);
+
+            if (empty($companyData)) {
+                http_response_code(500);
+                echo json_encode(["error" => "empresa não encontrada"]);
+                die;
+            }
+
+            $companyData->company_document = preg_replace("/[^\d]+/", "", $companyData->company_document);
+            $certificate = $requestFile["pfxFile"]["tmp_name"];
+
+            $invoiceModel = new ModelInvoice();
+            $invoiceModel->setUuid($requestPost["uuid"]);
+            $invoiceData = $invoiceModel->findInvoiceByUuid(["protocol_number", "access_key"]);
+
+            if (empty($invoiceData)) {
+                http_response_code(500);
+                echo json_encode(["error" => "nfe não encontrada"]);
+                die;
+            }
+
+            try {
+                $invoice = new SupportInvoice([
+                    "tpAmb" => $requestPost["environment"],
+                    "companyName" => $companyData->company_name,
+                    "companyDocument" => $companyData->company_document,
+                    "companyState" => $companyData->company_state,
+                    "certPfx" => $certificate,
+                    "certPassword" => $requestPost["certPassword"],
+                ]);
+
+                $invoice->isValidCertPfx();
+                $response = $invoice->cancelInvoice($invoiceData->access_key, $requestPost["reasonOfCancellation"], $invoiceData->protocol_number);
+                echo json_encode($response);
+            } catch (\Exception $th) {
+                http_response_code(500);
+                echo json_encode(["error" => $th->getMessage()]);
+            }
+            die;
+        }
+
+        if (!Uuid::isValid($data["uuid"])) {
+            redirect("/admin/invoice/report");
+        }
+
+        echo $this->view->render("admin/invoice-cancel", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => []
+        ]);
+    }
+
+    public function invoiceEmissionDanfe()
+    {
+        $uuidData = $this->getRequests()->getPost("uuid");
+        $invoice = new ModelInvoice();
+
+        $invoice->setUuid($uuidData);
+        $invoiceData = $invoice->findInvoiceByUuid(["xml"]);
+
+        if (empty($invoiceData)) {
+            throw new Exception("a emissão da danfe falhou - este registro não existe");
+        }
+
+        $danfe = new Danfe($invoiceData->getXml());
+        $danfe->debugMode(false);
+
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: attachment; filename="danfe-' . $uuidData . '.pdf"');
+        header('Cache-Control: no-cache, no-store, must-revalidate');
+        echo $danfe->render();
+    }
+
     public function invoiceReport()
+    {
+        $responseInitializaUserAndCompany = initializeUserAndCompanyId();
+        $params = [
+            [
+                "id_user" => $responseInitializaUserAndCompany["user_data"]->id,
+                "id_company" => $responseInitializaUserAndCompany["company_id"]
+            ],
+            [
+                "xml",
+                "protocol_number",
+                "access_key",
+                "created_at",
+                "uuid",
+                "deleted"
+            ],
+            [
+                "company_name"
+            ]
+        ];
+
+        $dateRange = $this->getRequests()->get("daterange");
+        if (!empty($dateRange)) {
+            $dates = explode("-", $dateRange);
+            $dates = array_map(function ($value) {
+                return preg_replace("/(\d{2})\/(\d{2})\/(\d{4})/", "$3-$2-$1", $value);
+            }, $dates);
+
+            $params[0]["date"] = [
+                "date_ini" => $dates[0],
+                "date_end" => $dates[1]
+            ];
+        }
+
+        $modelInvoice = new ModelInvoice();
+        $invoiceReportData = $modelInvoice->findAllInvoiceJoinCompany(...$params);
+
+        $invoiceReportData = array_filter($invoiceReportData, function ($item) {
+            return empty($item->getDeleted());
+        });
+
+        $invoiceReportData = array_map(function ($item) {
+            $item->created_at = (new DateTime($item->created_at))->format("d/m/Y");
+            return $item;
+        }, $invoiceReportData);
+
+        echo $this->view->render("admin/invoice-report", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => ["/admin/invoice/report"],
+            "invoiceReportData" => $invoiceReportData
+        ]);
+    }
+
+    public function invoiceForm()
     {
         $responseInitializaUserAndCompany = initializeUserAndCompanyId();
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
             $requestPost = $this->getRequests()->setRequiredFields(
                 [
-                    'productCode',
                     'natureOperation',
                     'invoiceNumber',
                     'invoiceSeries',
@@ -67,8 +337,8 @@ class Invoice extends Controller
                     'recipientNeighborhood',
                     'recipientMunicipality',
                     'recipientState',
-                    'recipientPhone',
                     'productItem',
+                    'productCode',
                     'productDescription',
                     'productComercialUnit',
                     'qttyProduct',
@@ -79,12 +349,9 @@ class Invoice extends Controller
                     'taxUnitValue',
                     'productNcmCode',
                     'productCodeCfop',
+                    'shippingMethod',
                     'productOrigin',
                     'productIcmsSituation',
-                    'determiningIcmsCalc',
-                    'calculationBaseValue',
-                    'icmsRate',
-                    'icmsValue',
                     'typePaymentMethod',
                     'paymentValue'
                 ]
@@ -202,10 +469,12 @@ class Invoice extends Controller
                 die;
             }
 
-            $validateDeterminingIcmsCalc = ["0", "1", "2", "3"];
-            if (!in_array($requestPost["determiningIcmsCalc"], $validateDeterminingIcmsCalc)) {
-                $message(["error" => "determinação do cálculo do icms inválido"], 500);
-                die;
+            if (!empty($requestPost["determiningIcmsCalc"])) {
+                $validateDeterminingIcmsCalc = ["0", "1", "2", "3"];
+                if (!in_array($requestPost["determiningIcmsCalc"], $validateDeterminingIcmsCalc)) {
+                    $message(["error" => "determinação do cálculo do icms inválido"], 500);
+                    die;
+                }
             }
 
             $validateProductIcmsSituation = [
@@ -460,10 +729,10 @@ class Invoice extends Controller
                         "item" => $requestPost["productItem"],
                         "orig" => $requestPost["productOrigin"],
                         "CST" => $requestPost["productIcmsSituation"],
-                        "modBC" => $requestPost["determiningIcmsCalc"],
-                        "vBC" => $requestPost["calculationBaseValue"],
-                        "pICMS" => $requestPost["icmsRate"],
-                        "vICMS" => $requestPost["icmsValue"],
+                        "modBC" => $requestPost["determiningIcmsCalc"] ?? null,
+                        "vBC" => $requestPost["calculationBaseValue"] ?? null,
+                        "pICMS" => $requestPost["icmsRate"] ?? null,
+                        "vICMS" => $requestPost["icmsValue"] ?? null,
                         "pFCP" => null,
                         "vFCP" => null,
                         "vBCFCP" => null,
@@ -520,7 +789,7 @@ class Invoice extends Controller
                         "CNPJReceb" => null,
                         "idTermPag" => null
                     ])->sendNfeToSefaz();
-                
+
                 $modelInvoice = new ModelInvoice();
                 $response = $modelInvoice->persistData([
                     "uuid" => Uuid::uuid4(),
@@ -533,7 +802,7 @@ class Invoice extends Controller
                     "updated_at" => date("Y-m-d"),
                     "deleted" => 0
                 ]);
-                
+
                 if (empty($response)) {
                     http_response_code(500);
                     echo $modelInvoice->message->json();
@@ -545,7 +814,7 @@ class Invoice extends Controller
                 http_response_code(500);
                 $jsonErrors = !empty($invoice->getMake()) ? $invoice->getMake()->getErrors() : [];
                 $jsonErrors = json_encode($jsonErrors);
-                echo json_encode(["error" => $th->getMessage()]) . " " . $jsonErrors;
+                echo json_encode(["error" => $th->getMessage() . " " . $jsonErrors]);
             }
             die;
         }

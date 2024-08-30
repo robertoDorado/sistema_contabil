@@ -384,7 +384,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <label for="productCodeCfop">Código Fiscal de Operações e Prestações</label>
-                                                <input type="text" data-mask="number" data-name="Código Fiscal de Operações e Prestações" class="form-control" name="productCodeCfop" id="productCodeCfop">
+                                                <input type="text" data-mask="cfop" data-name="Código Fiscal de Operações e Prestações" class="form-control" name="productCodeCfop" id="productCodeCfop">
                                             </div>
                                             <div class="form-group">
                                                 <label for="additionalBarCodeProductTrib">Código de barras adicional para o produto tributado</label>
@@ -496,7 +496,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <label for="determiningIcmsCalc">Modalidade de determinação da base de cálculo do ICMS</label>
-                                                <select name="determiningIcmsCalc" data-name="Modalidade de determinação da base de cálculo do ICMS" id="determiningIcmsCalc" class="form-control">
+                                                <select data-notrequired="true" name="determiningIcmsCalc" data-name="Modalidade de determinação da base de cálculo do ICMS" id="determiningIcmsCalc" class="form-control">
                                                     <option value="" disabled selected>Selecione a Modalidade de determinação da base de cálculo do ICMS</option>
                                                     <option value="0">Margem Valor Agregado (%)</option>
                                                     <option value="1">Pauta (Valor)</option>
@@ -504,17 +504,17 @@
                                                     <option value="3">Valor da operação</option>
                                                 </select>
                                             </div>
-                                            <div class="form-group">
+                                            <div  class="form-group">
                                                 <label for="calculationBaseValue">Valor da base de cálculo do ICMS</label>
-                                                <input type="text" data-mask="number" data-name="Valor da base de cálculo do ICMS" class="form-control" name="calculationBaseValue" id="calculationBaseValue">
+                                                <input data-notrequired="true" type="text" data-mask="number" data-name="Valor da base de cálculo do ICMS" class="form-control" name="calculationBaseValue" id="calculationBaseValue">
                                             </div>
                                             <div class="form-group">
                                                 <label for="icmsRate">Alíquota do ICMS</label>
-                                                <input type="text" data-mask="number" data-name="Alíquota do ICMS" class="form-control" name="icmsRate" id="icmsRate">
+                                                <input data-notrequired="true" type="text" data-mask="number" data-name="Alíquota do ICMS" class="form-control" name="icmsRate" id="icmsRate">
                                             </div>
                                             <div class="form-group">
                                                 <label for="icmsValue">Valor do icms cálculado</label>
-                                                <input type="text" data-mask="number" data-name="Valor do icms cálculado" class="form-control" name="icmsValue" id="icmsValue">
+                                                <input data-notrequired="true" type="text" data-mask="number" data-name="Valor do icms cálculado" class="form-control" name="icmsValue" id="icmsValue">
                                             </div>
                                         </div>
                                         <div class="tab-pane" id="step11">

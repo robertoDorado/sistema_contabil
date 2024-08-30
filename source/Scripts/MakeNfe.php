@@ -220,11 +220,11 @@ try {
     $std = new stdClass();
     $std->item = 1; //item da NFe
     $std->orig = 0;
-    $std->CST = '00';
-    $std->modBC = 3;
-    $std->vBC = 100.33;
-    $std->pICMS = 18.33;
-    $std->vICMS = 45.22;
+    $std->CST = '400';
+    $std->modBC = null;
+    $std->vBC = null;
+    $std->pICMS = null;
+    $std->vICMS = null;
     $std->pFCP = null;
     $std->vFCP = null;
     $std->vBCFCP = null;
