@@ -8,6 +8,9 @@ if (window.location.pathname == "/admin/invoice/form") {
     const companyPhone = document.getElementById("companyPhone")
     const recipientContactType = document.getElementById("recipientContactType")
     const recipientPhone = document.getElementById("recipientPhone")
+    const calculationBaseValue = document.getElementById("calculationBaseValue")
+    const icmsRate = document.getElementById("icmsRate")
+    const icmsValue = document.getElementById("icmsValue")
     let fieldsRequired = Array.from(invoiceForm.querySelectorAll("input,select"))
 
     $(`#productValueUnit,
@@ -19,7 +22,11 @@ if (window.location.pathname == "/admin/invoice/form") {
         #productValueOtherExpenses,
         #totalTaxValue,
         #paymentTotalValue,
-        #changeMoney
+        #changeMoney,
+        #calculationBaseValue,
+        #icmsRate,
+        #icmsValue,
+        #paymentValue
     `).maskMoney(
         {
             allowNegative: false,
@@ -35,15 +42,37 @@ if (window.location.pathname == "/admin/invoice/form") {
         'previousSelector': '.wizard .previous'
     })
 
-    $("#municipalityInvoice,#recipientMunicipality,#codeMethodPayment").select2()
+    $(`#municipalityInvoice,
+        #recipientMunicipality,
+        #codeMethodPayment,
+        #productIcmsSituation`
+    ).select2()
     document.querySelectorAll(".select2.select2-container.select2-container--default").forEach(function (element) {
         element.style.width = "100%"
     })
 
     const dataTransfer = {
         documentType: null,
-        phoneType: null
+        phoneType: null,
+        calcBaseValueFormated: 0,
+        icmsRate: 0,
+        icmsValue: 0,
+        formartCurrencyToFloat: function (value) {
+            return parseFloat(value.replace(/[^\d,]/g, '').replace(',', '.'));
+        }
     }
+
+    calculationBaseValue.addEventListener('keyup', function () {
+        dataTransfer.calcBaseValueFormated = dataTransfer.formartCurrencyToFloat(this.value)
+    });
+
+    icmsRate.addEventListener('keyup', function () {
+        dataTransfer.icmsRate = dataTransfer.formartCurrencyToFloat(this.value)
+        if (dataTransfer.calcBaseValueFormated > 0 && dataTransfer.icmsRate > 0) {
+            icmsValue.value = parseFloat((dataTransfer.calcBaseValueFormated * (dataTransfer.icmsRate / 100)).toFixed(2))
+                .toLocaleString("pt-br", { "currency": "BRL" })
+        }
+    });
 
     recipientDocumentType.addEventListener("change", function () {
         const validateDocumentType = {
@@ -121,18 +150,18 @@ if (window.location.pathname == "/admin/invoice/form") {
     })
 
     const configViewFieldsRequired = fieldsRequired.filter((element) => !element.dataset.notrequired)
-    const labelFieldsName = configViewFieldsRequired.map(function(element) {
+    const labelFieldsName = configViewFieldsRequired.map(function (element) {
         if (element.previousElementSibling) {
             return element.previousElementSibling.innerHTML
-        }else {
+        } else {
             return element.parentElement.parentElement.previousElementSibling.innerHTML
         }
     })
 
-    configViewFieldsRequired.forEach(function(element, index) {
+    configViewFieldsRequired.forEach(function (element, index) {
         if (element.previousElementSibling) {
             element.previousElementSibling.innerHTML = `* ${labelFieldsName[index]}`
-        }else {
+        } else {
             element.parentElement.parentElement.previousElementSibling.innerHTML = `* ${labelFieldsName[index]}`
         }
     })
@@ -177,9 +206,9 @@ if (window.location.pathname == "/admin/invoice/form") {
         }
 
         const btnSubmit = this.querySelector("[type='submit']")
-        // showSpinner(btnSubmit)
-
+        showSpinner(btnSubmit)
         const form = new FormData(this)
+        
         fetch(window.location.origin + "/admin/invoice/form", {
             method: "POST",
             body: form

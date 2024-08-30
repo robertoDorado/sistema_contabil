@@ -13,8 +13,8 @@ require dirname(dirname(__DIR__)) . "/vendor/autoload.php";
 try {
     // Carregar as configurações
     $config = json_decode(file_get_contents('config/config.json', true), true);
-    $soap = new SoapFake();
-    $soap->disableCertValidation(true);
+    // $soap = new SoapFake();
+    // $soap->disableCertValidation(true);
 
     $content = file_get_contents("config/{$config['certPfx']}", true);
 
@@ -23,9 +23,9 @@ try {
 
     // Instanciar a classe de ferramentas da NF-e
     $tools = new Tools(json_encode($config), $certificate);
-    $tools->model('55');
-    $tools->setVerAplic('5.1.34');
-    $tools->loadSoapClass($soap);
+    // $tools->model('55');
+    // $tools->setVerAplic('5.1.34');
+    // $tools->loadSoapClass($soap);
 
     // Instanciar a classe de criação do XML
     $make = new Make();
@@ -80,7 +80,7 @@ try {
 
     // Node com os dados do emitente
     $make->tagemit($std);
-    
+
     //code...
     $std = new stdClass();
     $std->xLgr = "Rua Cerata Donzeli Bongiovani teste";
@@ -139,8 +139,8 @@ try {
     $std->CFOP = 5102;
     $std->uCom = "77T";
     $std->qCom = 1;
-    $std->vUnCom = 200.75;
-    $std->vProd = 200.75;
+    $std->vUnCom = 1.10;
+    $std->vProd = 1.10;
     $std->cEANTrib = null;
     $std->cBarraTrib = null;
     $std->uTrib = 1;
@@ -222,66 +222,66 @@ try {
     $std->orig = 0;
     $std->CST = '00';
     $std->modBC = 3;
-    $std->vBC = 100;
-    $std->pICMS = 18;
-    $std->vICMS = 18;
-    $std->pFCP;
-    $std->vFCP;
-    $std->vBCFCP;
-    $std->modBCST;
-    $std->pMVAST;
-    $std->pRedBCST;
-    $std->vBCST;
-    $std->pICMSST;
-    $std->vICMSST;
-    $std->vBCFCPST;
-    $std->pFCPST;
-    $std->vFCPST;
-    $std->vICMSDeson;
-    $std->motDesICMS;
-    $std->pRedBC;
-    $std->vICMSOp;
-    $std->pDif;
-    $std->vICMSDif;
-    $std->vBCSTRet;
-    $std->pST;
-    $std->vICMSSTRet;
-    $std->vBCFCPSTRet;
-    $std->pFCPSTRet;
-    $std->vFCPSTRet;
-    $std->pRedBCEfet;
-    $std->vBCEfet;
-    $std->pICMSEfet;
-    $std->vICMSEfet;
-    $std->vICMSSubstituto; //NT 2020.005 v1.20
-    $std->vICMSSTDeson; //NT 2020.005 v1.20
-    $std->motDesICMSST; //NT 2020.005 v1.20
-    $std->pFCPDif; //NT 2020.005 v1.20
-    $std->vFCPDif; //NT 2020.005 v1.20
-    $std->vFCPEfet; //NT 2020.005 v1.20
-    $std->pRedAdRem; //NT 2023.001-v1.10
-    $std->qBCMono; //NT 2023.001-v1.10
-    $std->adRemiICMS; //NT 2023.001-v1.10
-    $std->vICMSMono; //NT 2023.001-v1.10
-    $std->adRemICMSRet; //NT 2023.001-v1.10
-    $std->vICMSMonoRet; //NT 2023.001-v1.10
-    $std->vICMSMonoDif; //NT 2023.001-v1.10
-    $std->cBenefRBC; //NT 2019.001 v1.61
-    $std->indDeduzDeson; //NT 2023.004 v1.00
+    $std->vBC = 100.33;
+    $std->pICMS = 18.33;
+    $std->vICMS = 45.22;
+    $std->pFCP = null;
+    $std->vFCP = null;
+    $std->vBCFCP = null;
+    $std->modBCST = null;
+    $std->pMVAST = null;
+    $std->pRedBCST = null;
+    $std->vBCST = null;
+    $std->pICMSST = null;
+    $std->vICMSST = null;
+    $std->vBCFCPST = null;
+    $std->pFCPST = null;
+    $std->vFCPST = null;
+    $std->vICMSDeson = null;
+    $std->motDesICMS = null;
+    $std->pRedBC = null;
+    $std->vICMSOp = null;
+    $std->pDif = null;
+    $std->vICMSDif = null;
+    $std->vBCSTRet = null;
+    $std->pST = null;
+    $std->vICMSSTRet = null;
+    $std->vBCFCPSTRet = null;
+    $std->pFCPSTRet = null;
+    $std->vFCPSTRet = null;
+    $std->pRedBCEfet = null;
+    $std->vBCEfet = null;
+    $std->pICMSEfet = null;
+    $std->vICMSEfet = null;
+    $std->vICMSSubstituto = null; //NT 2020.005 v1.20
+    $std->vICMSSTDeson = null; //NT 2020.005 v1.20
+    $std->motDesICMSST = null; //NT 2020.005 v1.20
+    $std->pFCPDif = null; //NT 2020.005 v1.20
+    $std->vFCPDif = null; //NT 2020.005 v1.20
+    $std->vFCPEfet = null; //NT 2020.005 v1.20
+    $std->pRedAdRem = null; //NT 2023.001-v1.10
+    $std->qBCMono = null; //NT 2023.001-v1.10
+    $std->adRemiICMS = null; //NT 2023.001-v1.10
+    $std->vICMSMono = null; //NT 2023.001-v1.10
+    $std->adRemICMSRet = null; //NT 2023.001-v1.10
+    $std->vICMSMonoRet = null; //NT 2023.001-v1.10
+    $std->vICMSMonoDif = null; //NT 2023.001-v1.10
+    $std->cBenefRBC = null; //NT 2019.001 v1.61
+    $std->indDeduzDeson = null; //NT 2023.004 v1.00
     $make->tagICMS($std);
 
     $std = new stdClass();
-    $std->indPag = '0'; //0= Pagamento à Vista 1= Pagamento à Prazo
+    $std->indPag = null; //0= Pagamento à Vista 1= Pagamento à Prazo
     $std->tPag = '03';
-    $std->vPag = 200.75; //Obs: deve ser informado o valor pago pelo cliente
-    $std->CNPJ = '12345678901234';
-    $std->tBand = '01';
-    $std->cAut = '3333333';
-    $std->tpIntegra = 1; //incluso na NT 2015/002
-    $std->CNPJPag; //NT 2023.004 v1.00
-    $std->UFPag; //NT 2023.004 v1.00
-    $std->CNPJReceb; //NT 2023.004 v1.00
-    $std->idTermPag; //NT 2023.004 v1.00
+    $std->vPag = 1.10; //Obs: deve ser informado o valor pago pelo cliente
+    $std->CNPJ = null;
+    $std->tBand = null;
+    $std->cAut = null;
+    $std->tpIntegra = null; //incluso na NT 2015/002
+    $std->CNPJPag = null; //NT 2023.004 v1.00
+    $std->UFPag = null; //NT 2023.004 v1.00
+    $std->CNPJReceb = null; //NT 2023.004 v1.00
+    $std->idTermPag = null; //NT 2023.004 v1.00
 
     $make->tagdetPag($std);
 
@@ -293,11 +293,11 @@ try {
     $idLote = str_pad(rand(1, 999999999999999), 15, '0', STR_PAD_LEFT);
 
     // Enviar NF-e para a sefaz
-    // $response = $tools->sefazEnviaLote([$xml], $idLote);
-    // $stdResponse = (new Standardize())->toStd($response);
-    // if ($stdResponse->cStat != 103) {
-    //     throw new Exception("Erro ao enviar lote: " . $stdResponse->xMotivo);
-    // }
+    $response = $tools->sefazEnviaLote([$xml], $idLote);
+    $stdResponse = (new Standardize())->toStd($response);
+    if ($stdResponse->cStat != 103) {
+        throw new Exception("Erro ao enviar lote: " . $stdResponse->xMotivo);
+    }
 
     $path = "source/Scripts/config";
     $response = file_put_contents("{$path}/nota.xml", $xml);

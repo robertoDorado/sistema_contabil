@@ -37,7 +37,9 @@
                                 <li class="nav-item"><a class="nav-link" href="#step7" data-toggle="tab">Validações fiscais</a></li>
                                 <li class="nav-item"><a class="nav-link" href="#step8" data-toggle="tab">Informações sobre importação, frete e seguro</a></li>
                                 <li class="nav-item"><a class="nav-link" href="#step9" data-toggle="tab">Informações sobre forma de pagamento</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#step10" data-toggle="tab">Confirmação</a></li>
+                                <li class="nav-item"><a class="nav-link" href="#step10" data-toggle="tab">informações de ICMS</a></li>
+                                <li class="nav-item"><a class="nav-link" href="#step11" data-toggle="tab">Detalhamento do pagamento</a></li>
+                                <li class="nav-item"><a class="nav-link" href="#step12" data-toggle="tab">Confirmação</a></li>
                             </ul>
                             <form id="invoiceForm">
                                 <div class="card-body">
@@ -288,7 +290,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <label for="recipientPhone">Telefone</label>
-                                                <input type="text" data-mask="phone" data-name="Telefone" class="form-control" name="recipientPhone" id="recipientPhone">
+                                                <input type="text" data-notrequired="true" data-mask="phone" data-name="Telefone" class="form-control" name="recipientPhone" id="recipientPhone">
                                             </div>
                                         </div>
                                         <div class="tab-pane" id="step6">
@@ -299,7 +301,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <label for="productCode">Código do produto</label>
-                                                <input type="text" data-notrequired="true" data-name="Código do produto" class="form-control" name="productCode" id="productCode">
+                                                <input type="text" data-name="Código do produto" class="form-control" name="productCode" id="productCode">
                                             </div>
                                             <div class="form-group">
                                                 <label for="barCodeProduct">Código de barras do produto (GTIN)</label>
@@ -393,7 +395,7 @@
                                             <h3>Informações sobre importação, frete e seguro</h3>
                                             <div class="form-group">
                                                 <label for="shippingMethod">Modalidade do frete</label>
-                                                <select name="shippingMethod" data-notrequired="true" data-name="Modalidade do frete" id="shippingMethod" class="form-control">
+                                                <select name="shippingMethod" data-name="Modalidade do frete" id="shippingMethod" class="form-control">
                                                     <option value="" disabled selected>Selecione a modalidade do frete</option>
                                                     <option value="0">Contratação do Frete por Conta do Remetente (CIF)</option>
                                                     <option value="1">Contratação do Frete por Conta do Destinatário (FOB)</option>
@@ -455,6 +457,106 @@
                                             </div>
                                         </div>
                                         <div class="tab-pane" id="step10">
+                                            <h3>informações de ICMS</h3>
+                                            <div class="form-group">
+                                                <label for="productOrigin">Origem da mercadoria</label>
+                                                <select name="productOrigin" data-name="Origem da mercadoria" id="productOrigin" class="form-control">
+                                                    <option value="" disabled selected>Selecione a origem da mercadoria</option>
+                                                    <option value="0">Nacional</option>
+                                                    <option value="1">Estrangeira - Importação direta</option>
+                                                    <option value="2">Estrangeira - Adquirida no mercado interno</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="productIcmsSituation">Código da Situação Tributária do ICMS</label>
+                                                <select name="productIcmsSituation" data-name="Código da Situação Tributária do ICMS" id="productIcmsSituation" class="form-control">
+                                                    <option value="" disabled selected>Selecione o código da situação tributária</option>
+                                                    <option value="00">00 - Tributação integral</option>
+                                                    <option value="10">10 - Tributada com cobrança do ICMS por substituição tributária</option>
+                                                    <option value="20">20 - Com redução de base de cálculo</option>
+                                                    <option value="30">30 - Isenta ou não tributada e com cobrança do ICMS por substituição tributária</option>
+                                                    <option value="40">40 - Isenta</option>
+                                                    <option value="41">41 - Não tributada</option>
+                                                    <option value="50">50 - Suspensão</option>
+                                                    <option value="51">51 - Diferimento</option>
+                                                    <option value="60">60 - ICMS cobrado anteriormente por substituição tributária</option>
+                                                    <option value="70">70 - Com redução de base de cálculo e cobrança do ICMS por substituição tributária</option>
+                                                    <option value="90">90 - Outros</option>
+                                                    <option value="101">101 - Tributada pelo Simples Nacional com permissão de crédito</option>
+                                                    <option value="102">102 - Tributada pelo Simples Nacional sem permissão de crédito</option>
+                                                    <option value="103">103 - Isenção do ICMS no Simples Nacional para faixa de receita bruta</option>
+                                                    <option value="201">201 - Tributada pelo Simples Nacional com permissão de crédito e com cobrança do ICMS por substituição tributária</option>
+                                                    <option value="202">202 - Tributada pelo Simples Nacional sem permissão de crédito e com cobrança do ICMS por substituição tributária</option>
+                                                    <option value="203">203 - Isenção do ICMS no Simples Nacional para faixa de receita bruta e com cobrança do ICMS por substituição tributária</option>
+                                                    <option value="300">300 - Imune</option>
+                                                    <option value="400">400 - Não tributada pelo Simples Nacional</option>
+                                                    <option value="500">500 - ICMS cobrado anteriormente por substituição tributária (Substituído) ou por antecipação</option>
+                                                    <option value="900">900 - Outros (inclui as demais situações que não se enquadrem nas anteriores)</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="determiningIcmsCalc">Modalidade de determinação da base de cálculo do ICMS</label>
+                                                <select name="determiningIcmsCalc" data-name="Modalidade de determinação da base de cálculo do ICMS" id="determiningIcmsCalc" class="form-control">
+                                                    <option value="" disabled selected>Selecione a Modalidade de determinação da base de cálculo do ICMS</option>
+                                                    <option value="0">Margem Valor Agregado (%)</option>
+                                                    <option value="1">Pauta (Valor)</option>
+                                                    <option value="2">Preço Tabelado Máximo (Valor)</option>
+                                                    <option value="3">Valor da operação</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="calculationBaseValue">Valor da base de cálculo do ICMS</label>
+                                                <input type="text" data-mask="number" data-name="Valor da base de cálculo do ICMS" class="form-control" name="calculationBaseValue" id="calculationBaseValue">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="icmsRate">Alíquota do ICMS</label>
+                                                <input type="text" data-mask="number" data-name="Alíquota do ICMS" class="form-control" name="icmsRate" id="icmsRate">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="icmsValue">Valor do icms cálculado</label>
+                                                <input type="text" data-mask="number" data-name="Valor do icms cálculado" class="form-control" name="icmsValue" id="icmsValue">
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane" id="step11">
+                                            <h3>Detalhamento do pagamento</h3>
+                                            <div class="form-group">
+                                                <label for="paymentMethodIndicator">Indicador da forma de pagamento</label>
+                                                <select data-notrequired="true" name="paymentMethodIndicator" data-name="Indicador da forma de pagamento" id="paymentMethodIndicator" class="form-control">
+                                                    <option value="" disabled selected>Selecione o Indicador da forma de pagamento</option>
+                                                    <option value="0">Pagamento à vista</option>
+                                                    <option value="1">Pagamento à prazo</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="typePaymentMethod">Tipo de Meio de Pagamento</label>
+                                                <select name="typePaymentMethod" data-name="Tipo de Meio de Pagamento" id="typePaymentMethod" class="form-control">
+                                                    <option value="" disabled selected>Selecione o Tipo de Meio de Pagamento</option>
+                                                    <option value="01">Dinheiro</option>
+                                                    <option value="02">Cheque</option>
+                                                    <option value="03">Cartão de crédito</option>
+                                                    <option value="04">Cartão de débito</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="paymentValue">Valor do pagamento</label>
+                                                <input type="text" data-mask="number" data-name="Valor do pagamento" class="form-control" name="paymentValue" id="paymentValue">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="documentOfPaymentInstitution">CNPJ da instituição de pagamento. (Quando o pagamento é realizado por meio de cartão, este campo deve conter o CNPJ da administradora do cartão)</label>
+                                                <input type="text" data-notrequired="true" data-mask="cnpj" data-name="CNPJ da instituição de pagamento" class="form-control" name="documentOfPaymentInstitution" id="documentOfPaymentInstitution">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="cardOperatorFlag">Bandeira da Operadora de Cartão</label>
+                                                <select name="cardOperatorFlag" data-notrequired="true" data-name="Bandeira da Operadora de Cartão" id="cardOperatorFlag" class="form-control">
+                                                    <option value="" disabled selected>Selecione a Bandeira da Operadora de Cartão</option>
+                                                    <option value="01">Visa</option>
+                                                    <option value="02">Mastercard</option>
+                                                    <option value="03">American Express</option>
+                                                    <option value="04">Sorocred</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane" id="step12">
                                             <h3>Confirmação</h3>
                                             <p>Revise as informações antes de emitir a nota fiscal.</p>
                                             <div class="card-footer">

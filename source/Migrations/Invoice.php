@@ -35,7 +35,7 @@ class Invoice
             "VARCHAR(36) UNIQUE NOT NULL",
             "BIGINT NOT NULL",
             "BIGINT NOT NULL",
-            "VARCHAR(2000) NOT NULL",
+            "TEXT(2000) NOT NULL",
             "VARCHAR(255) NOT NULL",
             "VARCHAR(255) NOT NULL",
             "DATE NOT NULL",

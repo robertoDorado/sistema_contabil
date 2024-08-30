@@ -31,7 +31,8 @@ class Invoice
      */
     public function __construct()
     {
-        $this->invoice = new ModelsInvoice();    
+        $this->invoice = new ModelsInvoice();
+        $this->data = new \stdClass();
     }
 
     public function __set($name, $value)

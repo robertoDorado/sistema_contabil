@@ -5,8 +5,10 @@ namespace Source\Controllers;
 use DateTime;
 use Exception;
 use Ramsey\Uuid\Nonstandard\Uuid;
+use Ramsey\Uuid\Uuid as UuidUuid;
 use Source\Core\Controller;
 use Source\Domain\Model\Company;
+use Source\Domain\Model\Invoice as ModelInvoice;
 use Source\Support\Invoice as SupportInvoice;
 
 /**
@@ -31,6 +33,7 @@ class Invoice extends Controller
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
             $requestPost = $this->getRequests()->setRequiredFields(
                 [
+                    'productCode',
                     'natureOperation',
                     'invoiceNumber',
                     'invoiceSeries',
@@ -39,7 +42,6 @@ class Invoice extends Controller
                     'purposeOfIssuance',
                     'finalConsumer',
                     'buyersPresence',
-                    'pfxFile',
                     'certPassword',
                     'environment',
                     'companyName',
@@ -76,7 +78,15 @@ class Invoice extends Controller
                     'qttyProuctTax',
                     'taxUnitValue',
                     'productNcmCode',
-                    'productCodeCfop'
+                    'productCodeCfop',
+                    'productOrigin',
+                    'productIcmsSituation',
+                    'determiningIcmsCalc',
+                    'calculationBaseValue',
+                    'icmsRate',
+                    'icmsValue',
+                    'typePaymentMethod',
+                    'paymentValue'
                 ]
             )->getAllPostData();
             $requestFile = $this->getRequestFiles()->getAllFiles();
@@ -170,16 +180,83 @@ class Invoice extends Controller
                 die;
             }
 
-            $validateShippingMethod = ['0', '1', '2', '3', '4', '9'];
-            if (!in_array($requestPost["shippingMethod"], $validateShippingMethod)) {
-                $message(["error" => "modalidade de frete inválido"], 500);
+            if (!empty($requestPost["shippingMethod"])) {
+                $validateShippingMethod = ['0', '1', '2', '3', '4', '9'];
+                if (!in_array($requestPost["shippingMethod"], $validateShippingMethod)) {
+                    $message(["error" => "modalidade de frete inválido"], 500);
+                    die;
+                }
+            }
+
+            if (!empty($requestPost["codeMethodPayment"])) {
+                $validateCodeMethodPayment = ["01", "02", "03", "04", "05", "10", "11", "12", "13", "15", "90", "99"];
+                if (!in_array($requestPost["codeMethodPayment"], $validateCodeMethodPayment)) {
+                    $message(["error" => "código da forma de pagamento inválido"], 500);
+                    die;
+                }
+            }
+
+            $validateProductOrigin = ['0', '1', '2'];
+            if (!in_array($requestPost["productOrigin"], $validateProductOrigin)) {
+                $message(["error" => "origem do produto inválido"], 500);
                 die;
             }
 
-            $validateCodeMethodPayment = ["01", "02", "03", "04", "05", "10", "11", "12", "13", "15", "90", "99"];
-            if (!in_array($requestPost["codeMethodPayment"], $validateCodeMethodPayment)) {
-                $message(["error" => "código da forma de pagamento inválido"], 500);
+            $validateDeterminingIcmsCalc = ["0", "1", "2", "3"];
+            if (!in_array($requestPost["determiningIcmsCalc"], $validateDeterminingIcmsCalc)) {
+                $message(["error" => "determinação do cálculo do icms inválido"], 500);
                 die;
+            }
+
+            $validateProductIcmsSituation = [
+                "00",
+                "10",
+                "20",
+                "30",
+                "40",
+                "41",
+                "50",
+                "51",
+                "60",
+                "70",
+                "90",
+                "101",
+                "102",
+                "103",
+                "201",
+                "202",
+                "203",
+                "300",
+                "400",
+                "500",
+                "900"
+            ];
+
+            if (!in_array($requestPost["productIcmsSituation"], $validateProductIcmsSituation)) {
+                $message(["error" => "código da situação tributária icms inválido"], 500);
+                die;
+            }
+
+            if (!empty($requestPost["paymentMethodIndicator"])) {
+                $validatePaymentMethodIndicator = ["0", "1"];
+                if (!in_array($requestPost["paymentMethodIndicator"], $validatePaymentMethodIndicator)) {
+                    $message(["error" => "indicador do método de pagamento inválido"], 500);
+                    die;
+                }
+            }
+
+            $validateTypePaymentMethod = ["01", "02", "03", "04"];
+            if (!in_array($requestPost["typePaymentMethod"], $validateTypePaymentMethod)) {
+                $message(["error" => "tipo do método de pagamento inválido"], 500);
+                die;
+            }
+
+            if (!empty($requestPost["cardOperatorFlag"])) {
+                $validateCardOperatorFlag = ["01", "02", "03", "04"];
+                if (!in_array($requestPost["cardOperatorFlag"], $validateCardOperatorFlag)) {
+                    $message(["error" => "bandeira da operadora inválida"], 500);
+                    die;
+                }
             }
 
             if (!empty($requestPost["cnaeInformation"])) {
@@ -204,6 +281,9 @@ class Invoice extends Controller
                 "stateRegistration",
                 "companyPhone",
                 "recipientPhone",
+                "documentOfPaymentInstitution",
+                "companyZipcode",
+                "recipientZipcode"
             ];
 
             foreach ($validateCleanValue as $key) {
@@ -220,7 +300,11 @@ class Invoice extends Controller
                 "productValueOtherExpenses",
                 "totalTaxValue",
                 "paymentTotalValue",
-                "changeMoney"
+                "changeMoney",
+                "calculationBaseValue",
+                "icmsRate",
+                "icmsValue",
+                "paymentValue"
             ];
 
             foreach ($validateConvertCurrencyRealToFloat as $key) {
@@ -252,128 +336,217 @@ class Invoice extends Controller
                 $validateRecipientDocument[$requestPost["recipientDocumentType"]]($requestPost["recipientDocument"]);
             }
 
-            $certificate = $requestFile["pfxFile"]["tmp_name"];
-            $invoice = new SupportInvoice([
-                "tpAmb" => $requestPost["environment"],
-                "companyName" => $requestPost["companyName"],
-                "companyDocument" => $requestPost["companyDocument"],
-                "companyState" => $requestPost["companyState"],
-                "certPfx" => $certificate,
-                "certPassword" => $requestPost["certPassword"],
-            ]);
-
-            $requestStateCode = $invoice->requestStateCode();
-            if (empty($requestStateCode)) {
-                http_response_code(500);
-                echo http_response_code(["error" => "erro ao consultar o código do estado"]);
-                die;
-            }
-
-            $requestPost["companyState"] = array_reduce($requestStateCode, function ($acc, $item) use ($requestPost) {
-                if (strtolower($item["sigla"]) == strtolower($requestPost["companyState"])) {
-                    $acc = $item;
-                }
-                return $acc;
-            }, []);
-
-            if (empty($requestPost["companyState"])) {
-                http_response_code(500);
-                echo json_encode(["error" => "código do estado inexistente"]);
-                die;
-            }
-
-            $invoice->isValidCertPfx();
-            $dateTime = new DateTime();
-
-            $invoice->makeInvoice()->invoiceIdentification([
-                "cUF" => $requestPost["companyState"]["id"],
-                "cNF" => str_pad(mt_rand(0, 99999999), 8, '0', STR_PAD_LEFT),
-                "natOp" => $requestPost["natureOperation"],
-                "mod" => 55,
-                "serie" => $requestPost["invoiceSeries"],
-                "nNF" => $requestPost["invoiceNumber"],
-                "dhEmi" => $dateTime->format("Y-m-d") . "T" . $dateTime->format("H:i:sP"),
-                "dhSaiEnt" => null,
-                "tpNF" => $requestPost["invoiceType"],
-                "idDest" => $requestPost["idInvoiceOperation"],
-                "cMunFG" => $municipalityCode,
-                "tpImp" => 1,
-                "tpEmis" => 1,
-                "finNFe" => $requestPost["purposeOfIssuance"],
-                "indFinal" => $requestPost["finalConsumer"],
-                "indPres" => $requestPost["buyersPresence"]
-            ])->issuerData([
-                "xNome" => $requestPost["companyName"],
-                "xFant" => $requestPost["fantasyName"],
-                "IE" => $requestPost["stateRegistration"],
-                "CNAE" => $requestPost["cnaeInformation"],
-                "CRT" => $requestPost["companyTaxRegime"],
-                "CNPJ" => $requestPost["companyDocument"]
-            ])->issuerAddressData([
-                "xLgr" => $requestPost["companyAddress"],
-                "nro" => $requestPost["companyAddressNumber"],
-                "xCpl" => $requestPost["companyComplement"],
-                "xBairro" => $requestPost["companyNeighborhood"],
-                "cMun" => $municipalityCode,
-                "xMun" => $municipalityName,
-                "UF" => $requestPost["companyState"]["sigla"],
-                "CEP" => $requestPost["companyZipcode"],
-                "cPais" => 1058,
-                "xPais" => "Brasil",
-                "fone" => $requestPost["companyPhone"] ?? null,
-            ])->recipientData($recipientData)
-                ->recipientAddressData([
-                    "xLgr" => $requestPost["recipientAddress"],
-                    "nro" => $requestPost["recipientAddressNumber"],
-                    "xCpl" => $requestPost["recipientComplement"],
-                    "xBairro" => $requestPost["recipientNeighborhood"],
-                    "cMun" => $recipientMunicipalityCode,
-                    "xMun" => $recipientMunicipalityName,
-                    "UF" => $requestPost["recipientState"],
-                    "CEP" => $requestPost["recipientZipcode"],
-                    "cPais" => 1058,
-                    "xPais" => "Brasil",
-                    "fone" => $requestPost["recipientPhone"] ?? null
-                ])->productOrServiceData([
-                    "item" => $requestPost["productItem"],
-                    "cProd" => $requestPost["productCode"] ?? Uuid::uuid4()->toString(),
-                    "cEAN" => $requestPost["barCodeProduct"] ?? null,
-                    "cBarra" => $requestPost["additionalBarCodeProduct"] ?? null,
-                    "xProd" => $requestPost["productDescription"],
-                    "NCM" => $requestPost["productNcmCode"],
-                    "cBenef" => $requestPost["productCodeBenef"] ?? null,
-                    "EXTIPI" => $requestPost["productCodeTipi"] ?? null,
-                    "CFOP" => $requestPost["productCodeCfop"],
-                    "uCom" => $requestPost["productComercialUnit"],
-                    "qCom" => $requestPost["qttyProduct"],
-                    "vUnCom" => $requestPost["productValueUnit"],
-                    "vProd" => $requestPost["productTotalValue"],
-                    "cEANTrib" => $requestPost["barCodeProductTrib"] ?? null,
-                    "cBarraTrib" => $requestPost["additionalBarCodeProductTrib"] ?? null,
-                    "uTrib" => $requestPost["productTaxUnit"],
-                    "qTrib" => $requestPost["qttyProuctTax"],
-                    "vUnTrib" => $requestPost["taxUnitValue"],
-                    "vFrete" => $requestPost["productShippingValue"] ?? null,
-                    "vSeg" => $requestPost["productInsuranceValue"] ?? null,
-                    "vDesc" => $requestPost["productDiscountAmount"] ?? null,
-                    "vOutro" => $requestPost["productValueOtherExpenses"] ?? null,
-                    "indTot" => 1,
-                    "xPed" => $requestPost["productOrderNumber"] ?? null,
-                    "nItemPed" => $requestPost["productItemNumberBuyOrder"] ?? null,
-                    "nFCI" => $requestPost["fciNumber"] ?? null
-                ])->shippingMethod([
-                    "modFrete" => $requestPost["shippingMethod"]
-                ])->declareTaxData([
-                    "item" => $requestPost["productItem"],
-                    "vTotTrib" => $requestPost["totalTaxValue"] ?? null
-                ])->paymentMethodInformation([
-                    "indPag" => $requestPost["indicatorPaymentMethod"] ?? null,
-                    "tPag" => $requestPost["codeMethodPayment"] ?? null,
-                    "vPag" => $requestPost["paymentTotalValue"] ?? null,
-                    "vTroco" => $requestPost["changeMoney"] ?? null
+            try {
+                $certificate = $requestFile["pfxFile"]["tmp_name"];
+                $invoice = new SupportInvoice([
+                    "tpAmb" => $requestPost["environment"],
+                    "companyName" => $requestPost["companyName"],
+                    "companyDocument" => $requestPost["companyDocument"],
+                    "companyState" => $requestPost["companyState"],
+                    "certPfx" => $certificate,
+                    "certPassword" => $requestPost["certPassword"],
                 ]);
 
-            echo json_encode(["success" => "nota fiscal válida"]);
+                $requestStateCode = $invoice->requestStateCode();
+                if (empty($requestStateCode)) {
+                    http_response_code(500);
+                    echo http_response_code(["error" => "erro ao consultar o código do estado"]);
+                    die;
+                }
+
+                $requestPost["companyState"] = array_reduce($requestStateCode, function ($acc, $item) use ($requestPost) {
+                    if (strtolower($item["sigla"]) == strtolower($requestPost["companyState"])) {
+                        $acc = $item;
+                    }
+                    return $acc;
+                }, []);
+
+                if (empty($requestPost["companyState"])) {
+                    http_response_code(500);
+                    echo json_encode(["error" => "código do estado inexistente"]);
+                    die;
+                }
+
+                $invoice->isValidCertPfx();
+                $dateTime = new DateTime();
+
+                $xmlSigned = $invoice->makeInvoice()->invoiceIdentification([
+                    "cUF" => $requestPost["companyState"]["id"],
+                    "cNF" => str_pad(mt_rand(0, 99999999), 8, '0', STR_PAD_LEFT),
+                    "natOp" => $requestPost["natureOperation"],
+                    "mod" => 55,
+                    "serie" => $requestPost["invoiceSeries"],
+                    "nNF" => $requestPost["invoiceNumber"],
+                    "dhEmi" => $dateTime->format("Y-m-d") . "T" . $dateTime->format("H:i:sP"),
+                    "dhSaiEnt" => null,
+                    "tpNF" => $requestPost["invoiceType"],
+                    "idDest" => $requestPost["idInvoiceOperation"],
+                    "cMunFG" => $municipalityCode,
+                    "tpImp" => 1,
+                    "tpEmis" => 1,
+                    "finNFe" => $requestPost["purposeOfIssuance"],
+                    "indFinal" => $requestPost["finalConsumer"],
+                    "indPres" => $requestPost["buyersPresence"]
+                ])->issuerData([
+                    "xNome" => $requestPost["companyName"],
+                    "xFant" => $requestPost["fantasyName"],
+                    "IE" => $requestPost["stateRegistration"],
+                    "CNAE" => $requestPost["cnaeInformation"],
+                    "CRT" => $requestPost["companyTaxRegime"],
+                    "CNPJ" => $requestPost["companyDocument"]
+                ])->issuerAddressData([
+                    "xLgr" => $requestPost["companyAddress"],
+                    "nro" => $requestPost["companyAddressNumber"],
+                    "xCpl" => $requestPost["companyComplement"],
+                    "xBairro" => $requestPost["companyNeighborhood"],
+                    "cMun" => $municipalityCode,
+                    "xMun" => $municipalityName,
+                    "UF" => $requestPost["companyState"]["sigla"],
+                    "CEP" => $requestPost["companyZipcode"],
+                    "cPais" => 1058,
+                    "xPais" => "Brasil",
+                    "fone" => $requestPost["companyPhone"] ?? null,
+                ])->recipientData($recipientData)
+                    ->recipientAddressData([
+                        "xLgr" => $requestPost["recipientAddress"],
+                        "nro" => $requestPost["recipientAddressNumber"],
+                        "xCpl" => $requestPost["recipientComplement"],
+                        "xBairro" => $requestPost["recipientNeighborhood"],
+                        "cMun" => $recipientMunicipalityCode,
+                        "xMun" => $recipientMunicipalityName,
+                        "UF" => $requestPost["recipientState"],
+                        "CEP" => $requestPost["recipientZipcode"],
+                        "cPais" => 1058,
+                        "xPais" => "Brasil",
+                        "fone" => $requestPost["recipientPhone"] ?? null
+                    ])->productOrServiceData([
+                        "item" => $requestPost["productItem"],
+                        "cProd" => $requestPost["productCode"],
+                        "cEAN" => $requestPost["barCodeProduct"] ?? null,
+                        "cBarra" => $requestPost["additionalBarCodeProduct"] ?? null,
+                        "xProd" => $requestPost["productDescription"],
+                        "NCM" => $requestPost["productNcmCode"],
+                        "cBenef" => $requestPost["productCodeBenef"] ?? null,
+                        "EXTIPI" => $requestPost["productCodeTipi"] ?? null,
+                        "CFOP" => $requestPost["productCodeCfop"],
+                        "uCom" => $requestPost["productComercialUnit"],
+                        "qCom" => $requestPost["qttyProduct"],
+                        "vUnCom" => $requestPost["productValueUnit"],
+                        "vProd" => $requestPost["productTotalValue"],
+                        "cEANTrib" => $requestPost["barCodeProductTrib"] ?? null,
+                        "cBarraTrib" => $requestPost["additionalBarCodeProductTrib"] ?? null,
+                        "uTrib" => $requestPost["productTaxUnit"],
+                        "qTrib" => $requestPost["qttyProuctTax"],
+                        "vUnTrib" => $requestPost["taxUnitValue"],
+                        "vFrete" => $requestPost["productShippingValue"] ?? null,
+                        "vSeg" => $requestPost["productInsuranceValue"] ?? null,
+                        "vDesc" => $requestPost["productDiscountAmount"] ?? null,
+                        "vOutro" => $requestPost["productValueOtherExpenses"] ?? null,
+                        "indTot" => 1,
+                        "xPed" => $requestPost["productOrderNumber"] ?? null,
+                        "nItemPed" => $requestPost["productItemNumberBuyOrder"] ?? null,
+                        "nFCI" => $requestPost["fciNumber"] ?? null
+                    ])->shippingMethod([
+                        "modFrete" => $requestPost["shippingMethod"]
+                    ])->declareTaxData([
+                        "item" => $requestPost["productItem"],
+                        "vTotTrib" => $requestPost["totalTaxValue"] ?? null
+                    ])->paymentMethodInformation([
+                        "indPag" => $requestPost["indicatorPaymentMethod"] ?? null,
+                        "tPag" => $requestPost["codeMethodPayment"] ?? null,
+                        "vPag" => $requestPost["paymentTotalValue"] ?? null,
+                        "vTroco" => $requestPost["changeMoney"] ?? null
+                    ])->icmsInformation([
+                        "item" => $requestPost["productItem"],
+                        "orig" => $requestPost["productOrigin"],
+                        "CST" => $requestPost["productIcmsSituation"],
+                        "modBC" => $requestPost["determiningIcmsCalc"],
+                        "vBC" => $requestPost["calculationBaseValue"],
+                        "pICMS" => $requestPost["icmsRate"],
+                        "vICMS" => $requestPost["icmsValue"],
+                        "pFCP" => null,
+                        "vFCP" => null,
+                        "vBCFCP" => null,
+                        "modBCST" => null,
+                        "pMVAST" => null,
+                        "pRedBCST" => null,
+                        "vBCST" => null,
+                        "pICMSST" => null,
+                        "vICMSST" => null,
+                        "vBCFCPST" => null,
+                        "pFCPST" => null,
+                        "vFCPST" => null,
+                        "vICMSDeson" => null,
+                        "motDesICMS" => null,
+                        "pRedBC" => null,
+                        "vICMSOp" => null,
+                        "pDif" => null,
+                        "vICMSDif" => null,
+                        "vBCSTRet" => null,
+                        "pST" => null,
+                        "vICMSSTRet" => null,
+                        "vBCFCPSTRet" => null,
+                        "pFCPSTRet" => null,
+                        "vFCPSTRet" => null,
+                        "pRedBCEfet" => null,
+                        "vBCEfet" => null,
+                        "pICMSEfet" => null,
+                        "vICMSEfet" => null,
+                        "vICMSSubstituto" => null,
+                        "vICMSSTDeson" => null,
+                        "motDesICMSST" => null,
+                        "pFCPDif" => null,
+                        "vFCPDif" => null,
+                        "vFCPEfet" => null,
+                        "pRedAdRem" => null,
+                        "qBCMono" => null,
+                        "adRemiICMS" => null,
+                        "vICMSMono" => null,
+                        "adRemICMSRet" => null,
+                        "vICMSMonoRet" => null,
+                        "vICMSMonoDif" => null,
+                        "cBenefRBC" => null,
+                        "indDeduzDeson" => null
+                    ])->paymentDetails([
+                        "indPag" => $requestPost["paymentMethodIndicator"] ?? null,
+                        "tPag" => $requestPost["typePaymentMethod"],
+                        "vPag" => $requestPost["paymentValue"],
+                        "CNPJ" => $requestPost["documentOfPaymentInstitution"] ?? null,
+                        "tBand" => $requestPost["cardOperatorFlag"] ?? null,
+                        "cAut" => null,
+                        "tpIntegra" => null,
+                        "CNPJPag" => null,
+                        "UFPag" => null,
+                        "CNPJReceb" => null,
+                        "idTermPag" => null
+                    ])->sendNfeToSefaz();
+                
+                $modelInvoice = new ModelInvoice();
+                $response = $modelInvoice->persistData([
+                    "uuid" => Uuid::uuid4(),
+                    "id_user" => $responseInitializaUserAndCompany["user"],
+                    "id_company" => $responseInitializaUserAndCompany["company_id"],
+                    "xml" => $xmlSigned["xml"],
+                    "protocol_number" => $xmlSigned["protocol_number"],
+                    "access_key" => $xmlSigned["access_key"],
+                    "created_at" => date("Y-m-d"),
+                    "updated_at" => date("Y-m-d"),
+                    "deleted" => 0
+                ]);
+                
+                if (empty($response)) {
+                    http_response_code(500);
+                    echo $modelInvoice->message->json();
+                    die;
+                }
+
+                echo json_encode(["success" => "nota fiscal emitida com sucesso"]);
+            } catch (\Exception $th) {
+                http_response_code(500);
+                $jsonErrors = !empty($invoice->getMake()) ? $invoice->getMake()->getErrors() : [];
+                $jsonErrors = json_encode($jsonErrors);
+                echo json_encode(["error" => $th->getMessage()]) . " " . $jsonErrors;
+            }
             die;
         }
 

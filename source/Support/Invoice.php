@@ -4,8 +4,8 @@ namespace Source\Support;
 
 use Exception;
 use NFePHP\Common\Certificate;
-use NFePHP\Common\Soap\SoapFake;
-use NFePHP\NFe\Common\Tools;
+use NFePHP\NFe\Common\Standardize;
+use NFePHP\NFe\Tools;
 use NFePHP\NFe\Make;
 
 /**
@@ -24,6 +24,9 @@ class Invoice
 
     /** @var object Data */
     private object $data;
+
+    /** @var Tools */
+    private Tools $tools;
 
     /**
      * Invoice constructor
@@ -66,7 +69,124 @@ class Invoice
         return $this->data->$name ?? null;
     }
 
-    public function paymentMethodInformation(array $config)
+    public function getMake(): Make
+    {
+        return $this->make;
+    }
+
+    public function sendNfeToSefaz(): array
+    {
+        $xml = $this->make->getXML();
+        if (empty($xml)) {
+            http_response_code(500);
+            echo json_encode(["error" => "o xml não foi gerado"]);
+            die;
+        }
+
+        $xml = $this->tools->signNFe($xml);
+        $idLote = str_pad(rand(1, 999999999999999), 15, '0', STR_PAD_LEFT);
+
+        // Enviar NF-e para a sefaz
+        $response = $this->tools->sefazEnviaLote([$xml], $idLote);
+        $stdResponse = (new Standardize())->toStd($response);
+        if ($stdResponse->cStat != 103) {
+            http_response_code(500);
+            echo json_encode(["error" => "Erro ao enviar lote: " . $stdResponse->xMotivo]);
+            die;
+        }
+
+        $dom = new \DOMDocument('1.0', 'utf-8');
+        $dom->loadXML($xml);
+        $chNFe = preg_replace("/[^\d]+/", '', $dom->getElementsByTagName('infNFe')->item(0)->getAttribute("Id"));
+
+        $protocolNumber = !empty($dom->getElementsByTagName('nProt')->item(0)->nodeValue) ?
+            $dom->getElementsByTagName('nProt')->item(0)->nodeValue :
+            date("y") . str_pad(mt_rand(0, 9999999999999), 13, '0', STR_PAD_LEFT);
+
+        $xml = $dom->saveXML();
+        return [
+            "access_key" => $chNFe,
+            "protocol_number" => $protocolNumber,
+            "xml" => $xml
+        ];
+    }
+
+    public function paymentDetails(array $config): Invoice
+    {
+        $this->data->std = new \stdClass();
+        $this->data->std->indPag = $config["indPag"];
+        $this->data->std->tPag = $config["tPag"];
+        $this->data->std->vPag = $config["vPag"];
+        $this->data->std->CNPJ = $config["CNPJ"];
+        $this->data->std->tBand = $config["tBand"];
+        $this->data->std->cAut = $config["cAut"];
+        $this->data->std->tpIntegra = $config["tpIntegra"];
+        $this->data->std->CNPJPag = $config["CNPJPag"];
+        $this->data->std->UFPag = $config["UFPag"];
+        $this->data->std->CNPJReceb = $config["CNPJReceb"];
+        $this->data->std->idTermPag = $config["idTermPag"];
+        $this->make->tagdetPag($this->data->std);
+        return $this;
+    }
+
+    public function icmsInformation(array $config): Invoice
+    {
+        $this->data->std = new \stdClass();
+        $this->data->std->item = $config["item"];
+        $this->data->std->orig = $config["orig"];
+        $this->data->std->CST = $config["CST"];
+        $this->data->std->modBC = $config["modBC"];
+        $this->data->std->vBC = $config["vBC"];
+        $this->data->std->pICMS = $config["pICMS"];
+        $this->data->std->vICMS = $config["vICMS"];
+        $this->data->std->pFCP = $config["pFCP"];
+        $this->data->std->vFCP = $config["vFCP"];
+        $this->data->std->vBCFCP = $config["vBCFCP"];
+        $this->data->std->modBCST = $config["modBCST"];
+        $this->data->std->pMVAST = $config["pMVAST"];
+        $this->data->std->pRedBCST = $config["pRedBCST"];
+        $this->data->std->vBCST = $config["vBCST"];
+        $this->data->std->pICMSST = $config["pICMSST"];
+        $this->data->std->vICMSST = $config["vICMSST"];
+        $this->data->std->vBCFCPST = $config["vBCFCPST"];
+        $this->data->std->pFCPST = $config["pFCPST"];
+        $this->data->std->vFCPST = $config["vFCPST"];
+        $this->data->std->vICMSDeson = $config["vICMSDeson"];
+        $this->data->std->motDesICMS = $config["motDesICMS"];
+        $this->data->std->pRedBC = $config["pRedBC"];
+        $this->data->std->vICMSOp = $config["vICMSOp"];
+        $this->data->std->pDif = $config["pDif"];
+        $this->data->std->vICMSDif = $config["vICMSDif"];
+        $this->data->std->vBCSTRet = $config["vBCSTRet"];
+        $this->data->std->pST = $config["pST"];
+        $this->data->std->vICMSSTRet = $config["vICMSSTRet"];
+        $this->data->std->vBCFCPSTRet = $config["vBCFCPSTRet"];
+        $this->data->std->pFCPSTRet = $config["pFCPSTRet"];
+        $this->data->std->vFCPSTRet = $config["vFCPSTRet"];
+        $this->data->std->pRedBCEfet = $config["pRedBCEfet"];
+        $this->data->std->vBCEfet = $config["vBCEfet"];
+        $this->data->std->pICMSEfet = $config["pICMSEfet"];
+        $this->data->std->vICMSEfet = $config["vICMSEfet"];
+        $this->data->std->vICMSSubstituto = $config["vICMSSubstituto"];
+        $this->data->std->vICMSSTDeson = $config["vICMSSTDeson"];
+        $this->data->std->motDesICMSST = $config["motDesICMSST"];
+        $this->data->std->pFCPDif = $config["pFCPDif"];
+        $this->data->std->vFCPDif = $config["vFCPDif"];
+        $this->data->std->vFCPEfet = $config["vFCPEfet"];
+        $this->data->std->pRedAdRem = $config["pRedAdRem"];
+        $this->data->std->qBCMono = $config["qBCMono"];
+        $this->data->std->adRemiICMS = $config["adRemiICMS"];
+        $this->data->std->vICMSMono = $config["vICMSMono"];
+        $this->data->std->adRemICMSRet = $config["adRemICMSRet"];
+        $this->data->std->vICMSMonoRet = $config["vICMSMonoRet"];
+        $this->data->std->vICMSMonoDif = $config["vICMSMonoDif"];
+        $this->data->std->cBenefRBC = $config["cBenefRBC"];
+        $this->data->std->indDeduzDeson = $config["indDeduzDeson"];
+        $this->make->tagICMS($this->data->std);
+        return $this;
+    }
+
+    public function paymentMethodInformation(array $config): Invoice
     {
         $this->data->std = new \stdClass();
         $this->data->std->indPag = $config["indPag"];
@@ -77,7 +197,7 @@ class Invoice
         return $this;
     }
 
-    public function declareTaxData(array $config)
+    public function declareTaxData(array $config): Invoice
     {
         $this->data->std = new \stdClass();
         $this->data->std->item = $config["item"];
@@ -86,7 +206,7 @@ class Invoice
         return $this;
     }
 
-    public function shippingMethod(array $config)
+    public function shippingMethod(array $config): Invoice
     {
         $this->data->std = new \stdClass();
         $this->data->std->modFrete = $config["modFrete"];
@@ -94,7 +214,7 @@ class Invoice
         return $this;
     }
 
-    public function productOrServiceData(array $config)
+    public function productOrServiceData(array $config): Invoice
     {
         $this->data->std = new \stdClass();
         $this->data->std->item = $config["item"];
@@ -109,7 +229,7 @@ class Invoice
         $this->data->std->uCom = $config["uCom"];
         $this->data->std->qCom = $config["qCom"];
         $this->data->std->vUnCom = $config["vUnCom"];
-        $this->data->std->vProd = $config["VProd"];
+        $this->data->std->vProd = $config["vProd"];
         $this->data->std->cEANTrib = $config["cEANTrib"];
         $this->data->std->cBarraTrib = $config["cBarraTrib"];
         $this->data->std->uTrib = $config["uTrib"];
@@ -127,7 +247,7 @@ class Invoice
         return $this;
     }
 
-    public function recipientAddressData(array $config)
+    public function recipientAddressData(array $config): Invoice
     {
         $this->data->std = new \stdClass();
         $this->data->std->xLgr = $config["xLgr"];
@@ -145,7 +265,7 @@ class Invoice
         return $this;
     }
 
-    public function recipientData(array $config)
+    public function recipientData(array $config): Invoice
     {
         $this->data->std = new \stdClass();
         $this->data->std->xNome = $config["xNome"];
@@ -161,7 +281,7 @@ class Invoice
         return $this;
     }
 
-    public function issuerAddressData(array $config)
+    public function issuerAddressData(array $config): Invoice
     {
         $this->data->std = new \stdClass();
         $this->data->std->xLgr = $config["xLgr"];
@@ -179,7 +299,7 @@ class Invoice
         return $this;
     }
 
-    public function issuerData(array $config)
+    public function issuerData(array $config): Invoice
     {
         $this->data->std = new \stdClass();
         $this->data->std->xNome = $config["xNome"];
@@ -284,16 +404,7 @@ class Invoice
         try {
             $content = file_get_contents($this->configData['certPfx'], true);
             $certificate = Certificate::readPfx($content, $this->configData['certPassword']);
-            $tools = new Tools(json_encode($this->configData), $certificate);
-
-            if ($this->configData["tpAmb"] == 2) {
-                $soap = new SoapFake();
-                $soap->disableCertValidation(true);
-                $tools->model('55');
-                $tools->setVerAplic('5.1.34');
-                $tools->loadSoapClass($soap);
-            }
-
+            $this->tools = new Tools(json_encode($this->configData), $certificate);
             return true;
         } catch (Exception $_) {
             http_response_code(500);

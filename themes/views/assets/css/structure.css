@@ -51,6 +51,10 @@
     margin-top: -0.5rem !important;
 }
 
+#productIcmsSituation+.select2.select2-container.select2-container--default>.selection>.select2-selection.select2-selection--single .select2-selection__rendered {
+    margin-top: -0.5rem !important;
+}
+
 #municipalityInvoice+.select2.select2-container.select2-container--default>.selection>.select2-selection.select2-selection--single .select2-selection__rendered {
     margin-top: -0.5rem !important;
 }
