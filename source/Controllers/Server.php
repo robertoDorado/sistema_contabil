@@ -1,4 +1,5 @@
 <?php
+
 namespace Source\Controllers;
 
 use Exception;
@@ -29,7 +30,7 @@ class Server extends Controller
     {
         $payload = @file_get_contents("php://input");
         $event = null;
-        
+
         try {
             $event = Event::constructFrom(json_decode($payload, true));
         } catch (UnexpectedValueException $e) {
@@ -39,14 +40,14 @@ class Server extends Controller
         if ($event->type == "customer.subscription.deleted") {
             $id = $event->data->object->id;
             $subscription = new Subscription();
-            
+
             $subscription->subscription_id = $id;
             $subscriptionData = $subscription->findSubsCriptionBySubscriptionId([]);
-            
+
             if (empty($subscriptionData)) {
                 throw new Exception($subscription->message->json() . json_encode(["subscription_id" => $id]));
             }
-            
+
             $subscription = new Subscription();
             $response = $subscription->updateSubscriptionBySubscriptionId([
                 "subscription_id" => $id,
@@ -57,7 +58,7 @@ class Server extends Controller
             if (empty($response)) {
                 throw new Exception($subscription->message->json() . json_encode(["subscription_id" => $id]));
             }
-            
+
             $customer = new Customer();
             $customer->setId($subscriptionData->customer_id);
             $response = $customer->updateCustomerById([

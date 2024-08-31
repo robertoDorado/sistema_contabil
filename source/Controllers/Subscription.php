@@ -229,8 +229,8 @@ class Subscription extends Controller
         }
 
         $response = $stripePayment->createPrice([
-            "currency" => "brl",
-            "unit_amount" => 6990,
+            "currency" => "BRL",
+            "unit_amount" => 20000,
             "recurring" => ["interval" => "month"],
             "product" => $stripePayment->product->id
         ]);

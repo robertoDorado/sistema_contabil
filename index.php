@@ -23,7 +23,8 @@ ini_set('log_errors', true);
 $verifyGlobalEndpoints = [
     "/admin/logout",
     "/customer/subscribe",
-    "/customer/subscription/thanks-purchase"
+    "/customer/subscription/thanks-purchase",
+    "/stripe/webhook/update/subscription"
 ];
 
 if (empty($_POST["request"]) && !empty($_SERVER["REDIRECT_URL"]) && !in_array($_SERVER["REDIRECT_URL"], $verifyGlobalEndpoints)) {

@@ -8,17 +8,17 @@ if (window.location.pathname == "/customer/subscribe") {
     });
 
     const verifyDocument = {
-        "14": function(value) {
+        "14": function (value) {
             return value.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5")
         },
 
-        "11": function(value) {
+        "11": function (value) {
             return value.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, "$1.$2.$3-$4")
         }
     }
 
     const documentData = document.querySelector("[name='document']")
-    documentData.addEventListener("input", function() {
+    documentData.addEventListener("input", function () {
         this.value = this.value.replace(/\D/g, "")
         if (typeof verifyDocument[this.value.length] == "function") {
             this.value = verifyDocument[this.value.length](this.value)
@@ -30,59 +30,59 @@ if (window.location.pathname == "/customer/subscribe") {
     })
 
     const birthDate = document.querySelector("[name='birthDate']")
-    birthDate.addEventListener("input", function() {
+    birthDate.addEventListener("input", function () {
         this.value = this.value.replace(/\D/g, "")
-        .replace(/(\d{2})(\d)/, "$1/$2")
-        .replace(/(\d{2})(\d)/, "$1/$2")
-        .replace(/(\/\d{4})\d+?$/, "$1")
+            .replace(/(\d{2})(\d)/, "$1/$2")
+            .replace(/(\d{2})(\d)/, "$1/$2")
+            .replace(/(\/\d{4})\d+?$/, "$1")
     })
 
     const zipcode = document.querySelector("[name='zipcode']")
-    zipcode.addEventListener("input", function() {
+    zipcode.addEventListener("input", function () {
         this.value = this.value.replace(/\D/g, "").replace(/(\d{5})(\d)/, "$1-$2")
-        .replace(/(-\d{3})\d+?$/, "$1")
+            .replace(/(-\d{3})\d+?$/, "$1")
 
         const searchValue = this.value.replace(/[^\d]+/, "")
         if (searchValue.length >= 8) {
             fetch(`https://brasilapi.com.br/api/cep/v1/${searchValue}`)
-            .then(response => response.json()).then(function(response) {
-                if (response.cep) {
-                    document.querySelector('[name="address"]').value = response.street
-                    document.querySelector('[name="neighborhood"]').value = response.neighborhood
-                    document.querySelector('[name="city"]').value = response.city
-                    document.querySelector('[name="state"]').value = response.state
-                }
-            })
+                .then(response => response.json()).then(function (response) {
+                    if (response.cep) {
+                        document.querySelector('[name="address"]').value = response.street
+                        document.querySelector('[name="neighborhood"]').value = response.neighborhood
+                        document.querySelector('[name="city"]').value = response.city
+                        document.querySelector('[name="state"]').value = response.state
+                    }
+                })
         }
     })
 
     const addressNumber = document.querySelector("[name='number']")
-    addressNumber.addEventListener("input", function() {
+    addressNumber.addEventListener("input", function () {
         this.value = this.value.replace(/\D/g, "")
     })
 
     const state = document.querySelector("[name='state']")
-    state.addEventListener("input", function() {
+    state.addEventListener("input", function () {
         this.value = this.value.replace(/[^A-Za-z]+/g, '')
-        .toUpperCase().replace(/([A-Z]{2})[A-Z]+?$/, "$1")
+            .toUpperCase().replace(/([A-Z]{2})[A-Z]+?$/, "$1")
     })
 
     const phone = document.querySelector("[name='phone']")
-    phone.addEventListener("input", function() {
+    phone.addEventListener("input", function () {
         this.value = this.value
-        .replace(/\D/g, "")
-        .replace(/(\d{2})(\d)/, "($1) $2")
-        .replace(/(\d{4})(\d)/, "$1-$2")
-        .replace(/(-\d{4})\d+?$/, "$1")
+            .replace(/\D/g, "")
+            .replace(/(\d{2})(\d)/, "($1) $2")
+            .replace(/(\d{4})(\d)/, "$1-$2")
+            .replace(/(-\d{4})\d+?$/, "$1")
     })
 
     const cellPhone = document.querySelector("[name='cellPhone']")
-    cellPhone.addEventListener("input", function() {
+    cellPhone.addEventListener("input", function () {
         this.value = this.value
-        .replace(/\D/g, "")
-        .replace(/(\d{2})(\d)/, "($1) $2")
-        .replace(/(\d{5})(\d)/, "$1-$2")
-        .replace(/(-\d{4})\d+?$/, "$1")
+            .replace(/\D/g, "")
+            .replace(/(\d{2})(\d)/, "($1) $2")
+            .replace(/(\d{5})(\d)/, "$1-$2")
+            .replace(/(-\d{4})\d+?$/, "$1")
     })
 
     const stripe = Stripe("pk_live_51OEIojC1Uv10wqUugUxFvBmy3CWhpFjR9t9lR9trtxfdxgKWdnQxzUERnlysdy1USdCfRTvUq72pBIAKNPH9V3tj00COXqcXEt", {
@@ -106,15 +106,15 @@ if (window.location.pathname == "/customer/subscribe") {
         }
     }
 
-    const card = elements.create('card', { 
-        style: style 
+    const card = elements.create('card', {
+        style: style
     })
 
     const cardMount = document.getElementById("cardMount")
     card.mount(cardMount)
 
     const subscriptionForm = document.getElementById("subscriptionForm")
-    subscriptionForm.addEventListener("submit", function(event) {
+    subscriptionForm.addEventListener("submit", function (event) {
         event.preventDefault()
 
         const btnSubmit = this.querySelector("button[type='submit']")
@@ -124,14 +124,14 @@ if (window.location.pathname == "/customer/subscribe") {
         }
 
         let validateBlankInput = Array.from(this.getElementsByTagName("input"))
-        validateBlankInput = validateBlankInput.filter(function(element) {
+        validateBlankInput = validateBlankInput.filter(function (element) {
             if (!element.classList.contains("__PrivateStripeElement-input")
-            && element.name != "phone" && element.name != "cellPhone") {
+                && element.name != "phone" && element.name != "cellPhone") {
                 return element
             }
         })
-        
-        validateBlankInput.forEach(function(element) {
+
+        validateBlankInput.forEach(function (element) {
             if (!element.value) {
                 toastr.warning(`Campos obrigatórios não foram preenchidos`)
                 throw new Error(`Campos obrigatórios não foram preenchidos`)
@@ -152,7 +152,7 @@ if (window.location.pathname == "/customer/subscribe") {
         const form = new FormData(this)
         showSpinner(btnSubmit)
 
-        stripe.createToken(card).then(function(response) {
+        stripe.createToken(card).then(function (response) {
             let message = ""
             if (response.error) {
                 btnSubmit.innerHTML = "Comprar assinatura"
@@ -162,12 +162,12 @@ if (window.location.pathname == "/customer/subscribe") {
                 toastr.error(message)
                 throw new Error(message)
             }
-            
+
             form.append("cardToken", response.token.id)
             fetch(window.location.origin + "/customer/subscription/process-payment", {
                 method: "POST",
                 body: form
-            }).then(response => response.json()).then(function(response) {
+            }).then(response => response.json()).then(function (response) {
 
                 if (response.error) {
                     btnSubmit.innerHTML = "Comprar assinatura"
