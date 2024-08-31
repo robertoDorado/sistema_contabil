@@ -24,7 +24,8 @@ $verifyGlobalEndpoints = [
     "/admin/logout",
     "/customer/subscribe",
     "/customer/subscription/thanks-purchase",
-    "/stripe/webhook/update/subscription"
+    "/stripe/webhook/update/subscription",
+    "/customer/subscription/process-payment"
 ];
 
 if (empty($_POST["request"]) && !empty($_SERVER["REDIRECT_URL"]) && !in_array($_SERVER["REDIRECT_URL"], $verifyGlobalEndpoints)) {
