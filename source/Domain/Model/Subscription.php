@@ -42,6 +42,22 @@ class Subscription
         $this->data->$name = $value;
     }
 
+    public function findSubscriptionByChargeId(array $columns)
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        $chargeId = empty($this->data->charge_id) ? 0 : $this->data->charge_id;
+        return $this->subscription->find("charge_id=:charge_id", ":charge_id=" . $chargeId . "", $columns)->fetch();
+    }
+
+    public function updateSubscriptionByChargeId(array $data)
+    {
+        $tools = new Tools($this->subscription, ModelsSubscription::class);
+        $response = $tools->updateData("charge_id=:charge_id",
+        ":charge_id={$data['charge_id']}", $data, "assinatura não localizada");
+        $this->data->message = !empty($tools->message) ? $tools->message : "";
+        return !empty($response) ? true : false;
+    }
+
     public function updateSubscriptionBySubscriptionId(array $data) : bool
     {
         $tools = new Tools($this->subscription, ModelsSubscription::class);
