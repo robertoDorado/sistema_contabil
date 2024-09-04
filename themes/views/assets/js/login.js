@@ -20,6 +20,11 @@ if (window.location.pathname == "/admin/login") {
             throw new Error("Campo csrf-token inválido")
         }
 
+        if (!this.userType.value) {
+            toastr.warning("Campo tipo de usuário inválido")
+            throw new Error("Campo tipo de usuário inválido")
+        }
+
         showSpinner(btnSubmit)
         const form = new FormData(this)
         fetch(window.location.pathname, {

@@ -10,6 +10,8 @@ use Source\Core\Model;
 use Source\Domain\Model\CashFlowGroup;
 use Source\Domain\Model\Customer;
 use Source\Domain\Model\User;
+use Source\Models\Support;
+use Source\Models\User as ModelsUser;
 use Source\Support\Message;
 
 /**
@@ -43,6 +45,90 @@ class Tools
         $this->message = new Message();
         $this->model = $model;
         $this->class = $class;
+    }
+
+    public function findUserByEmail(array $data): ?Model
+    {
+        $formatData = function (string $key, string $prefix) use ($data) {
+            $data[$key] = array_map(function ($item, $key) {
+                return $key . "=" . $item;
+            }, $data[$key], array_keys($data[$key]));
+
+            return implode("{$prefix}", $data[$key]);
+        };
+
+        $data["terms"] = $formatData("terms", " AND ");
+        $data["params"] = $formatData("params", "&");
+
+        $data["columns"] = empty($data["columns"]) ? "*" : implode(", ", $data["columns"]);
+        $data = $this->model->find($data["terms"], $data["params"], $data["columns"])->fetch();
+
+        if (empty($data)) {
+            $this->message->error("usuário não existe");
+            return null;
+        }
+
+        if (!empty($data->getDeleted())) {
+            $this->message->error("acesso negado");
+            return null;
+        }
+
+        return $data;
+    }
+
+    public function login(array $data): ?Model
+    {
+        $formatData = function (string $key, string $prefix) use ($data) {
+            $data[$key] = array_map(function ($item, $key) {
+                return $key . "=" . $item;
+            }, $data[$key], array_keys($data[$key]));
+
+            return implode("{$prefix}", $data[$key]);
+        };
+
+        $data["terms_validate_email"] = $formatData("terms_validate_email", " AND ");
+        $data["params_validate_email"] = $formatData("params_validate_email", "&");
+        $user = $this->model->find($data["terms_validate_email"], $data["params_validate_email"])->fetch();
+
+        if (empty($user)) {
+            $verifyModel = [
+                ModelsUser::class => new ModelsUser(),
+                Support::class => new Support()
+            ];
+
+            if (!empty($verifyModel[$this->class])) {
+                $this->model = $verifyModel[$this->class];
+            }
+
+            $data["terms_validate_name"] = $formatData("terms_validate_name", " AND ");
+            $data["params_validate_name"] = $formatData("params_validate_name", "&");
+            $user = $this->model->find($data["terms_validate_name"], $data["params_validate_name"])->fetch();
+        }
+
+        if (empty($user)) {
+            $this->message->error("usuário não registrado");
+            return null;
+        }
+
+        if (!empty($user->getDeleted())) {
+            $this->message->error("acesso negado");
+            return null;
+        }
+
+        $response = $this->validatePassword($data["password"], $user);
+        if (empty($response)) {
+            $this->message->error("usuário não autenticado");
+            return null;
+        }
+        return $user;
+    }
+
+    private function validatePassword(string $password, Model $userData): bool
+    {
+        if (!password_verify($password, $userData->user_password)) {
+            return false;
+        }
+        return true;
     }
 
     private function validateData(array $data, bool $isPersistence = true): void

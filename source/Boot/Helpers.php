@@ -1,50 +1,51 @@
 <?php
-function removeAccets(string $string) {
+function removeAccets(string $string)
+{
     $map = array(
-        'á' => 'a', 
-        'à' => 'a', 
-        'ã' => 'a', 
-        'â' => 'a', 
+        'á' => 'a',
+        'à' => 'a',
+        'ã' => 'a',
+        'â' => 'a',
         'ä' => 'a',
-        'é' => 'e', 
-        'è' => 'e', 
-        'ê' => 'e', 
+        'é' => 'e',
+        'è' => 'e',
+        'ê' => 'e',
         'ë' => 'e',
-        'í' => 'i', 
-        'ì' => 'i', 
-        'î' => 'i', 
+        'í' => 'i',
+        'ì' => 'i',
+        'î' => 'i',
         'ï' => 'i',
-        'ó' => 'o', 
-        'ò' => 'o', 
-        'õ' => 'o', 
-        'ô' => 'o', 
+        'ó' => 'o',
+        'ò' => 'o',
+        'õ' => 'o',
+        'ô' => 'o',
         'ö' => 'o',
-        'ú' => 'u', 
-        'ù' => 'u', 
-        'û' => 'u', 
+        'ú' => 'u',
+        'ù' => 'u',
+        'û' => 'u',
         'ü' => 'u',
         'ç' => 'c',
-        'Á' => 'A', 
-        'À' => 'A', 
-        'Ã' => 'A', 
-        'Â' => 'A', 
+        'Á' => 'A',
+        'À' => 'A',
+        'Ã' => 'A',
+        'Â' => 'A',
         'Ä' => 'A',
-        'É' => 'E', 
-        'È' => 'E', 
-        'Ê' => 'E', 
+        'É' => 'E',
+        'È' => 'E',
+        'Ê' => 'E',
         'Ë' => 'E',
-        'Í' => 'I', 
-        'Ì' => 'I', 
-        'Î' => 'I', 
+        'Í' => 'I',
+        'Ì' => 'I',
+        'Î' => 'I',
         'Ï' => 'I',
-        'Ó' => 'O', 
-        'Ò' => 'O', 
-        'Õ' => 'O', 
-        'Ô' => 'O', 
+        'Ó' => 'O',
+        'Ò' => 'O',
+        'Õ' => 'O',
+        'Ô' => 'O',
         'Ö' => 'O',
-        'Ú' => 'U', 
-        'Ù' => 'U', 
-        'Û' => 'U', 
+        'Ú' => 'U',
+        'Ù' => 'U',
+        'Û' => 'U',
         'Ü' => 'U',
         'Ç' => 'C'
     );
@@ -55,7 +56,8 @@ function removeAccets(string $string) {
     }, $string);
 }
 
-function arrayWithMostItems(array ...$arrays) {
+function arrayWithMostItems(array ...$arrays)
+{
     $maxCount = 0;
     $resultArray = [];
 
@@ -169,15 +171,19 @@ function getCompanysNameByUserId(): array
 
 function userHasCompany(): bool
 {
-    $user = new \Source\Domain\Model\User();
-    $user->setEmail(session()->user->user_email);
-    $userData = $user->findUserByEmail();
+    if (empty(session()->user->user_type)) {
+        $user = new \Source\Domain\Model\User();
+        $user->setEmail(session()->user->user_email);
+        $userData = $user->findUserByEmail();
 
-    $company = new \Source\Domain\Model\Company();
-    $company->id_user = $userData->id;
-    $dataCompany = $company->findCompanyByUserId();
+        $company = new \Source\Domain\Model\Company();
+        $company->id_user = $userData->id;
+        $dataCompany = $company->findCompanyByUserId();
 
-    return empty($dataCompany) ? false : true;
+        return empty($dataCompany) ? false : true;
+    } else {
+        return false;
+    }
 }
 
 function validateRequestData(array $requiredKeys, array &$requestData)
@@ -206,7 +212,12 @@ function validateRequestData(array $requiredKeys, array &$requestData)
 
 function showUserFullName(): string
 {
-    $user = new Source\Domain\Model\User();
+    $verifyUserType = [
+        "0" => new Source\Domain\Model\User(),
+        "1" => new Source\Domain\Model\Support()
+    ];
+
+    $user  = $verifyUserType[session()->user->user_type];
     $user->setEmail(session()->user->user_email);
     $userData = $user->findUserByEmail();
 

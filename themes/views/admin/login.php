@@ -26,6 +26,13 @@
             </div>
           </div>
         </div>
+        <div class="input-group mb-3">
+          <select name="userType" id="userTyoe" class="form-control">
+            <option value="" disabled selected>Selecione o tipo de usuário</option>
+            <option value="0">Cliente</option>
+            <option value="1">Suporte</option>
+          </select>
+        </div>
         <div class="row">
           <div class="col-8">
             <div class="icheck-primary">

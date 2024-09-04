@@ -1,4 +1,5 @@
 <?php
+
 namespace Source\Domain\Model;
 
 use Exception;
@@ -57,8 +58,12 @@ class User
     public function updateUserByCustomerId(array $data)
     {
         $tools = new Tools($this->user, ModelsUser::class);
-        $response = $tools->updateData("id_customer=:id_customer",
-        ":id_customer={$data['id_customer']->getId()}", $data, "usuário não encontrado");
+        $response = $tools->updateData(
+            "id_customer=:id_customer",
+            ":id_customer={$data['id_customer']->getId()}",
+            $data,
+            "usuário não encontrado"
+        );
         $this->data->message = !empty($tools->message) ? $tools->message : "";
         return !empty($response) ? true : false;
     }
@@ -66,8 +71,12 @@ class User
     public function updateUserByEmail(array $data): bool
     {
         $tools = new Tools($this->user, ModelsUser::class);
-        $response = $tools->updateData("user_email=:user_email",
-        ":user_email={$this->getEmail()}", $data, "usuário não encontrado");
+        $response = $tools->updateData(
+            "user_email=:user_email",
+            ":user_email={$this->getEmail()}",
+            $data,
+            "usuário não encontrado"
+        );
         $this->data->message = !empty($tools->message) ? $tools->message : "";
         return !empty($response) ? true : false;
     }
@@ -87,24 +96,18 @@ class User
 
     public function findUserByEmail(array $columns = []): ?ModelsUser
     {
-        $columns = empty($columns) ? "*" : implode(", ", $columns);
-        $data = $this->user
-        ->find("user_email=:user_email", ":user_email=" . $this->getEmail() . "", $columns)->fetch();
-        
-        $message = new Message();
-        if (empty($data)) {
-            $message->error("usuário não existe");
-            $this->data->message = $message;
-            return null;
-        }
-        
-        if (!empty($data->getDeleted())) {
-            $message->error("acesso negado");
-            $this->data->message = $message;
-            return null;
-        }
-
-        return $data;
+        $tools = new Tools($this->user, ModelsUser::class);
+        $response = $tools->findUserByEmail([
+            "terms" => [
+                "user_email" => ":user_email"
+            ],
+            "params" => [
+                ":user_email" => $this->getEmail()
+            ],
+            "columns" => $columns
+        ]);
+        $this->data->message = !empty($tools->message) ? $tools->message : "";
+        return $response;
     }
 
     public function getEmail(): string
@@ -135,43 +138,24 @@ class User
 
     public function login(string $password): ?ModelsUser
     {
-        $user = $this->user->find("user_email=:user_email",
-        ":user_email=" . $this->getEmail() . "")->fetch();
-        
-        $message = new Message();
-        if (empty($user)) {
-            $user = new ModelsUser();
-            $user = $user->find("user_nick_name=:user_nick_name",
-            ":user_nick_name=" . $this->getNickName() . "")->fetch();
-        }
-        
-        if (empty($user)) {
-            $message->error("usuário não registrado");
-            $this->data->message = $message;
-            return null;
-        }
-
-        if (!empty($user->getDeleted())) {
-            $message->error("acesso negado");
-            $this->data->message = $message;
-            return null;
-        }
-
-        $response = $this->validatePassword($password, $user);
-        if (empty($response)) {
-            $message->error("usuário não autenticado");
-            $this->data->message = $message;
-            return null;
-        }
-        return $user;
-    }
-
-    private function validatePassword(string $password, ModelsUser $userData): bool
-    {
-        if (!password_verify($password, $userData->user_password)) {
-            return false;
-        }
-        return true;
+        $tools = new Tools($this->user, ModelsUser::class);
+        $response = $tools->login([
+            "terms_validate_email" => [
+                "user_email" => ":user_email"
+            ],
+            "params_validate_email" => [
+                ":user_email" => $this->getEmail()
+            ],
+            "terms_validate_name" => [
+                "user_nick_name" => ":user_nick_name"
+            ],
+            "params_validate_name" => [
+                ":user_nick_name" => $this->getNickName()
+            ],
+            "password" => $password
+        ]);
+        $this->data->message = !empty($tools->message) ? $tools->message : "";
+        return $response;
     }
 
     public function getNickName(): string
@@ -188,9 +172,9 @@ class User
     {
         if (!empty($data["user_email"])) {
             $user = $this->user
-            ->find("user_email=:user_email", ":user_email=" . $data["user_email"] . "")
-            ->fetch();
-            
+                ->find("user_email=:user_email", ":user_email=" . $data["user_email"] . "")
+                ->fetch();
+
             $message = new Message();
             if (!empty($user)) {
                 $message->error("este usuário já foi cadastrado");

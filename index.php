@@ -32,29 +32,49 @@ if (empty($_POST["request"]) && !empty($_SERVER["REDIRECT_URL"]) && !in_array($_
     if (empty(session()->user)) {
         redirect("/admin/login");
     } else if ($_SERVER["REDIRECT_URL"] != "/admin/company/register") {
+        $validateSupportEndpoints = [
+            "/admin/support/dashboard"
+        ];
 
-        if (!userHasCompany()) {
-            redirect("/admin/warning/empty-company");
-        }
+        $validateUserType = [
+            "0" => function() use ($validateSupportEndpoints) {
+                if (!userHasCompany()) {
+                    redirect("/admin/warning/empty-company");
+                }
+    
+                $customer = new \Source\Domain\Model\Customer();
+                $customer->email = session()->user->user_email;
+                $customerData = $customer->findCustomerByEmail();
+    
+                if (empty($customerData)) {
+                    redirect("/admin/login");
+                }
+    
+                if (!empty($customerData->getDeleted())) {
+                    redirect("/admin/login");
+                }
+    
+                $allowEndpointsCashVariation = ["/admin/cash-variation-setting/backup", "/admin/cash-variation-setting/report"];
+                if (!in_array($_SERVER["REDIRECT_URL"], $allowEndpointsCashVariation)) {
+                    if (!empty(session()->account_group_variation) && !empty(session()->account_group_variation_id)) {
+                        session()->unset("account_group_variation");
+                        session()->unset("account_group_variation_id");
+                    }
+                }
 
-        $customer = new \Source\Domain\Model\Customer();
-        $customer->email = session()->user->user_email;
-        $customerData = $customer->findCustomerByEmail();
-
-        if (empty($customerData)) {
-            redirect("/admin/login");
-        }
-
-        if (!empty($customerData->getDeleted())) {
-            redirect("/admin/login");
-        }
-
-        $allowEndpointsCashVariation = ["/admin/cash-variation-setting/backup", "/admin/cash-variation-setting/report"];
-        if (!in_array($_SERVER["REDIRECT_URL"], $allowEndpointsCashVariation)) {
-            if (!empty(session()->account_group_variation) && !empty(session()->account_group_variation_id)) {
-                session()->unset("account_group_variation");
-                session()->unset("account_group_variation_id");
+                if (in_array($_SERVER["REDIRECT_URL"], $validateSupportEndpoints)) {
+                    redirect("/admin");
+                }
+            },
+            "1" => function() use ($validateSupportEndpoints) {
+                if (!in_array($_SERVER["REDIRECT_URL"], $validateSupportEndpoints)) {
+                    redirect("/admin/support/dashboard");
+                }
             }
+        ];
+        
+        if (!empty($validateUserType[session()->user->user_type])) {
+            $validateUserType[session()->user->user_type]();
         }
     }
 }
@@ -261,6 +281,12 @@ $route->post("/invoice/cancel/nfe", "Invoice::invoiceCancelNfe");
 $route->post("/invoice/remove", "Invoice::invoiceRemove");
 $route->get("/invoice/backup", "Invoice::invoiceBackup");
 $route->post("/invoice/backup", "Invoice::invoiceBackup");
+
+/**
+ * Suporte ao sistema
+ */
+$route->get("/support/dashboard", "Support::supportDashboard");
+$route->get("/support/open/ticket", "Support::openTicket");
 
 /** 
  * Assinatura do cliente

@@ -1,4 +1,5 @@
 <?php
+
 namespace Source\Controllers;
 
 use Source\Core\Controller;
@@ -34,8 +35,11 @@ class Site extends Controller
         ]);
     }
 
-    public function error(array $data)
+    public function error()
     {
-        redirect("/admin");
+        echo $this->view->render("admin/404", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => []
+        ]);
     }
 }

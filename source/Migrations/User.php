@@ -45,10 +45,10 @@ class User
             "BIGINT AUTO_INCREMENT PRIMARY KEY",
             "VARCHAR(36) UNIQUE NOT NULL",
             "BIGINT UNIQUE NOT NULL",
-            "VARCHAR(355) NOT NULL",
-            "VARCHAR(355) NOT NULL",
-            "VARCHAR(355) NOT NULL",
-            "VARCHAR(355) NOT NULL",
+            "VARCHAR(255) NOT NULL",
+            "VARCHAR(255) NOT NULL",
+            "VARCHAR(255) NOT NULL",
+            "VARCHAR(255) NOT NULL",
             "TINYINT(1) NOT NULL",
             "CONSTRAINT fk_customer_user FOREIGN KEY (id_customer) 
             REFERENCES customer(id) ON UPDATE CASCADE ON DELETE CASCADE"

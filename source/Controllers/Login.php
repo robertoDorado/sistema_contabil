@@ -5,6 +5,7 @@ namespace Source\Controllers;
 use Source\Core\Controller;
 use Source\Domain\Model\Customer;
 use Source\Domain\Model\Subscription;
+use Source\Domain\Model\Support;
 use Source\Domain\Model\User;
 
 /**
@@ -45,9 +46,23 @@ class Login extends Controller
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
             verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $requestPost = $this->getRequests()
-                ->setRequiredFields(["csrfToken", "userData", "userPassword"])->getAllPostData();
+                ->setRequiredFields(["csrfToken", "userData", "userPassword", "userType"])->getAllPostData();
 
-            $user = new User();
+            if (!preg_match("/^\d{1}$/", $requestPost["userType"])) {
+                http_response_code(500);
+                echo json_encode(["error" => "tipo de usuário inválido"]);
+                die;
+            }
+
+            $verifyUserType = [
+                "0" => new User(),
+                "1" => new Support()
+            ];
+
+            if (!empty($verifyUserType[$requestPost["userType"]])) {
+                $user = $verifyUserType[$requestPost["userType"]];
+            }
+
             if (filter_var($requestPost["userData"], FILTER_VALIDATE_EMAIL)) {
                 $user->setEmail($requestPost["userData"]);
             } else {
@@ -83,18 +98,14 @@ class Login extends Controller
             $customer->customer_id = $userData->id_customer;
             $customerData = $customer->findCustomerById();
 
-            if (empty($customerData)) {
-                echo $customer->message->json();
-                die;
-            }
-
             session()->set("user", [
                 "subscription" => $status,
-                "id_customer" => $customerData->id,
+                "id_customer" => $customerData->id ?? null,
                 "user_full_name" => $userData->user_full_name,
                 "user_nick_name" => $userData->user_nick_name,
                 "user_email" => $userData->user_email,
-                "period_end" => $periodEnd
+                "period_end" => $periodEnd,
+                "user_type" => $requestPost["userType"]
             ]);
 
             echo json_encode(["login_success" => true, "url" => url("/admin")]);
