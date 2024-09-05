@@ -5,12 +5,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Abrir um chamado</h1>
+                    <h1 class="m-0">Detalhes do ticket</h1>
                 </div><!-- /.col -->
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="<?= url("/admin") ?>">Página Inicial</a></li>
-                        <li class="breadcrumb-item active">Abrir um chamado</li>
+                        <li class="breadcrumb-item"><a href="<?= url("/admin/support/my-tickets") ?>">Relatório de tickets</a></li>
+                        <li class="breadcrumb-item active">Detalhes do ticket</li>
                     </ol>
                 </div><!-- /.col -->
             </div><!-- /.row -->
@@ -24,13 +24,13 @@
                 <div class="col">
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">Formulário de abertura de chamado</h3>
+                            <h3 class="card-title">Formulário de atualização do ticket</h3>
                         </div>
-                        <form id="supportTicketsForm">
+                        <form id="supportTicketsFormUpdate">
                             <div class="card-body">
                                 <div class="form-group">
                                     <label for="contentMessage">Conteúdo da mensagem</label>
-                                    <textarea name="contentMessage" data-name="Conteúdo da mensagem" class="form-control" id="contentMessage"></textarea>
+                                    <textarea value="<?= !empty($supportTicketsData->content_message) ? $supportTicketsData->content_message : "" ?>" name="contentMessage" data-name="Conteúdo da mensagem" class="form-control" id="contentMessage"><?= !empty($supportTicketsData->content_message) ? $supportTicketsData->content_message : "" ?></textarea>
                                     <input type="hidden" data-name="Token" name="csrfToken" id="csrfToken" value="<?= session()->csrf_token ?>">
                                 </div>
                                 <div class="form-group">
@@ -39,9 +39,18 @@
                                         <option value="" disabled selected>Selecione uma conta suporte</option>
                                         <?php if (!empty($userSupportData)) : ?>
                                             <?php foreach ($userSupportData as $support) : ?>
-                                                <option value="<?= $support->getUuid() ?>"><?= $support->user_full_name ?></option>
+                                                <option <?= $supportTicketsData->id_user == $support->id ? "selected" : "" ?> value="<?= $support->getUuid() ?>"><?= $support->user_full_name ?></option>
                                             <?php endforeach ?>
                                         <?php endif ?>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="ticketStatus">Status</label>
+                                    <select name="ticketStatus" data-name="Status" id="ticketStatus" class="form-control">
+                                        <option <?= $supportTicketsData->getStatus() == "aberto" ? "selected" : "" ?> value="aberto">aberto</option>
+                                        <option <?= $supportTicketsData->getStatus() == "pendente" ? "selected" : "" ?> value="pendente">pendente</option>
+                                        <option <?= $supportTicketsData->getStatus() == "em análise" ? "selected" : "" ?> value="em análise">em análise</option>
+                                        <option <?= $supportTicketsData->getStatus() == "resolvido" ? "selected" : "" ?> value="resolvido">resolvido</option>
                                     </select>
                                 </div>
                                 <div class="mb-3">
@@ -55,7 +64,7 @@
                                 </div>
                             </div>
                             <div class="card-footer">
-                                <button type="submit" id="launchBtn" class="btn btn-primary">Enviar</button>
+                                <button type="submit" id="launchBtn" class="btn btn-primary">Atualizar</button>
                             </div>
                         </form>
                     </div>

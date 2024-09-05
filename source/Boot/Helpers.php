@@ -106,7 +106,12 @@ function financialIndicators(): array
 }
 function initializeUserAndCompanyId(): array
 {
-    $user = new \Source\Domain\Model\User();
+    $verifyUserType = [
+        "0" => new \Source\Domain\Model\User(),
+        "1" => new \Source\Domain\Model\Support(),
+    ];
+
+    $user = $verifyUserType[session()->user->user_type];
     $user->setEmail(session()->user->user_email);
     $userData = $user->findUserByEmail();
 

@@ -54,6 +54,24 @@ class Support
         $this->data->$name = $value;
     }
 
+    public function findUserSupportByUuid(array $columns = []): ?ModelsSupport
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        return $this->support->find("uuid=:uuid", ":uuid=" . $this->getUuid() . "", $columns)->fetch();
+    }
+
+    public function findAllUserSupport(array $columns = []): array
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        $response = $this->support->find("", "", $columns)->fetch(true);
+
+        if (empty($response)) {
+            return [];
+        }
+
+        return $response;
+    }
+
     public function findUserByEmail(array $columns = []): ?ModelsSupport
     {
         $tools = new Tools($this->support, ModelsSupport::class);

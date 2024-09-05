@@ -334,11 +334,6 @@
                     <p>Formulário do usuário</p>
                 </a>
             </li>
-            <li class="nav-item">
-                <a href="<?= url("/admin/support/open/ticket") ?>" class="nav-link">
-                    <p>Abrir um chamado</p>
-                </a>
-            </li>
             <?php if (session()->user->subscription != "active") : ?>
                 <li class="nav-item">
                     <a href="<?= url("/customer/subscribe") ?>" class="nav-link">
@@ -372,6 +367,27 @@
             <li class="nav-item">
                 <a href="<?= url("/admin/history-audit/backup") ?>" class="nav-link">
                     <p>Backup da auditoria</p>
+                </a>
+            </li>
+        </ul>
+    </li>
+    <li class="nav-item">
+        <a href="#" class="nav-link">
+            <i class="nav-icon fas fa-headset"></i>
+            <p>
+                Chamados
+                <i class="right fas fa-angle-left"></i>
+            </p>
+        </a>
+        <ul class="nav nav-treeview">
+            <li class="nav-item">
+                <a href="<?= url("/admin/support/open/ticket") ?>" class="nav-link">
+                    <p>Abrir um chamado</p>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="<?= url("/admin/support/my-tickets") ?>" class="nav-link">
+                    <p>Meus chamados</p>
                 </a>
             </li>
         </ul>

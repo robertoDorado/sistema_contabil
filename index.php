@@ -287,6 +287,10 @@ $route->post("/invoice/backup", "Invoice::invoiceBackup");
  */
 $route->get("/support/dashboard", "Support::supportDashboard");
 $route->get("/support/open/ticket", "Support::openTicket");
+$route->post("/support/open/ticket", "Support::openTicket");
+$route->get("/support/my-tickets", "Support::myTickets");
+$route->get("/support/my-tickets/update/{uuid}", "Support::ticketDetail");
+$route->post("/support/my-tickets/update", "Support::ticketDetail");
 
 /** 
  * Assinatura do cliente

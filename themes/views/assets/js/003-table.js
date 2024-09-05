@@ -1834,7 +1834,21 @@ const invoiceReportBackup = dataTableConfig($("#invoiceReportBackup"),
                 .appendTo("#widgets .col-md-6:eq(0)");
         }
     })
-const supportTicketsReport = dataTableConfig($("#supportTicketsReport"),
+const supportDashboardTable = dataTableConfig($("#supportDashboardTable"),
+    {
+        "columnDefs": [
+            {
+                "targets": [0],
+                "visible": false
+            }
+        ],
+        "language": {
+            "url": urlJson
+        },
+        "responsive": true,
+        "autoWidth": false
+    })
+const myTicketsReport = dataTableConfig($("#myTicketsReport"),
     {
         "columnDefs": [
             {

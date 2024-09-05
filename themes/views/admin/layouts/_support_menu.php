@@ -14,7 +14,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="<?= url("/admin/invoice/report") ?>" class="nav-link">
+                <a href="#" class="nav-link">
                     <p>Relatório de chamados</p>
                 </a>
             </li>

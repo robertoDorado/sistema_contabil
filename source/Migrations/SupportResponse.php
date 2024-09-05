@@ -1,29 +1,27 @@
 <?php
-
 namespace Source\Migrations;
 
 use Source\Migrations\Core\DDL;
-use Source\Models\SupportTickets as ModelsSupportTickets;
+use Source\Models\SupportResponse as ModelsSupportResponse;
 
 require dirname(dirname(__DIR__)) . "/vendor/autoload.php";
 
 /**
- * SupportTickets Migrations
+ * SupportResponse Migrations
  * @link 
  * @author Roberto Dorado <robertodorado7@gmail.com>
  * @package Source\Migrations
  */
-class SupportTickets
+class SupportResponse
 {
-    /** @var DDL */
     private DDL $ddl;
 
     /**
-     * SupportTickets constructor
+     * SupportResponse constructor
      */
     public function __construct()
     {
-        $this->ddl = new DDL(ModelsSupportTickets::class);
+        $this->ddl = new DDL(ModelsSupportResponse::class);
     }
 
     public function defineTable()
@@ -35,21 +33,20 @@ class SupportTickets
             [
                 "BIGINT AUTO_INCREMENT PRIMARY KEY",
                 "VARCHAR(36) UNIQUE NOT NULL",
-                "BIGINT NOT NULL",
+                "BIGINT UNIQUE NOT NULL",
                 "BIGINT NOT NULL",
                 "VARCHAR(1000) NOT NULL",
-                "VARCHAR(255) NULL",
                 "VARCHAR(255) NOT NULL",
                 "TINYINT(1) NOT NULL",
                 "DATE NOT NULL",
                 "DATE NOT NULL",
-                "CONSTRAINT fk_support_tickets_user FOREIGN KEY (id_user) 
-                REFERENCES user(id) ON UPDATE CASCADE ON DELETE CASCADE",
-                "CONSTRAINT fk_support_tickets_support FOREIGN KEY (id_support) 
-                REFERENCES support(id) ON UPDATE CASCADE ON DELETE CASCADE",
+                "CONSTRAINT fk_support_response_support_tickets FOREIGN KEY (id_support_tickets) 
+                REFERENCES support_tickets(id) ON UPDATE CASCADE ON DELETE CASCADE",
+                "CONSTRAINT fk_support_response_support FOREIGN KEY (id_support) 
+                REFERENCES support(id) ON UPDATE CASCADE ON DELETE CASCADE"
             ]
         );
         $this->ddl->setForeignKeyChecks(0)->dropTableIfExists()->createTableQuery()->setForeignKeyChecks(1)->executeQuery();
     }
 }
-executeMigrations(SupportTickets::class);
+executeMigrations(SupportResponse::class);

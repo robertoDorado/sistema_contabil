@@ -4,52 +4,47 @@ namespace Source\Models;
 use Source\Core\Model;
 
 /**
- * SupportTickets Models
+ * SupportResponse Models
  * @link 
  * @author Roberto Dorado <robertodorado7@gmail.com>
  * @package Source\Models
  */
-class SupportTickets extends Model
+class SupportResponse extends Model
 {
     /** @var string Uuid */
     protected string $uuid = "uuid";
 
-    /** @var string id_user */
-    protected string $idUser = "id_user";
+    /** @var string id dos tickets chave estrangeira */
+    protected string $idSupportTickets = "id_support_tickets";
 
-    /** @var string id_support */
+    /** @var string id suporte */
     protected string $idSupport = "id_support";
 
-    /** @var string Conteúdo do ticket */
+    /** @var string Conteúdo da mensagem */
     protected string $contentMessage = "content_message";
 
-    /** @var string Anexo da mensagem */
+    /** @var string anexo */
     protected string $contentAttachment = "content_attachment";
 
-    /** @var string Status do chamado */
-    protected string $status = "status";
-
-    /** @var string Soft delete */
+    /** @var string deleted */
     protected string $deleted = "deleted";
 
-    /** @var string Data criada */
+    /** @var string datetime */
     protected string $createdAt = "created_at";
 
-    /** @var string Data de atualização */
+    /** @var string updatedAt datetime */
     protected string $updatedAt = "updated_at";
 
     /**
-     * SupportTickets constructor
+     * SupportResponse constructor
      */
     public function __construct()
     {
-        parent::__construct(CONF_DB_NAME . ".support_tickets", ["id"], [
+        parent::__construct(CONF_DB_NAME . ".support_response", ["id"], [
             $this->uuid,
-            $this->idUser,
-            $this->idSupport,
+            $this->idSupportTickets,
             $this->contentMessage,
-            $this->contentAttachment,
-            $this->status,
+            $this->contentAttachMent,
             $this->deleted,
             $this->createdAt,
             $this->updatedAt
@@ -64,16 +59,6 @@ class SupportTickets extends Model
     public function getUuid()
     {
         return $this->uuid;
-    }
-
-    public function setStatus(string $status)
-    {
-        $this->status = $status;
-    }
-
-    public function getStatus()
-    {
-        return $this->status;
     }
 
     public function setDeleted(string $deleted)
