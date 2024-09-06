@@ -32,9 +32,17 @@ if (empty($_POST["request"]) && !empty($_SERVER["REDIRECT_URL"]) && !in_array($_
     if (empty(session()->user)) {
         redirect("/admin/login");
     } else if ($_SERVER["REDIRECT_URL"] != "/admin/company/register") {
+        $urlReplyTickets = explode("/", $_SERVER["REDIRECT_URL"]);
+        $uuidReplyTickets = array_pop($urlReplyTickets);
+        
         $validateSupportEndpoints = [
-            "/admin/support/dashboard"
+            "/admin/support/dashboard",
+            "/admin/support/tickets/reply"
         ];
+
+        if ($_SERVER["REDIRECT_URL"] == "/admin/support/tickets/reply/{$uuidReplyTickets}") {
+            $validateSupportEndpoints[] = "/admin/support/tickets/reply/{$uuidReplyTickets}";
+        }
 
         $validateUserType = [
             "0" => function() use ($validateSupportEndpoints) {
@@ -63,12 +71,12 @@ if (empty($_POST["request"]) && !empty($_SERVER["REDIRECT_URL"]) && !in_array($_
                 }
 
                 if (in_array($_SERVER["REDIRECT_URL"], $validateSupportEndpoints)) {
-                    redirect("/admin");
+                    redirect("/ops/error/404");
                 }
             },
             "1" => function() use ($validateSupportEndpoints) {
                 if (!in_array($_SERVER["REDIRECT_URL"], $validateSupportEndpoints)) {
-                    redirect("/admin/support/dashboard");
+                    redirect("/ops/error/404");
                 }
             }
         ];
@@ -291,6 +299,9 @@ $route->post("/support/open/ticket", "Support::openTicket");
 $route->get("/support/my-tickets", "Support::myTickets");
 $route->get("/support/my-tickets/update/{uuid}", "Support::ticketDetail");
 $route->post("/support/my-tickets/update", "Support::ticketDetail");
+$route->get("/support/tickets/reply/{uuid}", "Support::replyTickets");
+$route->post("/support/tickets/reply", "Support::replyTickets");
+$route->get("/support/tickets/see-reply/{uuid}", "Support::seeTicketReply");
 
 /** 
  * Assinatura do cliente

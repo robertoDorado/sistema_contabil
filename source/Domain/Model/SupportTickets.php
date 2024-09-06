@@ -47,6 +47,25 @@ class SupportTickets
     }
 
     /** @var ModelsSupportTickets[] */
+    public function findAllSupportTickets(array  $columns): array
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        $response = $this->supportTickets->find("", "", $columns)->fetch(true);
+
+        if (empty($response)) {
+            return [];
+        }
+
+        return $response;
+    }
+
+    public function findSupportTicketsByUuid(array $columns): ?ModelsSupportTickets
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        return $this->supportTickets->find("uuid=:uuid", ":uuid=" . $this->getUuid() . "", $columns)->fetch();
+    }
+
+    /** @var ModelsSupportTickets[] */
     public function findSupportTicketsBySupportUserIdJoinUser(array $data): array
     {
         $data["columns_tickets"] = empty($data["columns_tickets"]) ? "*" : implode(", ", $data["columns_tickets"]);

@@ -13,11 +13,6 @@
                     <p>Dashboard</p>
                 </a>
             </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <p>Relatório de chamados</p>
-                </a>
-            </li>
         </ul>
     </li>
 </ul>

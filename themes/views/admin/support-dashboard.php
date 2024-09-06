@@ -63,7 +63,6 @@
 
                         <div class="card-body">
                             <div id="widgets" class="dataTables_wrapper dt-bootstrap4">
-                                <!-- <i class="fas fa-paperclip"></i> -->
                                 <table id="supportDashboardTable" class="table table-bordered table-striped">
                                     <thead>
                                         <tr>
@@ -84,7 +83,7 @@
                                                     <td><?= $supportTickets->content_message ?></td>
                                                     <td style="text-align:center"><?= !empty($supportTickets->content_attachment) ? '<i class="fas fa-paperclip"></i>' : "Não possui anexo" ?></td>
                                                     <td style="text-align:center"><span class="right badge <?= $supportTickets->badge ?>"><?= $supportTickets->status?></span></td>
-                                                    <td><a href="<?= url("/admin/support/tickets/reply") ?>" class="btn btn-success">Responder</a></td>
+                                                    <td><a href="<?= url("/admin/support/tickets/reply/{$supportTickets->getUuid()}") ?>" class="btn btn-success">Responder</a></td>
                                                 </tr>
                                             <?php endforeach ?>
                                         <?php endif ?>

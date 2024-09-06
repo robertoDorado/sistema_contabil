@@ -55,6 +55,42 @@ class User
         return $this->data->$name ?? null;
     }
 
+    /** @var ModelsUser[] */
+    public function findAllUserJoinCustomerJoinSubscription(array $data): array
+    {
+        $data["user_columns"] = empty($data["user_columns"]) ? "*" : implode(", ", $data["user_columns"]);
+        $data["customer_columns"] = empty($data["customer_columns"]) ? "*" : implode(", ", $data["customer_columns"]);
+        $data["subscription_columns"] = empty($data["subscription_columns"]) ? "*" : implode(", ", $data["subscription_columns"]);
+
+        $response = $this->user->find(
+            "", 
+            "",
+            $data["user_columns"]
+        )->join(
+            CONF_DB_NAME . ".customer",
+            "id",
+            "",
+            "",
+            $data["customer_columns"],
+            "id_customer",
+            CONF_DB_NAME . ".user"
+        )->leftJoin(
+            CONF_DB_NAME . ".subscription",
+            "customer_id",
+            "",
+            "",
+            $data["subscription_columns"],
+            "id",
+            CONF_DB_NAME . ".customer"
+        )->fetch(true);
+
+        if (empty($response)) {
+            return [];
+        }
+
+        return $response;
+    }
+
     public function updateUserByCustomerId(array $data)
     {
         $tools = new Tools($this->user, ModelsUser::class);

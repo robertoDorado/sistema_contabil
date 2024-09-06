@@ -1,2 +1,7 @@
 <?php
-var_dump(empty("0"));
+$data = [
+    "name" => "roberto"
+];
+foreach ($data as $value) {
+    echo $value;
+}

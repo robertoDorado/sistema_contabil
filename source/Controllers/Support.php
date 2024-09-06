@@ -6,6 +6,7 @@ use DateTime;
 use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Controller;
 use Source\Domain\Model\Support as ModelSupport;
+use Source\Domain\Model\SupportResponse;
 use Source\Domain\Model\SupportTickets;
 
 /**
@@ -24,9 +25,178 @@ class Support extends Controller
         parent::__construct();
     }
 
+    public function seeTicketReply(array $data)
+    {
+        if (!Uuid::isValid($data["uuid"])) {
+            redirect("/admin/support/my-tickets");
+        }
+
+        $supportResponse = new SupportResponse();
+        $supportResponseData = $supportResponse->findSupportResponseJoinSupportByUuid([
+            "support_response_columns" => [
+                "content_message",
+                "content_attachment",
+                "created_at"
+            ],
+            "support_columns" => [
+                "user_full_name"
+            ],
+            "uuid" => $data["uuid"]
+        ]);
+
+        $supportResponseData->created_at = (new DateTime($supportResponseData->created_at))->format("d/m/Y");
+
+        echo $this->view->render("admin/see-reply", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => [],
+            "supportResponseData" => $supportResponseData
+        ]);
+    }
+
+    public function replyTickets(array $data)
+    {
+        $responseInitializeUserAndCompany = initializeUserAndCompanyId();
+        if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
+            $requestPost = $this->getRequests()->setRequiredFields(
+                [
+                    'ticketStatus',
+                    'contentMessage',
+                    'csrfToken',
+                    'uuid'
+                ]
+            )->getAllPostData();
+            $requestFiles = $this->getRequestFiles()->getFile("attachmentFile");
+
+            if (strlen($requestPost["contentMessage"]) > 1000) {
+                http_response_code(500);
+                echo json_encode(["error" => "conteúdo do chamado ultrapassa o limite de caracteres (1000)"]);
+                die;
+            }
+
+            $verifyTicketStatus = [
+                "aberto",
+                "pendente",
+                "em análise",
+                "resolvido"
+            ];
+
+            if (!in_array($requestPost["ticketStatus"], $verifyTicketStatus)) {
+                http_response_code(500);
+                echo json_encode(["error" => "status inválido"]);
+                die;
+            }
+
+            $supportTickets = new SupportTickets();
+            $supportTickets->setUuid($requestPost["uuid"]);
+            $supportTicketsData = $supportTickets->findSupportTicketsByUuid(["id", "uuid"]);
+
+            if (empty($supportTicketsData)) {
+                http_response_code(500);
+                echo json_encode(["error" => "ticket inexistente"]);
+                die;
+            }
+
+            if (empty($requestFiles["error"])) {
+                $filePath = dirname(dirname(__DIR__)) . "/tickets";
+                if (!is_dir($filePath)) {
+                    mkdir($filePath, 0777, true);
+                }
+
+                $fileDestination = $filePath . "/" . basename($requestFiles["name"]);
+                $verifyImage = getimagesize($requestFiles["tmp_name"]);
+
+                if (!$verifyImage) {
+                    http_response_code(500);
+                    echo json_encode(["error" => "arquivo inválido"]);
+                    die;
+                }
+
+                if (!move_uploaded_file($requestFiles["tmp_name"], $fileDestination)) {
+                    http_response_code(500);
+                    echo json_encode(["error" => "erro no upload do arquivo"]);
+                    die;
+                }
+            }
+
+            $supportTickets = new SupportTickets();
+            $response = $supportTickets->updateData([
+                "uuid" => $supportTicketsData->getUuid(),
+                "status" => $requestPost["ticketStatus"]
+            ]);
+
+            if (!$response) {
+                http_response_code(500);
+                echo $response->message->json();
+                die;
+            }
+
+            $supportResponse = new SupportResponse();
+            $supportResponseData = $supportResponse->findSupportResponseBySupportTicketId(["id"], $supportTicketsData->id);
+
+            if (empty($supportResponseData)) {
+                $supportResponse = new SupportResponse();
+                $response = $supportResponse->persistData([
+                    "uuid" => Uuid::uuid4(),
+                    "id_support_tickets" => $supportTicketsData->id,
+                    "id_support" => $responseInitializeUserAndCompany["user_data"]->id,
+                    "content_message" => $requestPost["contentMessage"],
+                    "content_attachment" => $requestFiles["name"],
+                    "deleted" => 0,
+                    "created_at" => date("Y-m-d"),
+                    "updated_at" => date("Y-m-d")
+                ]);
+            }else {
+                $supportResponseData->setRequiredFields(["content_message", "content_attachment"]);
+                $supportResponseData->content_message = $requestPost["contentMessage"];
+                $supportResponseData->content_attachment = $requestFiles["name"];
+                if (!$supportResponseData->save()) {
+                    http_response_code(500);
+                    echo json_encode(["error" => "erro ao tentar atualizar a resposta do chamado"]);
+                    die;
+                }
+            }
+
+            if (!$response) {
+                http_response_code(500);
+                echo $supportResponse->message->json();
+                die;
+            }
+
+            echo json_encode(["success" => true, "url" => url("/admin/support/dashboard")]);
+            die;
+        }
+
+        if (!Uuid::isValid($data["uuid"])) {
+            redirect("/admin/support/dashboard");
+        }
+
+        $supportTickets = new SupportTickets();
+        $supportTickets->setUuid($data["uuid"]);
+        $supportTicketsData = $supportTickets->findSupportTicketsJoinSupportByUuid(
+            [
+                "uuid",
+                "id_user",
+                "content_message",
+                "content_attachment",
+                "status"
+            ],
+            [
+                "user_full_name"
+            ]
+        );
+
+        echo $this->view->render("admin/reply-tickets", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => [],
+            "supportTicketsData" => $supportTicketsData
+        ]);
+    }
+
     public function ticketDetail(array $data)
     {
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $requestPost = $this->getRequests()->setRequiredFields([
                 'contentMessage',
                 'csrfToken',
@@ -35,6 +205,12 @@ class Support extends Controller
                 'uuid'
             ])->getAllPostData();
             $requestFiles = $this->getRequestFiles()->getFile("attachmentFile");
+
+            if (strlen($requestPost["contentMessage"]) > 1000) {
+                http_response_code(500);
+                echo json_encode(["error" => "conteúdo do chamado ultrapassa o limite de caracteres (1000)"]);
+                die;
+            }
 
             $verifyTicketStatus = [
                 "aberto",
@@ -145,6 +321,7 @@ class Support extends Controller
                 "created_at AS created_at_ticket"
             ],
             "support_response" => [
+                "uuid AS uuid_support_response",
                 "content_message AS content_message_response",
                 "content_attachment AS content_attachment_response",
                 "created_at AS created_at_response"
@@ -208,6 +385,7 @@ class Support extends Controller
     {
         $responseInitializeUserAndCompany = initializeUserAndCompanyId();
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") == "POST") {
+            verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $requestPost = $this->getRequests()->setRequiredFields(
                 [
                     'contentMessage',
@@ -216,6 +394,12 @@ class Support extends Controller
                 ]
             )->getAllPostData();
             $requestFiles = $this->getRequestFiles()->getFile("attachmentFile");
+
+            if (strlen($requestPost["contentMessage"]) > 1000) {
+                http_response_code(500);
+                echo json_encode(["error" => "conteúdo do chamado ultrapassa o limite de caracteres (1000)"]);
+                die;
+            }
 
             $support = new ModelSupport();
             $support->setUuid($requestPost["userSupportData"]);

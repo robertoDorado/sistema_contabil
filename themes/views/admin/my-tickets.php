@@ -59,11 +59,11 @@
                                                     <td style="text-align:center"><span class="right badge <?= $supportTickets->badge ?>"><?= $supportTickets->status ?></span></td>
                                                     <td><?= $supportTickets->created_at_ticket ?></td>
                                                     <?php if ($supportTickets->reply_message) : ?>
-                                                        <td><a href="#" class="btn btn-primary">Ver detalhes</a></td>
+                                                        <td><a href="<?= url("/admin/support/tickets/see-reply/{$supportTickets->uuid_support_response}") ?>" class="btn btn-success">Resposta</a></td>
                                                     <?php else : ?>
                                                         <td></td>
                                                     <?php endif ?>
-                                                    <td><a href="<?= url("/admin/support/my-tickets/update/{$supportTickets->getUuid()}") ?>" class="btn btn-primary">Ver detalhes</a></td>
+                                                    <td><a href="<?= url("/admin/support/my-tickets/update/{$supportTickets->uuid_support_response}") ?>" class="btn btn-primary">Ver detalhes</a></td>
                                                 </tr>
                                             <?php endforeach ?>
                                         <?php endif ?>

@@ -48,7 +48,8 @@ class Login extends Controller
             $requestPost = $this->getRequests()
                 ->setRequiredFields(["csrfToken", "userData", "userPassword", "userType"])->getAllPostData();
 
-            if (!preg_match("/^\d{1}$/", $requestPost["userType"])) {
+            $validateUserType = ["0", "1"];
+            if (!in_array($requestPost["userType"], $validateUserType)) {
                 http_response_code(500);
                 echo json_encode(["error" => "tipo de usuário inválido"]);
                 die;
@@ -108,7 +109,13 @@ class Login extends Controller
                 "user_type" => $requestPost["userType"]
             ]);
 
-            echo json_encode(["login_success" => true, "url" => url("/admin")]);
+            $verifyRedirectUrl = [
+                "0" =>  url("/admin"),
+                "1" =>  url("/admin/support/dashboard")
+            ];
+
+            $url = $verifyRedirectUrl[$requestPost["userType"]];
+            echo json_encode(["login_success" => true, "url" => $url]);
             die;
         }
 

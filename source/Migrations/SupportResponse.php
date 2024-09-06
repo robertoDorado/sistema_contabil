@@ -36,7 +36,7 @@ class SupportResponse
                 "BIGINT UNIQUE NOT NULL",
                 "BIGINT NOT NULL",
                 "VARCHAR(1000) NOT NULL",
-                "VARCHAR(255) NOT NULL",
+                "VARCHAR(255) NULL",
                 "TINYINT(1) NOT NULL",
                 "DATE NOT NULL",
                 "DATE NOT NULL",

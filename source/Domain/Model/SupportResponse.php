@@ -1,4 +1,5 @@
 <?php
+
 namespace Source\Domain\Model;
 
 use Exception;
@@ -43,6 +44,36 @@ class SupportResponse
     public function __set($name, $value)
     {
         $this->data->$name = $value;
+    }
+
+    public function findSupportResponseBySupportTicketId(array $columns, int $idSupportTicket): ?ModelsSupportResponse
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        return $this->supportResponse->find(
+            "id_support_tickets=:id_support_tickets",
+            ":id_support_tickets=" . $idSupportTicket . "",
+            $columns
+        )->fetch();
+    }
+
+    public function findSupportResponseJoinSupportByUuid(array $data): ?ModelsSupportResponse
+    {
+        $data["support_response_columns"] = empty($data["support_response_columns"]) ? "*" : implode(", ", $data["support_response_columns"]);
+        $data["support_columns"] = empty($data["support_columns"]) ? "*" : implode(", ", $data["support_columns"]);
+
+        return $this->supportResponse->find(
+            "uuid=:uuid",
+            ":uuid=" . $data["uuid"] . "",
+            $data["support_response_columns"]
+        )->join(
+            CONF_DB_NAME . ".support",
+            "id",
+            "",
+            "",
+            $data["support_columns"],
+            "id_support",
+            CONF_DB_NAME . ".support_response",
+        )->fetch();
     }
 
     public function getId(): int
