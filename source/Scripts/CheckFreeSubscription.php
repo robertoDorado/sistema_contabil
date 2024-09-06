@@ -8,15 +8,16 @@ require dirname(dirname(__DIR__)) . "/vendor/autoload.php";
 
 $user = new User();
 $userData = $user->findAllUserJoinCustomerJoinSubscription([
-    "user_columns" => ["id", "deleted", "id_customer"],
+    "user_columns" => ["id", "deleted", "id_customer", "user_email"],
     "customer_columns" => ["created_at"],
     "subscription_columns" => ["status"]
 ]);
 
+$filterEmail = ["robertodorado7@gmail.com"];
 $dateTimeNow = new DateTime();
-$userData = array_filter($userData, function ($item) use ($dateTimeNow) {
+$userData = array_filter($userData, function ($item) use ($dateTimeNow, $filterEmail) {
     $dateTimeUser = new DateTime($item->created_at);
-    return $dateTimeNow->diff($dateTimeUser)->days >= 7 && $item->status != "active" && empty($item->deleted);
+    return $dateTimeNow->diff($dateTimeUser)->days >= 7 && $item->status != "active" && empty($item->deleted) && !in_array($item->user_email, $filterEmail);
 });
 
 $closeFreeAccount = function (Model $userData) {
