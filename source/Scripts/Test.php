@@ -1,7 +1,2 @@
 <?php
-$data = [
-    "name" => "roberto"
-];
-foreach ($data as $value) {
-    echo $value;
-}
+echo (208.75*(1-(3.99/100)))-0.39 . PHP_EOL;

@@ -5,7 +5,7 @@
             <a href="#" class="h1"><b>Assinatura Mensal</a>
         </div>
         <div class="card-body">
-            <p class="login-box-msg">Faça a sua assinatura do sistema contabil por R$ 200,00 por mês.</p>
+            <p class="login-box-msg">Faça a sua assinatura do sistema contabil por R$ 208,75 por mês.</p>
 
             <form action="#" method="post" id="subscriptionForm">
                 <div class="input-group mb-3">
