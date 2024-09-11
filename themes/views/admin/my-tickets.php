@@ -63,7 +63,7 @@
                                                     <?php else : ?>
                                                         <td></td>
                                                     <?php endif ?>
-                                                    <td><a href="<?= url("/admin/support/my-tickets/update/{$supportTickets->uuid_support_response}") ?>" class="btn btn-primary">Ver detalhes</a></td>
+                                                    <td><a href="<?= url("/admin/support/my-tickets/update/{$supportTickets->uuid_ticket}") ?>" class="btn btn-primary">Ver detalhes</a></td>
                                                 </tr>
                                             <?php endforeach ?>
                                         <?php endif ?>

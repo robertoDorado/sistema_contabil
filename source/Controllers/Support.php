@@ -313,7 +313,7 @@ class Support extends Controller
         $responseInitializeUserAndCompany = initializeUserAndCompanyId();
         $params = [
             "support_tickets" => [
-                "uuid",
+                "uuid AS uuid_ticket",
                 "deleted",
                 "content_message AS content_message_tickets",
                 "content_attachment AS content_attachment_tickets",
