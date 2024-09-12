@@ -40,7 +40,7 @@ class CashFlowExplanatoryNotes extends Controller
             $cashFlowExplanatoryNotesData = $cashFlowExplanatoryNotes->findCashFlowExplanatoryNotesByUuid($noteParams, true);
 
             if (empty($cashFlowExplanatoryNotesData)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "este registro não existe"]);
                 die;
             }
@@ -83,7 +83,7 @@ class CashFlowExplanatoryNotes extends Controller
             }
 
             if (!$response->modify) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $response->message->json();
                 die;
             }
@@ -122,7 +122,7 @@ class CashFlowExplanatoryNotes extends Controller
             ->getAllPostData();
 
         if (!Uuid::uuid4($requestPost["uuid"])) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => "uuid inválido"]);
             die;
         }
@@ -132,7 +132,7 @@ class CashFlowExplanatoryNotes extends Controller
         $cashFlowExplanatoryNotesData = $cashFlowExplanatoryNotes->findCashFlowExplanatoryNotesByUuid([], false);
 
         if (empty($cashFlowExplanatoryNotesData)) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => "este registro não existe"]);
             die;
         }
@@ -156,7 +156,7 @@ class CashFlowExplanatoryNotes extends Controller
             ])->getAllPostData();
 
             if (!Uuid::isValid($requestPost["uuid"])) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "uuid inválido"]);
                 die;
             }
@@ -166,7 +166,7 @@ class CashFlowExplanatoryNotes extends Controller
             $cashFlowExplanatoryNotesData = $cashFlowExplanatoryNotes->findCashFlowExplanatoryNotesByUuid([], false);
 
             if (empty($cashFlowExplanatoryNotesData)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "este registro não existe"]);
                 die;
             }
@@ -262,7 +262,7 @@ class CashFlowExplanatoryNotes extends Controller
                 ]);
 
                 if (empty($response)) {
-                    http_response_code(500);
+                    http_response_code(400);
                     echo $cashFlowExplanatoryNotes->message->json();
                     die;
                 }

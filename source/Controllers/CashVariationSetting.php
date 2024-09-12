@@ -173,7 +173,7 @@ class CashVariationSetting extends Controller
             )->getAllPostData();
 
             if ($requestPost["currentUuid"] != $requestPost["accountGroup"]) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "grupo de contas inválido"]);
                 die;
             }
@@ -183,7 +183,7 @@ class CashVariationSetting extends Controller
             $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid();
 
             if (empty($cashFlowGroupData)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $cashFlowGroup->message->json();
                 die;
             }
@@ -215,7 +215,7 @@ class CashVariationSetting extends Controller
             $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid();
 
             if (empty($cashFlowGroupData)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "grupo de caixa não existe"]);
                 die;
             }
@@ -252,7 +252,7 @@ class CashVariationSetting extends Controller
             }
 
             if (empty($response[0])) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $response[1]->message->json();
                 die;
             }

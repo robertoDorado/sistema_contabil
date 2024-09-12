@@ -62,7 +62,7 @@ class HistoryAudit extends Controller
             }
 
             if (!$response->status) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $response->message->json();
                 die;
             }
@@ -108,7 +108,7 @@ class HistoryAudit extends Controller
         $historyAuditData = $historyAudit->findHistoryAndAuditByUuid(["deleted", "id"]);
 
         if (empty($historyAuditData)) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => "este registro não existe"]);
             die;
         }
@@ -117,7 +117,7 @@ class HistoryAudit extends Controller
         $historyAuditData->deleted = 1;
 
         if (!$historyAuditData->save()) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => "erro ao deletar o registro"]);
             die;
         }

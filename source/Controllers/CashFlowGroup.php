@@ -76,13 +76,13 @@ class CashFlowGroup extends Controller
         }
 
         if (empty($responseHistoryAudit)) {
-            http_response_code(500);
+            http_response_code(400);
             echo $historyAudit->message->json();
             die;
         }
 
         if (empty($response)) {
-            http_response_code(500);
+            http_response_code(400);
             echo $cashFlowGroup->message->json();
             die;
         }
@@ -116,7 +116,7 @@ class CashFlowGroup extends Controller
         $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid();
 
         if (empty($cashFlowGroupData)) {
-            http_response_code(500);
+            http_response_code(400);
             echo $cashFlowGroup->message->json();
             die;
         }
@@ -142,13 +142,13 @@ class CashFlowGroup extends Controller
         ]);
 
         if (empty($responseHistoryAudit)) {
-            http_response_code(500);
+            http_response_code(400);
             echo $historyAudit->message->json();
             die;
         }
 
         if (empty($response)) {
-            http_response_code(500);
+            http_response_code(400);
             echo $cashFlowGroup->message->json();
             die;
         }
@@ -176,7 +176,7 @@ class CashFlowGroup extends Controller
             $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid();
 
             if (empty($cashFlowGroupData)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $cashFlowGroup->message->json();
                 die;
             }
@@ -202,13 +202,13 @@ class CashFlowGroup extends Controller
             ]);
 
             if (empty($responseHistoryAudit)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $historyAudit->message->json();
                 die;
             }
 
             if (!$response) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "erro interno ao tentar alterar o dado"]);
                 die;
             }
@@ -264,7 +264,7 @@ class CashFlowGroup extends Controller
             $cashFlowGroup = new ModelCashFlowGroup();
 
             if (empty($responseUserAndCompany["company_id"])) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "selecione uma empresa antes de criar un grupo de contas"]);
                 die;
             }
@@ -280,7 +280,7 @@ class CashFlowGroup extends Controller
             ]);
 
             if (empty($response)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $cashFlowGroup->message->json();
                 die;
             }
@@ -298,7 +298,7 @@ class CashFlowGroup extends Controller
             ]);
 
             if (empty($responseHistoryAudit)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $historyAudit->message->json();
                 die;
             }

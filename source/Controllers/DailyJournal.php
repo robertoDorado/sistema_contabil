@@ -41,7 +41,7 @@ class DailyJournal extends Controller
             $balanceSheetData = $balanceSheet->findBalanceSheetByUuid(["uuid", "id"]);
 
             if (empty($balanceSheetData)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "registro não encontrado"]);
                 die;
             }
@@ -54,7 +54,7 @@ class DailyJournal extends Controller
                     $response = $model->save();
 
                     if (!$response) {
-                        http_response_code(500);
+                        http_response_code(400);
                         echo json_encode(["error" => "erro ao restaurar o registro"]);
                         die;
                     }
@@ -66,7 +66,7 @@ class DailyJournal extends Controller
                     $response = $model->destroy();
 
                     if (!$response) {
-                        http_response_code(500);
+                        http_response_code(400);
                         echo json_encode(["error" => "erro ao deletar o registro"]);
                         die;
                     }
@@ -139,7 +139,7 @@ class DailyJournal extends Controller
         $balanceSheetData = $balanceSheet->findBalanceSheetByUuid(["id", "deleted"]);
 
         if (empty($balanceSheetData)) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => "registro não encontrado"]);
             die;
         }
@@ -152,7 +152,7 @@ class DailyJournal extends Controller
         ]);
 
         if (!$response) {
-            http_response_code(500);
+            http_response_code(400);
             echo $balanceSheet->message->json();
             die;
         }
@@ -178,43 +178,43 @@ class DailyJournal extends Controller
             )->getAllPostData();
 
             if (preg_match("/[^\d\.,]+/", $requestPost["accountValue"])) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "valor da conta inválido"]);
                 die;
             }
 
             if (empty($responseInitializeUserAndCompany["company_id"])) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "selecione uma empresa antes de atualizar algum registro"]);
                 die;
             }
 
             if (!preg_match("/^\d{2}\/\d{2}\/\d{4}$/", $requestPost["createdAt"])) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "campo data inválido"]);
                 die;
             }
 
             if (!preg_match("/^\d+$/", $requestPost["accountType"])) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "campo tipo de conta inválido"]);
                 die;
             }
 
             if ($requestPost["accountType"] > 1) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "campo tipo de conta inválido"]);
                 die;
             }
 
             if ($requestPost["accountType"] < 0) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "campo tipo de conta inválido"]);
                 die;
             }
 
             if (strlen($requestPost["accountHistory"]) > 1000) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "histórico da conta ultrapassa o limite de caracter"]);
                 die;
             }
@@ -227,7 +227,7 @@ class DailyJournal extends Controller
             $chartOfAccountData = $chartOfAccount->findChartOfAccountByUuid(["id"]);
 
             if (empty($chartOfAccountData)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "conta não encontrada"]);
                 die;
             }
@@ -248,7 +248,7 @@ class DailyJournal extends Controller
             );
 
             if (!$response) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $balanceSheet->message->json();
                 die;
             }

@@ -69,7 +69,7 @@ class Support extends Controller
             $requestFiles = $this->getRequestFiles()->getFile("attachmentFile");
 
             if (strlen($requestPost["contentMessage"]) > 1000) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "conteúdo do chamado ultrapassa o limite de caracteres (1000)"]);
                 die;
             }
@@ -82,7 +82,7 @@ class Support extends Controller
             ];
 
             if (!in_array($requestPost["ticketStatus"], $verifyTicketStatus)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "status inválido"]);
                 die;
             }
@@ -92,7 +92,7 @@ class Support extends Controller
             $supportTicketsData = $supportTickets->findSupportTicketsByUuid(["id", "uuid"]);
 
             if (empty($supportTicketsData)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "ticket inexistente"]);
                 die;
             }
@@ -107,13 +107,13 @@ class Support extends Controller
                 $verifyImage = getimagesize($requestFiles["tmp_name"]);
 
                 if (!$verifyImage) {
-                    http_response_code(500);
+                    http_response_code(400);
                     echo json_encode(["error" => "arquivo inválido"]);
                     die;
                 }
 
                 if (!move_uploaded_file($requestFiles["tmp_name"], $fileDestination)) {
-                    http_response_code(500);
+                    http_response_code(400);
                     echo json_encode(["error" => "erro no upload do arquivo"]);
                     die;
                 }
@@ -126,7 +126,7 @@ class Support extends Controller
             ]);
 
             if (!$response) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $response->message->json();
                 die;
             }
@@ -151,14 +151,14 @@ class Support extends Controller
                 $supportResponseData->content_message = $requestPost["contentMessage"];
                 $supportResponseData->content_attachment = $requestFiles["name"];
                 if (!$supportResponseData->save()) {
-                    http_response_code(500);
+                    http_response_code(400);
                     echo json_encode(["error" => "erro ao tentar atualizar a resposta do chamado"]);
                     die;
                 }
             }
 
             if (!$response) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $supportResponse->message->json();
                 die;
             }
@@ -207,7 +207,7 @@ class Support extends Controller
             $requestFiles = $this->getRequestFiles()->getFile("attachmentFile");
 
             if (strlen($requestPost["contentMessage"]) > 1000) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "conteúdo do chamado ultrapassa o limite de caracteres (1000)"]);
                 die;
             }
@@ -220,7 +220,7 @@ class Support extends Controller
             ];
 
             if (!in_array($requestPost["ticketStatus"], $verifyTicketStatus)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "status inválido"]);
                 die;
             }
@@ -230,7 +230,7 @@ class Support extends Controller
             $userSupportData = $support->findUserSupportByUuid(["id"]);
 
             if (empty($userSupportData)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "usuário suporte não encontrado"]);
                 die;
             }
@@ -245,13 +245,13 @@ class Support extends Controller
                 $verifyImage = getimagesize($requestFiles["tmp_name"]);
 
                 if (!$verifyImage) {
-                    http_response_code(500);
+                    http_response_code(400);
                     echo json_encode(["error" => "arquivo inválido"]);
                     die;
                 }
 
                 if (!move_uploaded_file($requestFiles["tmp_name"], $fileDestination)) {
-                    http_response_code(500);
+                    http_response_code(400);
                     echo json_encode(["error" => "erro no upload do arquivo"]);
                     die;
                 }
@@ -269,7 +269,7 @@ class Support extends Controller
             ]);
 
             if (!$response) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "erro ao atualizar o ticket"]);
                 die;
             }
@@ -396,7 +396,7 @@ class Support extends Controller
             $requestFiles = $this->getRequestFiles()->getFile("attachmentFile");
 
             if (strlen($requestPost["contentMessage"]) > 1000) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "conteúdo do chamado ultrapassa o limite de caracteres (1000)"]);
                 die;
             }
@@ -406,7 +406,7 @@ class Support extends Controller
             $userSupportData = $support->findUserSupportByUuid(["id"]);
 
             if (empty($userSupportData)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "usuário suporte não encontrado"]);
                 die;
             }
@@ -421,13 +421,13 @@ class Support extends Controller
                 $verifyImage = getimagesize($requestFiles["tmp_name"]);
 
                 if (!$verifyImage) {
-                    http_response_code(500);
+                    http_response_code(400);
                     echo json_encode(["error" => "arquivo inválido"]);
                     die;
                 }
 
                 if (!move_uploaded_file($requestFiles["tmp_name"], $fileDestination)) {
-                    http_response_code(500);
+                    http_response_code(400);
                     echo json_encode(["error" => "erro no upload do arquivo"]);
                     die;
                 }
@@ -447,7 +447,7 @@ class Support extends Controller
             ]);
 
             if (!$response) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "erro ao registrar o chamado"]);
                 die;
             }

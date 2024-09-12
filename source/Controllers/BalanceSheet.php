@@ -43,7 +43,7 @@ class BalanceSheet extends Controller
             $chartOfAccountGroupData = $chartOfAccountGroup->findChartOfAccountGroupByUuid(["id", "account_name"]);
 
             if (empty($chartOfAccountGroupData)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "registro não encontrado"]);
                 die;
             }
@@ -74,7 +74,7 @@ class BalanceSheet extends Controller
             }
 
             if ($response->error) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $response->message->json();
                 die;
             }
@@ -92,7 +92,7 @@ class BalanceSheet extends Controller
             ]);
 
             if (empty($historyResponse)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $historyResponse->message->json();
                 die;
             }
@@ -133,7 +133,7 @@ class BalanceSheet extends Controller
         $chartOfAccountGroupData = $chartOfAccountGroup->findChartOfAccountGroupByUuid(["account_name"]);
 
         if (empty($chartOfAccountGroupData)) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => "registro inexistente"]);
             die;
         }
@@ -145,7 +145,7 @@ class BalanceSheet extends Controller
         ]);
 
         if (!$response) {
-            http_response_code(500);
+            http_response_code(400);
             echo $chartOfAccountGroup->message->json();
             die;
         }
@@ -163,7 +163,7 @@ class BalanceSheet extends Controller
         ]);
 
         if (empty($historyResponse)) {
-            http_response_code(500);
+            http_response_code(400);
             echo $historyResponse->message->json();
             die;
         }
@@ -186,7 +186,7 @@ class BalanceSheet extends Controller
             )->getAllPostData();
 
             if (empty($responseInitializeUserAndCompany["company_id"])) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "selecione uma empresa antes de atualizar uma categoria de contas"]);
                 die;
             }
@@ -196,7 +196,7 @@ class BalanceSheet extends Controller
             $chartOfAccountGroupData = $chartOfAccountGroup->findChartOfAccountGroupByUuid(["account_name", "account_number"]);
 
             if (empty($chartOfAccountGroupData)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "registro inexistente"]);
                 die;
             }
@@ -209,7 +209,7 @@ class BalanceSheet extends Controller
             ]);
 
             if (!$response) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $chartOfAccountGroup->message->json();
                 die;
             }
@@ -237,7 +237,7 @@ class BalanceSheet extends Controller
             ]);
 
             if (empty($historyResponse)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $historyResponse->message->json();
                 die;
             }
@@ -289,7 +289,7 @@ class BalanceSheet extends Controller
             )->getAllPostData();
 
             if (empty($responseInitializeUserAndCompany["company_id"])) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "selecione uma empresa antes de criar uma categoria de contas"]);
                 die;
             }
@@ -308,7 +308,7 @@ class BalanceSheet extends Controller
             );
 
             if (!empty($chartOfAccountGroupData)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "esta conta {$requestPost['accountNumber']} já esta cadastrada"]);
                 die;
             }
@@ -324,7 +324,7 @@ class BalanceSheet extends Controller
             ]);
 
             if (empty($response)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $chartOfAccountGroup->message->json();
                 die;
             }
@@ -347,7 +347,7 @@ class BalanceSheet extends Controller
             ]);
 
             if (empty($historyResponse)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $historyResponse->message->json();
                 die;
             }
@@ -430,7 +430,7 @@ class BalanceSheet extends Controller
             }
 
             if ($response->error) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $response->message->json();
                 die;
             }
@@ -448,7 +448,7 @@ class BalanceSheet extends Controller
             ]);
 
             if (empty($historyResponse)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $historyResponse->message->json();
                 die;
             }
@@ -498,13 +498,13 @@ class BalanceSheet extends Controller
         $responseUserAndCompany = initializeUserAndCompanyId();
 
         if (empty($responseUserAndCompany["company_id"])) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => "selecione uma empresa antes de importar o plano de contas"]);
             die;
         }
 
         if (empty($data)) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => "o arquivo plano de contas está vazio"]);
             die;
         }
@@ -531,7 +531,7 @@ class BalanceSheet extends Controller
             $response = $chartOfAccountGroup->persistData($params);
 
             if (!$response) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $chartOfAccountGroup->message->json();
                 Connect::getInstance()->rollBack();
                 die;
@@ -552,7 +552,7 @@ class BalanceSheet extends Controller
         );
 
         if (empty($chartOfAccountGroupData)) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => "grupo de contas não foi importado corretamente"]);
             die;
         }
@@ -610,7 +610,7 @@ class BalanceSheet extends Controller
                 ]);
 
                 if (!empty($chartOfAccountData)) {
-                    http_response_code(500);
+                    http_response_code(400);
                     echo json_encode(["error" => "esta conta {$params["account_number"]} já está cadastrada"]);
                     Connect::getInstance()->rollBack();
                     die;
@@ -618,7 +618,7 @@ class BalanceSheet extends Controller
 
                 $response = $chartOfAccount->persistData($params);
                 if (!$response) {
-                    http_response_code(500);
+                    http_response_code(400);
                     echo $chartOfAccount->message->json();
                     Connect::getInstance()->rollBack();
                     die;
@@ -637,7 +637,7 @@ class BalanceSheet extends Controller
                 ]);
 
                 if (empty($historyResponse)) {
-                    http_response_code(500);
+                    http_response_code(400);
                     echo $historyResponse->message->json();
                     die;
                 }
@@ -662,7 +662,7 @@ class BalanceSheet extends Controller
         );
 
         if (empty($chartOfAccountData)) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => "registro plano de contas não encontrado"]);
             Connect::getInstance()->rollBack();
             die;
@@ -690,7 +690,7 @@ class BalanceSheet extends Controller
         $chartOfAccountData = $chartOfAccount->findChartOfAccountByUuid(["account_name"]);
 
         if (empty($chartOfAccountData)) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => "registro inexistente"]);
             die;
         }
@@ -702,7 +702,7 @@ class BalanceSheet extends Controller
         ]);
 
         if (!$response) {
-            http_response_code(500);
+            http_response_code(400);
             echo $chartOfAccount->message->json();
             die;
         }
@@ -720,7 +720,7 @@ class BalanceSheet extends Controller
         ]);
 
         if (empty($historyResponse)) {
-            http_response_code(500);
+            http_response_code(400);
             echo $historyResponse->message->json();
             die;
         }
@@ -746,7 +746,7 @@ class BalanceSheet extends Controller
             $chartOfAccountGroupData = $chartOfAccountGroup->findChartOfAccountGroupByUuid(["id", "account_name"]);
 
             if (empty($chartOfAccountGroupData)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "grupo de contas inexistente"]);
                 die;
             }
@@ -766,7 +766,7 @@ class BalanceSheet extends Controller
             $oldChartOfAccountGroupData = $oldChartOfAccountGroup->findChartOfAccountGroupById(["account_name"]);
 
             if (empty($oldChartOfAccountGroup)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "grupo de contas anterior inexistente"]);
                 die;
             }
@@ -780,7 +780,7 @@ class BalanceSheet extends Controller
             ]);
 
             if (!$response) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $chartOfAccount->message->json();
                 die;
             }
@@ -810,7 +810,7 @@ class BalanceSheet extends Controller
             ]);
 
             if (empty($historyResponse)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $historyResponse->message->json();
                 die;
             }
@@ -891,7 +891,7 @@ class BalanceSheet extends Controller
             ])->getAllPostData();
 
             if (empty($responseInitializeUserAndCompany["company_id"])) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "selecione uma empresa antes de lançar uma conta nova"]);
                 die;
             }
@@ -906,7 +906,7 @@ class BalanceSheet extends Controller
             );
 
             if (empty($chartOfAccountGroupData)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "grupo de contas inexistente"]);
                 die;
             }
@@ -920,7 +920,7 @@ class BalanceSheet extends Controller
             ]);
 
             if (!empty($chartOfAccountData)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "esta conta {$requestPost['accountValue']} já está cadastrada"]);
                 die;
             }
@@ -938,7 +938,7 @@ class BalanceSheet extends Controller
             ]);
 
             if (empty($response)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $chartOfAccount->message->json();
                 die;
             }
@@ -948,7 +948,7 @@ class BalanceSheet extends Controller
             $chartOfAccountData = $chartOfAccount->findChartOfAccountByUuid();
 
             if (empty($chartOfAccountData)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "Erro ao tentar encontrar o registro"]);
                 die;
             }
@@ -972,7 +972,7 @@ class BalanceSheet extends Controller
             ]);
 
             if (empty($historyResponse)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $historyResponse->message->json();
                 die;
             }

@@ -43,7 +43,7 @@ class Invoice extends Controller
             $invoiceData = $invoice->findInvoiceByUuid(["id", "deleted"]);
 
             if (empty($invoiceData)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "registro não encontrado"]);
                 die;
             }
@@ -77,7 +77,7 @@ class Invoice extends Controller
             }
 
             if (!$response->success) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $response->message->json();
                 die;
             }
@@ -129,7 +129,7 @@ class Invoice extends Controller
         $invoiceData = $invoice->findInvoiceByUuid(["deleted", "id"]);
 
         if (empty($invoiceData)) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => "registro não encontrado"]);
             die;
         }
@@ -137,7 +137,7 @@ class Invoice extends Controller
         $invoiceData->setRequiredFields(["deleted"]);
         $invoiceData->deleted = 1;
         if (!$invoiceData->save()) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => "erro ao tentar excluir o registro"]);
             die;
         }
@@ -159,14 +159,14 @@ class Invoice extends Controller
             $requestFile = $this->getRequestFiles()->getAllFiles();
 
             if (empty($responseInitializaUserAndCompany["company_id"])) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "selecione uma empresa antes de cancelar uma nota fiscal"]);
                 die;
             }
 
             $validateEnvironment = ["1", "2"];
             if (!in_array($requestPost["environment"], $validateEnvironment)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "ambiente inválido"]);
                 die;
             }
@@ -176,7 +176,7 @@ class Invoice extends Controller
             $companyData = $company->findCompanyById(["company_name", "company_document", "company_state"]);
 
             if (empty($companyData)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "empresa não encontrada"]);
                 die;
             }
@@ -189,7 +189,7 @@ class Invoice extends Controller
             $invoiceData = $invoiceModel->findInvoiceByUuid(["protocol_number", "access_key"]);
 
             if (empty($invoiceData)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "nfe não encontrada"]);
                 die;
             }
@@ -208,7 +208,7 @@ class Invoice extends Controller
                 $response = $invoice->cancelInvoice($invoiceData->access_key, $requestPost["reasonOfCancellation"], $invoiceData->protocol_number);
                 echo json_encode($response);
             } catch (\Exception $th) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => $th->getMessage()]);
             }
             die;
@@ -618,7 +618,7 @@ class Invoice extends Controller
 
                 $requestStateCode = $invoice->requestStateCode();
                 if (empty($requestStateCode)) {
-                    http_response_code(500);
+                    http_response_code(400);
                     echo http_response_code(["error" => "erro ao consultar o código do estado"]);
                     die;
                 }
@@ -631,7 +631,7 @@ class Invoice extends Controller
                 }, []);
 
                 if (empty($requestPost["companyState"])) {
-                    http_response_code(500);
+                    http_response_code(400);
                     echo json_encode(["error" => "código do estado inexistente"]);
                     die;
                 }
@@ -804,14 +804,14 @@ class Invoice extends Controller
                 ]);
 
                 if (empty($response)) {
-                    http_response_code(500);
+                    http_response_code(400);
                     echo $modelInvoice->message->json();
                     die;
                 }
 
                 echo json_encode(["success" => "nota fiscal emitida com sucesso"]);
             } catch (\Exception $th) {
-                http_response_code(500);
+                http_response_code(400);
                 $jsonErrors = !empty($invoice->getMake()) ? $invoice->getMake()->getErrors() : [];
                 $jsonErrors = json_encode($jsonErrors);
                 echo json_encode(["error" => $th->getMessage() . " " . $jsonErrors]);

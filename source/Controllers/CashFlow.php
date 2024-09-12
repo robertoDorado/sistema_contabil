@@ -87,13 +87,13 @@ class CashFlow extends Controller
         }
 
         if (empty($responseHistoryAudit)) {
-            http_response_code(500);
+            http_response_code(400);
             echo $historyAudit->message->json();
             die;
         }
 
         if (empty($response)) {
-            http_response_code(500);
+            http_response_code(400);
             echo $cashFlow->message->json();
             die;
         }
@@ -127,7 +127,7 @@ class CashFlow extends Controller
         verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
         Connect::getInstance()->beginTransaction();
         if (empty(session()->user->company_id)) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => "selecione uma empresa antes de importar um arquivo"]);
             die;
         }
@@ -156,14 +156,14 @@ class CashFlow extends Controller
         $arrayHeader = array_shift($data);
         foreach ($requiredFieldsExcelFile as $field) {
             if (!in_array($field, $arrayHeader)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "cabeçalho do arquivo inválido"]);
                 die;
             }
         }
 
         if (empty($data)) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => "os dados do arquivo não podem estar vazio"]);
             die;
         }
@@ -179,7 +179,7 @@ class CashFlow extends Controller
         $lengths = array_map('count', $excelData);
 
         if (count(array_unique($lengths)) != 1) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => "alguns dados possuem valores a mais no arquivo"]);
             die;
         }
@@ -214,7 +214,7 @@ class CashFlow extends Controller
                 }
             }
 
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => $errorMessage]);
             die;
         }
@@ -254,7 +254,7 @@ class CashFlow extends Controller
         $limit = 1000;
         foreach ($verifyTotalDataFromExcelFile as $value) {
             if ($value > $limit) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "o limite de importação é de {$limit} registros"]);
                 die;
             }
@@ -324,7 +324,7 @@ class CashFlow extends Controller
             ]);
 
             if (!$response) {
-                http_response_code(500);
+                http_response_code(400);
                 $errorMessage = "erro interno ao importar os dados";
                 continue;
             }
@@ -336,7 +336,7 @@ class CashFlow extends Controller
                 $errorMessage .= ", {$value}";
             }
 
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => $errorMessage]);
             Connect::getInstance()->rollBack();
             die;
@@ -348,7 +348,7 @@ class CashFlow extends Controller
                 $errorMessage .= ", {$value}";
             }
 
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => $errorMessage]);
             Connect::getInstance()->rollBack();
             die;
@@ -360,7 +360,7 @@ class CashFlow extends Controller
                 $errorMessage .= ", {$value}";
             }
 
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => $errorMessage]);
             Connect::getInstance()->rollBack();
             die;
@@ -372,7 +372,7 @@ class CashFlow extends Controller
                 $errorMessage .= ", {$value}";
             }
 
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => $errorMessage]);
             Connect::getInstance()->rollBack();
             die;
@@ -418,7 +418,7 @@ class CashFlow extends Controller
             ]);
 
             if (empty($responseHistoryAudit)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $historyAudit->message->json();
                 Connect::getInstance()->rollBack();
                 die;
@@ -442,7 +442,7 @@ class CashFlow extends Controller
         ];
 
         if (!empty($errorMessage)) {
-            http_response_code(500);
+            http_response_code(400);
             unset($response["full_success"]);
             $response["error"] = $errorMessage;
             echo json_encode($response);
@@ -495,7 +495,7 @@ class CashFlow extends Controller
         ]);
 
         if (empty($responseHistoryAudit)) {
-            http_response_code(500);
+            http_response_code(400);
             echo $historyAudit->message->json();
             die;
         }
@@ -545,13 +545,13 @@ class CashFlow extends Controller
             $cashFlowData = $cashFlow->findCashFlowByUuid();
 
             if (empty($cashFlowData)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $cashFlow->message->json();
                 die;
             }
 
             if (strtotime($requestPost["createdAt"]) > strtotime(date("Y-m-d"))) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["invalid_date" => "Data de lançamento não pode ser futura"]);
                 die;
             }
@@ -561,7 +561,7 @@ class CashFlow extends Controller
             $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid();
 
             if (empty($cashFlowGroupData)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $cashFlowGroup->message->json();
                 die;
             }
@@ -582,7 +582,7 @@ class CashFlow extends Controller
             ]);
 
             if (empty($response)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $cashFlow->message->json();
                 die;
             }
@@ -618,7 +618,7 @@ class CashFlow extends Controller
             ]);
 
             if (empty($responseHistoryAudit)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $historyAudit->message->json();
                 die;
             }
@@ -723,13 +723,13 @@ class CashFlow extends Controller
 
             $launchDate = date("Y-m-d", strtotime(str_replace("/", "-", $requestPost["launchDate"])));
             if (strtotime(date("Y-m-d")) < strtotime($launchDate)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "a data de lançamento não pode ser uma data futura"]);
                 die;
             }
 
             if (empty($entryTypeFields[$requestPost["entryType"]])) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["invalid_entry_type" => "erro na verificação do tipo de entrada"]);
                 die;
             }
@@ -740,7 +740,7 @@ class CashFlow extends Controller
             $cashFlowGroupData = $cashFlowGroup->findCashFlowGroupByUuid();
 
             if (empty($cashFlowGroup)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $cashFlowGroup->message->json();
                 die;
             }
@@ -774,13 +774,13 @@ class CashFlow extends Controller
             ]);
 
             if (empty($responseHistoryAudit)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $historyAudit->message->json();
                 die;
             }
 
             if (empty($response)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $cashFlow->message->json();
                 die;
             }

@@ -95,7 +95,7 @@ class Invoice
     {
         $xml = $this->make->getXML();
         if (empty($xml)) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => "o xml não foi gerado"]);
             die;
         }
@@ -107,7 +107,7 @@ class Invoice
         $response = $this->tools->sefazEnviaLote([$xml], $idLote);
         $stdResponse = (new Standardize())->toStd($response);
         if ($stdResponse->cStat != 103) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => "Erro ao enviar lote: " . $stdResponse->xMotivo]);
             die;
         }
@@ -424,7 +424,7 @@ class Invoice
             $this->tools = new Tools(json_encode($this->configData), $certificate);
             return true;
         } catch (Exception $_) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => "certficado inválido"]);
             die;
         }

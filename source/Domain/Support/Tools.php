@@ -138,7 +138,7 @@ class Tools
             "state_registration" => function ($value) {
                 if (!empty($value)) {
                     if (!preg_match("/^\d{3}\.\d{3}\.\d{3}\.\d{3}$/", $value)) {
-                        http_response_code(500);
+                        http_response_code(400);
                         echo json_encode(["error" => "inscrição estadual inválido"]);
                         die;
                     }
@@ -149,7 +149,7 @@ class Tools
 
             "company_document" => function ($value) {
                 if (!preg_match("/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/", $value)) {
-                    http_response_code(500);
+                    http_response_code(400);
                     echo json_encode(["error" => "cnpj inválido"]);
                     die;
                 }
@@ -238,7 +238,7 @@ class Tools
             $dataResponse->setRequiredFields(array_keys($data));
             return $dataResponse->save();
         } catch (\PDOException $th) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => "erro ao tentar atualizar o registro"]);
             $response = file_put_contents(CONF_ERROR_PATH, $th->getMessage() . PHP_EOL, FILE_APPEND);
             if (!$response) {
@@ -305,7 +305,7 @@ class Tools
             $this->lastId = Connect::getInstance()->lastInsertId();
             return true;
         } catch (\PDOException $th) {
-            http_response_code(500);
+            http_response_code(400);
             $response = file_put_contents(CONF_ERROR_PATH, $th->getMessage() . PHP_EOL, FILE_APPEND);
             if (!$response) {
                 throw new Exception("Erro ao tentar gravar o erro no arquivo de log");

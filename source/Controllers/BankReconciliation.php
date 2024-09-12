@@ -58,7 +58,7 @@ class BankReconciliation extends Controller
         $arrayHeader = array_shift($data);
         foreach ($requiredFieldsExcelFile as $field) {
             if (!in_array($field, $arrayHeader)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "cabeçalho do arquivo inválido"]);
                 die;
             }
@@ -130,7 +130,7 @@ class BankReconciliation extends Controller
                 }
             }
 
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => $errorMessage]);
             die;
         }
@@ -252,14 +252,14 @@ class BankReconciliation extends Controller
         $urlComponents = parse_url($httpReferer);
 
         if (!file_exists($requestFiles["ofxFile"]["tmp_name"]) && !is_readable($requestFiles["ofxFile"]["tmp_name"])) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => "o arquivo não existe ou não pode ser lido corretamente"]);
             die;
         }
 
         $fileContent = file_get_contents($requestFiles["ofxFile"]["tmp_name"]);
         if (empty($fileContent)) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => "o arquivo não pode estar vazio"]);
             die;
         }
@@ -271,7 +271,7 @@ class BankReconciliation extends Controller
         $transactions = $bankAccount->statement->transactions;
 
         if (empty($transactions)) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => "o arquivo de transações está vazio"]);
             die;
         }

@@ -52,7 +52,7 @@ class Company extends Controller
         }
 
         if (empty($response)) {
-            http_response_code(500);
+            http_response_code(400);
             echo $company->message->json();
             die;
         }
@@ -96,7 +96,7 @@ class Company extends Controller
 
         if (!empty(session()->user->company_id)) {
             if ($companyData->id == session()->user->company_id) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "não é possível deletar o id da empresa selecionado"]);
                 die;
             }
@@ -109,7 +109,7 @@ class Company extends Controller
         ]);
 
         if (empty($response)) {
-            http_response_code(500);
+            http_response_code(400);
             echo $company->message->json();
             die;
         }
@@ -170,7 +170,7 @@ class Company extends Controller
             ]);
             
             if (empty($response)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $company->message->json();
                 die;
             }
@@ -226,13 +226,13 @@ class Company extends Controller
         $companyData = $company->findCompanyById(["id", "deleted"]);
 
         if (!empty($companyData->getDeleted())) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode(["error" => "esta empresa já foi deletada"]);
             die;
         }
 
         if (!preg_match("/^\d+$/", $requestPost["companyId"])) {
-            http_response_code(500);
+            http_response_code(400);
             throw new Exception("id empresa inválido");
         }
 
@@ -285,7 +285,7 @@ class Company extends Controller
             ]);
 
             if (empty($response)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $company->message->json();
                 die;
             }

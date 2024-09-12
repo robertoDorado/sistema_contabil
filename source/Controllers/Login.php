@@ -50,7 +50,7 @@ class Login extends Controller
 
             $validateUserType = ["0", "1"];
             if (!in_array($requestPost["userType"], $validateUserType)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "tipo de usuário inválido"]);
                 die;
             }
@@ -72,7 +72,7 @@ class Login extends Controller
 
             $userData = $user->login($requestPost["userPassword"]);
             if (empty($userData)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $user->message->json();
                 die;
             }

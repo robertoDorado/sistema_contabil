@@ -35,7 +35,7 @@ class BalanceSheetOverView extends Controller
             $requestPost = $this->getRequests()->setRequiredFields(["closeAccounting", "date"])->getAllPostData();
 
             if (!$requestPost["closeAccounting"]) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "erro ao tentar encerrar o período contábil"]);
                 die;
             }
@@ -46,7 +46,7 @@ class BalanceSheetOverView extends Controller
             }
 
             if (empty($responseInitializeUserAndCompany["company_id"])) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "selecione uma empresa antes de encerrar um período contábil"]);
                 die;
             }
@@ -174,7 +174,7 @@ class BalanceSheetOverView extends Controller
                 $data = $chartOfAccount->findChartOfAccountLikeAccountName(...$chartOfAccountParams);
 
                 if (empty($data)) {
-                    http_response_code(500);
+                    http_response_code(400);
                     echo json_encode(["error" => "conta {$chartOfAccountParams[2]['account_name']} não existe"]);
                     die;
                 }
@@ -186,7 +186,7 @@ class BalanceSheetOverView extends Controller
                 });
 
                 if (empty($data)) {
-                    http_response_code(500);
+                    http_response_code(400);
                     echo json_encode(["error" => "não foi encontrada a conta {$accountName}"]);
                     die;
                 }
@@ -198,7 +198,7 @@ class BalanceSheetOverView extends Controller
                 });
 
                 if (empty($data)) {
-                    http_response_code(500);
+                    http_response_code(400);
                     echo json_encode(["error" => "a conta {$accountName} não pertence ao {$accountNameGroup}"]);
                     die;
                 }
@@ -234,7 +234,7 @@ class BalanceSheetOverView extends Controller
                 $chartOfAccountData = $chartOfAccount->findChartOfAccountById(["account_name"], $balanceSheetParams["id_chart_of_account"]);
 
                 if (!$response) {
-                    http_response_code(500);
+                    http_response_code(400);
                     echo json_encode([
                         "error" => "erro ao tentar realizar o encerramento contábil para a conta {$accountType} - {$chartOfAccountData->account_name}"
                     ]);
@@ -303,7 +303,7 @@ class BalanceSheetOverView extends Controller
             ]);
 
             if (empty($historyResponse)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $historyResponse->message->json();
                 die;
             }
@@ -413,7 +413,7 @@ class BalanceSheetOverView extends Controller
 
 
             $errorMessage = function (string $message) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => $message]);
                 die;
             };
@@ -488,7 +488,7 @@ class BalanceSheetOverView extends Controller
             ]);
 
             if (empty($historyResponse)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo $historyResponse->message->json();
                 die;
             }

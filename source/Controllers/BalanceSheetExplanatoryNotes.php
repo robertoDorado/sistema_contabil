@@ -42,7 +42,7 @@ class BalanceSheetExplanatoryNotes extends Controller
             $explanatoryNotesBalanceSheetData = $explanatoryNotesBalanceSheet->findBalanceSheetExplanatoryNotesByUuid([]);
 
             if (empty($explanatoryNotesBalanceSheetData)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "este registro não existe"]);
                 die;
             }
@@ -64,7 +64,7 @@ class BalanceSheetExplanatoryNotes extends Controller
             }
 
             if (!$response) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "erro ao modificar o registro"]);
                 die;
             }
@@ -188,7 +188,7 @@ class BalanceSheetExplanatoryNotes extends Controller
 
             $explanatoryNotesBalanceSheetData = $searchBalanceSheetExplanatoryNotesData($requestPost["uuid"], false);
             if (empty($explanatoryNotesBalanceSheetData)) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "nota não encontrada"]);
                 die;
             }
@@ -196,7 +196,7 @@ class BalanceSheetExplanatoryNotes extends Controller
             $explanatoryNotesBalanceSheetData->setRequiredFields(["note"]);
             $explanatoryNotesBalanceSheetData->note = $requestPost["explanatoryNoteText"];
             if (!$explanatoryNotesBalanceSheetData->save()) {
-                http_response_code(500);
+                http_response_code(400);
                 echo json_encode(["error" => "erro ao tentar atualizar a nota"]);
                 die;
             }
@@ -301,7 +301,7 @@ class BalanceSheetExplanatoryNotes extends Controller
                 ]);
 
                 if (empty($response)) {
-                    http_response_code(500);
+                    http_response_code(400);
                     echo $balanceSheetExplanatoryNotes->message->json();
                     die;
                 }
