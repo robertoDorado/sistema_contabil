@@ -125,7 +125,7 @@
                                                     <td><?= $cashFlow["month"] ?></td>
                                                     <td><?= "R$ " . number_format($cashFlow["total_income_value"], 2, ",", ".") ?></td>
                                                     <td><?= "R$ " . number_format($cashFlow["total_expenses_value"], 2, ",", ".") ?></td>
-                                                    <td><?= "R$ " . number_format($cashFlow["month_balance"], 1, ",", ".") ?></td>
+                                                    <td><?= "R$ " . number_format($cashFlow["month_balance"], 2, ",", ".") ?></td>
                                                     <td><?= "R$ " . number_format($cashFlow["accumulated_balance"], 2, ",", ".") ?></td>
                                                 </tr>
                                             <?php endforeach ?>
