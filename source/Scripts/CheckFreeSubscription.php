@@ -13,7 +13,7 @@ $userData = $user->findAllUserJoinCustomerJoinSubscription([
     "subscription_columns" => ["status"]
 ]);
 
-$filterEmail = ["robertodorado7@gmail.com", "test@gmail.com"];
+$filterEmail = ["robertodorado7@gmail.com", "teste@gmail.com"];
 $dateTimeNow = new DateTime();
 $userData = array_filter($userData, function ($item) use ($dateTimeNow, $filterEmail) {
     $dateTimeUser = new DateTime($item->created_at);
