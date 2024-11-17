@@ -270,6 +270,7 @@ class CashFlow extends Controller
         $invalidEntryValue = [];
         $invalidDate = [];
         $invalidEntryType = [];
+        $dateStorage = [];
 
         foreach ($excelData['h'] as $key => $history) {
             if (!in_array($excelData["t"][$key], $verifyEntryType)) {
@@ -289,7 +290,8 @@ class CashFlow extends Controller
 
             $verifyDateData = strtotime($excelData["d"][$key]);
             if (strtotime(date("Y-m-d")) < $verifyDateData) {
-                $errorMessage = "a data de lançamento não pode ser uma data futura";
+                $dateStorage[] =  date("Y-m-d", $verifyDateData);
+                $errorMessage = "a data de lançamento não pode ser uma data futura " . implode(", ", $dateStorage);
                 continue;
             }
 
