@@ -124,6 +124,7 @@ $route->post("/cash-flow/remove/{uuid}", "CashFlow::cashFlowRemoveRegister");
 $route->post("/cash-flow/import-excel", "CashFlow::importExcelFile");
 $route->get("/cash-flow/backup/report", "CashFlow::cashFlowBackupReport");
 $route->post("/cash-flow/modify/{uuid}", "CashFlow::cashFlowModifyData");
+$route->post("/cash-flow/delete-in-bulk", "CashFlow::deleteInBulk");
 
 /**
  * Admin grupo fluxo de caixa

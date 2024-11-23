@@ -1,4 +1,10 @@
 <?php
+function printData($data) {
+    echo "<pre>";
+    print_r($data);
+    die;
+}
+
 function removeAccets(string $string)
 {
     $map = array(

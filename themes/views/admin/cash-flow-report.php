@@ -40,6 +40,7 @@
                             </div>
                         </div>
                     </form>
+                    <button id="deleteRecordsInBulk" class="btn btn-danger">Deletar registros em massa</button>
                 </div>
                 <?= $v->insert("admin/layouts/_cashflow_report.php") ?>
             </div>

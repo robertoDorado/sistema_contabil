@@ -28,6 +28,34 @@ class CashFlow extends Controller
         parent::__construct();
     }
 
+    public function deleteInBulk()
+    {
+        verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
+        $dateRange = $this->getRequests()->getPost('daterange');
+        $userData = initializeUserAndCompanyId();
+        
+        if ($dateRange == "null") {
+            http_response_code(400);
+            echo json_encode(["error" => "intervalo de data inválido"]);
+            die;
+        }
+
+        $cashFlow = new ModelCashFlow();
+        $responseCashFlowData = $cashFlow->findCashFlowDataByDate($dateRange, $userData["user"], ["id"], $userData["company_id"]);
+
+        if (empty($responseCashFlowData)) {
+            http_response_code(400);
+            echo json_encode(["error" => "não foram encontrados os registros"]);
+            die;
+        }
+
+        foreach ($responseCashFlowData as $cashFlowData) {
+            $cashFlowData->destroy();
+        }
+
+        echo json_encode(["success" => "Registros deletado com sucesso"]);
+    }
+
     public function cashFlowModifyData(array $data)
     {
         verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
