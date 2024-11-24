@@ -10,3 +10,4 @@ ssl
 apache-config
 source/Scripts/config/
 tickets/
+shell/backup_mysql.sh
