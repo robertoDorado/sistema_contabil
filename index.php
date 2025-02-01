@@ -34,7 +34,7 @@ if (empty($_POST["request"]) && !empty($_SERVER["REDIRECT_URL"]) && !in_array($_
     } else if ($_SERVER["REDIRECT_URL"] != "/admin/company/register") {
         $urlReplyTickets = explode("/", $_SERVER["REDIRECT_URL"]);
         $uuidReplyTickets = array_pop($urlReplyTickets);
-        
+
         $validateSupportEndpoints = [
             "/admin/support/dashboard",
             "/admin/support/tickets/reply"
@@ -45,23 +45,23 @@ if (empty($_POST["request"]) && !empty($_SERVER["REDIRECT_URL"]) && !in_array($_
         }
 
         $validateUserType = [
-            "0" => function() use ($validateSupportEndpoints) {
+            "0" => function () use ($validateSupportEndpoints) {
                 if (!userHasCompany()) {
                     redirect("/admin/warning/empty-company");
                 }
-    
+
                 $customer = new \Source\Domain\Model\Customer();
                 $customer->email = session()->user->user_email;
                 $customerData = $customer->findCustomerByEmail();
-    
+
                 if (empty($customerData)) {
                     redirect("/admin/login");
                 }
-    
+
                 if (!empty($customerData->getDeleted())) {
                     redirect("/admin/login");
                 }
-    
+
                 $allowEndpointsCashVariation = ["/admin/cash-variation-setting/backup", "/admin/cash-variation-setting/report"];
                 if (!in_array($_SERVER["REDIRECT_URL"], $allowEndpointsCashVariation)) {
                     if (!empty(session()->account_group_variation) && !empty(session()->account_group_variation_id)) {
@@ -74,20 +74,25 @@ if (empty($_POST["request"]) && !empty($_SERVER["REDIRECT_URL"]) && !in_array($_
                     redirect("/ops/error/404");
                 }
             },
-            "1" => function() use ($validateSupportEndpoints) {
+            "1" => function () use ($validateSupportEndpoints) {
                 if (!in_array($_SERVER["REDIRECT_URL"], $validateSupportEndpoints)) {
                     redirect("/ops/error/404");
                 }
             }
         ];
-        
+
         if (!empty($validateUserType[session()->user->user_type])) {
             $validateUserType[session()->user->user_type]();
         }
     }
 }
 
+$statusCode = http_response_code();
 $route = new MyRouter(url(), "::");
+
+if ($statusCode > 308) {
+    redirect("/ops/error/{$statusCode}");
+}
 
 /**
  * Site Route
@@ -323,15 +328,13 @@ $route->namespace("Source\Controllers");
 $route->group($module);
 $route->post("/webhook/update/subscription", "Server::webhookUpdateSubscription");
 
-
 /**
  * Error Route
  */
 $module = "ops";
 $route->namespace("Source\Controllers");
 $route->group($module);
-$route->get("/error/{error_code}", "Site::error");
-
+$route->get("/error/{code}", "Site::error");
 
 /**
  * Route

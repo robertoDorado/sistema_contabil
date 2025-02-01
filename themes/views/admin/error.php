@@ -20,8 +20,8 @@
 
     <div class="content">
         <div class="vh-100 d-flex justify-content-center align-items-center flex-direction-column flex-column">
-            <h1 class="text-center">404!</h1>
-            <h2>Página não encontrada</h2>
+            <h1 class="text-center"><?= $code ?></h1>
+            <h2><?= $errorMessage ?></h2>
         </div>
     </div>
 </div>

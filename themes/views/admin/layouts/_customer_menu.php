@@ -9,19 +9,27 @@
         </a>
         <ul class="nav nav-treeview">
             <li class="nav-item">
-                <a href="<?= url("/admin/invoice/form") ?>" class="nav-link">
-                    <p>Emissão de NF-e</p>
+                <a href="#" class="nav-link">
+                    <p>Nota Fiscal Eletrônica</p>
+                    <i class="right fas fa-angle-left"></i>
                 </a>
-            </li>
-            <li class="nav-item">
-                <a href="<?= url("/admin/invoice/report") ?>" class="nav-link">
-                    <p>Relatório de NF-e</p>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="<?= url("/admin/invoice/backup") ?>" class="nav-link">
-                    <p>Backup de NF-e</p>
-                </a>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                        <a href="<?= url("/admin/invoice/form") ?>" class="nav-link">
+                            <p>Emissão de NF-e</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?= url("/admin/invoice/report") ?>" class="nav-link">
+                            <p>Relatório de NF-e</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?= url("/admin/invoice/backup") ?>" class="nav-link">
+                            <p>Backup de NF-e</p>
+                        </a>
+                    </li>
+                </ul>
             </li>
         </ul>
     </li>

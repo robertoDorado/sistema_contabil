@@ -35,11 +35,30 @@ class Site extends Controller
         ]);
     }
 
-    public function error()
+    public function error(array $data = [])
     {
-        echo $this->view->render("admin/404", [
+        $checkErrorByStatusCode = [
+            400 => "Solicitação Inválida: Verifique os Dados Enviados",
+            401 => "Acesso Negado: Autenticação Necessária",
+            403 => "Permissão Negada: Você Não Tem Acesso a Este Recurso",
+            404 => "Página Não Encontrada: O Recurso Solicitado Não Existe",
+            405 => "Operação Inválida: Método HTTP Não Suportado",
+            408 => "Tempo Esgotado: A Solicitação Demorou Muito para Responder",
+            429 => "Limite de Requisições Excedido: Tente Novamente em Instantes",
+            500 => "Erro Interno: Algo Deu Errado no Servidor",
+            501 => "Funcionalidade Não Suportada: O Servidor Não Reconhece Esta Solicitação",
+            502 => "Falha de Comunicação: Erro de Gateway ou Proxy",
+            503 => "Serviço Indisponível: O Sistema Está Temporariamente Fora do Ar",
+            504 => "Tempo de Espera Excedido: O Servidor Não Respondeu a Tempo",
+            505 => "Versão HTTP Incompatível: Atualize Seu Cliente ou API",
+        ];
+
+        $data["error_message"] = $checkErrorByStatusCode[$data["code"]] ?? "Erro desconhecido";
+        echo $this->view->render("admin/error", [
             "userFullName" => showUserFullName(),
-            "endpoints" => []
+            "endpoints" => [],
+            "errorMessage" => $data["error_message"],
+            "code" => $data["code"] ?? "??"
         ]);
     }
 }
