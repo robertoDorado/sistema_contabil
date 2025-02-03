@@ -109,7 +109,7 @@ class BalanceSheetExplanatoryNotes extends Controller
 
         echo $this->view->render("admin/balance-sheet-explanatory-notes-backup", [
             "userFullName" => showUserFullName(),
-            "endpoints" => ["/balance-sheet-explanatory-notes/form/backup"],
+            "endpoints" => ["/admin/balance-sheet-explanatory-notes/form/backup"],
             "explanatoryNotesBalanceSheetData" => $explanatoryNotesBalanceSheetData
         ]);
     }

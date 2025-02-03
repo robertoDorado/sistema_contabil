@@ -248,7 +248,7 @@ class CashFlowGroup extends Controller
 
         echo $this->view->render("admin/cash-flow-group-report", [
             "userFullName" => showUserFullName(),
-            "endpoints" => ["/admin/cash-flow-group/form", "/admin/cash-flow-group/report"],
+            "endpoints" => ["/admin/cash-flow-group/report"],
             "cashFlowGroupData" => $cashFlowGroupData
         ]);
     }
@@ -309,7 +309,7 @@ class CashFlowGroup extends Controller
 
         echo $this->view->render("admin/cash-flow-group-form", [
             "userFullName" => showUserFullName(),
-            "endpoints" => ["/admin/cash-flow-group/form", "/admin/cash-flow-group/report"]
+            "endpoints" => ["/admin/cash-flow-group/form"]
         ]);
     }
 }

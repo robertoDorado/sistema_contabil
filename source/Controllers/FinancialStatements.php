@@ -281,7 +281,7 @@ class FinancialStatements extends Controller
 
         echo $this->view->render("admin/statement-of-value-added", [
             "userFullName" => showUserFullName(),
-            "endpoints" => ["/balance-sheet/statement-of-value-added/report"],
+            "endpoints" => ["/admin/balance-sheet/statement-of-value-added/report"],
             "statementOfValueAdded" => $statementOfValueAdded,
             "netIncome" => $formatCurrency($netIncome),
             "grossAddValue" => $formatCurrency($grossAddValue),

@@ -32,6 +32,36 @@
                 </ul>
             </li>
         </ul>
+        <ul class="nav nav-treeview">
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <p>Parametrização Fiscal</p>
+                    <i class="right fas fa-angle-left"></i>
+                </a>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                        <a href="<?= url("/admin/tax-regime/form") ?>" class="nav-link">
+                            <p>Regime Tributário</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <p>Alíquotas Personalizadas</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <p>CFOP e CST</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <p>Regras de Substituição Tributária</p>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
     </li>
     <li class="nav-item">
         <a href="#" class="nav-link">

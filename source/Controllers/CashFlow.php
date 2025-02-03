@@ -825,7 +825,7 @@ class CashFlow extends Controller
 
         echo $this->view->render("admin/cash-flow-form", [
             "userFullName" => showUserFullName(),
-            "endpoints" => ["/admin/cash-flow/form", "/admin/cash-flow/report"],
+            "endpoints" => ["/admin/cash-flow/form"],
             "cashFlowGroupData" => $cashFlowGroupData
         ]);
     }

@@ -3,31 +3,29 @@ if (endpointsElement) {
     let endpoints = JSON.parse(endpointsElement.getAttribute("endpoints"))
     
     if (endpoints.length > 0) {
-        const sidebarMenu = document.querySelector("[sidebarMenu]")
-        const menuAdmin = Array.from(sidebarMenu.firstElementChild.children)
-
-        menuAdmin.forEach(function(element) {
-            const navItem = element.querySelectorAll(".nav-item")
+        let sidebarMenu = Array.from(document.querySelector("[sidebarmenu]").firstElementChild.children)
+        sidebarMenu = sidebarMenu.filter((element) => element.querySelectorAll(".nav-item"))
+        sidebarMenu.forEach((element) => {
+            let links = Array.from(element.querySelectorAll(".nav-link"))
+            links = links.filter((link) => !link.href.match(/\w#$/g))
             
-            navItem.forEach(function(element) {
-                const navLink = element.firstElementChild
-                const currentUrl = window.location.href.split("?").shift().replace("#", "")
-                
-                if (navLink.href == currentUrl) {
-                    navLink.classList.add("active")
-                    const menuElement = element.closest("ul").closest("li")
-                    if (menuElement) {
-                        menuElement.classList.add("menu-open")
-                        menuElement.firstElementChild.classList.add("active")
-                    }
-
-                    const submenuElement = menuElement.closest("ul").closest("li")
-                    if (submenuElement) {
-                        submenuElement.classList.add("menu-open")
-                        submenuElement.firstElementChild.classList.add("active")
-                    }
-                }
+            links = links.filter((link) => {
+                const url = new URL(link.href)
+                return endpoints.includes(url.pathname)
             })
+            
+            if (links.length > 0) {
+                element.classList.add("menu-open")
+                element.firstElementChild.classList.add("active")
+
+                links.forEach((link) => {
+                    link.closest("li").classList.add("menu-open")
+                    link.classList.add("active")
+    
+                    link.closest("li").closest("ul").closest("li").classList.add("menu-open")
+                    link.closest("li").closest("ul").closest("li").firstElementChild.classList.add("active")
+                })
+            }
         })
     }
 }

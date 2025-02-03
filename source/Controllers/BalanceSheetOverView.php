@@ -379,7 +379,7 @@ class BalanceSheetOverView extends Controller
 
         echo $this->view->render("admin/balance-sheet-report", [
             "userFullName" => showUserFullName(),
-            "endpoints" => ["/admin/balance-sheet/balnace-sheet-overview/report"],
+            "endpoints" => ["/admin/balance-sheet/balance-sheet-overview/report"],
             "currentAssetsData" => $currentAssets["data"],
             "nonCurrentAssetsData" => $nonCurrentAssets["data"],
             "currentLiabilitiesData" => $currentLiabilities["data"],

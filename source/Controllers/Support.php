@@ -461,7 +461,7 @@ class Support extends Controller
 
         echo $this->view->render("admin/open-ticket", [
             "userFullName" => showUserFullName(),
-            "endpoints" => ["/admin/support/dashboard"],
+            "endpoints" => ["/admin/support/dashboard", "/admin/support/open/ticket"],
             "userSupportData" => $userSupportData
         ]);
     }
