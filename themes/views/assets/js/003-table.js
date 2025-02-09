@@ -1862,3 +1862,23 @@ const myTicketsReport = dataTableConfig($("#myTicketsReport"),
         "responsive": true,
         "autoWidth": false
     })
+const taxRegimeReport = dataTableConfig($("#taxRegimeReport"),
+    {
+        "columnDefs": [
+            {
+                "targets": [0],
+                "visible": false
+            }
+        ],
+        "language": {
+            "url": urlJson
+        },
+        "responsive": true,
+        "autoWidth": false,
+        "initComplete": function () {
+            this.api()
+                .buttons()
+                .container()
+                .appendTo("#widgets .col-md-6:eq(0)");
+        }
+    })

@@ -4,6 +4,7 @@ namespace Source\Domain\Model;
 
 use Exception;
 use Ramsey\Uuid\Nonstandard\Uuid;
+use Source\Domain\Support\Tools;
 use Source\Models\ChartOfAccountModel as ModelsChartOfAccountModel;
 
 /**
@@ -48,21 +49,8 @@ class ChartOfAccountModel
     /** @var ModelsChartOfAccountModel[] */
     public function findAllChartOfAccountModel(array $columns, bool $onlyData): array
     {
-        $columns = empty($columns) ? "*" : implode(", ", $columns);
-        $response = $this->chartOfAccountModel->find("", "", $columns)->fetch(true);
-
-        if (empty($response)) {
-            return [];
-        }
-
-        if ($onlyData) {
-            $response = array_reduce($response, function($acc, $item) {
-                $acc[] = (array)$item->data();
-                return $acc;
-            }, []);
-        }
-
-        return $response;
+        $tools = new Tools($this->chartOfAccountModel, ModelsChartOfAccountModel::class);
+        return $tools->findAllData($columns, $onlyData);
     }
 
     public function getUuid(): string

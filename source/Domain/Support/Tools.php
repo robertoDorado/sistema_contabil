@@ -47,6 +47,25 @@ class Tools
         $this->class = $class;
     }
 
+    public function findAllData(array $columns, bool $onlyData = false, $terms = "", $params = "")
+    {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
+        $response = $this->model->find($terms, $params, $columns)->fetch(true);
+
+        if (empty($response)) {
+            return [];
+        }
+
+        if ($onlyData) {
+            $response = array_reduce($response, function($acc, $item) {
+                $acc[] = (array)$item->data();
+                return $acc;
+            }, []);
+        }
+
+        return $response;
+    }
+
     public function findUserByEmail(array $data): ?Model
     {
         $formatData = function (string $key, string $prefix) use ($data) {

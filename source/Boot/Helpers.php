@@ -1,4 +1,9 @@
 <?php
+function dumpAndDie($data) {
+    var_dump($data);
+    die;
+}
+
 function printData($data) {
     echo "<pre>";
     print_r($data);

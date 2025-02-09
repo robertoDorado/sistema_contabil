@@ -49,14 +49,8 @@ class SupportTickets
     /** @var ModelsSupportTickets[] */
     public function findAllSupportTickets(array  $columns): array
     {
-        $columns = empty($columns) ? "*" : implode(", ", $columns);
-        $response = $this->supportTickets->find("", "", $columns)->fetch(true);
-
-        if (empty($response)) {
-            return [];
-        }
-
-        return $response;
+        $tools = new Tools($this->supportTickets, ModelsSupportTickets::class);
+        return $tools->findAllData($columns);
     }
 
     public function findSupportTicketsByUuid(array $columns): ?ModelsSupportTickets

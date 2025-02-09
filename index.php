@@ -296,8 +296,13 @@ $route->post("/invoice/remove", "Invoice::invoiceRemove");
 $route->get("/invoice/backup", "Invoice::invoiceBackup");
 $route->post("/invoice/backup", "Invoice::invoiceBackup");
 
-/** Parametrização Fiscal */
+/** 
+ * Parametrização Fiscal 
+ */
 $route->get("/tax-regime/form", "TaxRegime::taxRegimeForm");
+$route->post("/tax-regime/form", "TaxRegime::taxRegimeForm");
+$route->post("/tax-regime/form/{uuid}", "TaxRegime::taxRegimeFormUpdate");
+$route->post("/tax-regime/remove/{uuid}", "TaxRegime::taxRegimeFormRemove");
 
 /**
  * Suporte ao sistema
