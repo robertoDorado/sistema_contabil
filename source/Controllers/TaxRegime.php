@@ -24,6 +24,12 @@ class TaxRegime extends Controller
 
     public function taxRegimeForm()
     {
+        $responseInitializeUserAndCompany = initializeUserAndCompanyId();
+        $params = [
+            "id_company" => $responseInitializeUserAndCompany["company_id"],
+            "id_user" => $responseInitializeUserAndCompany["user"]->getId()
+        ];
+
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") === "POST") {
             verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
             $autoFillTrigger = $this->getRequests()->getPost("fill");
@@ -36,7 +42,6 @@ class TaxRegime extends Controller
                 die;
             }
 
-            $responseInitializeUserAndCompany = initializeUserAndCompanyId();
             if (empty($responseInitializeUserAndCompany["company_id"])) {
                 http_response_code(400);
                 echo json_encode([
@@ -57,7 +62,7 @@ class TaxRegime extends Controller
 
             foreach ($allTaxRegimes as $taxRegime) {
                 $taxRegimeModel = new TaxRegimeModel();
-                $id = $taxRegimeModel->findTaxRegimeByName($taxRegime);
+                $id = $taxRegimeModel->findTaxRegimeByName($taxRegime, $params);
 
                 if (!empty($id)) {
                     array_push($foundData, $taxRegime);
@@ -97,17 +102,20 @@ class TaxRegime extends Controller
                 "success" => "auto preenchimento realizado com sucesso",
                 "data" => json_encode($responseData)
             ]) : json_encode([
-                "warning" => "as contas " . implode(", ", $foundData) . " não foram importadas no sistema",
+                "warning" => "as contas " . implode(", ", $foundData) . " já existem no sistema",
                 "data" => json_encode($responseData)
             ]);
             die;
         }
 
         $taxRegimeModel = new TaxRegimeModel();
-        $taxRegimeModelData = $taxRegimeModel->findAllTaxRegimeModel([
-            "uuid",
-            "tax_regime_value"
-        ]);
+        $taxRegimeModelData = $taxRegimeModel->findAllTaxRegimeModel(
+            [
+                "uuid",
+                "tax_regime_value"
+            ],
+            $params
+        );
 
         echo $this->view->render("admin/tax-regime", [
             "userFullName" => showUserFullName(),

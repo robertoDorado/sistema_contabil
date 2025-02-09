@@ -47,7 +47,7 @@ class Tools
         $this->class = $class;
     }
 
-    public function findAllData(array $columns, bool $onlyData = false, $terms = "", $params = "")
+    public function findAllData(array $columns, bool $onlyData = false, $terms = "", $params = ""): array
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
         $response = $this->model->find($terms, $params, $columns)->fetch(true);

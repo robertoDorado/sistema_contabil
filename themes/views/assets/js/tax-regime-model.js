@@ -33,14 +33,12 @@ if (window.location.pathname === "/admin/tax-regime/form") {
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.warning(message)
                 importResponseData()
-                throw new Error(message)
             }
 
             if (response.error) {
                 message = response.error
                 message = message.charAt(0).toUpperCase() + message.slice(1)
                 toastr.error(message)
-                throw new Error(message)
             }
 
             if (response.success) {
