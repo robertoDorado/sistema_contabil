@@ -61,6 +61,28 @@
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Formulário Regime Tributário</h3>
+                        </div>
+                        <form id="taxRegimeForm">
+                            <div class="card-body">
+                                <div class="form-group">
+                                <label for="taxRegimeValue">Regime tributário</label>
+                                    <input class="form-control" type="text" name="taxRegimeValue" id="taxRegimeValue">
+                                    <input type="hidden" name="csrfToken" value="<?= session()->csrf_token ?>">
+                                </div>
+                            </div>
+
+                            <div class="card-footer">
+                                <button type="submit" id="launchBtn" class="btn btn-primary">Enviar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

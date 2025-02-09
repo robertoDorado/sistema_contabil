@@ -22,6 +22,64 @@ class TaxRegime extends Controller
         parent::__construct();
     }
 
+    public function taxRegimeFormCreate()
+    {
+        verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
+        $responseInitializeUserAndCompany = initializeUserAndCompanyId();
+
+        if (empty($responseInitializeUserAndCompany["company_id"])) {
+            http_response_code(400);
+            echo json_encode([
+                "error" => "selecione uma empresa antes de criar um regime tributário"
+            ]);
+            die;
+        }
+
+        $postData = $this->getRequests()->setRequiredFields(["csrfToken", "taxRegimeValue"])->getAllPostData();
+        $taxRegimeModel = new TaxRegimeModel();
+        $responseTaxRegimeModel = $taxRegimeModel->persistData([
+            "uuid" => Uuid::uuid4(),
+            "id_user" => $responseInitializeUserAndCompany["user"],
+            "id_company" => $responseInitializeUserAndCompany["company_id"],
+            "tax_regime_value" => $postData["taxRegimeValue"],
+            "created_at" => date("Y-m-d H:i:s"),
+            "updated_at" => date("Y-m-d H:i:s"),
+            "deleted" => 0
+        ]);
+
+        if (empty($responseTaxRegimeModel)) {
+            http_response_code(400);
+            echo $responseTaxRegimeModel->message->json();
+            die;
+        }
+
+        $taxRegimeModelData = $taxRegimeModel->findTaxRegimeById(
+            [
+                "uuid",
+                "tax_regime_value"
+            ],
+            $taxRegimeModel->getId()
+        );
+
+        if (empty($taxRegimeModelData)) {
+            http_response_code(400);
+            echo json_encode(["error" => "registro não identificado"]);
+            die;
+        }
+
+        echo json_encode(
+            [
+                "success" => "registro criado com sucesso",
+                "data" => json_encode([
+                    "uuid" => $taxRegimeModelData->getUuid(),
+                    "tax_regime_value" => $taxRegimeModelData->tax_regime_value,
+                    "edit" => "<a class='icons' href=" . url("/admin/tax-regime/form/{$taxRegimeModelData->getUuid()}") . "><i class='fas fa-edit' aria-hidden='true'></i>",
+                    "delete" => "<a class='icons' href='#'><i style='color:#ff0000' class='fa fa-trash' aria-hidden='true'></i></a>"
+                ])
+            ]
+        );
+    }
+
     public function taxRegimeForm()
     {
         $responseInitializeUserAndCompany = initializeUserAndCompanyId();
@@ -51,7 +109,6 @@ class TaxRegime extends Controller
             }
 
             $allTaxRegimes = ["Simples Nacional", "Lucro Presumido", "Lucro Real", "MEI"];
-            $taxRegimeModel = new TaxRegimeModel();
             $responseTaxRegimeModel = null;
 
             $arrayUuid = [];

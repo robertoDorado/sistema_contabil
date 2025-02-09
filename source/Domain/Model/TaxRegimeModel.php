@@ -49,6 +49,12 @@ class TaxRegimeModel
         $this->data->$name = $value;
     }
 
+    public function findTaxRegimeById(array $columns, int $id): ?ModelsTaxRegimeModel
+    {
+        $columns = implode(", ", $columns);
+        return $this->taxRegimeModel->findById($id, $columns);
+    }
+
     public function findTaxRegimeByName(string $name, array $params): ?ModelsTaxRegimeModel
     {
         return $this->taxRegimeModel->find(
