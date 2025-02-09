@@ -14,7 +14,7 @@ if (window.location.pathname === "/admin/tax-regime/form") {
         }).then(response => response.json()).then((response) => {
             this.removeAttribute("disabled")
             this.innerHTML = btnTextContent
-            const responseImport = JSON.parse(response.data)
+            const responseImport = JSON.parse(response.data ?? "{}")
             let message = ""
 
             const importResponseData = () => {
