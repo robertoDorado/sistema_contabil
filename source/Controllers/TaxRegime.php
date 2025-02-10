@@ -43,9 +43,31 @@ class TaxRegime extends Controller
             die;
         }
 
+        $taxRegime = new ModelTaxRegime();
+        $establishedTaxRegime = $taxRegime->findTaxRegimeByTaxRegimeModelId(
+            [
+                "uuid AS uuid_tax_regime"
+            ],
+            [
+                "uuid AS uuid_tax_regime_model"
+            ],
+            [
+                "id_company" => $responseInitializeUserAndCompany["company_id"],
+                "id_user" => $responseInitializeUserAndCompany["user"]->getId()
+            ]
+        );
+
+        if (!empty($establishedTaxRegime) && empty($postData["updateTaxRegime"])) {
+            http_response_code(400);
+            echo json_encode([
+                "error" => "regime tributário já foi cadastrado"
+            ]);
+            die;
+        }
+
         $taxRegimeModel = new TaxRegimeModel();
         $taxRegimeModelData = $taxRegimeModel->findTaxRegimeByUuid(["id"], $postData["taxRegimeSelectMultiple"]);
-        
+
         if (empty($taxRegimeModelData)) {
             http_response_code(400);
             echo json_encode([
@@ -62,10 +84,15 @@ class TaxRegime extends Controller
             $establishedTaxRegime->tax_regime_id = $taxRegimeModelData->id;
             $establishedTaxRegime->save();
 
-            echo json_encode(["success" => "regime tributário atualizado com sucesso"]);
+            echo json_encode(
+                [
+                    "success" => "regime tributário atualizado com sucesso",
+                    "last_uuid" => $postData["updateTaxRegime"]
+                ]
+            );
             die;
         }
-        
+
         $taxRegime = new ModelTaxRegime();
         $responseTaxRegime = $taxRegime->persistData([
             "uuid" => $uuid,
@@ -85,7 +112,7 @@ class TaxRegime extends Controller
 
         echo json_encode(
             [
-                "success" => "regime tributário da empresa configurado com sucesso", 
+                "success" => "regime tributário da empresa configurado com sucesso",
                 "last_uuid" => $uuid
             ]
         );
@@ -258,10 +285,10 @@ class TaxRegime extends Controller
         $establishedTaxRegime = $taxRegime->findTaxRegimeByTaxRegimeModelId(
             [
                 "uuid AS uuid_tax_regime"
-            ], 
+            ],
             [
                 "uuid AS uuid_tax_regime_model"
-            ], 
+            ],
             $params
         );
 
