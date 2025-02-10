@@ -302,6 +302,7 @@ $route->post("/invoice/backup", "Invoice::invoiceBackup");
 $route->get("/tax-regime/form", "TaxRegime::taxRegimeForm");
 $route->post("/tax-regime/form", "TaxRegime::taxRegimeForm");
 $route->post("/tax-regime/create", "TaxRegime::taxRegimeFormCreate");
+$route->post("/tax-regime/set", "TaxRegime::setTaxRegime");
 
 /**
  * Suporte ao sistema

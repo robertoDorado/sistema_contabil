@@ -1,18 +1,19 @@
 <?php
+
 namespace Source\Domain\Model;
 
 use Exception;
 use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Domain\Support\Tools;
-use Source\Models\TaxRegimeModel as ModelsTaxRegimeModel;
+use Source\Models\TaxRegime as ModelsTaxRegime;
 
 /**
- * TaxRegimeModel Domain\Model
+ * TaxRegime Domain\Model
  * @link 
  * @author Roberto Dorado <robertodorado7@gmail.com>
  * @package Source\Domain\Model
  */
-class TaxRegimeModel
+class TaxRegime
 {
     /** @var object */
     private object $data;
@@ -23,20 +24,20 @@ class TaxRegimeModel
     /** @var string Uuid do usuário */
     private string $uuid;
 
-    /** @var ModelsTaxRegimeModel */
-    private ModelsTaxRegimeModel $taxRegimeModel;
+    /** @var ModelsTaxRegime */
+    private ModelsTaxRegime $taxRegime;
 
     /** @var Tools */
     private Tools $tools;
 
     /**
-     * TaxRegimeModel constructor
+     * TaxRegime constructor
      */
     public function __construct()
     {
-        $this->taxRegimeModel = new ModelsTaxRegimeModel();
+        $this->taxRegime = new ModelsTaxRegime();
         $this->data = new \stdClass();
-        $this->tools = new Tools($this->taxRegimeModel, ModelsTaxRegimeModel::class);
+        $this->tools = new Tools($this->taxRegime, ModelsTaxRegime::class);
     }
 
     public function __get($name)
@@ -49,35 +50,29 @@ class TaxRegimeModel
         $this->data->$name = $value;
     }
 
-    public function findTaxRegimeByUuid(array $columns, string $uuid): ?ModelsTaxRegimeModel
+    public function findTaxRegimeByUuid(array $columns, string $uuid): ?ModelsTaxRegime
     {
         $columns = empty($columns) ? "*" : implode(", ", $columns);
-        return $this->taxRegimeModel->find("uuid=:uuid AND deleted=0", ":uuid={$uuid}", $columns)->fetch();
+        return $this->taxRegime->find("uuid=:uuid", ":uuid={$uuid}", $columns)->fetch();
     }
 
-    public function findTaxRegimeById(array $columns, int $id): ?ModelsTaxRegimeModel
+    public function findTaxRegimeByTaxRegimeModelId(array $columnsA, array $columnsB, array $params): ?ModelsTaxRegime
     {
-        $columns = empty($columns) ? "*" : implode(", ", $columns);
-        return $this->taxRegimeModel->findById($id, $columns);
-    }
-
-    public function findTaxRegimeByName(string $name, array $params): ?ModelsTaxRegimeModel
-    {
-        return $this->taxRegimeModel->find(
-            "tax_regime_value=:tax_regime_value AND deleted=0 AND id_company=:id_company AND id_user=:id_user", 
-            ":tax_regime_value={$name}&:id_company={$params['id_company']}&:id_user={$params['id_user']}",
-            "id"
+        $columnsA = empty($columnsA) ? "*" : implode(", ", $columnsA);
+        $columnsB = empty($columnsB) ? "*" : implode(", ", $columnsB);
+        return $this->taxRegime->find(
+            "deleted=0 AND id_user=:id_user AND id_company=:id_company",
+            ":id_user={$params['id_user']}&:id_company={$params['id_company']}",
+            $columnsA
+        )->join(
+            CONF_DB_NAME . ".tax_regime_model",
+            "id",
+            "deleted=0 AND id_user=:id_user AND id_company=:id_company",
+            ":id_user={$params['id_user']}&:id_company={$params['id_company']}",
+            $columnsB,
+            "tax_regime_id",
+            CONF_DB_NAME . ".tax_regime"
         )->fetch();
-    }
-
-    public function findAllTaxRegimeModel(array $columns, array $params): array
-    {
-        return $this->tools->findAllData(
-            $columns, 
-            false,
-            "deleted=:deleted AND id_company=:id_company AND id_user=:id_user", 
-            ":deleted=0&:id_company={$params['id_company']}&:id_user={$params['id_user']}"
-        );
     }
 
     public function getId(): int
@@ -112,7 +107,7 @@ class TaxRegimeModel
             "uuid=:uuid",
             ":uuid={$data['uuid']}",
             $data,
-            "modelo de regime tributário não encontrado"
+            "regime tributário não encontrado"
         );
         $this->data->message = !empty($this->tools->message) ? $this->tools->message : "";
         return !empty($response) ? true : false;

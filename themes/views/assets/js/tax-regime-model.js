@@ -1,6 +1,53 @@
 if (window.location.pathname === "/admin/tax-regime/form") {
     const taxRegimeBtn = document.querySelector("[tax-regime-btn]")
     const taxRegimeForm = document.querySelector("#taxRegimeForm")
+    const setTaxRegimeForm = document.querySelector("#setTaxRegimeForm")
+    const updateTaxRegime = document.querySelector("[name='updateTaxRegime']")
+    $("#taxRegimeSelectMultiple").select2()
+
+    setTaxRegimeForm.addEventListener("submit", function (event) {
+        event.preventDefault()
+        const sendFormBtn = this.querySelector("#setTaxRegimeBtn")
+        const btnContent = sendFormBtn.innerHTML
+        showSpinner(sendFormBtn)
+
+        if (!this.csrfToken.value) {
+            toastr.error("Valor do token é obrigatório")
+            sendFormBtn.removeAttribute("disabled")
+            sendFormBtn.innerHTML = btnContent
+            throw new Error("Valor do token é obrigatório")
+        }
+
+        if (!this.taxRegimeSelectMultiple.value) {
+            toastr.error("Valor do regime tributário é obrigatório")
+            sendFormBtn.removeAttribute("disabled")
+            sendFormBtn.innerHTML = btnContent
+            throw new Error("Valor do regime tributário é obrigatório")
+        }
+
+        const form = new FormData(this)
+        fetch("/admin/tax-regime/set", {
+            method: "POST",
+            body: form
+        }).then(response => response.json()).then((response) => {
+            sendFormBtn.removeAttribute("disabled")
+            sendFormBtn.innerHTML = btnContent
+            let message = ""
+
+            if (response.error) {
+                message = response.error
+                message = message.charAt(0).toUpperCase() + message.slice(1)
+                toastr.error(message)
+            }
+
+            if (response.success) {
+                message = response.success
+                message = message.charAt(0).toUpperCase() + message.slice(1)
+                updateTaxRegime.value = response.last_uuid
+                toastr.success(message)
+            }
+        })
+    })
 
     taxRegimeForm.addEventListener("submit", function (event) {
         event.preventDefault()
@@ -10,11 +57,15 @@ if (window.location.pathname === "/admin/tax-regime/form") {
 
         if (!this.taxRegimeValue.value) {
             toastr.error("Valor do regime tributário é obrigatório")
+            sendFormBtn.removeAttribute("disabled")
+            sendFormBtn.innerHTML = btnContent
             throw new Error("Valor do regime tributário é obrigatório")
         }
 
         if (!this.csrfToken.value) {
             toastr.error("Valor do token é obrigatório")
+            sendFormBtn.removeAttribute("disabled")
+            sendFormBtn.innerHTML = btnContent
             throw new Error("Valor do token é obrigatório")
         }
 

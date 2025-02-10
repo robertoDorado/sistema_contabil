@@ -70,7 +70,7 @@
                         <form id="taxRegimeForm">
                             <div class="card-body">
                                 <div class="form-group">
-                                <label for="taxRegimeValue">Regime tributário</label>
+                                    <label for="taxRegimeValue">Regime tributário</label>
                                     <input class="form-control" type="text" name="taxRegimeValue" id="taxRegimeValue">
                                     <input type="hidden" name="csrfToken" value="<?= session()->csrf_token ?>">
                                 </div>
@@ -78,6 +78,43 @@
 
                             <div class="card-footer">
                                 <button type="submit" id="launchBtn" class="btn btn-primary">Enviar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Atual regime tributário da empresa</h3>
+                        </div>
+                        <form id="setTaxRegimeForm">
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <select id="taxRegimeSelectMultiple" name="taxRegimeSelectMultiple" style="width: 50%">
+                                        <?php if (!empty($establishedTaxRegime)) : ?>
+                                            <option value="" disabled>Selecione o atual regime tributário da empresa</option>
+                                        <?php else : ?>
+                                            <option value="" disabled selected>Selecione o atual regime tributário da empresa</option>
+                                        <?php endif ?>
+                                        <?php if (!empty($taxRegimeModelData)) : ?>
+                                            <?php foreach ($taxRegimeModelData as $taxRegimeModel) : ?>
+                                                <?php if (!empty($establishedTaxRegime) && $taxRegimeModel->getUuid() === $establishedTaxRegime->uuid_tax_regime_model) : ?>
+                                                    <option value="<?= $taxRegimeModel->getUuid() ?>" selected><?= $taxRegimeModel->tax_regime_value ?></option>
+                                                <?php else : ?>
+                                                    <option value="<?= $taxRegimeModel->getUuid() ?>"><?= $taxRegimeModel->tax_regime_value ?></option>
+                                                <?php endif ?>
+                                            <?php endforeach ?>
+                                        <?php endif ?>
+                                    </select>
+                                    <input type="hidden" name="updateTaxRegime" value="<?= empty($establishedTaxRegime) ? "" : $establishedTaxRegime->uuid_tax_regime ?>">
+                                    <input type="hidden" name="csrfToken" value="<?= session()->csrf_token ?>">
+                                </div>
+                            </div>
+
+                            <div class="card-footer">
+                                <button type="submit" id="setTaxRegimeBtn" class="btn btn-primary">Enviar</button>
                             </div>
                         </form>
                     </div>

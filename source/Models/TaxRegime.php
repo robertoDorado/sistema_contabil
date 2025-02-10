@@ -20,7 +20,7 @@ class TaxRegime extends Model
     /** @var string id da empresa */
     protected string $idCompany = "id_company";
 
-    /** @var string regisme tributário id */
+    /** @var string regime tributário id */
     protected string $taxRegimeId = "tax_regime_id";
 
     /** @var string Data criada */
