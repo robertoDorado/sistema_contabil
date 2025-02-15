@@ -73,7 +73,7 @@ class TaxRegime extends Controller
                 die;
             }
 
-            $invalidUuid = function() {
+            $invalidUuid = function () {
                 http_response_code(400);
                 echo json_encode(["error" => "uuid inválido"]);
                 die;
@@ -85,6 +85,14 @@ class TaxRegime extends Controller
 
             if (!Uuid::isValid($postData["uuid"])) {
                 $invalidUuid();
+            }
+
+            $checkValidTaxRegime = ["lucro presumido", "lucro real", "mei", "simples nacional"];
+            $taxRegimeValueFormated = strtolower($postData["taxRegimeValue"]);
+            if (!in_array($taxRegimeValueFormated, $checkValidTaxRegime)) {
+                http_response_code(400);
+                echo json_encode(["error" => "regime tributário inválido"]);
+                die;
             }
 
             $taxRegimeModel = new TaxRegimeModel();
@@ -258,6 +266,32 @@ class TaxRegime extends Controller
             die;
         }
 
+        $checkValidTaxRegime = ["lucro presumido", "lucro real", "mei", "simples nacional"];
+        $taxRegimeValueFormated = strtolower($postData["taxRegimeValue"]);
+        if (!in_array($taxRegimeValueFormated, $checkValidTaxRegime)) {
+            http_response_code(400);
+            echo json_encode(["error" => "regime tributário inválido"]);
+            die;
+        }
+
+        $taxRegimeModel = new TaxRegimeModel();
+        $allTaxRegimeData = $taxRegimeModel->findAllTaxRegimeModel(
+            [
+                "tax_regime_value"
+            ],
+            [
+                "id_company" => $responseInitializeUserAndCompany["company_id"],
+                "id_user" => $responseInitializeUserAndCompany["user"]->getId()
+            ]
+        );
+
+        $allTaxRegimeData = array_map(fn($item) => strtolower($item->tax_regime_value), $allTaxRegimeData);
+        if (in_array($taxRegimeValueFormated, $allTaxRegimeData)) {
+            http_response_code(400);
+            echo json_encode(["error" => "já existe este regime tributário cadastrado no sistema"]);
+            die;
+        }
+
         $taxRegimeModel = new TaxRegimeModel();
         $responseTaxRegimeModel = $taxRegimeModel->persistData([
             "uuid" => Uuid::uuid4(),
@@ -295,7 +329,7 @@ class TaxRegime extends Controller
                 "data" => json_encode([
                     "uuid" => $taxRegimeModelData->getUuid(),
                     "tax_regime_value" => $taxRegimeModelData->tax_regime_value,
-                    "edit" => "<a class='icons' href=" . url("/admin/tax-regime/form/{$taxRegimeModelData->getUuid()}") . "><i class='fas fa-edit' aria-hidden='true'></i>",
+                    "edit" => "<a class='icons' href=" . url("/admin/tax-regime/form/update/{$taxRegimeModelData->getUuid()}") . "><i class='fas fa-edit' aria-hidden='true'></i>",
                     "delete" => "<a class='icons' href='#'><i style='color:#ff0000' class='fa fa-trash' aria-hidden='true'></i></a>"
                 ])
             ]
@@ -367,7 +401,7 @@ class TaxRegime extends Controller
 
                 array_push($arrayUuid, $uuid);
                 array_push($taxRegimeValue, $taxRegime);
-                array_push($arrayEdit, "<a class='icons' href=" . url("/admin/tax-regime/form/{$uuid}") . "><i class='fas fa-edit' aria-hidden='true'></i>");
+                array_push($arrayEdit, "<a class='icons' href=" . url("/admin/tax-regime/form/update/{$uuid}") . "><i class='fas fa-edit' aria-hidden='true'></i>");
                 array_push($arrayDelete, "<a class='icons' href='#'><i style='color:#ff0000' class='fa fa-trash' aria-hidden='true'></i></a>");
             }
 
