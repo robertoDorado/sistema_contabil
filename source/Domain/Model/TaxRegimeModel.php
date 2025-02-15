@@ -61,12 +61,13 @@ class TaxRegimeModel
         return $this->taxRegimeModel->findById($id, $columns);
     }
 
-    public function findTaxRegimeByName(string $name, array $params): ?ModelsTaxRegimeModel
+    public function findTaxRegimeByName(string $name, array $params, array $columns = []): ?ModelsTaxRegimeModel
     {
+        $columns = empty($columns) ? "*" : implode(", ", $columns);
         return $this->taxRegimeModel->find(
             "tax_regime_value=:tax_regime_value AND deleted=0 AND id_company=:id_company AND id_user=:id_user", 
             ":tax_regime_value={$name}&:id_company={$params['id_company']}&:id_user={$params['id_user']}",
-            "id"
+            $columns
         )->fetch();
     }
 

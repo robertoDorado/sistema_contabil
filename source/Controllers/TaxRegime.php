@@ -3,6 +3,7 @@
 namespace Source\Controllers;
 
 use Ramsey\Uuid\Nonstandard\Uuid;
+use Ramsey\Uuid\Uuid as UuidUuid;
 use Source\Core\Controller;
 use Source\Domain\Model\TaxRegime as ModelTaxRegime;
 use Source\Domain\Model\TaxRegimeModel;
@@ -21,6 +22,86 @@ class TaxRegime extends Controller
     public function __construct()
     {
         parent::__construct();
+    }
+
+    public function taxRegimeFormUpdate(array $data)
+    {
+        if ($this->getServer()->getServerByKey("REQUEST_METHOD") === "POST") {
+            $postData = $this->getRequests()->setRequiredFields(["csrfToken", "taxRegimeValue"])->getAllPostData();
+            $validatePostData = array_filter($postData, function ($item) {
+                return empty($item);
+            });
+
+            if (!empty($validatePostData)) {
+                http_response_code(400);
+                echo json_encode(["error" => "formulário inválido"]);
+                die;
+            }
+
+            $invalidUuid = function() {
+                http_response_code(400);
+                echo json_encode(["error" => "uuid inválido"]);
+                die;
+            };
+
+            if (empty($postData["uuid"])) {
+                $invalidUuid();
+            }
+
+            if (!Uuid::isValid($postData["uuid"])) {
+                $invalidUuid();
+            }
+
+            $taxRegimeModel = new TaxRegimeModel();
+            $taxRegimeModelData = $taxRegimeModel->findTaxRegimeByUuid(
+                [
+                    "uuid",
+                    "tax_regime_value"
+                ],
+                $postData["uuid"]
+            );
+
+            if (empty($taxRegimeModelData)) {
+                http_response_code(400);
+                echo json_encode(["error" => "modelo de regime tributário não existe"]);
+                die;
+            }
+
+            $taxRegimeModel = new TaxRegimeModel();
+            $responseUpdateTaxRegimeModel = $taxRegimeModel->updateData([
+                "uuid" => $taxRegimeModelData->getUuid(),
+                "tax_regime_value" => $postData["taxRegimeValue"]
+            ]);
+
+            if (empty($responseUpdateTaxRegimeModel)) {
+                echo $taxRegimeModel->message->json();
+                die;
+            }
+
+            echo json_encode(["success" => "modelo de regime tributário atualizado com sucesso"]);
+            die;
+        }
+
+        if (empty($data["uuid"])) {
+            redirect("/admin/tax-regime/form");
+        }
+
+        if (!Uuid::isValid($data["uuid"])) {
+            redirect("/admin/tax-regime/form");
+        }
+
+        $taxRegimeModel = new TaxRegimeModel();
+        $establishedTaxRegime = $taxRegimeModel->findTaxRegimeByUuid([], $data["uuid"]);
+
+        if (empty($establishedTaxRegime)) {
+            redirect("/admin/tax-regime/form");
+        }
+
+        echo $this->view->render("admin/tax-regime-update", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => ["/admin/tax-regime/form"],
+            "establishedTaxRegime" => $establishedTaxRegime
+        ]);
     }
 
     public function setTaxRegime()

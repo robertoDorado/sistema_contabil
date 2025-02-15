@@ -49,7 +49,7 @@
                                                 <tr>
                                                     <td><?= $taxRegime->getUuid() ?></td>
                                                     <td><?= $taxRegime->tax_regime_value ?></td>
-                                                    <td><a class="icons" href="<?= url("/admin/tax-regime/form/" . $taxRegime->getUuid() . "") ?>"><i class="fas fa-edit" aria-hidden="true"></i></a></td>
+                                                    <td><a class="icons" href="<?= url("/admin/tax-regime/form/update/" . $taxRegime->getUuid() . "") ?>"><i class="fas fa-edit" aria-hidden="true"></i></a></td>
                                                     <td><a class="icons" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a></td>
                                                 </tr>
                                             <?php endforeach ?>
