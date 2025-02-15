@@ -1,4 +1,5 @@
 <?php $v->layout("admin/layouts/_admin") ?>
+<?php $v->insert("admin/layouts/_modal") ?>
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <div class="content-header">
@@ -50,7 +51,7 @@
                                                     <td><?= $taxRegime->getUuid() ?></td>
                                                     <td><?= $taxRegime->tax_regime_value ?></td>
                                                     <td><a class="icons" href="<?= url("/admin/tax-regime/form/update/" . $taxRegime->getUuid() . "") ?>"><i class="fas fa-edit" aria-hidden="true"></i></a></td>
-                                                    <td><a class="icons" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a></td>
+                                                    <td><a data-name="<?= $taxRegime->tax_regime_value ?>" data-uuid="<?= $taxRegime->getUuid() ?>" class="icons trash-icon" href="#"><i style="color:#ff0000" class="fa fa-trash" aria-hidden="true"></i></a></td>
                                                 </tr>
                                             <?php endforeach ?>
                                         <?php endif ?>

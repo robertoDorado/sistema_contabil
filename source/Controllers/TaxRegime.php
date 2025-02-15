@@ -24,6 +24,41 @@ class TaxRegime extends Controller
         parent::__construct();
     }
 
+    public function taxRegimeFormDelete()
+    {
+        $uuid = $this->getRequests()->getPost("uuid");
+        $invalidUuid = function () {
+            http_response_code(400);
+            echo json_encode(["error" => "identificador inválido"]);
+            die;
+        };
+
+        if (empty($uuid)) {
+            $invalidUuid();
+        }
+
+        if (!Uuid::isValid($uuid)) {
+            $invalidUuid();
+        }
+
+        $taxRegimeModel = new TaxRegimeModel();
+        $taxRegimeModelData = $taxRegimeModel->findTaxRegimeByUuid([], $uuid);
+
+        if (empty($taxRegimeModelData)) {
+            http_response_code(400);
+            echo json_encode(["error" => "modelo de regime tributário não encontrado"]);
+            die;
+        }
+
+        if (!$taxRegimeModelData->destroy()) {
+            http_response_code(400);
+            echo json_encode(["error" => "não foi possível excluir o regime tributário"]);
+            die;
+        }
+
+        echo json_encode(["success" => "registro excluído com sucesso"]);
+    }
+
     public function taxRegimeFormUpdate(array $data)
     {
         if ($this->getServer()->getServerByKey("REQUEST_METHOD") === "POST") {

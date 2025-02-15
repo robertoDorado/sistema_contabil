@@ -3,7 +3,65 @@ if (window.location.pathname === "/admin/tax-regime/form") {
     const taxRegimeForm = document.querySelector("#taxRegimeForm")
     const setTaxRegimeForm = document.querySelector("#setTaxRegimeForm")
     const updateTaxRegime = document.querySelector("[name='updateTaxRegime']")
+    
+    const launchModal = document.getElementById("launchModal")
+    const modalContainerLabel = document.getElementById("modalContainerLabel")
+    const dismissModal = document.getElementById("dismissModal")
+    const saveChanges = document.getElementById("saveChanges")
+    const modalBody = document.querySelector(".modal-body")
     $("#taxRegimeSelectMultiple").select2()
+
+    const dataTransfer = {
+        uuid: "",
+        row: null,
+        name: ""
+    }
+
+    taxRegimeReport.on("click", ".trash-icon", function (event) {
+        event.preventDefault()
+        dataTransfer.uuid = this.dataset.uuid
+        dataTransfer.row = $(this).closest("tr")
+        dataTransfer.name = this.dataset.name
+        launchModal.click()
+    })
+
+    launchModal.addEventListener("click", function () {
+        modalContainerLabel.innerHTML = "Atenção!"
+        dismissModal.innerHTML = "Fechar"
+        saveChanges.innerHTML = "Excluir"
+        modalBody.innerHTML = `Deseja mesmo excluir o registro ${dataTransfer.name}?`
+        saveChanges.classList.remove("btn-primary")
+        saveChanges.classList.add("btn-danger")
+    })
+
+    saveChanges.addEventListener("click", function () {
+        showSpinner(this)
+        const form = new FormData()
+        form.append("uuid", dataTransfer.uuid)
+
+        fetch("/admin/tax-regime/form/delete", {
+            method: "POST",
+            body: form
+        }).then(response => response.json()).then((response) => {
+            this.removeAttribute("disabled")
+            this.innerHTML = "Excluir"
+            let message = ""
+
+            if (response.error) {
+                message = response.error
+                message = message.charAt(0).toUpperCase() + message.slice(1)
+                toastr.error(message)
+            }
+
+            if (response.success) {
+                message = response.success
+                message = message.charAt(0).toUpperCase() + message.slice(1)
+                toastr.success(message)
+                taxRegimeReport.row(dataTransfer.row).remove().draw(false)
+                dismissModal.click()
+            }
+        })
+    })
 
     setTaxRegimeForm.addEventListener("submit", function (event) {
         event.preventDefault()
