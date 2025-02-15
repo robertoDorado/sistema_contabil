@@ -44,21 +44,6 @@
                             <p>Regime Tributário</p>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <p>Alíquotas Personalizadas</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <p>CFOP e CST</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <p>Regras de Substituição Tributária</p>
-                        </a>
-                    </li>
                 </ul>
             </li>
         </ul>
