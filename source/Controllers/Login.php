@@ -102,10 +102,10 @@ class Login extends Controller
 
             $customerCreatedAtInstance = new DateTime($customerData->created_at);
             $now = new DateTime();
-            echo "<pre>";
-            print_r($customerData->created_at);
-            die;
             $diffCustomerDate = $now->diff($customerCreatedAtInstance);
+            echo "<pre>";
+            print_r($diffCustomerDate);
+            die;
 
             session()->set("user", [
                 "subscription" => $status,
