@@ -103,7 +103,7 @@ class Login extends Controller
             $customerCreatedAtInstance = new DateTime($customerData->created_at);
             $now = new DateTime();
             echo "<pre>";
-            print_r($now);
+            print_r($customerData->created_at);
             die;
             $diffCustomerDate = $now->diff($customerCreatedAtInstance);
 
