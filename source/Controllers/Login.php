@@ -121,7 +121,9 @@ class Login extends Controller
             ];
 
             $url = $verifyRedirectUrl[$requestPost["userType"]];
-            if ($diffCustomerDate->days > 7 && $status !== "active") {
+            $usersAllowedEmail = ["robertodorado7@gmail.com"];
+            
+            if ($diffCustomerDate->days > 7 && $status !== "active" && !in_array($customerData->customer_email, $usersAllowedEmail)) {
                 $url = url("/customer/subscribe");
             }
 
