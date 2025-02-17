@@ -103,9 +103,6 @@ class Login extends Controller
             $customerCreatedAtInstance = new DateTime($customerData->created_at);
             $now = new DateTime();
             $diffCustomerDate = $now->diff($customerCreatedAtInstance);
-            echo "<pre>";
-            print_r($diffCustomerDate);
-            die;
 
             session()->set("user", [
                 "subscription" => $status,
@@ -115,7 +112,7 @@ class Login extends Controller
                 "user_email" => $userData->user_email,
                 "period_end" => $periodEnd,
                 "user_type" => $requestPost["userType"],
-                "diff_customer_date" => $diffCustomerDate->d
+                "diff_customer_date" => $diffCustomerDate->days
             ]);
 
             $verifyRedirectUrl = [
@@ -124,7 +121,7 @@ class Login extends Controller
             ];
 
             $url = $verifyRedirectUrl[$requestPost["userType"]];
-            if ($diffCustomerDate->d > 7 && $status !== "active") {
+            if ($diffCustomerDate->days > 7 && $status !== "active") {
                 $url = url("/customer/subscribe");
             }
 
