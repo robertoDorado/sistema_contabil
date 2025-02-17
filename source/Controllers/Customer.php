@@ -1,9 +1,12 @@
 <?php
+
 namespace Source\Controllers;
 
 use Exception;
+use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Controller;
 use Source\Domain\Model\Customer as ModelCustomer;
+use Source\Domain\Model\SubscriptionCancellation;
 use Source\Domain\Model\User;
 
 /**
@@ -20,6 +23,14 @@ class Customer extends Controller
     public function __construct()
     {
         parent::__construct();
+    }
+
+    public function cancelSubscriptionForm()
+    {
+        echo $this->view->render("admin/cancel-subscription-form", [
+            "userFullName" => showUserFullName(),
+            "endpoints" => ["/admin/customer/cancel-subscription"]
+        ]);
     }
 
     public function cancelSubscription()
@@ -59,12 +70,12 @@ class Customer extends Controller
             if (!preg_match("/^[A-Z]{2}$/", $requestPost["state"])) {
                 throw new Exception("estado inválido");
             }
-    
+
             $verifyZipcode = preg_replace("/[^\d]+/", "", $requestPost["zipcode"]);
             if (strlen($verifyZipcode) > 8) {
                 throw new Exception("cep inválido");
             }
-    
+
             $verifyDocument = preg_replace("/[^\d]+/", "", $requestPost["document"]);
             if (strlen($verifyDocument) > 14) {
                 throw new Exception("documento inválido");
@@ -113,7 +124,7 @@ class Customer extends Controller
             session()->user->user_nick_name = $requestPost["userName"];
             session()->user->user_email = $requestPost["email"];
             echo json_encode([
-                "success" => "cliente atualizado com sucesso", 
+                "success" => "cliente atualizado com sucesso",
                 "fullName" => session()->user->user_full_name
             ]);
             die;
@@ -122,7 +133,7 @@ class Customer extends Controller
         $customer = new ModelCustomer();
         $customer->email = session()->user->user_email;
         $customerData = $customer->findCustomerByEmail();
-        
+
         echo $this->view->render("admin/customer-update-data-form", [
             "userFullName" => showUserFullName(),
             "endpoints" => ["/admin/customer/update-data/form"],
@@ -144,7 +155,7 @@ class Customer extends Controller
         if (!empty(session()->user->subscription) && session()->user->subscription == "active") {
             redirect("/admin/login");
         }
-        
+
         $customerData = null;
         $userData = null;
 
@@ -154,7 +165,7 @@ class Customer extends Controller
         if (!empty(session()->user)) {
             $customer->email = session()->user->user_email;
             $customerData = $customer->findCustomerByEmail();
-            
+
             $user->setEmail(session()->user->user_email);
             $userData = $user->findUserByEmail(["user_nick_name", "deleted"]);
         }

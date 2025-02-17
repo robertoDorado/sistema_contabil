@@ -7,6 +7,7 @@ use Ramsey\Uuid\Nonstandard\Uuid;
 use Source\Core\Controller;
 use Source\Domain\Model\Customer;
 use Source\Domain\Model\Subscription as ModelSubscription;
+use Source\Domain\Model\SubscriptionCancellation;
 use Source\Domain\Model\User;
 use Source\Support\StripePayment;
 
@@ -33,11 +34,33 @@ class Subscription extends Controller
             throw new Exception("usuário não está logado");
         }
 
-        $cancelData = $this->getRequests()
-        ->setRequiredFields(["cancelData"])->getPost("cancelData");
+        $postData = $this->getRequests()->setRequiredFields(
+            [
+                "csrfToken",
+                "cancelSubscriptionValue",
+                "cancelData"
+            ]
+        )->getAllPostData();
+        $verifyPostData = array_filter($postData, function ($item) {
+            return empty($item);
+        });
 
-        if (empty($cancelData)) {
-            throw new Exception("valor de cancelamento inválido");
+        if (!empty($verifyPostData)) {
+            http_response_code(400);
+            echo json_encode(["error" => "dados do formulário inválido"]);
+            die;
+        }
+
+        if (empty($postData["cancelData"])) {
+            http_response_code(400);
+            echo json_encode(["error" => "não foi possível cancelar a assinatura"]);
+            die;
+        }
+
+        if (strlen($postData["cancelSubscriptionValue"]) > 1000) {
+            http_response_code(400);
+            echo json_encode(["error" => "limite de caracteres inválido"]);
+            die;
         }
 
         $customer = new Customer();
@@ -68,8 +91,27 @@ class Subscription extends Controller
                 throw new Exception($subscription->message->json());
             }
 
+            $customer = new Customer();
+            $customer->setId(session()->user->id_customer);
+
+            $subscriptionCancellation = new SubscriptionCancellation();
+            $responsePersistData = $subscriptionCancellation->persistData([
+                "uuid" => Uuid::uuid4(),
+                "id_customer" => $customer,
+                "cancellation_reason" => $postData["cancelSubscriptionValue"],
+                "created_at" => date("Y-m-d"),
+                "updated_at" => date("Y-m-d"),
+                "deleted" => 0
+            ]);
+
+            if (empty($responsePersistData)) {
+                http_response_code(400);
+                echo $subscriptionCancellation->message->json();
+                die;
+            }
+
             echo json_encode(["success" => "assinatura cancelada com sucesso"]);
-        }else {
+        } else {
             echo json_encode(["error" => "erro interno ao cancelar assinatura"]);
         }
     }
@@ -78,24 +120,24 @@ class Subscription extends Controller
     {
         verifyRequestHttpOrigin($this->getServer()->getServerByKey("HTTP_ORIGIN"));
         $requestPost = $this->getRequests()
-        ->setRequiredFields([
-            "fullName",
-            "document",
-            "birthDate",
-            "gender",
-            "email",
-            "zipcode",
-            "address",
-            "number",
-            "neighborhood",
-            "city",
-            "state",
-            "userName",
-            "password",
-            "confirmPassword",
-            "csrfToken",
-            "cardToken"
-        ])->getAllPostData();
+            ->setRequiredFields([
+                "fullName",
+                "document",
+                "birthDate",
+                "gender",
+                "email",
+                "zipcode",
+                "address",
+                "number",
+                "neighborhood",
+                "city",
+                "state",
+                "userName",
+                "password",
+                "confirmPassword",
+                "csrfToken",
+                "cardToken"
+            ])->getAllPostData();
 
         if (!preg_match("/^[A-Z]{2}$/", $requestPost["state"])) {
             throw new Exception("estado inválido");
@@ -110,7 +152,7 @@ class Subscription extends Controller
         if (strlen($verifyDocument) > 14) {
             throw new Exception("documento inválido");
         }
-        
+
         if ($requestPost["password"] != $requestPost["confirmPassword"]) {
             throw new Exception("as senhas não conferem");
         }
@@ -131,7 +173,7 @@ class Subscription extends Controller
             "user_password" => password_hash($requestPost["confirmPassword"], PASSWORD_DEFAULT),
             "deleted" => 0
         ];
-        
+
         $customerUuid = Uuid::uuid4();
         $requestCustomerData = [
             "uuid" => $customerUuid,
@@ -158,7 +200,7 @@ class Subscription extends Controller
             $customer = new Customer();
             $response = $customer->persistData($requestCustomerData);
             $customerId = $customer->getId();
-            
+
             if (empty($response)) {
                 echo $customer->message->json();
                 die;
@@ -172,7 +214,6 @@ class Subscription extends Controller
                 echo $user->message->json();
                 die;
             }
-
         } else {
             $unsetFields = ["uuid", "created_at", "deleted"];
             foreach ($unsetFields as $key) {
@@ -182,10 +223,10 @@ class Subscription extends Controller
             $requestCustomerData["customer_email"] = $customerData->customer_email;
             $customer = new Customer();
             $customerId = $customerData->id;
-            
+
             $customer->setId($customerData->id);
             $response = $customer->updateCustomerByEmail($requestCustomerData);
-            
+
             if (empty($response)) {
                 echo $customer->message->json();
                 die;
@@ -193,7 +234,7 @@ class Subscription extends Controller
 
             $customerUuid = $customerData->getUuid();
             $requestUserData["id_customer"] = $customer;
-            
+
             $user->setEmail($userData->user_email);
             $response = $user->updateUserByEmail($requestUserData);
 
@@ -279,7 +320,7 @@ class Subscription extends Controller
                 }
             }
             echo json_encode([
-                "success" => true, 
+                "success" => true,
                 "url" => url("/customer/subscription/thanks-purchase")
             ]);
         }

@@ -2,6 +2,7 @@
 
 namespace Source\Controllers;
 
+use DateTime;
 use Source\Core\Controller;
 use Source\Domain\Model\Customer;
 use Source\Domain\Model\Subscription;
@@ -99,14 +100,19 @@ class Login extends Controller
             $customer->customer_id = $userData->id_customer;
             $customerData = $customer->findCustomerById();
 
+            $customerCreatedAtInstance = new DateTime($customerData->created_at);
+            $now = new DateTime();
+            $diffCustomerDate = $now->diff($customerCreatedAtInstance);
+
             session()->set("user", [
                 "subscription" => $status,
-                "id_customer" => $customerData->id ?? null,
+                "id_customer" => $customerData->id,
                 "user_full_name" => $userData->user_full_name,
                 "user_nick_name" => $userData->user_nick_name,
                 "user_email" => $userData->user_email,
                 "period_end" => $periodEnd,
-                "user_type" => $requestPost["userType"]
+                "user_type" => $requestPost["userType"],
+                "diff_customer_date" => $diffCustomerDate->d
             ]);
 
             $verifyRedirectUrl = [
@@ -115,6 +121,10 @@ class Login extends Controller
             ];
 
             $url = $verifyRedirectUrl[$requestPost["userType"]];
+            if ($diffCustomerDate->d > 7 && $status !== "active") {
+                $url = url("/customer/subscribe");
+            }
+
             echo json_encode(["login_success" => true, "url" => $url]);
             die;
         }

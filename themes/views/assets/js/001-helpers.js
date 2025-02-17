@@ -1,4 +1,11 @@
 const modal = document.getElementById("loadingModal");
+function stripePublicKeys() {
+    return {
+        live: "pk_live_51OEIojC1Uv10wqUugUxFvBmy3CWhpFjR9t9lR9trtxfdxgKWdnQxzUERnlysdy1USdCfRTvUq72pBIAKNPH9V3tj00COXqcXEt",
+        test: "pk_test_51OEIojC1Uv10wqUudCsaCYGleVine1HcYMo3kLbOJDbFnetTHFMLkCEiCt24J256ahte6UCvHkBfFMrlEIT7qFlE00LQx8SDKD"
+    }
+}
+
 function downloadRequestPost(response, fileName) {
     const url = window.URL.createObjectURL(response)
     const a = document.createElement('a');

@@ -1,5 +1,4 @@
 <?php $v->layout("admin/layouts/_admin") ?>
-<?php $v->insert("admin/layouts/_modal") ?>
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <div class="content-header">
@@ -22,7 +21,7 @@
     <div class="content">
         <div class="vh-100 d-flex justify-content-center align-items-center flex-direction-column flex-column">
             <h1 class="text-center">Atenção! Ao cancelar sua assinatura, a sua conta ficará permanentemente desativada.</h1>
-            <button cancelSubscription class="btn btn-danger btn-lg mt-2" type="button">Cancelar Assinatura Agora Mesmo!</button>
+            <a href="<?= url("/admin/customer/cancel-subscription/form") ?>" class="btn btn-danger btn-lg mt-2" type="button">Cancelar Assinatura Agora Mesmo!</a>
         </div>
     </div>
 </div>

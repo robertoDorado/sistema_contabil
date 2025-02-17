@@ -28,6 +28,17 @@ $verifyGlobalEndpoints = [
     "/customer/subscription/process-payment"
 ];
 
+$verifyPaymentGlobalEndpoints = [
+    "/admin/login",
+    ...$verifyGlobalEndpoints
+];
+
+if (!empty(session()->user) && !in_array($_SERVER["REDIRECT_URL"], $verifyPaymentGlobalEndpoints)) {
+    if (session()->user->diff_customer_date > 7 && session()->user->subscription !== "active") {
+        redirect("/customer/subscribe");
+    }
+}
+
 if (empty($_POST["request"]) && !empty($_SERVER["REDIRECT_URL"]) && !in_array($_SERVER["REDIRECT_URL"], $verifyGlobalEndpoints)) {
     if (empty(session()->user)) {
         redirect("/admin/login");
@@ -149,6 +160,8 @@ $route->post("/cash-flow-group/modify/{uuid}", "CashFlowGroup::cashFlowGroupModi
 $route->get("/customer/update-data/form", "Customer::updateDataCustomerForm");
 $route->post("/customer/update-data/form", "Customer::updateDataCustomerForm");
 $route->get("/customer/cancel-subscription", "Customer::cancelSubscription");
+$route->get("/customer/cancel-subscription/form", "Customer::cancelSubscriptionForm");
+$route->post("/customer/cancel-subscription/form", "Customer::cancelSubscriptionForm");
 
 /**
  * Admin empresa

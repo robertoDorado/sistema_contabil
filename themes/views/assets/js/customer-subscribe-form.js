@@ -85,7 +85,7 @@ if (window.location.pathname == "/customer/subscribe") {
             .replace(/(-\d{4})\d+?$/, "$1")
     })
 
-    const stripe = Stripe("pk_live_51OEIojC1Uv10wqUugUxFvBmy3CWhpFjR9t9lR9trtxfdxgKWdnQxzUERnlysdy1USdCfRTvUq72pBIAKNPH9V3tj00COXqcXEt", {
+    const stripe = Stripe(stripePublicKeys().live, {
         locale: "pt-BR"
     })
 
