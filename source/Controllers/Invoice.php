@@ -10,6 +10,7 @@ use Source\Core\Controller;
 use Source\Core\Model;
 use Source\Domain\Model\Company;
 use Source\Domain\Model\Invoice as ModelInvoice;
+use Source\Domain\Model\TaxRegime;
 use Source\Support\Invoice as SupportInvoice;
 use Source\Support\Message;
 
@@ -837,11 +838,32 @@ class Invoice extends Controller
         $company->setId($responseInitializaUserAndCompany["company_id"]);
         $companyData = $company->findCompanyById();
 
+        $taxRegime = new TaxRegime();
+        $taxRegimeData = $taxRegime->findTaxRegimeByTaxRegimeModelId(
+            ["id"],
+            ["tax_regime_value"],
+            [
+                "id_company" => $responseInitializaUserAndCompany["company_id"],
+                "id_user" => $responseInitializaUserAndCompany["user"]->getId()
+            ]
+        )->tax_regime_value ?? "";
+
+        $taxRegimeData = strtolower($taxRegimeData);
+        $checkTaxRegimeCode = [
+            "simples nacional" => 1,
+            "mei" => 1,
+            "simples nacional - excesso de sublimite" => 2,
+            "lucro real" => 3,
+            "lucro presumido" => 3
+        ];
+
+        $taxRegimeData = $checkTaxRegimeCode[$taxRegimeData] ?? "";
         echo $this->view->render("admin/invoice-form", [
             "userFullName" => showUserFullName(),
             "endpoints" => ["/admin/invoice/form"],
             "companyData" => $companyData,
-            "responseMunicipality" => $responseMunicipality
+            "responseMunicipality" => $responseMunicipality,
+            "taxRegimeData" => $taxRegimeData
         ]);
     }
 }

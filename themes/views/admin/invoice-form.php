@@ -153,10 +153,10 @@
                                             <div class="form-group">
                                                 <label for="companyTaxRegime">Regime tributário da empresa</label>
                                                 <select name="companyTaxRegime" data-name="Regime tributário da empresa" id="companyTaxRegime" class="form-control">
-                                                    <option value="" disabled selected>Selecione o regime tributário da empresa</option>
-                                                    <option value="1">Simples Nacional</option>
-                                                    <option value="2">Simples Nacional - Excesso de Sublimite de Receita Bruta</option>
-                                                    <option value="3">Regime Normal</option>
+                                                    <option value="" disabled <?= empty($taxRegimeData) ? "selected" : "" ?>>Selecione o regime tributário da empresa</option>
+                                                    <option value="1" <?= !empty($taxRegimeData) && $taxRegimeData === 1 ? "selected" : "" ?>>Simples Nacional</option>
+                                                    <option value="2" <?= !empty($taxRegimeData) && $taxRegimeData === 2 ? "selected" : "" ?>>Simples Nacional - Excesso de Sublimite de Receita Bruta</option>
+                                                    <option value="3" <?= !empty($taxRegimeData) && $taxRegimeData === 3 ? "selected" : "" ?>>Regime Normal</option>
                                                 </select>
                                             </div>
                                         </div>

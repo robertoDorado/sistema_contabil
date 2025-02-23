@@ -87,7 +87,13 @@ class TaxRegime extends Controller
                 $invalidUuid();
             }
 
-            $checkValidTaxRegime = ["lucro presumido", "lucro real", "mei", "simples nacional"];
+            $checkValidTaxRegime = [
+                "lucro presumido",
+                "lucro real",
+                "mei",
+                "simples nacional",
+                "simples nacional - excesso de sublimite"
+            ];
             $taxRegimeValueFormated = strtolower($postData["taxRegimeValue"]);
             if (!in_array($taxRegimeValueFormated, $checkValidTaxRegime)) {
                 http_response_code(400);
@@ -266,7 +272,14 @@ class TaxRegime extends Controller
             die;
         }
 
-        $checkValidTaxRegime = ["lucro presumido", "lucro real", "mei", "simples nacional"];
+        $checkValidTaxRegime = [
+            "lucro presumido",
+            "lucro real",
+            "mei",
+            "simples nacional",
+            "simples nacional - excesso de sublimite"
+        ];
+
         $taxRegimeValueFormated = strtolower($postData["taxRegimeValue"]);
         if (!in_array($taxRegimeValueFormated, $checkValidTaxRegime)) {
             http_response_code(400);
@@ -364,7 +377,13 @@ class TaxRegime extends Controller
                 die;
             }
 
-            $allTaxRegimes = ["Simples Nacional", "Lucro Presumido", "Lucro Real", "MEI"];
+            $allTaxRegimes = [
+                "Simples Nacional",
+                "Lucro Presumido",
+                "Lucro Real",
+                "MEI",
+                "Simples Nacional - Excesso de Sublimite"
+            ];
             $responseTaxRegimeModel = null;
 
             $arrayUuid = [];
