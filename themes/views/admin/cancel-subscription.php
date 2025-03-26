@@ -20,7 +20,7 @@
 
     <div class="content">
         <div class="vh-100 d-flex justify-content-center align-items-center flex-direction-column flex-column">
-            <h1 class="text-center">Atenção! Ao cancelar sua assinatura, a sua conta ficará permanentemente desativada.</h1>
+            <h1 class="text-center">Atenção! ao cancelar a assinatura o usuário terá acesso até a data <?= date("d/m/Y", strtotime(session()->user->period_end)) ?></h1>
             <a href="<?= url("/admin/customer/cancel-subscription/form") ?>" class="btn btn-danger btn-lg mt-2" type="button">Cancelar Assinatura Agora Mesmo!</a>
         </div>
     </div>

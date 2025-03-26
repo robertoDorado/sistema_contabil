@@ -28,18 +28,6 @@ $verifyGlobalEndpoints = [
     "/customer/subscription/process-payment"
 ];
 
-$verifyPaymentGlobalEndpoints = [
-    "/admin/login",
-    ...$verifyGlobalEndpoints
-];
-
-$usersAllowedEmail = ["robertodorado7@gmail.com"];
-if (!empty(session()->user) && !in_array($_SERVER["REDIRECT_URL"], $verifyPaymentGlobalEndpoints) && !in_array(session()->user->user_email, $usersAllowedEmail)) {
-    if (session()->user->diff_customer_date > 7 && session()->user->subscription !== "active") {
-        redirect("/customer/subscribe");
-    }
-}
-
 if (empty($_POST["request"]) && !empty($_SERVER["REDIRECT_URL"]) && !in_array($_SERVER["REDIRECT_URL"], $verifyGlobalEndpoints)) {
     if (empty(session()->user)) {
         redirect("/admin/login");

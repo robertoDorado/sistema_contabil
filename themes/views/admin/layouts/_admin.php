@@ -19,12 +19,25 @@
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
         <a href="<?= url("/admin") ?>" class="brand-link text-center">
-            <span class="brand-text font-weight-light">Sistema Contabil</span><br />
+            <span class="brand-text font-weight-light">Sistema Financeiro</span><br />
             <?php if (empty(session()->user->user_type)) : ?>
-                <span class="right badge badge-danger"><?= (!empty(session()->user->subscription) &&
-                                                            session()->user->subscription == "active" ? "Assinatura ativa" : "Conta grátis") ?></span><br />
+                <?php if (!empty(session()->user->subscription) && session()->user->subscription == "active") : ?>
+                    <span class="right badge badge-danger">
+                        Assinatura ativa
+                    </span><br />
+                <?php elseif (!empty(session()->user->subscription) && session()->user->subscription == "trialing") : ?>
+                    <span class="right badge badge-danger">
+                        Assinatura em avaliação
+                    </span><br />
+                <?php else : ?>
+                    <span class="right badge badge-danger">
+                        Conta grátis
+                    </span><br />
+                <?php endif ?>
                 <?php if (!empty(session()->user->period_end) && session()->user->subscription == "active") : ?>
                     <span style="font-size:1rem" class="brand-text font-weight-light">Renovação em <?= date("d/m/Y", strtotime(session()->user->period_end)) ?></span>
+                <?php elseif (!empty(session()->user->period_end) && session()->user->subscription == "trialing") : ?>
+                    <span style="font-size:1rem" class="brand-text font-weight-light">A cobrança será realizada no dia <br /> <?= date("d/m/Y", strtotime(session()->user->period_end)) ?></span>
                 <?php endif ?>
             <?php endif ?>
         </a>

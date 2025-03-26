@@ -2,10 +2,15 @@
 <div class="register-box">
     <div class="card card-outline card-primary">
         <div class="card-header text-center">
-            <a href="#" class="h1"><b>Assinatura Mensal</a>
+            <a href="#" class="h1"><b>Assinatura</a>
         </div>
         <div class="card-body">
-            <p class="login-box-msg">Faça a sua assinatura do sistema contabil por R$ 208,75 por mês.</p>
+            <p class="login-box-msg">
+                Faça a sua assinatura do sistema financeiro por 
+                R$ <?= number_format(formatStripePriceInFloatValue(true), 2, ',', '.') ?> 
+                por <?= formatStripeIntervalPeriod(true) ?>
+                <?= formaStripetTextFreeTrial() ?>
+            </p>
 
             <form action="#" method="post" id="subscriptionForm">
                 <div class="input-group mb-3">

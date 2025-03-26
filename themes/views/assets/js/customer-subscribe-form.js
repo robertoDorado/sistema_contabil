@@ -149,9 +149,22 @@ if (window.location.pathname == "/customer/subscribe") {
             throw new Error("As senhas não conferem")
         }
 
+        const urlParams = new URLSearchParams(window.location.search)
         const form = new FormData(this)
-        showSpinner(btnSubmit)
 
+        if (urlParams.has('free_days')) {
+            form.append('free_days', urlParams.get('free_days'))
+        }
+
+        if (urlParams.has('value')) {
+            form.append('value', urlParams.get('value'))
+        }
+
+        if (urlParams.has('period')) {
+            form.append('period', urlParams.get('period'))
+        }
+
+        showSpinner(btnSubmit)
         stripe.createToken(card).then(function (response) {
             let message = ""
             if (response.error) {

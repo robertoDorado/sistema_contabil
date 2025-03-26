@@ -83,52 +83,66 @@ class Login extends Controller
                 setcookie("user_password", $requestPost["userPassword"], time() + 3600);
             }
 
-            $subscription = new Subscription();
-            $subscription->customer_id = $userData->id_customer;
-            $subscriptionData = $subscription->findSubsCriptionByCustomerId(["status", "period_end"]);
-
-            if (empty($subscriptionData)) {
-                $subscriptionStatus = new \stdClass();
-                $subscriptionStatus->status = "free";
-            }
-
-            $status = empty($subscriptionData)
-                ? $subscriptionStatus->status : $subscriptionData->getStatus();
-            $periodEnd = empty($subscriptionData->period_end) ? null : $subscriptionData->period_end;
-
             $customer = new Customer();
             $customer->customer_id = $userData->id_customer;
             $customerData = $customer->findCustomerById();
 
-            $customerCreatedAtInstance = new DateTime($customerData->created_at);
-            $now = new DateTime();
-            $diffCustomerDate = $now->diff($customerCreatedAtInstance);
+            $subscription = new Subscription();
+            $subscription->customer_id = $userData->id_customer;
 
-            session()->set("user", [
-                "subscription" => $status,
-                "id_customer" => $customerData->id,
-                "user_full_name" => $userData->user_full_name,
-                "user_nick_name" => $userData->user_nick_name,
-                "user_email" => $userData->user_email,
-                "period_end" => $periodEnd,
-                "user_type" => $requestPost["userType"],
-                "diff_customer_date" => $diffCustomerDate->days
-            ]);
-
-            $verifyRedirectUrl = [
-                "0" =>  url("/admin"),
-                "1" =>  url("/admin/support/dashboard")
-            ];
-
-            $url = $verifyRedirectUrl[$requestPost["userType"]];
-            $usersAllowedEmail = ["robertodorado7@gmail.com"];
+            $subscriptionData = $subscription->findAllSubscriptiosByCustomerId(["status", "period_end", "subscription_id"]);
+            $subscriptionData = array_values(array_filter($subscriptionData, fn($item) => in_array($item->getStatus(), ['active', 'trialing'])));
             
-            if ($diffCustomerDate->days > 7 && $status !== "active" && !in_array($customerData->customer_email, $usersAllowedEmail)) {
-                $url = url("/customer/subscribe");
+            $allowEmails = ['robertodorado7@gmail.com'];
+            if (in_array($userData->user_email, $allowEmails)) {
+                session()->set("user", [
+                    "subscription" => 'free',
+                    "id_customer" => $customerData->id,
+                    "user_full_name" => $userData->user_full_name,
+                    "user_nick_name" => $userData->user_nick_name,
+                    "user_email" => $userData->user_email,
+                    "period_end" => (new DateTime())->modify('+1 day')->format('Y-m-d'),
+                    "user_type" => $requestPost["userType"]
+                ]);
+    
+                $verifyRedirectUrl = [
+                    "0" =>  url("/admin"),
+                    "1" =>  url("/admin/support/dashboard")
+                ];
+    
+                $url = $verifyRedirectUrl[$requestPost["userType"]];
+                echo json_encode(["login_success" => true, "url" => $url]);
+                die;
+            }else {
+                if (empty($subscriptionData)) {
+                    echo json_encode(['error' => 'usuário não possui assinatura ou está cancelada']);
+                    die;
+                }
+    
+                $subscriptionData = $subscriptionData[0];
+                $status =  $subscriptionData->getStatus();
+                $periodEnd = empty($subscriptionData->period_end) ? null : $subscriptionData->period_end;
+    
+                session()->set("user", [
+                    "subscription" => $status,
+                    "id_customer" => $customerData->id,
+                    "user_full_name" => $userData->user_full_name,
+                    "user_nick_name" => $userData->user_nick_name,
+                    "user_email" => $userData->user_email,
+                    "period_end" => $periodEnd,
+                    "user_type" => $requestPost["userType"]
+                ]);
+
+                $verifyRedirectUrl = [
+                    "0" =>  url("/admin"),
+                    "1" =>  url("/admin/support/dashboard")
+                ];
+    
+                $url = $verifyRedirectUrl[$requestPost["userType"]];
+                echo json_encode(["login_success" => true, "url" => $url]);
+                die;
             }
 
-            echo json_encode(["login_success" => true, "url" => $url]);
-            die;
         }
 
         echo $this->view->render("admin/login", []);
