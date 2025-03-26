@@ -73,7 +73,7 @@ class Subscription
         $subscriptionId = empty($this->data->subscription_id) ? 0 : $this->data->subscription_id;
         
         $subscriptionData = $this->subscription
-        ->find("subscription_id=:subscription_id AND status=:status", ":subscription_id={$subscriptionId}&status=active", $columns)
+        ->find("subscription_id=:subscription_id", ":subscription_id={$subscriptionId}", $columns)
         ->fetch();
 
         $message = new Message();
@@ -111,7 +111,7 @@ class Subscription
         $customerId = empty($this->data->customer_id) ? 0 : $this->data->customer_id;
         
         $subscriptionData = $this->subscription
-        ->find("customer_id=:customer_id AND status=:status", ":customer_id={$customerId}&:status=active", $columns)
+        ->find("customer_id=:customer_id AND status IN('active', 'trialing')", ":customer_id={$customerId}", $columns)
         ->fetch();
 
         $message = new Message();

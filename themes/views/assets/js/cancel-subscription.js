@@ -14,9 +14,8 @@ if (window.location.pathname == "/admin/customer/cancel-subscription/form") {
         }
 
         const btnSubmit = this.querySelector("[type='submit']")
-        const textBtn = btnSubmit.innerText
-        
         showSpinner(btnSubmit)
+        
         const form = new FormData(this)
         form.append("cancelData", true)
 
@@ -25,7 +24,7 @@ if (window.location.pathname == "/admin/customer/cancel-subscription/form") {
             body: form
         }).then(response => response.json()).then((response) => {
             btnSubmit.removeAttribute("disabled")
-            btnSubmit.innerHTML = textBtn
+            btnSubmit.innerHTML = "Cancelar assinatura"
             let message = ""
 
             if (response.error) {

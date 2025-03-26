@@ -357,14 +357,14 @@
                     <p>Formulário do usuário</p>
                 </a>
             </li>
-            <?php if (session()->user->subscription != "active") : ?>
+            <?php if (!in_array(session()->user->subscription, ['active', 'trialing'])) : ?>
                 <li class="nav-item">
                     <a href="<?= url("/customer/subscribe") ?>" class="nav-link">
                         <p>Comprar assinatura mensal</p>
                     </a>
                 </li>
             <?php endif ?>
-            <?php if (!empty(session()->user->subscription) && session()->user->subscription == "active") : ?>
+            <?php if (!empty(session()->user->subscription) && in_array(session()->user->subscription, ['active', 'trialing'])) : ?>
                 <li class="nav-item">
                     <a href="<?= url("/admin/customer/cancel-subscription") ?>" class="nav-link">
                         <p>Cancelar assinatura</p>

@@ -35,7 +35,7 @@ class Customer extends Controller
 
     public function cancelSubscription()
     {
-        if (session()->user->subscription != "active") {
+        if (!in_array(session()->user->subscription, ['active', 'trialing'])) {
             redirect("/admin");
         }
 

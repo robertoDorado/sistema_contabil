@@ -68,7 +68,8 @@ class Subscription extends Controller
         $customerData = $customer->findCustomerByEmail();
 
         if (empty($customerData)) {
-            throw new Exception($customer->message->json());
+            echo $customer->message->json();
+            die;
         }
 
         $subscription = new ModelSubscription();
@@ -76,7 +77,8 @@ class Subscription extends Controller
         $subscriptionData = $subscription->findSubsCriptionByCustomerId(["subscription_id", "status"]);
 
         if (empty($subscriptionData)) {
-            throw new Exception($subscription->message->json());
+            echo $subscription->message->json();
+            die;
         }
 
         $stripePayment = new StripePayment();
@@ -88,7 +90,9 @@ class Subscription extends Controller
             $subscriptionData = $subscription->findSubsCriptionBySubscriptionId(["id"]);
 
             if (empty($subscriptionData)) {
-                throw new Exception($subscription->message->json());
+                http_response_code(400);
+                echo $subscription->message->json();
+                die;
             }
 
             $customer = new Customer();
@@ -112,7 +116,7 @@ class Subscription extends Controller
 
             echo json_encode(["success" => "assinatura cancelada com sucesso"]);
         } else {
-            echo json_encode(["error" => "erro interno ao cancelar assinatura"]);
+            echo $stripePayment->message->json();
         }
     }
 
