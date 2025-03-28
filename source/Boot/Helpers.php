@@ -1,11 +1,18 @@
 <?php
 
-function formaStripetTextFreeTrial() {
+function allowUsersEmail()
+{
+    return ['robertodorado7@gmail.com'];
+}
+
+function formaStripetTextFreeTrial()
+{
     $days = preg_match("/^\d+$/", $_GET['free_days'] ?? "") ? $_GET['free_days'] : 7;
     return !empty($_GET['free_days']) ? "({$days} dias gratuito)" : "";
 }
 
-function formatStripeIntervalPeriod(bool $isFormatted = false, string $period = DEFAULT_PERIOD) {
+function formatStripeIntervalPeriod(bool $isFormatted = false, string $period = DEFAULT_PERIOD)
+{
     $period = $_GET['period'] ?? $period;
     $checkIntervalPeriod = [
         "month" => function () use ($isFormatted) {
@@ -29,17 +36,20 @@ function formatStripeIntervalPeriod(bool $isFormatted = false, string $period = 
     return $checkIntervalPeriod[$period]();
 }
 
-function formatStripePriceInFloatValue(bool $isFormatted = false, string $value = DEFAULT_PRICE_VALUE) {
+function formatStripePriceInFloatValue(bool $isFormatted = false, string $value = DEFAULT_PRICE_VALUE)
+{
     $value = $_GET['value'] ?? $value;
     return $isFormatted ? preg_replace("/(\d+)(\d{2})$/", "$1.$2", $value) : $value;
 }
 
-function dumpAndDie($data) {
+function dumpAndDie($data)
+{
     var_dump($data);
     die;
 }
 
-function printData($data) {
+function printData($data)
+{
     echo "<pre>";
     print_r($data);
     die;

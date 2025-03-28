@@ -93,8 +93,7 @@ class Login extends Controller
             $subscriptionData = $subscription->findAllSubscriptiosByCustomerId(["status", "period_end", "subscription_id"]);
             $subscriptionData = array_values(array_filter($subscriptionData, fn($item) => in_array($item->getStatus(), ['active', 'trialing'])));
             
-            $allowEmails = ['robertodorado7@gmail.com'];
-            if (in_array($userData->user_email, $allowEmails)) {
+            if (in_array($userData->user_email, allowUsersEmail())) {
                 session()->set("user", [
                     "subscription" => 'free',
                     "id_customer" => $customerData->id,
