@@ -124,10 +124,10 @@ class Server extends Controller
                 }
 
                 $dateTimePeriodStart = new DateTime();
-                $dateTimePeriodStart->setTimestamp($event->data->object->period->start);
+                $dateTimePeriodStart->setTimestamp($event->data->object->lines->data[0]->period->start);
 
                 $dateTimePeriodEnd = new DateTime();
-                $dateTimePeriodEnd->setTimestamp($event->data->object->period->end);
+                $dateTimePeriodEnd->setTimestamp($event->data->object->lines->data[0]->period->end);
 
                 $subscription = new Subscription();
                 $response = $subscription->updateSubscriptionByChargeId([
