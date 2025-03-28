@@ -5,12 +5,22 @@ ob_start();
 require __DIR__ . '/vendor/autoload.php';
 
 use Source\Core\MyRouter;
+use Source\Domain\Model\Subscription;
 
 setlocale(LC_ALL, 'en_US.UTF-8');
 date_default_timezone_set("America/Sao_Paulo");
 
-$path = "./Logs/error.log";
+if (!empty(session()->user)) {
+    $subscription = new Subscription();
+    $subscription->customer_id = session()->user->id_customer;
+    $subscriptionData = $subscription->findSubsCriptionByCustomerId(["id"]);
+    if (empty($subscriptionData)) {
+        session()->unset('user');
+        redirect('/admin/login');
+    }
+}
 
+$path = "./Logs/error.log";
 if (!file_exists($path)) {
     mkdir("Logs");
     file_put_contents($path, '');
