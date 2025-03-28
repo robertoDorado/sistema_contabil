@@ -168,8 +168,8 @@ class Subscription extends Controller
             }
 
             if (!empty($requestPost['free_days'])) {
-                if ($requestPost['free_days'] > 30) {
-                    echo $errorMessage("período gratuito acima de 30 dias");
+                if ($requestPost['free_days'] > 7) {
+                    echo $errorMessage("período gratuito não autorizado");
                     die;
                 }
             }
@@ -184,8 +184,16 @@ class Subscription extends Controller
 
             if (!empty($requestPost['period']) && !empty($requestPost['value'])) {
                 $value = formatStripePriceInFloatValue(true, $requestPost['value']);
-                if ($requestPost['period'] === 'year' && $value < 1000) {
-                    echo $errorMessage("valor anual inválido (abaixo de R$ 1.000,00)");
+                if ($requestPost['period'] === 'year' && $value < 1200) {
+                    echo $errorMessage("valor anual não autorizado");
+                    die;
+                }
+            }
+            
+            if (!empty($requestPost['value'])) {
+                $value = formatStripePriceInFloatValue(true, $requestPost['value']);
+                if ($value < DEFAULT_PRICE_VALUE) {
+                    echo $errorMessage("valor da mensalidade não autorizado.");
                     die;
                 }
             }
