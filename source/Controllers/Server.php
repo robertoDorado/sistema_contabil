@@ -64,27 +64,6 @@ class Server extends Controller
                     throw new Exception($subscription->message->json() . json_encode(["subscription_id" => $id]));
                 }
 
-                $customer = new Customer();
-                $customer->setId($subscriptionData->customer_id);
-                $response = $customer->updateCustomerById([
-                    "id" => $subscriptionData->customer_id,
-                    "deleted" => 1
-                ]);
-
-                if (empty($response)) {
-                    throw new Exception($customer->message->json() . json_encode(["subscription_id" => $id]));
-                }
-
-                $user = new User();
-                $response = $user->updateUserByCustomerId([
-                    "id_customer" => $customer,
-                    "deleted" => 1
-                ]);
-
-                if (empty($response)) {
-                    throw new Exception($user->message->json() . json_encode(["subscription_id" => $id]));
-                }
-
                 $response = file_put_contents(CONF_SUBSCRIPTION_CANCELED_PATH, json_encode($subscriptionData->data())  . PHP_EOL, FILE_APPEND);
                 if (!$response) {
                     throw new Exception("Não foi possível criar o arquivo " . CONF_SUBSCRIPTION_CANCELED_PATH . "");
