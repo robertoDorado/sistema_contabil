@@ -42,7 +42,7 @@ class StripePayment
      */
     public function __construct()
     {
-        $this->stripeClient = new StripeClient(STRIPE_SECRET_KEY);
+        $this->stripeClient = new StripeClient(STRIPE_TEST_SECRET_KEY);
         $this->data = new \stdClass();
     }
 
