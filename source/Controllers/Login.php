@@ -96,7 +96,7 @@ class Login extends Controller
             if (in_array($userData->user_email, allowUsersEmail())) {
                 session()->set("user", [
                     "subscription" => 'free',
-                    "id_customer" => $customerData->id,
+                    "id_customer" => $customerData->id ?? null,
                     "user_full_name" => $userData->user_full_name,
                     "user_nick_name" => $userData->user_nick_name,
                     "user_email" => $userData->user_email,
