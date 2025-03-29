@@ -7,8 +7,6 @@ require __DIR__ . '/vendor/autoload.php';
 use Source\Core\MyRouter;
 use Source\Domain\Model\Subscription;
 
-// testCommit
-
 setlocale(LC_ALL, 'en_US.UTF-8');
 date_default_timezone_set("America/Sao_Paulo");
 
