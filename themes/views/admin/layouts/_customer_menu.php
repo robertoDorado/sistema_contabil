@@ -359,7 +359,7 @@
             </li>
             <?php if (!in_array(session()->user->subscription, ['active', 'trialing'])) : ?>
                 <li class="nav-item">
-                    <a href="<?= url("/customer/subscribe") ?>" class="nav-link">
+                    <a href="<?= url(DEFAULT_ENDPOINT_SUBSCRIPTION) ?>" class="nav-link">
                         <p>Comprar assinatura mensal</p>
                     </a>
                 </li>

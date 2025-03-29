@@ -48,7 +48,7 @@
           </div>
           <!-- /.col -->
         </div>
-        <a href="<?= url("/customer/subscribe") ?>">Faça uma assinatura</a>
+        <a href="<?= url(DEFAULT_ENDPOINT_SUBSCRIPTION) ?>">Faça uma assinatura</a>
       </form>
     </div>
     <!-- /.card-body -->

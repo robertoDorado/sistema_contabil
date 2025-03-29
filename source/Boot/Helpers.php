@@ -1,5 +1,58 @@
 <?php
 
+function validateSubscriptionQueryString($callbackAction)
+{
+    if (!is_callable($callbackAction)) {
+        throw new Exception('o parâmetro precisa obrigatóriamente ser uma função');
+    }
+
+    $queryStringParsed = [];
+    $_SERVER['REQUEST_METHOD'] === 'GET' ? parse_str($_SERVER['QUERY_STRING'], $queryStringParsed) : $queryStringParsed = $_POST;
+
+    $validKeys = ["free_days", "period", "value"];
+    $validateQueryStringKeys = array_values(array_flip($queryStringParsed));
+    $validateQueryStringKeys = array_values(array_filter($validateQueryStringKeys, function($item) use ($validKeys) {
+        return in_array($item, $validKeys);
+    }));
+
+    sort($validateQueryStringKeys);
+    if ($validateQueryStringKeys !== $validKeys) {
+        $callbackAction();
+    }
+
+    if (!preg_match("/^\d+$/", $queryStringParsed['free_days'])) {
+        $callbackAction();
+    }
+
+    if (!preg_match("/^\d+$/", $queryStringParsed['value'])) {
+        $callbackAction();
+    }
+
+    $defaultSubscriptionValue = formatStripePriceInFloatValue(true, DEFAULT_PRICE_VALUE);
+    $subscriptionValue = formatStripePriceInFloatValue(true, $queryStringParsed['value']);
+
+    if ($subscriptionValue < $defaultSubscriptionValue) {
+        $callbackAction();
+    }
+
+    $subscriptionYearDefaultValue = number_format(($defaultSubscriptionValue * 12) * (1 - 0.1), 2, '.', '');
+    if ($queryStringParsed['period'] === 'year' && $subscriptionValue < $subscriptionYearDefaultValue) {
+        $callbackAction();
+    }
+
+    if (!in_array($queryStringParsed['period'], ['month', 'year'])) {
+        $callbackAction();
+    }
+
+    if ($queryStringParsed['period'] === 'month' && $subscriptionValue < $defaultSubscriptionValue) {
+        $callbackAction();
+    }
+    
+    if ($queryStringParsed['free_days'] > 7) {
+        $callbackAction();
+    }
+}
+
 function allowUsersEmail()
 {
     return ['robertodorado7@gmail.com'];
@@ -11,7 +64,7 @@ function formaStripetTextFreeTrial()
     return !empty($_GET['free_days']) ? "({$days} dias gratuito)" : "";
 }
 
-function formatStripeIntervalPeriod(bool $isFormatted = false, string $period = DEFAULT_PERIOD)
+function formatStripeIntervalPeriod(bool $isFormatted, string $period)
 {
     $period = $_GET['period'] ?? $period;
     $checkIntervalPeriod = [
@@ -36,9 +89,8 @@ function formatStripeIntervalPeriod(bool $isFormatted = false, string $period = 
     return $checkIntervalPeriod[$period]();
 }
 
-function formatStripePriceInFloatValue(bool $isFormatted = false, string $value = DEFAULT_PRICE_VALUE)
+function formatStripePriceInFloatValue(bool $isFormatted, string $value)
 {
-    $value = $_GET['value'] ?? $value;
     return $isFormatted ? preg_replace("/(\d+)(\d{2})$/", "$1.$2", $value) : $value;
 }
 

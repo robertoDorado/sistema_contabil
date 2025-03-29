@@ -145,6 +145,11 @@ class Subscription extends Controller
                 ])->getAllPostData();
 
             $errorMessage = fn(string $message) => json_encode(['error' => $message]);
+            validateSubscriptionQueryString(function () use ($errorMessage) {
+                echo $errorMessage("parâmetros inválidos");
+                die;
+            });
+
             if (!preg_match("/^[A-Z]{2}$/", $requestPost["state"])) {
                 echo $errorMessage("estado inválido");
                 die;
@@ -165,37 +170,6 @@ class Subscription extends Controller
             if ($requestPost["password"] != $requestPost["confirmPassword"]) {
                 echo $errorMessage("as senhas não conferem");
                 die;
-            }
-
-            if (!empty($requestPost['free_days'])) {
-                if ($requestPost['free_days'] > 7) {
-                    echo $errorMessage("período gratuito não autorizado");
-                    die;
-                }
-            }
-
-            if (!empty($requestPost['period'])) {
-                $checkIntervalPeriod = ["month", "year", "week", "day"];
-                if (!in_array($requestPost['period'], $checkIntervalPeriod)) {
-                    echo $errorMessage("período inválido");
-                    die;
-                }
-            }
-
-            if (!empty($requestPost['period']) && !empty($requestPost['value'])) {
-                $value = formatStripePriceInFloatValue(true, $requestPost['value']);
-                if ($requestPost['period'] === 'year' && $value < 1200) {
-                    echo $errorMessage("valor anual não autorizado");
-                    die;
-                }
-            }
-            
-            if (!empty($requestPost['value'])) {
-                $value = formatStripePriceInFloatValue(true, $requestPost['value']);
-                if ($value < DEFAULT_PRICE_VALUE) {
-                    echo $errorMessage("valor da mensalidade não autorizado.");
-                    die;
-                }
             }
 
             $customer = new Customer();
@@ -310,12 +284,12 @@ class Subscription extends Controller
                 die;
             }
 
-            $requestPost['value'] = formatStripePriceInFloatValue(false, $requestPost['value'] ?? "");
+            $requestPost['value'] = formatStripePriceInFloatValue(false, $requestPost['value']);
             if (empty($requestPost['value'])) {
                 $requestPost['value'] = DEFAULT_PRICE_VALUE;
             }
 
-            $requestPost['period'] = formatStripeIntervalPeriod(false, $requestPost['period'] ?? "");
+            $requestPost['period'] = formatStripeIntervalPeriod(false, $requestPost['period']);
             if (empty($requestPost['period'])) {
                 $requestPost['period'] = ["interval" => DEFAULT_PERIOD];
             }
@@ -358,6 +332,7 @@ class Subscription extends Controller
                 if (!empty($response->latest_invoice->lines->data)) {
                     $customer = new Customer();
                     $customer->setId($customerId);
+                    $priceValue = formatStripePriceInFloatValue(true, $requestPost['value']);
 
                     foreach ($response->latest_invoice->lines->data as $value) {
                         $response = $subscription->persistData([
@@ -366,6 +341,7 @@ class Subscription extends Controller
                             "customer_id" => $customer,
                             "charge_id" => $response->latest_invoice->charge ?? "ch_" . uniqid(),
                             "product_description" => $value->description,
+                            "price_value" => $priceValue,
                             "period_end" => date("Y-m-d", $value->period->end),
                             "period_start" => date("Y-m-d", $value->period->start),
                             "created_at" => date("Y-m-d"),
