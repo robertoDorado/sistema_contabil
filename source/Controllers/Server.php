@@ -40,7 +40,7 @@ class Server extends Controller
 
         $validateStripeEvent = [
             "invoice.finalized" => function (Event $event) {
-                $id = $event->object->lines->data[0]->parent->subscription_item_details->subscription;
+                $id = $event->data->object->lines->data[0]->parent->subscription_item_details->subscription;
                 $subscription = new Subscription();
 
                 $subscription->subscription_id = $id;
