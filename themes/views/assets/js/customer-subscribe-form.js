@@ -17,6 +17,27 @@ if (window.location.pathname == "/customer/subscribe") {
         }
     }
 
+    const callbackTogglePassword = function() {
+        const eyeIcon = this.firstElementChild
+        const inputElement = this.parentElement.previousElementSibling
+
+        if (eyeIcon.classList.contains("fa-eye-slash")) {
+            eyeIcon.classList.remove("fa-eye-slash")
+            eyeIcon.classList.add("fa-eye")
+            inputElement.type = "text"
+        }else {
+            eyeIcon.classList.remove("fa-eye")
+            eyeIcon.classList.add("fa-eye-slash")
+            inputElement.type = "password"
+        }
+    }
+
+    const passwordToggle = document.getElementById("passwordToggle")
+    const confirmPasswordToggle = document.getElementById("confirmPasswordToggle")
+
+    passwordToggle.addEventListener("click", callbackTogglePassword)
+    confirmPasswordToggle.addEventListener("click", callbackTogglePassword)
+
     const documentData = document.querySelector("[name='document']")
     documentData.addEventListener("input", function () {
         this.value = this.value.replace(/\D/g, "")

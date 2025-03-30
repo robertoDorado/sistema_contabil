@@ -7,8 +7,8 @@
         <div class="card-body">
             <p class="login-box-msg">
                 Faça a sua assinatura do sistema financeiro por 
-                R$ <?= number_format(formatStripePriceInFloatValue(true), 2, ',', '.') ?> 
-                por <?= formatStripeIntervalPeriod(true) ?>
+                R$ <?= number_format(formatStripePriceInFloatValue(true, $_GET['value']), 2, ',', '.') ?> 
+                por <?= formatStripeIntervalPeriod(true, $_GET['period']) ?>
                 <?= formaStripetTextFreeTrial() ?>
             </p>
 
@@ -30,7 +30,7 @@
                     </div>
                 </div>
                 <div class="input-group mb-3 date" data-date-format="dd/mm/yyyy">
-                    <input type="text" value="<?= empty($customerData->birth_date) ? "" : date("d/m/Y", strtotime($customerData->birth_date)) ?>" name="birthDate" id="birthDate" class="form-control" placeholder="Aniversário">
+                    <input type="text" value="<?= empty($customerData->birth_date) ? "" : date("d/m/Y", strtotime($customerData->birth_date)) ?>" name="birthDate" id="birthDate" class="form-control" placeholder="Data de Nascimento">
                     <div class="input-group-append">
                         <div class="input-group-text">
                             <i class="fa-solid fa-cake-candles"></i>
@@ -132,17 +132,17 @@
                 <div class="input-group mb-3">
                     <input type="password" name="password" class="form-control" placeholder="Senha">
                     <div class="input-group-append">
-                        <div class="input-group-text">
-                            <span class="fas fa-lock"></span>
+                        <div class="input-group-text" style="cursor:pointer" id="passwordToggle">
+                            <span class="fas fa-eye-slash"></span>
                         </div>
                     </div>
                 </div>
                 <div class="input-group mb-3">
-                    <input type="password" name="confirmPassword" class="form-control" placeholder="Confirme a senha">
                     <input type="hidden" name="csrfToken" value="<?= $csrfToken ?>">
+                    <input type="password" name="confirmPassword" class="form-control" placeholder="Confirme a senha">
                     <div class="input-group-append">
-                        <div class="input-group-text">
-                            <span class="fas fa-lock"></span>
+                        <div class="input-group-text" style="cursor:pointer" id="confirmPasswordToggle">
+                            <span class="fas fa-eye-slash"></span>
                         </div>
                     </div>
                 </div>

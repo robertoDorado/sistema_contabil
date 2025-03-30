@@ -156,6 +156,10 @@ class Customer extends Controller
             redirect("/admin/login");
         }
 
+        validateSubscriptionQueryString(function() {
+            redirect('/admin/login');
+        });
+
         $customerData = null;
         $userData = null;
 

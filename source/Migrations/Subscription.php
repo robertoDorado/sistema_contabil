@@ -32,9 +32,17 @@ class Subscription
         $this->ddl->setProperty('');
         $this->ddl->setKeysToProperties([
             "BIGINT AUTO_INCREMENT PRIMARY KEY",
-            "VARCHAR(36) UNIQUE NOT NULL", "VARCHAR(255) NOT NULL", "BIGINT NOT NULL",
-            "VARCHAR(255) NOT NULL", "VARCHAR(255) NOT NULL", "DATE NOT NULL", "DATE NOT NULL",
-            "DATE NOT NULL", "DATE NOT NULL", "VARCHAR(255) NOT NULL",
+            "VARCHAR(36) UNIQUE NOT NULL",
+            "VARCHAR(255) NOT NULL",
+            "BIGINT NOT NULL",
+            "VARCHAR(255) NOT NULL",
+            "VARCHAR(255) NOT NULL",
+            "DECIMAL(10, 2) NOT NULL",
+            "DATE NOT NULL",
+            "DATE NOT NULL",
+            "DATE NOT NULL",
+            "DATE NOT NULL",
+            "VARCHAR(255) NOT NULL",
             "CONSTRAINT fk_customer_subscription FOREIGN KEY (customer_id) REFERENCES customer(id) ON DELETE CASCADE ON UPDATE CASCADE"
         ]);
         $this->ddl->setForeignKeyChecks(0)->dropTableIfExists()->createTableQuery()->setForeignKeyChecks(1);

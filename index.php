@@ -13,10 +13,13 @@ date_default_timezone_set("America/Sao_Paulo");
 if (!empty(session()->user) && !in_array(session()->user->user_email, allowUsersEmail())) {
     $subscription = new Subscription();
     $subscription->customer_id = session()->user->id_customer;
-    $subscriptionData = $subscription->findSubsCriptionByCustomerId(["id"]);
+    $subscriptionData = $subscription->findSubsCriptionByCustomerId(["id", "status", "period_end"]);
     if (empty($subscriptionData)) {
         session()->unset('user');
         redirect('/admin/login');
+    }else {
+        session()->user->subscription = $subscriptionData->getStatus();
+        session()->user->period_end = $subscriptionData->period_end;
     }
 }
 
