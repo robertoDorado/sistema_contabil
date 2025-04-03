@@ -38,6 +38,7 @@ class Subscription
             "VARCHAR(255) NOT NULL",
             "VARCHAR(255) NOT NULL",
             "DECIMAL(10, 2) NOT NULL",
+            "VARCHAR(255) NOT NULL",
             "DATE NOT NULL",
             "DATE NOT NULL",
             "DATE NOT NULL",

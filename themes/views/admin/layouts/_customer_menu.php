@@ -1,168 +1,172 @@
 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-    <li class="nav-item">
-        <a href="#" class="nav-link">
-            <i class="nav-icon fas fa-money-check"></i>
-            <p>
-                Menu fiscal
-                <i class="right fas fa-angle-left"></i>
-            </p>
-        </a>
-        <ul class="nav nav-treeview">
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <p>Nota Fiscal Eletrônica</p>
+    <?php if (in_array(session()->user->subscription_type, checkPremiumAccount())) : ?>
+        <li class="nav-item">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-money-check"></i>
+                <p>
+                    Menu fiscal
                     <i class="right fas fa-angle-left"></i>
-                </a>
-                <ul class="nav nav-treeview">
-                    <li class="nav-item">
-                        <a href="<?= url("/admin/invoice/form") ?>" class="nav-link">
-                            <p>Emissão de NF-e</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?= url("/admin/invoice/report") ?>" class="nav-link">
-                            <p>Relatório de NF-e</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?= url("/admin/invoice/backup") ?>" class="nav-link">
-                            <p>Backup de NF-e</p>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-        </ul>
-        <ul class="nav nav-treeview">
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <p>Parametrização Fiscal</p>
+                </p>
+            </a>
+            <ul class="nav nav-treeview">
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <p>NF-e de Produto</p>
+                        <i class="right fas fa-angle-left"></i>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="<?= url("/admin/invoice/form") ?>" class="nav-link">
+                                <p>Emissão de NF-e</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<?= url("/admin/invoice/report") ?>" class="nav-link">
+                                <p>Relatório de NF-e</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<?= url("/admin/invoice/backup") ?>" class="nav-link">
+                                <p>Backup de NF-e</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="nav nav-treeview">
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <p>Parametrização Fiscal</p>
+                        <i class="right fas fa-angle-left"></i>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="<?= url("/admin/tax-regime/form") ?>" class="nav-link">
+                                <p>Regime Tributário</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    <?php endif ?>
+    <?php if (in_array(session()->user->subscription_type, checkPremiumAccount())) : ?>
+        <li class="nav-item">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-balance-scale"></i>
+                <p>
+                    Balanço patrimonial
                     <i class="right fas fa-angle-left"></i>
-                </a>
-                <ul class="nav nav-treeview">
-                    <li class="nav-item">
-                        <a href="<?= url("/admin/tax-regime/form") ?>" class="nav-link">
-                            <p>Regime Tributário</p>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-        </ul>
-    </li>
-    <li class="nav-item">
-        <a href="#" class="nav-link">
-            <i class="nav-icon fas fa-balance-scale"></i>
-            <p>
-                Balanço patrimonial
-                <i class="right fas fa-angle-left"></i>
-            </p>
-        </a>
-        <ul class="nav nav-treeview">
-            <li class="nav-item">
-                <a href="<?= url("/admin/balance-sheet/balance-sheet-overview/report") ?>" class="nav-link">
-                    <p>Visão geral do balanço</p>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <p>Configuração do balanço</p>
-                    <i class="right fas fa-angle-left"></i>
-                </a>
-                <ul class="nav nav-treeview">
-                    <li class="nav-item">
-                        <a href="<?= url("/admin/balance-sheet/chart-of-account") ?>" class="nav-link">
-                            <p>Plano de contas</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?= url("/admin/balance-sheet/chart-of-account/backup") ?>" class="nav-link">
-                            <p>Backup plano de contas</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?= url("/admin/balance-sheet/chart-of-account-group/form") ?>" class="nav-link">
-                            <p>Nova categoria de contas</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?= url("/admin/balance-sheet/chart-of-account-group") ?>" class="nav-link">
-                            <p>Categoria de contas</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?= url("/admin/balance-sheet/chart-of-account-group/backup") ?>" class="nav-link">
-                            <p>Backup categoria de contas</p>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-item">
-                <a href="<?= url("/admin/balance-sheet/balance-sheet-overview/form") ?>" class="nav-link">
-                    <p>Lançamentos contábeis</p>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <p>Relatórios contábeis</p>
-                    <i class="right fas fa-angle-left"></i>
-                </a>
-                <ul class="nav nav-treeview">
-                    <li class="nav-item">
-                        <a href="<?= url("/admin/balance-sheet/daily-journal/report") ?>" class="nav-link">
-                            <p>Livro diário</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?= url("/admin/balance-sheet/daily-journal/report/backup") ?>" class="nav-link">
-                            <p>Backup do livro diário</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?= url("/admin/balance-sheet/trial-balance/report") ?>" class="nav-link">
-                            <p>Balancete de verificação</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?= url("/admin/balance-sheet/general-ledge/report") ?>" class="nav-link">
-                            <p>Livro razão</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?= url("/admin/balance-sheet/income-statement/report") ?>" class="nav-link">
-                            <p>DRE</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?= url("/admin/balance-sheet/statement-of-value-added/report") ?>" class="nav-link">
-                            <p>DVA</p>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <p>Notas explicativas</p>
-                    <i class="right fas fa-angle-left"></i>
-                </a>
-                <ul class="nav nav-treeview">
-                    <li class="nav-item">
-                        <a href="<?= url("/admin/balance-sheet-explanatory-notes/form") ?>" class="nav-link">
-                            <p>Adicionar nova nota</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?= url("/admin/balance-sheet-explanatory-notes/report") ?>" class="nav-link">
-                            <p>Relatório de notas</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?= url("/admin/balance-sheet-explanatory-notes/form/backup") ?>" class="nav-link">
-                            <p>Backup de notas</p>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-        </ul>
-    </li>
+                </p>
+            </a>
+            <ul class="nav nav-treeview">
+                <li class="nav-item">
+                    <a href="<?= url("/admin/balance-sheet/balance-sheet-overview/report") ?>" class="nav-link">
+                        <p>Visão geral do balanço</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <p>Configuração do balanço</p>
+                        <i class="right fas fa-angle-left"></i>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="<?= url("/admin/balance-sheet/chart-of-account") ?>" class="nav-link">
+                                <p>Plano de contas</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<?= url("/admin/balance-sheet/chart-of-account/backup") ?>" class="nav-link">
+                                <p>Backup plano de contas</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<?= url("/admin/balance-sheet/chart-of-account-group/form") ?>" class="nav-link">
+                                <p>Nova categoria de contas</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<?= url("/admin/balance-sheet/chart-of-account-group") ?>" class="nav-link">
+                                <p>Categoria de contas</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<?= url("/admin/balance-sheet/chart-of-account-group/backup") ?>" class="nav-link">
+                                <p>Backup categoria de contas</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= url("/admin/balance-sheet/balance-sheet-overview/form") ?>" class="nav-link">
+                        <p>Lançamentos contábeis</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <p>Relatórios contábeis</p>
+                        <i class="right fas fa-angle-left"></i>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="<?= url("/admin/balance-sheet/daily-journal/report") ?>" class="nav-link">
+                                <p>Livro diário</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<?= url("/admin/balance-sheet/daily-journal/report/backup") ?>" class="nav-link">
+                                <p>Backup do livro diário</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<?= url("/admin/balance-sheet/trial-balance/report") ?>" class="nav-link">
+                                <p>Balancete de verificação</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<?= url("/admin/balance-sheet/general-ledge/report") ?>" class="nav-link">
+                                <p>Livro razão</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<?= url("/admin/balance-sheet/income-statement/report") ?>" class="nav-link">
+                                <p>DRE</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<?= url("/admin/balance-sheet/statement-of-value-added/report") ?>" class="nav-link">
+                                <p>DVA</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <p>Notas explicativas</p>
+                        <i class="right fas fa-angle-left"></i>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="<?= url("/admin/balance-sheet-explanatory-notes/form") ?>" class="nav-link">
+                                <p>Adicionar nova nota</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<?= url("/admin/balance-sheet-explanatory-notes/report") ?>" class="nav-link">
+                                <p>Relatório de notas</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<?= url("/admin/balance-sheet-explanatory-notes/form/backup") ?>" class="nav-link">
+                                <p>Backup de notas</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    <?php endif ?>
     <li class="nav-item">
         <a href="#" class="nav-link">
             <i class="nav-icon fas fa-building-user"></i>
@@ -394,25 +398,27 @@
             </li>
         </ul>
     </li>
-    <li class="nav-item">
-        <a href="#" class="nav-link">
-            <i class="nav-icon fas fa-headset"></i>
-            <p>
-                Chamados
-                <i class="right fas fa-angle-left"></i>
-            </p>
-        </a>
-        <ul class="nav nav-treeview">
-            <li class="nav-item">
-                <a href="<?= url("/admin/support/open/ticket") ?>" class="nav-link">
-                    <p>Abrir um chamado</p>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="<?= url("/admin/support/my-tickets") ?>" class="nav-link">
-                    <p>Meus chamados</p>
-                </a>
-            </li>
-        </ul>
-    </li>
+    <?php if (in_array(session()->user->subscription_type, checkPremiumAccount())) : ?>
+        <li class="nav-item">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-headset"></i>
+                <p>
+                    Chamados
+                    <i class="right fas fa-angle-left"></i>
+                </p>
+            </a>
+            <ul class="nav nav-treeview">
+                <li class="nav-item">
+                    <a href="<?= url("/admin/support/open/ticket") ?>" class="nav-link">
+                        <p>Abrir um chamado</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= url("/admin/support/my-tickets") ?>" class="nav-link">
+                        <p>Meus chamados</p>
+                    </a>
+                </li>
+            </ul>
+        </li>
+    <?php endif ?>
 </ul>

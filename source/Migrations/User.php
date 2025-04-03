@@ -26,6 +26,12 @@ class User
         $this->ddl = new DDL(ModelsUser::class);
     }
 
+    public function setUniqueKeyNickName()
+    {
+        $this->ddl->alterTable(["ADD UNIQUE (user_nick_name)"]);
+        return $this->ddl->executeQuery();
+    }
+
     public function setUniqueKeyEmail()
     {
         $this->ddl->alterTable(["ADD UNIQUE (user_email)"]);
@@ -57,4 +63,5 @@ class User
         $this->ddl->executeQuery();
     }
 }
-executeMigrations(User::class);
+(new User())->setUniqueKeyNickName();
+// executeMigrations(User::class);
