@@ -279,7 +279,7 @@ class CashFlow extends Controller
         $verifyTotalDataFromExcelFile = array_map("count", $excelData);
         $verifyTotalDataFromExcelFile = array_unique($verifyTotalDataFromExcelFile);
 
-        $limit = 1000;
+        $limit = 100;
         foreach ($verifyTotalDataFromExcelFile as $value) {
             if ($value > $limit) {
                 http_response_code(400);
