@@ -29,6 +29,9 @@ class Subscription extends Model
     /** @var string Valor da Assinatura */
     protected string $priceValue = "price_value";
 
+    /** Tipo de assinatura */
+    protected string $subscriptionType = "subscription_type";
+
     /** @var string Data de encerramento do ciclo da assinatura */
     protected string $periodEnd = "period_end";
 
@@ -56,6 +59,7 @@ class Subscription extends Model
             $this->chargeId,
             $this->productDescription,
             $this->priceValue,
+            $this->subscriptionType,
             $this->periodEnd,
             $this->periodStart,
             $this->createdAt,

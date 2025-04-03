@@ -55,6 +55,20 @@ class User
         return $this->data->$name ?? null;
     }
 
+    public function findUserByNickName(array $columns): ?ModelsUser
+    {
+        $columns = empty($columns) ? "" : implode(", ", $columns);
+        $this->data->nick_name = empty($this->data->nick_name) ? "" : $this->data->nick_name;
+
+        $response = $this->user->find(
+            "user_nick_name=:user_nick_name", 
+            ":user_nick_name={$this->data->nick_name}",
+            $columns
+        )->fetch();
+
+        return $response ?? null;
+    }
+
     /** @var ModelsUser[] */
     public function findAllUserJoinCustomerJoinSubscription(array $data): array
     {

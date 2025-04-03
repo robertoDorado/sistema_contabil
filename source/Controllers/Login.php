@@ -100,6 +100,7 @@ class Login extends Controller
                     "user_full_name" => $userData->user_full_name,
                     "user_nick_name" => $userData->user_nick_name,
                     "user_email" => $userData->user_email,
+                    "subscription_type" => "premium",
                     "period_end" => (new DateTime())->modify('+1 day')->format('Y-m-d'),
                     "user_type" => $requestPost["userType"]
                 ]);
@@ -128,6 +129,7 @@ class Login extends Controller
                     "user_full_name" => $userData->user_full_name,
                     "user_nick_name" => $userData->user_nick_name,
                     "user_email" => $userData->user_email,
+                    "subscription_type" => $subscriptionData->subscription_type,
                     "period_end" => $periodEnd,
                     "user_type" => $requestPost["userType"]
                 ]);

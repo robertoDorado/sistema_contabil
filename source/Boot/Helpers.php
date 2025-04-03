@@ -1,5 +1,10 @@
 <?php
 
+function checkPremiumAccount()
+{
+    return ['premium_month', 'premium_year', 'premium'];
+}
+
 function validateSubscriptionQueryString($callbackAction)
 {
     if (!is_callable($callbackAction)) {

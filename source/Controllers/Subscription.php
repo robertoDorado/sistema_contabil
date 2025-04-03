@@ -172,6 +172,13 @@ class Subscription extends Controller
                 die;
             }
 
+            $checkSubscriptionType = [
+                "192.66" => "basic_month",
+                "224.49" => "premium_month",
+                "2080.90" => "basic_year",
+                "2424.50" => "premium_year",
+            ];
+
             $customer = new Customer();
             $customer->email = $requestPost["email"];
             $customerData = $customer->findCustomerByEmail();
@@ -212,6 +219,15 @@ class Subscription extends Controller
 
             $customerId = 0;
             if (empty($customerData)) {
+                $user = new User();
+                $user->nick_name = $requestPost["userName"];
+                $checkNickName = $user->findUserByNickName(["id"]);
+
+                if (!empty($checkNickName)) {
+                    echo $errorMessage("nome de usuário já existe");
+                    die;
+                }
+
                 $customer = new Customer();
                 $response = $customer->persistData($requestCustomerData);
                 $customerId = $customer->getId();
@@ -342,6 +358,7 @@ class Subscription extends Controller
                             "charge_id" => $response->latest_invoice->charge ?? "ch_" . uniqid(),
                             "product_description" => $value->description,
                             "price_value" => $priceValue,
+                            "subscription_type" => $checkSubscriptionType[$priceValue] ?? "basic",
                             "period_end" => date("Y-m-d", $value->period->end),
                             "period_start" => date("Y-m-d", $value->period->start),
                             "created_at" => date("Y-m-d"),
