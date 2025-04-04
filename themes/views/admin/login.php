@@ -18,11 +18,11 @@
           </div>
         </div>
         <div class="input-group mb-3">
-          <input type="password" value="<?= empty($_COOKIE["user_password"]) ? '' : $_COOKIE["user_password"] ?>" class="form-control" name="userPassword" placeholder="Senha">
           <input type="hidden" name="csrfToken" value="<?= session()->csrf_token ?>">
+          <input type="password" value="<?= empty($_COOKIE["user_password"]) ? '' : $_COOKIE["user_password"] ?>" class="form-control" name="userPassword" placeholder="Senha">
           <div class="input-group-append">
-            <div class="input-group-text">
-              <span class="fas fa-lock"></span>
+            <div class="input-group-text" style="cursor:pointer" id="passwordToggle">
+              <span class="fas fa-eye-slash"></span>
             </div>
           </div>
         </div>

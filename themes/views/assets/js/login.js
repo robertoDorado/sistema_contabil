@@ -1,4 +1,6 @@
 if (window.location.pathname == "/admin/login") {
+    const passwordToggle = document.getElementById("passwordToggle")
+    passwordToggle.addEventListener("click", callbackTogglePassword)
     
     const loginForm = document.getElementById("loginForm")
     loginForm.addEventListener("submit", function(event) {
