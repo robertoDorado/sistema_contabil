@@ -138,6 +138,11 @@ if (window.location.pathname == "/customer/subscribe") {
     subscriptionForm.addEventListener("submit", function (event) {
         event.preventDefault()
 
+        if (/[\u0300-\u036f]/.test(this.userName.value.normalize("NFD"))) {
+            toastr.error("Nome de usuário não pode conter acentuação")
+            throw new Error("Nome de usuário não pode conter acentuação")
+        }
+
         const btnSubmit = this.querySelector("button[type='submit']")
         if (/\s/.test(this.userName.value)) {
             toastr.warning("Nome de usuário não pode conter espaços em branco")

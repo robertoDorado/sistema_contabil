@@ -1,5 +1,5 @@
 <?php
-$verifyEndpoints = ["/admin/login", "/customer/subscribe"];
+$verifyEndpoints = ["/admin/login", "/customer/subscribe", "/customer/subscription/thanks-purchase"];
 $defineClass = in_array($_SERVER["REDIRECT_URL"], $verifyEndpoints) ? "login-page" : "sidebar-mini";
 ?>
 <!DOCTYPE html>

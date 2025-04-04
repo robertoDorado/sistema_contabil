@@ -8,17 +8,6 @@
     content: "Buscar arquivo";
 }
 
-.thanks-container-purchase {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    background: rgb(193, 193, 193);
-    background: linear-gradient(90deg, rgba(193, 193, 193, 1) 0%, rgba(138, 138, 140, 1) 52%);
-}
-
 .content-message {
     display: flex;
     flex-direction: column;
@@ -144,4 +133,48 @@
     100% {
         transform: rotate(360deg);
     }
+}
+
+.thanks-container-purchase {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    text-align: center;
+}
+
+.thanks-container-purchase h1 {
+    color: #4CAF50;
+}
+
+.thanks-container-purchase p {
+    font-size: 18px;
+}
+
+.thanks-container-purchase a {
+    margin-top: 20px;
+    padding: 12px 24px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.thanks-container-purchase a:hover {
+    background-color: #45a049;
+}
+
+.thanks-container-purchase i {
+    font-size: 5rem;
+    color: #4CAF50;
 }
