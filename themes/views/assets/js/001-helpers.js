@@ -1,4 +1,20 @@
 const modal = document.getElementById("loadingModal");
+
+function callbackTogglePassword() {
+    const eyeIcon = this.firstElementChild
+    const inputElement = this.parentElement.previousElementSibling
+
+    if (eyeIcon.classList.contains("fa-eye-slash")) {
+        eyeIcon.classList.remove("fa-eye-slash")
+        eyeIcon.classList.add("fa-eye")
+        inputElement.type = "text"
+    } else {
+        eyeIcon.classList.remove("fa-eye")
+        eyeIcon.classList.add("fa-eye-slash")
+        inputElement.type = "password"
+    }
+}
+
 function stripePublicKeys() {
     return {
         live: "pk_live_51OEIojC1Uv10wqUugUxFvBmy3CWhpFjR9t9lR9trtxfdxgKWdnQxzUERnlysdy1USdCfRTvUq72pBIAKNPH9V3tj00COXqcXEt",
