@@ -57,7 +57,7 @@ class Server extends Controller
             "updated_at" => $dateTimePeriodStart->format("Y-m-d"),
             "period_start" => $dateTimePeriodStart->format("Y-m-d"),
             "period_end" => $dateTimePeriodEnd->format("Y-m-d"),
-            "status" => "active"
+            "status" => $priceValue > 0 ? "active" : "trialing"
         ]);
         return empty($response) ? [] : ["subscriptionData" => $subscription, "id" => $id];
     }
