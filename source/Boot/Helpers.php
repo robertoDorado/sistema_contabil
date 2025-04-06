@@ -1,5 +1,15 @@
 <?php
 
+function checkSubscriptionType()
+{
+    return [
+        "192.66" => "basic_month",
+        "224.49" => "premium_month",
+        "2080.90" => "basic_year",
+        "2424.50" => "premium_year",
+    ];
+}
+
 function checkPremiumAccount()
 {
     return ['premium_month', 'premium_year', 'premium'];

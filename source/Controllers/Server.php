@@ -55,11 +55,13 @@ class Server extends Controller
 
                 $dateTimePeriodEnd = new DateTime();
                 $dateTimePeriodEnd->setTimestamp($event->data->object->lines->data[0]->period->end);
+                $priceValue = formatStripePriceInFloatValue(true, $event->data->object->lines->data[0]->amount);
 
                 $subscription = new Subscription();
                 $response = $subscription->updateSubscriptionBySubscriptionId([
                     "subscription_id" => $id,
-                    "price_value" => formatStripePriceInFloatValue(true, $event->data->object->lines->data[0]->amount),
+                    "price_value" => $priceValue,
+                    "subscription_type" => checkSubscriptionType()[$priceValue] ?? "basic",
                     "charge_id" => $event->data->object->charge,
                     "product_description" => $event->data->object->lines->data[0]->description,
                     "updated_at" => $dateTimePeriodStart->format("Y-m-d"),
