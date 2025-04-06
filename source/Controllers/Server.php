@@ -4,6 +4,7 @@ namespace Source\Controllers;
 
 use DateTime;
 use Exception;
+use PhpOffice\PhpSpreadsheet\Calculation\LookupRef\Unique;
 use Source\Core\Controller;
 use Source\Domain\Model\Customer;
 use Source\Domain\Model\Subscription;
@@ -51,7 +52,7 @@ class Server extends Controller
             "subscription_id" => $id,
             "price_value" => $priceValue,
             "subscription_type" => checkSubscriptionType()[$priceValue] ?? "basic",
-            "charge_id" => $event->data->object->charge,
+            "charge_id" => $event->data->object->charge ?? "ch_" . uniqid(),
             "product_description" => $event->data->object->lines->data[0]->description,
             "updated_at" => $dateTimePeriodStart->format("Y-m-d"),
             "period_start" => $dateTimePeriodStart->format("Y-m-d"),
