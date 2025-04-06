@@ -52,16 +52,19 @@ class Server extends Controller
             "status" => "active"
         ] : [];
 
+        $chargeData = !empty($event->data->object->charge) ? [
+            "charge_id" => $event->data->object->charge
+        ] : [];
+
         $defaultData = [
             "subscription_id" => $id,
-            "charge_id" => $event->data->object->charge ?? "ch_" . uniqid(),
             "product_description" => $event->data->object->lines->data[0]->description,
             "updated_at" => $dateTimePeriodStart->format("Y-m-d"),
             "period_start" => $dateTimePeriodStart->format("Y-m-d"),
             "period_end" => $dateTimePeriodEnd->format("Y-m-d"),
         ];
 
-        $data = array_merge($defaultData, $priceData);
+        $data = array_merge($defaultData, $priceData, $chargeData);
         $subscription = new Subscription();
         $response = $subscription->updateSubscriptionBySubscriptionId($data);
         return empty($response) ? [] : ["subscriptionData" => $subscription, "id" => $id];
