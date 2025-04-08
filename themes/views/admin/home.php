@@ -109,15 +109,39 @@
                                             <h6><strong>Funcionalidades:</strong></h6>
                                             <ul>
                                                 <li><strong>Projeções de caixa:</strong> Previsão de entradas e saídas de dinheiro em um determinado período futuro, possiblitando filtrar por período.</li>
-                                                <li><strong>Indicadores Financeiros:</strong> Cálculo e exibição de indicadores financeiros. 
-                                                Abaixo a lista dos indicadores financeiros que devem estar cadastrados no grupo de contas para serem exibidas no relatório.</li>
+                                                <li><strong>Indicadores Financeiros:</strong> Cálculo e exibição de indicadores financeiros.
+                                                    Abaixo a lista dos indicadores financeiros que devem estar cadastrados no grupo de contas para serem exibidas no relatório.</li>
                                                 <?php if (!empty(financialIndicators())) : ?>
                                                     <ol>
-                                                        <?php foreach(financialIndicators() as $value): ?>
+                                                        <?php foreach (financialIndicators() as $value): ?>
                                                             <li><?= strtoupper(substr($value, 0, 1)) . substr($value, 1) ?></li>
                                                         <?php endforeach ?>
                                                     </ol>
                                                 <?php endif ?>
+                                                <li><strong>Indicadores</strong></li>
+                                                <ol>
+                                                    <li>Fluxo de Caixa Operacional (FCO)</li>
+                                                    <li>Fluxo de Caixa Livre (FCL)</li>
+                                                    <li>Fluxo de Caixa de Financiamento (FCF)</li>
+                                                    <li>Fluxo de Caixa de Investimento (FCI)</li>
+                                                    <li>Índice de Cobertura de Juros pelo Fluxo de Caixa (ICJFC)</li>
+                                                    <li>Índice de Cobertura do Serviço da Dívida (ICSD)</li>
+                                                    <li>Índice de Retorno sobre o Fluxo de Caixa (IRFC)</li>
+                                                    <li>Margem de Fluxo de Caixa (MFC)</li>
+                                                    <li>Ciclo de caixa</li>
+                                                </ol>
+                                                <li><strong>Cáluculo realizado:</strong></li>
+                                                <ol>
+                                                    <li>FCO=Recebimentos de clientes-Pagamentos a fornecedores e empregados</li>
+                                                    <li>FCL=FCO-Despesas de Capital</li>
+                                                    <li>FCF=Emissão de dívidas ou ações-Pagamento de dívidas ou dividendos</li>
+                                                    <li>FCI=Compra de Ativos Fixos-Venda de Investimentos</li>
+                                                    <li>ICJFC=(FCO+Pagamentos de juros)/Pagamentos de juros</li>
+                                                    <li>ICSD=FCO/Pagamentos de dívidas</li>
+                                                    <li>IRFC=Lucro líquido/FCO</li>
+                                                    <li>MFC=FCO/Receita líquida</li>
+                                                    <li>Ciclo de caixa=Período médio de cobrança + Período médio de estoque - Período médio de pagamento</li>
+                                                </ol>
                                                 <li><strong>Gráficos e visualizações:</strong> Gráficos de barras ou linhas que mostram as tendências de entradas e saídas de caixa ao longo do tempo.</li>
                                             </ul>
                                             <h6><strong>Configuração Variação de Caixa</strong></h6>
