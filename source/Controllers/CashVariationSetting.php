@@ -318,7 +318,7 @@ class CashVariationSetting extends Controller
             "userFullName" => showUserFullName(),
             "cashVariationData" => $cashVariationData,
             "cashFlowGroupData" => $cashFlowGroupData,
-            "endpoints" => []
+            "endpoints" => ["/admin/cash-variation-setting/report"]
         ]);
     }
 

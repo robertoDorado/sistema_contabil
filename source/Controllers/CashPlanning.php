@@ -233,7 +233,7 @@ class CashPlanning extends Controller
             foreach ($grouppedCashFlowData as $grouppedArray) {
                 foreach ($grouppedArray as $groupData) {
                     $cashFlowDateTime = new DateTime($groupData["created_at"]);
-                    if ($currentDateTime->modify("-1 month")->format('m') == $cashFlowDateTime->format('m')) {
+                    if ($currentDateTime->modify("-1 month")->format('Y-m') == $cashFlowDateTime->format('Y-m')) {
                         $cashBudget["opening_cash_balance"] += $groupData["total_entry"];
                     }
 
