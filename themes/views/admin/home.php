@@ -130,7 +130,7 @@
                                                     <li>Margem de Fluxo de Caixa (MFC)</li>
                                                     <li>Ciclo de caixa</li>
                                                 </ol>
-                                                <li><strong>Cáluculo realizado:</strong></li>
+                                                <li><strong>Cálculo realizado:</strong></li>
                                                 <ol>
                                                     <li>FCO=Recebimentos de clientes-Pagamentos a fornecedores e empregados</li>
                                                     <li>FCL=FCO-Despesas de Capital</li>
