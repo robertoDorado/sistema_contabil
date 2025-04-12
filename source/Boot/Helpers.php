@@ -5,7 +5,7 @@ function checkSubscriptionType()
     return [
         "187.62" => "basic_month",
         "202.05" => "premium_month",
-        "2026.28" => "basic_year",
+        "2026.30" => "basic_year",
         "2182.15" => "premium_year",
     ];
 }
