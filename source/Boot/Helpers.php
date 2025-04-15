@@ -3,10 +3,8 @@
 function checkSubscriptionType()
 {
     return [
-        "187.62" => "basic_month",
-        "202.05" => "premium_month",
-        "2026.30" => "basic_year",
-        "2182.15" => "premium_year",
+        "37.52" => "basic_month",
+        "40.41" => "premium_month"
     ];
 }
 
