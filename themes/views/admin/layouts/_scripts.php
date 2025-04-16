@@ -49,6 +49,18 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <script src="https://js.stripe.com/v3/"></script>
     <!-- Select2 -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17009805739"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'AW-17009805739');
+    </script>
 </head>
 
 <body class="hold-transition <?= $defineClass ?>">
