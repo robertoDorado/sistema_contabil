@@ -53,6 +53,8 @@ class SubscriptionTest extends TestCase
 
         $requestPost = [
             "uuid" => Uuid::uuid4(),
+            "price_value" => 100.55,
+            "subscription_type" => "premium",
             "subscription_id" => "sub_" . bin2hex(random_bytes(16)),
             "customer_id" => $this->customer,
             "charge_id" => "ch_" . bin2hex(random_bytes(16)),
@@ -89,9 +91,11 @@ class SubscriptionTest extends TestCase
         $this->subscription = new Subscription();
         $requestPost = [
             "uuid" => "-----",
+            "subscription_type" => "premium",
             "subscription_id" => "sub_" . bin2hex(random_bytes(16)),
+            "price_value" => 100.55,
             "customer_id" => $this->customer,
-            "charge_id" => "ch_" . bin2hex(random_bytes(16)),
+            "charge_id" => "ch_" . uniqid(),
             "product_description" => "sistema_contabil R$ 69,90 1x",
             "period_end" => date("Y-m-d", strtotime("+30 days", strtotime(date("Y-m-d")))),
             "period_start" => date("Y-m-d"),
@@ -109,6 +113,8 @@ class SubscriptionTest extends TestCase
         $this->subscription = new Subscription();
         $requestPost = [
             "uuid" => Uuid::uuid4(),
+            "subscription_type" => "premium",
+            "price_value" => 100.55,
             "subscription_id" => "sub_" . bin2hex(random_bytes(16)),
             "customer_id" => new Subscription(),
             "charge_id" => "ch_" . bin2hex(random_bytes(16)),
@@ -132,6 +138,8 @@ class SubscriptionTest extends TestCase
         $this->subscription = new Subscription();
         $requestPost = [
             "uuid" => Uuid::uuid4(),
+            "subscription_type" => "premium",
+            "price_value" => 100.55,
             "subscription_id" => "test_" . bin2hex(random_bytes(16)),
             "customer_id" => $this->customer,
             "charge_id" => "ch_" . bin2hex(random_bytes(16)),
@@ -155,6 +163,8 @@ class SubscriptionTest extends TestCase
         $this->subscription = new Subscription();
         $requestPost = [
             "uuid" => Uuid::uuid4(),
+            "subscription_type" => "premium",
+            "price_value" => 100.55,
             "subscription_id" => "sub_" . bin2hex(random_bytes(16)),
             "customer_id" => $this->customer,
             "charge_id" => "test_" . bin2hex(random_bytes(16)),
@@ -226,6 +236,8 @@ class SubscriptionTest extends TestCase
 
         $requestPost = [
             "uuid" => Uuid::uuid4(),
+            "price_value" => 100.55,
+            "subscription_type" => "premium",
             "subscription_id" => "sub_" . bin2hex(random_bytes(16)),
             "customer_id" => $this->customer,
             "charge_id" => "ch_" . bin2hex(random_bytes(16)),
@@ -293,6 +305,8 @@ class SubscriptionTest extends TestCase
 
         $requestPost = [
             "uuid" => Uuid::uuid4(),
+            "price_value" => 100.55,
+            "subscription_type" => "premium",
             "subscription_id" => "sub_123456",
             "customer_id" => $this->customer,
             "charge_id" => "ch_" . bin2hex(random_bytes(16)),
@@ -347,6 +361,8 @@ class SubscriptionTest extends TestCase
         $this->subscription = new Subscription();
         $requestPost = [
             "uuid" => Uuid::uuid4(),
+            "price_value" => 100.55,
+            "subscription_type" => "premium",
             "subscription_id" => "sub_" . bin2hex(random_bytes(16)),
             "customer_id" => $this->customer,
             "charge_id" => "ch_" . bin2hex(random_bytes(16)),
@@ -386,5 +402,184 @@ class SubscriptionTest extends TestCase
         
         $this->assertJsonStringEqualsJsonString(json_encode(["error" => "assinatura não encontrada"]),
         $this->subscription->message->json());
+    }
+
+    public function testFindSubscriptionByChargeId()
+    {
+        $this->customer = new Customer();
+        $customerUuid = Uuid::uuid4();
+        $chargeId = "ch_" . bin2hex(random_bytes(16));
+
+        $requestPost = [
+            "uuid" => $customerUuid,
+            "customer_name" => "Sarah Luzia Stefany Gomes",
+            "customer_document" => "194.626.014-00",
+            "birth_date" => "2005-01-25",
+            "customer_gender" => "0",
+            "customer_email" => "sarah.luzia.gomes@lumavalee.com.br",
+            "customer_zipcode" => "52191-261",
+            "customer_address" => "Rua Juarina",
+            "customer_number" => 624,
+            "customer_neighborhood" => "Nova Descoberta",
+            "customer_city" => "Recife",
+            "customer_state" => "PE",
+            "customer_phone" => "(81) 3799-9446",
+            "cell_phone" => "(81) 99548-0856",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0,
+        ];
+
+        $this->customer->persistData($requestPost);
+        $this->subscription = new Subscription();
+
+        $requestPost = [
+            "uuid" => Uuid::uuid4(),
+            "price_value" => 100.55,
+            "subscription_type" => "premium",
+            "subscription_id" => "sub_" . bin2hex(random_bytes(16)),
+            "customer_id" => $this->customer,
+            "charge_id" => $chargeId,
+            "product_description" => "sistema_contabil R$ 69,90 1x",
+            "period_end" => date("Y-m-d", strtotime("+30 days", strtotime(date("Y-m-d")))),
+            "period_start" => date("Y-m-d"),
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "status" => "active"
+        ];
+
+        $this->subscription->persistData($requestPost);
+        $this->subscription = new Subscription();
+
+        $this->subscription->charge_id = $chargeId;
+        $responseData = $this->subscription->findSubscriptionByChargeId(["id"]);
+
+        $this->assertNotEmpty($responseData);
+        $this->customer = new Customer();
+        $this->customer->setUuid($customerUuid);
+        $this->customer->dropCustomerByUuid();
+    }
+
+    public function testUpdateSubscriptionByChargeId()
+    {
+        $this->customer = new Customer();
+        $customerUuid = Uuid::uuid4();
+        $chargeId = "ch_" . bin2hex(random_bytes(16));
+
+        $requestPost = [
+            "uuid" => $customerUuid,
+            "customer_name" => "Sarah Luzia Stefany Gomes",
+            "customer_document" => "194.626.014-00",
+            "birth_date" => "2005-01-25",
+            "customer_gender" => "0",
+            "customer_email" => "sarah.luzia.gomes@lumavalee.com.br",
+            "customer_zipcode" => "52191-261",
+            "customer_address" => "Rua Juarina",
+            "customer_number" => 624,
+            "customer_neighborhood" => "Nova Descoberta",
+            "customer_city" => "Recife",
+            "customer_state" => "PE",
+            "customer_phone" => "(81) 3799-9446",
+            "cell_phone" => "(81) 99548-0856",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0,
+        ];
+
+        $this->customer->persistData($requestPost);
+        $this->subscription = new Subscription();
+
+        $requestPost = [
+            "uuid" => Uuid::uuid4(),
+            "price_value" => 100.55,
+            "subscription_type" => "premium",
+            "subscription_id" => "sub_" . bin2hex(random_bytes(16)),
+            "customer_id" => $this->customer,
+            "charge_id" => $chargeId,
+            "product_description" => "sistema_contabil R$ 69,90 1x",
+            "period_end" => date("Y-m-d", strtotime("+30 days", strtotime(date("Y-m-d")))),
+            "period_start" => date("Y-m-d"),
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "status" => "active"
+        ];
+
+        $this->subscription->persistData($requestPost);
+        $this->subscription = new Subscription();
+        $this->subscription->updateSubscriptionByChargeId([
+            'charge_id' => $chargeId,
+            "product_description" => "sistema_financeiro R$ 69,90 1x",
+        ]);
+
+        $this->subscription = new Subscription();
+        $this->subscription->charge_id = $chargeId;
+        $responseData = $this->subscription->findSubscriptionByChargeId(["product_description"]);
+        $this->assertEquals("sistema_financeiro R$ 69,90 1x", $responseData->product_description);
+
+        $this->customer = new Customer();
+        $this->customer->setUuid($customerUuid);
+        $this->customer->dropCustomerByUuid();
+    }
+
+    public function testFindAllSubscriptiosByCustomerId()
+    {
+        $this->customer = new Customer();
+        $customerUuid = Uuid::uuid4();
+        $chargeId = "ch_" . bin2hex(random_bytes(16));
+
+        $requestPost = [
+            "uuid" => $customerUuid,
+            "customer_name" => "Sarah Luzia Stefany Gomes",
+            "customer_document" => "194.626.014-00",
+            "birth_date" => "2005-01-25",
+            "customer_gender" => "0",
+            "customer_email" => "sarah.luzia.gomes@lumavalee.com.br",
+            "customer_zipcode" => "52191-261",
+            "customer_address" => "Rua Juarina",
+            "customer_number" => 624,
+            "customer_neighborhood" => "Nova Descoberta",
+            "customer_city" => "Recife",
+            "customer_state" => "PE",
+            "customer_phone" => "(81) 3799-9446",
+            "cell_phone" => "(81) 99548-0856",
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "deleted" => 0,
+        ];
+
+        $this->customer->persistData($requestPost);
+        $this->customer->setUuid($customerUuid);
+        $customerData = $this->customer->findCustomerByUuid(["id"]);
+
+        $this->subscription = new Subscription();
+        $this->subscription->customer_id = $customerData->id;
+        $responseData = $this->subscription->findAllSubscriptiosByCustomerId(["id"]);
+        $this->assertEquals([], $responseData);
+
+        $this->subscription = new Subscription();
+        $requestPost = [
+            "uuid" => Uuid::uuid4(),
+            "price_value" => 100.55,
+            "subscription_type" => "premium",
+            "subscription_id" => "sub_" . bin2hex(random_bytes(16)),
+            "customer_id" => $this->customer,
+            "charge_id" => $chargeId,
+            "product_description" => "sistema_contabil R$ 69,90 1x",
+            "period_end" => date("Y-m-d", strtotime("+30 days", strtotime(date("Y-m-d")))),
+            "period_start" => date("Y-m-d"),
+            "created_at" => date("Y-m-d"),
+            "updated_at" => date("Y-m-d"),
+            "status" => "active"
+        ];
+
+        $this->subscription->persistData($requestPost);
+        $this->subscription = new Subscription();
+        $this->subscription->customer_id = $customerData->id;
+        $responseData = $this->subscription->findAllSubscriptiosByCustomerId(["id"]);
+        $this->assertIsArray($responseData);
+
+        $this->customer = new Customer();
+        $this->customer->setUuid($customerUuid);
+        $this->customer->dropCustomerByUuid();
     }
 }
