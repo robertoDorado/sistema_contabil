@@ -19,7 +19,9 @@
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
         <a href="<?= url("/admin") ?>" class="brand-link text-center">
-            <span class="brand-text font-weight-light">Sistema Financeiro</span><br />
+            <span class="brand-text font-weight-light">
+                <img class="img-circle" src="<?= theme("assets/img/laborcode-logo.png") ?>" alt="logo">
+            </span><br />
             <?php if (empty(session()->user->user_type)) : ?>
                 <?php if (!empty(session()->user->subscription) && session()->user->subscription == "active") : ?>
                     <span class="right badge badge-danger">
