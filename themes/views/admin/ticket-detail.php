@@ -63,6 +63,13 @@
                                     </div>
                                 </div>
                             </div>
+                            <?php if (!empty($supportTicketsData->content_attachment)) : ?>
+                                <div class="mb-3">
+                                    <div id="file" class="file-container">
+                                        <img class="ticket-image" src="<?= url("/tickets/{$supportTicketsData->content_attachment}") ?>" alt="<?= $supportTicketsData->content_attachment ?>">
+                                    </div>
+                                </div>
+                            <?php endif ?>
                             <div class="card-footer">
                                 <button type="submit" id="launchBtn" class="btn btn-primary">Atualizar</button>
                             </div>

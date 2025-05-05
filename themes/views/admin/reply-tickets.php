@@ -42,7 +42,7 @@
                                     </select>
                                 </div>
                                 <div class="mb-3">
-                                    <div id="file">
+                                    <div id="file" class="file-container">
                                         <img class="ticket-image" src="<?= url("/tickets/{$supportTicketsData->content_attachment}") ?>" alt="<?= $supportTicketsData->content_attachment ?>">
                                     </div>
                                 </div>

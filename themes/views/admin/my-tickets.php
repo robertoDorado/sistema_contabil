@@ -52,7 +52,7 @@
                                         <?php if (!empty($supportTicketsData)) : ?>
                                             <?php foreach ($supportTicketsData as $supportTickets): ?>
                                                 <tr>
-                                                    <td><?= $supportTickets->getUuid() ?></td>
+                                                    <td><?= $supportTickets->uuid_ticket ?></td>
                                                     <td><?= $supportTickets->user_full_name ?></td>
                                                     <td><?= $supportTickets->content_message_tickets ?></td>
                                                     <td style="text-align:center"><?= !empty($supportTickets->content_attachment_tickets) ? '<i class="fas fa-paperclip"></i>' : "Não possui anexo" ?></td>

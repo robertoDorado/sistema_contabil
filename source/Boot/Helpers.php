@@ -1,5 +1,39 @@
 <?php
 
+function uploadFileData(array $requestFiles): void
+{
+    if (empty($requestFiles["error"])) {
+        $maxFileSize = 1 * 1024 * 1024;
+        $fileSize = $requestFiles['size'];
+
+        if ($fileSize > $maxFileSize) {
+            http_response_code(400);
+            echo json_encode(["error" => "arquivo inválido, tamanho máximo permitido é de 1MB."]);
+            die;
+        }
+
+        $filePath = dirname(dirname(__DIR__)) . "/tickets";
+        if (!is_dir($filePath)) {
+            mkdir($filePath, 0777, true);
+        }
+
+        $fileDestination = $filePath . "/" . basename($requestFiles["name"]);
+        $verifyImage = getimagesize($requestFiles["tmp_name"]);
+
+        if (!$verifyImage) {
+            http_response_code(400);
+            echo json_encode(["error" => "arquivo inválido"]);
+            die;
+        }
+
+        if (!move_uploaded_file($requestFiles["tmp_name"], $fileDestination)) {
+            http_response_code(400);
+            echo json_encode(["error" => "erro no upload do arquivo"]);
+            die;
+        }
+    }
+}
+
 function checkSubscriptionType()
 {
     return [
@@ -26,7 +60,7 @@ function validateSubscriptionQueryString($callbackAction)
 
     $validKeys = ["free_days", "period", "value"];
     $validateQueryStringKeys = array_values(array_flip($queryStringParsed));
-    $validateQueryStringKeys = array_values(array_filter($validateQueryStringKeys, function($item) use ($validKeys) {
+    $validateQueryStringKeys = array_values(array_filter($validateQueryStringKeys, function ($item) use ($validKeys) {
         return in_array($item, $validKeys);
     }));
 
@@ -62,7 +96,7 @@ function validateSubscriptionQueryString($callbackAction)
     if ($queryStringParsed['period'] === 'month' && $subscriptionValue < $defaultSubscriptionValue) {
         $callbackAction();
     }
-    
+
     if ($queryStringParsed['free_days'] > 7) {
         $callbackAction();
     }

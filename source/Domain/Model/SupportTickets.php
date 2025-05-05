@@ -77,7 +77,7 @@ class SupportTickets
             $data["columns_user"],
             "id_user",
             CONF_DB_NAME . ".support_tickets"
-        )->fetch(true);
+        )->order(CONF_DB_NAME . ".support_tickets.id", true)->fetch(true);
 
         if (empty($response)) {
             return [];
@@ -148,11 +148,11 @@ class SupportTickets
             );
         }
 
-        if (empty($response->fetch(true))) {
+        if (empty($response->order(CONF_DB_NAME . ".support_tickets.id", true)->fetch(true))) {
             return [];
         }
 
-        return $response->fetch(true);
+        return $response->order(CONF_DB_NAME . ".support_tickets.id", true)->fetch(true);
     }
 
     public function getId(): int

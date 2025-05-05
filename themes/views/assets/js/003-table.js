@@ -1846,7 +1846,8 @@ const supportDashboardTable = dataTableConfig($("#supportDashboardTable"),
             "url": urlJson
         },
         "responsive": true,
-        "autoWidth": false
+        "autoWidth": false,
+        "ordering": false
     })
 const myTicketsReport = dataTableConfig($("#myTicketsReport"),
     {
@@ -1860,7 +1861,8 @@ const myTicketsReport = dataTableConfig($("#myTicketsReport"),
             "url": urlJson
         },
         "responsive": true,
-        "autoWidth": false
+        "autoWidth": false,
+        "ordering": false
     })
 const taxRegimeReport = dataTableConfig($("#taxRegimeReport"),
     {
