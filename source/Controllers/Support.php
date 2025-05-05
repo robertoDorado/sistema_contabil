@@ -48,7 +48,7 @@ class Support extends Controller
 
         echo $this->view->render("admin/see-reply", [
             "userFullName" => showUserFullName(),
-            "endpoints" => [],
+            "endpoints" => ['/admin/support/my-tickets'],
             "supportResponseData" => $supportResponseData
         ]);
     }
@@ -97,28 +97,7 @@ class Support extends Controller
                 die;
             }
 
-            if (empty($requestFiles["error"])) {
-                $filePath = dirname(dirname(__DIR__)) . "/tickets";
-                if (!is_dir($filePath)) {
-                    mkdir($filePath, 0777, true);
-                }
-
-                $fileDestination = $filePath . "/" . basename($requestFiles["name"]);
-                $verifyImage = getimagesize($requestFiles["tmp_name"]);
-
-                if (!$verifyImage) {
-                    http_response_code(400);
-                    echo json_encode(["error" => "arquivo inválido"]);
-                    die;
-                }
-
-                if (!move_uploaded_file($requestFiles["tmp_name"], $fileDestination)) {
-                    http_response_code(400);
-                    echo json_encode(["error" => "erro no upload do arquivo"]);
-                    die;
-                }
-            }
-
+            uploadFileData($requestFiles);
             $supportTickets = new SupportTickets();
             $response = $supportTickets->updateData([
                 "uuid" => $supportTicketsData->getUuid(),
@@ -188,7 +167,7 @@ class Support extends Controller
 
         echo $this->view->render("admin/reply-tickets", [
             "userFullName" => showUserFullName(),
-            "endpoints" => [],
+            "endpoints" => ["/admin/support/dashboard"],
             "supportTicketsData" => $supportTicketsData
         ]);
     }
@@ -235,28 +214,7 @@ class Support extends Controller
                 die;
             }
 
-            if (empty($requestFiles["error"])) {
-                $filePath = dirname(dirname(__DIR__)) . "/tickets";
-                if (!is_dir($filePath)) {
-                    mkdir($filePath, 0777, true);
-                }
-
-                $fileDestination = $filePath . "/" . basename($requestFiles["name"]);
-                $verifyImage = getimagesize($requestFiles["tmp_name"]);
-
-                if (!$verifyImage) {
-                    http_response_code(400);
-                    echo json_encode(["error" => "arquivo inválido"]);
-                    die;
-                }
-
-                if (!move_uploaded_file($requestFiles["tmp_name"], $fileDestination)) {
-                    http_response_code(400);
-                    echo json_encode(["error" => "erro no upload do arquivo"]);
-                    die;
-                }
-            }
-
+            uploadFileData($requestFiles);
             $supportTickets = new SupportTickets();
             $response = $supportTickets->updateData([
                 "uuid" => $requestPost["uuid"],
@@ -302,7 +260,7 @@ class Support extends Controller
 
         echo $this->view->render("admin/ticket-detail", [
             "userFullName" => showUserFullName(),
-            "endpoints" => [],
+            "endpoints" => ['/admin/support/my-tickets'],
             "userSupportData" => $userSupportData,
             "supportTicketsData" => $supportTicketsData
         ]);
@@ -411,28 +369,7 @@ class Support extends Controller
                 die;
             }
 
-            if (empty($requestFiles["error"])) {
-                $filePath = dirname(dirname(__DIR__)) . "/tickets";
-                if (!is_dir($filePath)) {
-                    mkdir($filePath, 0777, true);
-                }
-
-                $fileDestination = $filePath . "/" . basename($requestFiles["name"]);
-                $verifyImage = getimagesize($requestFiles["tmp_name"]);
-
-                if (!$verifyImage) {
-                    http_response_code(400);
-                    echo json_encode(["error" => "arquivo inválido"]);
-                    die;
-                }
-
-                if (!move_uploaded_file($requestFiles["tmp_name"], $fileDestination)) {
-                    http_response_code(400);
-                    echo json_encode(["error" => "erro no upload do arquivo"]);
-                    die;
-                }
-            }
-
+            uploadFileData($requestFiles);
             $supportTickets = new SupportTickets();
             $response = $supportTickets->persistData([
                 "uuid" => Uuid::uuid4(),
@@ -471,7 +408,8 @@ class Support extends Controller
         $responseInitializeUserAndCompany = initializeUserAndCompanyId();
         $supportTickets = new SupportTickets();
         $supportTicketsData = $supportTickets->findSupportTicketsBySupportUserIdJoinUser([
-            "columns_ticketes" => [
+            "columns_tickets" => [
+                "id",
                 "uuid",
                 "content_message",
                 "content_attachment",

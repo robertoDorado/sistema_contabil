@@ -41,7 +41,7 @@
                                     <div id="ticketData"><?= !empty($supportResponseData->content_message) ? $supportResponseData->content_message : "" ?></div>
                                 </div>
                                 <div class="mb-3">
-                                    <div id="file">
+                                    <div id="file" class="file-container">
                                         <img class="ticket-image" src="<?= url("/tickets/{$supportResponseData->content_attachment}") ?>" alt="<?= $supportResponseData->content_attachment ?>">
                                     </div>
                                 </div>
