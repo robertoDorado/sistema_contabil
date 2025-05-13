@@ -104,7 +104,11 @@ function validateSubscriptionQueryString($callbackAction)
 
 function allowUsersEmail()
 {
-    return ['robertodorado7@gmail.com', 'almeida_consultor@outlook.com'];
+    return [
+        'robertodorado7@gmail.com', 
+        'almeida_consultor@outlook.com',
+        'teste@email.com'
+    ];
 }
 
 function formaStripetTextFreeTrial()
