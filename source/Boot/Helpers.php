@@ -106,7 +106,6 @@ function allowUsersEmail()
 {
     return [
         'robertodorado7@gmail.com', 
-        'almeida_consultor@outlook.com',
         'teste@email.com'
     ];
 }
